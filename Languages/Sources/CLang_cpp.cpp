@@ -520,6 +520,18 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 							break;
 						}
 					}
+					// on "else" or "elif" and nest count 1, fall back to normal
+					// parsing:
+					else if (ifZeroCounter == 1
+						&& (strings_equal(text + s, "else", len, 4)
+							|| strings_equal(text + s, "elif", len, 4)))
+					{
+						i = end + 1;
+						ifZeroCounter == 0;
+						state = START;
+						leave = true;
+						break;
+					}
 				}
 				// we need to check for C style comments
 				int commentOffset;
