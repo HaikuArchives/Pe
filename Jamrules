@@ -41,6 +41,6 @@ rule MakeDistro
 
 actions MakeDistro
 {
-	echo "making distro" ;
+	ln -sf /boot/home/config/bin/ generated/distro/\(drag\ lpe\ here\ to\ install\) ;
 }
 
