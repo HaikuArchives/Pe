@@ -14,7 +14,7 @@ if $(OSPLAT) = X86 {
 	SubDirSysHdrs $(TOP) regex ;
 }
 
-Library libhekkel 
+Library libhekkel.a
 	:  HAppResFile.cpp
 		HBox.cpp
 		HButtonBar.cpp
