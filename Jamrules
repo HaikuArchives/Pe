@@ -59,7 +59,6 @@ actions Make1
 {
 	cd $(2) ;
 	make ;
-	touch $(1) ;
 }
 
 rule UserObject
