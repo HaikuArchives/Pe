@@ -94,7 +94,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 {
 	const char *text = proxy.Text();
 	int size = proxy.Size();
-	int i = 0, s = 0, kws, cc_cnt, esc = 0;
+	int i = 0, s = 0, kws = 0, cc_cnt = 0, esc = 0;
 	char c;
 	bool leave = false;
 	// floating point flag, true when the NUMERIC: label finds a . inside a number, and checks to make sure that a number with two '.' is invalid. (and not highlighted as numeric)

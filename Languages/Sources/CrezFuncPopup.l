@@ -50,8 +50,6 @@ static bool inString;
 
 static void GetNextChar(char *tok, int& result, int max);
 static void AddResource(CLanguageProxy& proxy);
-static void AddPrototype(CLanguageProxy& proxy);
-static void AddType(CLanguageProxy& proxy);
 static void AddResType(CLanguageProxy& proxy);
 static void AddMarker(CLanguageProxy& proxy);
 static void AddInclude(CLanguageProxy& proxy, char openingquote, char closingquote);
@@ -65,7 +63,7 @@ ident		[a-zA-Z_][a-zA-Z0-9_]*{ws}
 %x CC
 
 %%
-												int BLOCKlevel = 0, CC_caller, STR_caller, CC_cnt;
+												int BLOCKlevel = 0, CC_caller = 0, STR_caller = 0, CC_cnt = 0;
 \#{ws}include{ws}\<[^\n>]+\>		AddInclude(proxy, '<', '>');
 \#{ws}include{ws}\"[^\n"]+\"		AddInclude(proxy, '"', '"');
 \#{ws}pragma\ mark\ -\n				proxy.AddSeparator();
@@ -80,7 +78,6 @@ resource{ws}\'[^\']{4}\'				AddResource(proxy);
 <BLOCK>\}								BLOCKlevel--; if (BLOCKlevel == 0) BEGIN(INITIAL);
 <BLOCK>\'									CC_caller = BLOCK; BEGIN(CC);
 <BLOCK>\"								STR_caller = BLOCK; BEGIN(STR); inString = true;
-<BLOCK>[^'"{}\n]+
 <BLOCK>.
 <STR>\"								BEGIN(STR_caller); inString = false;
 <STR>[^\\\n\"]+

@@ -66,7 +66,7 @@ proc		PROCEDURE{ws}(\(("VAR"{ws})?{ident}\:{ws}{ident}\){ws})?
 %x import
 
 %%
-																int string_caller, nesting = 0;
+																int string_caller = 0, nesting = 0;
 {proc}\*?{ident}(\*{ws})?{params}?				AddFunction(proxy, nesting); nesting++;
 {proc}^{ident}(\*{ws})?{params}?					AddPrototype(proxy);
 "BEGIN"														BEGIN(block);
@@ -78,7 +78,6 @@ proc		PROCEDURE{ws}(\(("VAR"{ws})?{ident}\:{ws}{ident}\){ws})?
 <block>{ident}
 <block>.
 <string>\"													BEGIN(string_caller); inString = false;
-<string>[^\n\"]+
 <string>.
 <import>{ident}/":="
 <import>[a-zA-Z][a-zA-Z0-9]*						AddInclude(proxy);

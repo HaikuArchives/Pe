@@ -70,7 +70,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 {
 	const char *text = proxy.Text();
 	int size = proxy.Size();
-	int i = 0, s = 0, kws, cc_cnt, esc = 0;
+	int i = 0, s = 0, kws = 0;
 	char c;
 	bool leave = false;
 	

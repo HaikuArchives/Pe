@@ -50,10 +50,8 @@ static bool inString;
 
 static void GetNextChar(char *tok, int& result, int max);
 static void AddFunction(CLanguageProxy& proxy);
-static void AddPrototype(CLanguageProxy& proxy);
 static void AddInclude(CLanguageProxy& proxy);
 static void AddInclude2(CLanguageProxy& proxy);
-static void EnterNewClass();
 %}
 
 ws			[ \n\t]*

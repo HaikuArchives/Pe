@@ -53,7 +53,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 	const char *text = proxy.Text();
 	int size = proxy.Size();
 	char c;
-	int i = 0, bo = 0, s = 0, kws;
+	int i = 0, s = 0, kws = 0;
 	bool leave = false;
 	
 	proxy.SetColor(0, kLTextColor);

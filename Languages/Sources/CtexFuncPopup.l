@@ -40,7 +40,6 @@
 static const char *gBuf = NULL;
 static int gIndx;
 static int gBufSize;
-static int gHighestLevel;
 
 #undef YY_DECL
 #define YY_DECL	static int yylex(CLanguageProxy& proxy)
@@ -105,8 +104,8 @@ void GetNextChar(char *tok, int& result, int)
 static void Add(int level, CLanguageProxy& proxy, int hasOptional)
 {
 	char *s, *f, *select;
-	int i, nesting, argLength;
-	char c;
+	int i, nesting, argLength = 0;
+	char c = 0;
 	char braceOpen,braceClose;
 
 /*	This is a bit of a kludge.  More text from the flex regexp is acquired

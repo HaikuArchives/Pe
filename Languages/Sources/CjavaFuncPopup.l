@@ -69,7 +69,7 @@ throws		throws{ws}{ident}({ws},{ws}{ident})*{ws}
 %x pragma
 
 %%
-												int blocklevel = 0, cc_caller, string_caller, cc_cnt;
+												int blocklevel = 0, cc_caller = 0, string_caller = 0, cc_cnt = 0;
 class{ws}{ident}+\{								EnterNewClass(); BEGIN(class);
 <class>{ident}{params}/{throws}?\{				AddFunction(proxy);
 <class>{ident}{params}/{throws}?;				AddPrototype(proxy);

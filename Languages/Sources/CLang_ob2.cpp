@@ -94,7 +94,7 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 
 	if (C - c < a - A)
 	{
-		char c = txt[C - 1], m;
+		char c = txt[C - 1], m = 0;
 
 		switch (c)
 		{
@@ -126,7 +126,7 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 	}
 	else
 	{
-		char c = txt[A + 1], m;
+		char c = txt[A + 1], m = 0;
 
 		switch (c)
 		{
@@ -170,7 +170,7 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 {
 	const char *text = proxy.Text();
 	int size = proxy.Size();
-	int i = 0, s = 0, kws, esc = 0;
+	int i = 0, s = 0, kws = 0, esc = 0;
 	char c;
 	bool leave = false;
 	

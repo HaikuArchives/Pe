@@ -50,9 +50,7 @@ static bool inString;
 
 static void GetNextChar(char *tok, int& result, int max);
 static void AddFunction(CLanguageProxy& proxy);
-static void AddPrototype(CLanguageProxy& proxy);
 static void AddInclude(CLanguageProxy& proxy, char openingquote, char closingquote);
-static void EnterNewClass();
 %}
 
 ws			[ \n\t]*
@@ -62,7 +60,7 @@ ident		[a-zA-Z_][a-zA-Z0-9_]*{ws}
 %x string
 
 %%
-												int blocklevel = 0, cc_caller, string_caller;
+												int blocklevel = 0, string_caller = 0;
 "#"[^\n]*\n
 "require"{ws}\"[^"]+\";				AddInclude(proxy, '"', '"');
 "sub"[ \n\t]+[^{]+\{						AddFunction(proxy); BEGIN(block); blocklevel = 1;
@@ -70,7 +68,6 @@ ident		[a-zA-Z_][a-zA-Z0-9_]*{ws}
 <block>\{									blocklevel++;
 <block>\}									blocklevel--; if (blocklevel == 0) BEGIN(INITIAL);
 <block>\"									string_caller = block; BEGIN(string); inString = true;
-<block>[^"{}\n]+
 <block>.
 <string>\"									BEGIN(string_caller); inString = false;
 <string>[^\\\n\"]+
