@@ -2066,7 +2066,7 @@ class CSortMenuInfo
 
 struct MenuFunctionScanHandler : public CFunctionScanHandler {
 	void AddFunction(const char *name, const char *match, int offset,
-		bool italic, uint32 nestLevel)
+		bool italic, uint32 nestLevel, const char *params)
 	{
 		BMessage *msg = new BMessage(msg_JumpToProcedure);
 		msg->AddInt32("offset", offset);

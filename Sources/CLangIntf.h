@@ -123,7 +123,7 @@ public:
 virtual	~CFunctionScanHandler();
 
 virtual	void AddFunction(const char *name, const char *match, int offset, 
-	bool italic, uint32 nestLevel);
+	bool italic, uint32 nestLevel, const char *params);
 virtual	void AddInclude(const char *name, const char *open, bool italic);
 virtual	void AddSeparator();
 };

@@ -55,6 +55,7 @@ const char *skip(const char *text, char ch);
 const char *skip_ne(const char *text, char ch);
 void pragma(const char *&text, int offset, CLanguageProxy& proxy);
 const char *preprocessor(const char *text, CLanguageProxy& proxy);
+const char *params(const char *text, char *&name, int& size);
 const char *ident(const char *text, CLanguageProxy& proxy);
 const char *i_extern(const char *text);
 void parse(const char *text);
@@ -307,11 +308,79 @@ const char *i_extern(const char *text)
 	return text;
 } /* i_extern */
 
+const char *params(const char *text, char *&name, int& size)
+{
+	int c;
+	
+	while (true)
+	{
+		text = comment(text);
+
+		c = *text;
+		
+		if (c == '\'') 
+		{
+			text = skip(text+1, '\'');
+			continue;
+		}
+		
+		if (c == '"') 
+		{
+			text = skip(text+1, '"');
+			continue;
+		}
+		
+		if (c == '#') 
+		{
+			text = skip(text+1, '\n');
+			continue;
+		}
+		
+		if (c == '(')
+		{
+			text = parens(text+1, '(');
+			continue;
+		}
+		
+		if (c == ')')
+			return text+1;
+		
+		if (c == '\0')
+			return text;
+			
+		if (isidentf(c))
+		{ // fetch one param-spec:
+			while(*text != ')' && *text != ',' && *text != '=')
+				name_append(text, name, size);
+			while(isspace(*name) && size>0) {
+				name--;
+				size--;
+			}
+			if (*text == '=') {
+				while(*text != ')' && *text != ',') {
+					if (*text == '(')
+						text = parens(text+1, '(');
+					else
+						text++;
+				}
+				text = comment(text);
+			}
+			if (*text == ',') {
+				name_append(text, name, size);
+				*name++ = ' ';
+			}
+			continue;
+		}
+		text++;
+	}
+} /* params */
+
 const char *ident(const char *text, CLanguageProxy& proxy)
 {
 	const char *start = text, *id = start;
 	char nameBuf[kMaxNameSize], *name = nameBuf;
-	int size = 0, offset = start - proxy.Text();
+	char paramBuf[kMaxNameSize*10], *param = paramBuf;
+	int size = 0, paramSize = 0, offset = start - proxy.Text();
 	bool destructor = false;
 	
 	while (isident(*text))
@@ -529,23 +598,24 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 		strncpy(match, start, l);
 		match[l] = 0;
 		
-		text = parens(text + 1, '(');
+		text = params(text + 1, param, paramSize);
+		*param = 0;
 		text = comment(text);
 		
 		if (*text == ':')
-		{
+		{	// [zooey]: what does this do? please explain!
 			while (*text != '{' && *text != ';')
 				text++;
 			if (*text == '{')
 			{
 				text = parens(text + 1, '{');
-				proxy.AddFunction(nameBuf, match, offset, false);
+				proxy.AddFunction(nameBuf, match, offset, false, paramBuf);
 			}
 			else
 			{
 				text++;
 				if (proxy.Prototypes())
-					proxy.AddFunction(nameBuf, match, offset, true);
+					proxy.AddFunction(nameBuf, match, offset, true, paramBuf);
 			}
 			if (*text == '\n')
 				text++;
@@ -555,13 +625,13 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 		if (*text == ';')
 		{
 			if (proxy.Prototypes())
-				proxy.AddFunction(nameBuf, match, offset, true);
+				proxy.AddFunction(nameBuf, match, offset, true, paramBuf);
 			return text + 1;
 		}
 		
 		if (isidentf(*text) || *text == '{')
 		{
-			proxy.AddFunction(nameBuf, match, offset, false);
+			proxy.AddFunction(nameBuf, match, offset, false, paramBuf);
 			text = skip_ne(text, '{');
 			text = parens(text, '{');
 			if (*text == '\n')

@@ -631,7 +631,7 @@ CFunctionScanHandler::~CFunctionScanHandler()
 } // CFunctionScanHandler::~CFunctionScanHandler()
 
 void CFunctionScanHandler::AddFunction(const char *name, const char *match,
-	int offset, bool italic, uint32 nestLevel)
+	int offset, bool italic, uint32 nestLevel, const char *params)
 {
 } // CFunctionScanHandler::AddFunction
 

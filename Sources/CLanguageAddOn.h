@@ -128,7 +128,8 @@ virtual	void SetColor(int start, int color);
 	text. This value may be incorrect but should be 'near by', preferrably before.
 	The open parameter is of course the name of the include file.
 */		
-virtual	void AddFunction(const char *name, const char *match, int offset, bool italic = false);
+virtual	void AddFunction(const char *name, const char *match, int offset, 
+	bool italic = false, const char *params = "");
 virtual	void AddInclude(const char *name, const char *open, bool italic = false);
 virtual	void AddSeparator();
 

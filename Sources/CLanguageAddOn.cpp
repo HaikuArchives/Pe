@@ -122,10 +122,11 @@ void CLanguageProxy::SetColor(int start, int color)
 	}
 } /* CLanguageProxy::SetColor */
 
-void CLanguageProxy::AddFunction(const char *name, const char *match, int offset, bool italic)
+void CLanguageProxy::AddFunction(const char *name, const char *match, 
+	int offset, bool italic, const char *params)
 {
 	FailNilMsg(fFunctionScanHandler, "Not a valid call in this context");
-	fFunctionScanHandler->AddFunction(name, match, offset, italic, fNestLevel);
+	fFunctionScanHandler->AddFunction(name, match, offset, italic, fNestLevel, params);
 } /* CLanguageProxy::AddFunction */
 
 void CLanguageProxy::AddInclude(const char *name, const char *open, bool italic)
