@@ -85,28 +85,50 @@ void OpenInPe(entry_ref& doc)
 	if (be_roster->FindApp("application/x-vnd.beunited.pe", &pe))
 		DoError("Could not find Pe!");
 	
+	status_t err;
 	if (! be_roster->IsRunning(&pe))
 	{
-		status_t err;
-		err = be_roster->Launch(&pe);
+		team_id team;
+		err = be_roster->Launch(&pe, &msg, &team);
 		if (err) DoError("Error launching Pe (%s)", strerror(err));
-	}
-		
-	BMessenger msr(NULL, be_roster->TeamFor(&pe));
-	msr.SendMessage(&msg, &reply);
-
-	if (reply.HasInt32("thread"))
+		// now wait for the requested edit-window to come up (filter out standard
+		// windows):
+		bool foundThread = false;
+		while(!foundThread)
+		{
+			int32 cookie = 0;
+			thread_info tinfo;
+			while((err = get_next_thread_info(team, &cookie, &tinfo)) == B_OK)
+			{
+				if (!strncmp("w>", tinfo.name, 2) 
+				&& strcmp("w>pe: Open", tinfo.name)
+				&& strcmp("w>/boot/home/config/settings/pe", tinfo.name))
+				{
+					threads.push_back(tinfo.thread);
+					foundThread = true;
+					break;
+				}
+			}
+			snooze(100*1000);
+		}
+	} 
+	else 
 	{
-		thread_id tid;
-		status_t err;
+		BMessenger msr(NULL, be_roster->TeamFor(&pe));
+		msr.SendMessage(&msg, &reply);
+
+		if (reply.HasInt32("thread"))
+		{
+			thread_id tid;
+			err = reply.FindInt32("thread", (long *)&tid);
+			if (err) DoError("Error getting thread id (%s)", strerror(err));
 		
-		err = reply.FindInt32("thread", (long *)&tid);
-		if (err) DoError("Error getting thread id (%s)", strerror(err));
-		
-		threads.push_back(tid);
+			threads.push_back(tid);
+		}
+		else
+			DoError("No Thread ID in reply");
 	}
-	else
-		DoError("No Thread ID in reply");
+
 } /* OpenInPe */
 
 int main(int argc, char *argv[])
