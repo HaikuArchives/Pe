@@ -813,6 +813,41 @@ void PDoc::OpenSelection()
 		char *s;
 		fText->GetSelectedText(s, true);
 
+		if (!s) {
+			// try to find a filename around the cursor
+			int current = fText->Caret();
+			int front = current;
+			int back = current;
+			int end = fText->Size();
+			const char * text = fText->Text();
+			int selectOnOpenTopLine = -1;
+			int selectOnOpenBottomLine = -1;
+			
+			// push forward until (a) end of file (b) end of line (c) space
+			//                    (d) double quote (e) greater-than sign (f) colon
+			while ((front < end) && (text[front] != '\n') && (text[front] != ' ') 
+					&& (text[front] != '"') && (text[front] != '>')
+					&& (text[front] != ':')) {
+				front++;
+			}
+			if ((front < end) && (text[front] == ':')) {
+				// handle possible line number case
+			}
+			
+			// push back until (a) start of file (b) end of line (c) space
+			//                 (d) double quote (e) less-than sign
+			while ((back > 0) && (text[back] != '\n') && (text[back] != ' ') 
+					&& (text[back] != '"') && (text[back] != '<')) {
+				back--;
+			}
+			
+			if (front > back+1) {
+				// found something, select it
+				fText->Select(back+1,front,true,false);
+				fText->GetSelectedText(s, true);
+			}			
+		}
+		
 		if (s)
 			OpenInclude(s);
 		else
