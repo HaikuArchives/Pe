@@ -150,6 +150,7 @@ virtual	bool isspace_uc(int unicode) const;
 
 virtual	void IncNestLevel();
 virtual	void DecNestLevel();
+virtual	void SetNestLevel(uint32 nestLevel);
 		
 private:
 		const char *fText;

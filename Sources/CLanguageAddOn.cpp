@@ -193,3 +193,7 @@ void CLanguageProxy::DecNestLevel() {
 	if (fNestLevel)
 		fNestLevel--;
 } /* DecNestLevel */
+
+void CLanguageProxy::SetNestLevel(uint32 nestLevel) {
+	fNestLevel = nestLevel;
+} /* SetNestLevel */
