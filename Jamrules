@@ -6,7 +6,7 @@ DEBUG ?= 1 ;
 # DEFINES ?= -DBETA -DDEMO ;
 
 # set up debug flags
-if $(DEBUG) {
+if $(DEBUG) = 1 {
 	ALL_LOCATE_TARGET ?= [ FDirName $(TOP) Obj.Debug ] ;
 	CCFLAGS += -g ;
 	C++FLAGS += -g ;
