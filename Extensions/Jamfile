@@ -1,4 +1,67 @@
-
 SubDir TOP Extensions ;
 
-Make extensions ;
+SubDirHdrs $(TOP) Sources ;
+
+if $(OSPLAT) = PPC {
+	# include regex-subfolder as system header folder
+	SubDirSysHdrs $(TOP) regex ;
+}
+
+PeExtension PrefixLines 
+	: PrefixLines.cpp 
+	: libhekkel.a be $(STDC++LIB) 
+	: prefix.r
+	;
+
+PeExtension BeBookFetch 
+	: BeBookFetch.cpp 
+	: be $(STDC++LIB) 
+	;
+
+PeExtension Copy\ Lines\ Containing 
+	: CopyContaining.cpp 
+	: libhekkel.a $(RX_LIB) be $(STDC++LIB) 
+	: copycon.r
+	;
+
+PeExtension Cut\ Lines\ Containing 
+	: CutContaining.cpp 
+	: libhekkel.a $(RX_LIB) be $(STDC++LIB) 
+	;
+
+PeExtension Pipe
+	: Pipe.cpp 
+	: libhekkel.a be $(STDC++LIB) 
+	: Pipe.dlog.r
+	;
+
+PeExtension HTMLImage
+	: HTMLImage.cpp 
+	: libhekkel.a be $(STDC++LIB) 
+	: HTMLImage.dlog.r
+	;
+
+PeExtension HTMLAnchor
+	: HTMLAnchor.cpp 
+	: libhekkel.a be $(STDC++LIB) 
+	: HTMLAnchor.dlog.r
+	;
+
+PeExtension HTMLUpdate
+	: HTMLUpdate.cpp 
+	: libhekkel.a be $(STDC++LIB) mail 
+	;
+if $(OSPLAT) = X86 {
+	# avoid warning about strftime() with %x:
+	ObjectC++Flags HTMLUpdate.cpp : -Wno-format ;
+}
+
+PeExtension ROT13
+	: ROT13.cpp 
+	: libhekkel.a be $(STDC++LIB) 
+	;
+
+PeExtension drieuxCaps
+	: drieuxCaps.cpp JRandom.cpp 
+	: libhekkel.a be $(STDC++LIB) 
+	;

@@ -2,7 +2,7 @@ SubDir TOP Resources ;
 
 SubDirHdrs $(TOP) Sources ;
 
-Objects
+RezObjects
 	menus.r
 	fonttabs.r
 	find.r

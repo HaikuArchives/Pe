@@ -1,10 +1,15 @@
 SubDir TOP ;
 
+SubInclude TOP rez ;
+if $(OSPLAT) = PPC {
+	# need to build regex-library on PPC, as BeOS doesn't provide one!
+	SubInclude TOP regex ;
+}
 SubInclude TOP Sources ;
 SubInclude TOP Extensions ;
 SubInclude TOP Resources ;
 SubInclude TOP Languages ;
 SubInclude TOP lpe ;
 
-File _APP_ : pe ;
-MakeLocate _APP_ : [ FDirName $(TOP) ] ;
+MakeDistro distro ;
+

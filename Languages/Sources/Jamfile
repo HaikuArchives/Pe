@@ -1,0 +1,101 @@
+
+SubDir TOP Languages Sources ;
+
+SubDirHdrs $(TOP) Sources ;
+
+if $(OSPLAT) = X86 {
+	C++FLAGS += -include [ FDirName $(TOP) Languages Sources CLangIncl.h ] -Wno-unused ;
+} else {
+	C++FLAGS += -prefix CLangIncl.h -w nounusedvar ;
+}
+
+PeLanguage CppExt 
+	: CLang_cpp.cpp CcppPopup.cpp 
+	: be 
+	: keywords.cpp.rsrc 
+	;
+
+PeLanguage PascalExt 
+	: CLang_pas.cpp CpasPopup.cpp 
+	: be 
+	: keywords.pas.rsrc 
+	;
+
+PeLanguage SQLExt 
+	: CLang_sql.cpp 
+	: be 
+	: keywords.sql.rsrc 
+	;
+
+PeLanguage JavaExt 
+	: CLang_java.cpp CjavaFuncPopup.l 
+	: be 
+	: keywords.java.rsrc 
+	;
+
+PeLanguage HtmlExt 
+	: CLang_html.cpp ChtmlPopup.cpp 
+	: be $(STDC++LIB) 
+	: keywords.html.rsrc 
+	;
+
+PeLanguage HtmlJSExt 
+	: CLang_html_2.cpp ChtmlPopup.cpp 
+	: be $(STDC++LIB) 
+	: keywords.html-js.rsrc 
+	;
+
+PeLanguage OberonExt 
+	: CLang_ob2.cpp Cob2FuncPopup.l 
+	: be 
+	: keywords.ob2.rsrc 
+	;
+
+PeLanguage PerlExt 
+	: CLang_perl.cpp CperlFuncPopup.l 
+	: be 
+	: keywords.pl.rsrc 
+	;
+
+PeLanguage PythonExt 
+	: CLang_python.cpp CpythonFuncPopup.l 
+	: be 
+	: keywords.py.rsrc 
+	;
+
+PeLanguage RezExt 
+	: CLang_rez.cpp CrezFuncPopup.l 
+	: be 
+	: keywords.rez.rsrc 
+	;
+
+PeLanguage TexExt 
+	: CLang_tex.cpp CtexFuncPopup.l 
+	: be 
+	: keywords.tex.rsrc 
+	;
+
+PeLanguage MathematicaExt 
+	: CLang_m.cpp CmFuncPopup.l 
+	: be 
+	: keywords.m.rsrc 
+	;
+
+PeLanguage ShellExt 
+	: CLang_shell.cpp 
+	: be 
+	: keywords.sh.rsrc 
+	;
+
+PeLanguage LuaExt 
+	: CLang_lua.cpp CluaPopup.cpp 
+	: be 
+	: keywords.lua.rsrc 
+	;
+
+PeLanguage AsmExt 
+	: CLang_asm.cpp 
+	: be 
+	: keywords.asm.rsrc 
+	;
+

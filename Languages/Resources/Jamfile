@@ -1,0 +1,19 @@
+SubDir TOP Languages Resources ;
+
+RezObjects
+	keywords.asm.r
+	keywords.cpp.r
+	keywords.html.r
+	keywords.html-js.r
+	keywords.java.r
+	keywords.lua.r
+	keywords.m.r
+	keywords.ob2.r
+	keywords.pas.r
+	keywords.pl.r
+	keywords.py.r
+	keywords.rez.r
+	keywords.sh.r
+	keywords.sql.r
+	keywords.tex.r
+	;

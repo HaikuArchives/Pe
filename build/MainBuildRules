@@ -1,0 +1,392 @@
+# MainBuildRules
+#
+# Rules that specify what to build and how to do it.
+
+rule Application
+{
+	# Application <name> : <sources> : <libraries> ;
+	#
+	# Creates an application from sources.
+	#
+	# <name>: Name of the application. Grist is allowed.
+	# <sources>: List of source files. Grist will be set.
+	# <libraries>: List of libraries to link against.
+	#
+	local app = $(1) ;
+	local sources = $(2) ;
+	local libs = $(3) ;
+
+	Main $(app) : $(sources) ;
+	MakeLocate $(app) : $(LOCATE_MAIN_TARGET) ;
+	LinkAgainst $(app) : $(libs) ;
+}
+
+actions Strip
+{
+	strip "$(1)" ;
+}
+
+rule AddOn
+{
+	# AddOn <name> : <sources> : <libraries> ;
+	#
+	# Creates an add-on from sources.
+	#
+	# <name>: Name of the add-on. Grist is allowed.
+	# <sources>: List of source files. Grist will be set.
+	# <libraries>: List of libraries to link against.
+	#
+	SharedLibrary $(1) : $(2) : $(3) ;
+}
+
+rule SharedLibrary
+{
+	# SharedLibrary <name> : <sources> : <libraries> ;
+	#
+	# Creates a shared library from sources.
+	#
+	# <name>: Name of the shared library. Grist is allowed.
+	# <sources>: List of source files. Grist will be set.
+	# <libraries>: List of libraries to link against.
+	#
+	local lib = $(1) ;
+	local sources = $(2) ;
+	local libs = $(3) ;
+
+	Main $(lib) : $(sources) ;
+	MakeLocate $(lib) : $(LOCATE_MAIN_TARGET) ;
+	local linkFlags ;
+	if $(OSPLAT) = X86 {
+		linkFlags = -nostart -Xlinker -soname=\"$(lib)\" ;
+	} else {
+		linkFlags = -xms ;
+	}
+	LINKFLAGS on $(lib) = [ on $(lib) return $(LINKFLAGS) ] $(linkFlags) ;
+	LinkAgainst $(lib) : $(libs) ;
+}
+
+rule StaticLibrary
+{
+	# StaticLibrary <name> : <sources> ;
+	#
+	# Creates a static library from sources.
+	#
+	# <name>: Name of the static library. Grist is allowed.
+	# <source>: List of source files. Grist will be set.
+	#
+	local lib = $(1) ;
+	Library $(lib) : $(2) ;
+	MakeLocate $(lib) : $(LOCATE_MAIN_TARGET) ;
+
+	# If KEEPOBJS is set, Library doesn't make the library depend on `lib'.
+	if $(KEEPOBJS) {
+		Depends lib : $(lib) ;
+	}
+}
+
+rule LinkAgainst
+{
+	# LinkAgainst <name> : <libs> ;
+	#
+	# Adds libraries to the list of libraries a (Main) target shall be linked
+	# against.
+	#
+	# <name>: The name of the target for which to add libraries.
+	# <libs>: The libraries (actually arbitrary shared objects and static
+	#         libraries) to be added. Valid elements are e.g. "be" or
+	#         "libopenbeos.so" or "/boot/.../libfoo.so". If the basename starts
+	#         with "lib" or the thingy has a dirname or grist, it is added to
+	#         the NEEDLIBS variable (i.e. the file will be bound!), otherwise
+	#         it is prefixed "-l" and added to LINKLIBS. If you want to specify
+	#         a target that isn't a library and also has neither grist nor a
+	#         dirname, you can prepend "<nogrist>" as grist; it will be
+	#         stripped by this rule.
+	#
+	for i in $(>)
+	{
+		local isfile = ;
+		if $(i:D) || $(i:G) {
+			isfile = true ;
+			if $(i:G) = <nogrist> {
+				i = $(i:G=) ;
+			}
+		} else {
+			switch $(i:B)
+			{
+				# XXX: _APP_ and _KERNEL_ should not be needed for ELF.
+				case _APP_ : isfile = true ;
+				case _KERNEL_ : isfile = true ;
+				case lib*	: isfile = true ;
+				case *	: isfile = ;
+			}
+			if ! $(isfile) && ( $(i:S) = .so || $(i:S) = .a ) {
+				isfile = true ;
+			}
+		}
+		if $(isfile) {
+			NEEDLIBS on $(1) = [ on $(1) return $(NEEDLIBS) ] $(i) ;
+			Depends $(1) : $(i) ;
+		} else {
+			LINKLIBS on $(1) = [ on $(1) return $(LINKLIBS) ] -l$(i) ;
+		}
+	}
+}
+
+rule XRes
+{
+	# XRes <target> : <resource files> ;
+	#
+	# Adds resources to a file.
+	#
+	# <target>: The files to which resources shall be added.
+	# <resource files>: The resource files.
+	#
+	if $(2)
+	{
+		Depends $(1) : $(2) ;
+		XRes1 $(1) : $(2) ;
+	}
+}
+
+actions XRes1
+{
+	xres -o "$(1)" "$(2)" ;
+}
+
+actions MimeSet
+{
+	mimeset -f "$(1)" ;
+}
+
+rule LexC++
+{
+	Depends $(1) : $(2) ;
+	MakeLocate $(1) : $(LOCATE_SOURCE) ;
+	Clean clean : $(1) ;
+}
+
+actions LexC++
+{
+	$(LEX) -i -o$(1) $(2)
+}
+
+rule Bison
+{
+	local _h ;
+
+	_h = $(1).h ;
+
+	MakeLocate $(<) $(_h) : $(LOCATE_SOURCE) ;
+
+    Depends $(<) $(_h) : $(>) ;
+    BisonC++ $(<) $(_h) : $(>) ;
+    Clean clean : $(<) $(_h) ;
+
+	# make sure someone includes $(_h) else it will be
+	# a deadly independent target
+
+	Includes $(<) : $(_h) ;
+}
+
+actions BisonC++
+{
+	$(BISON) $(YACCFLAGS) -o $(1[1]) $(2)
+}
+
+rule Rez
+{
+	Depends $(<) : $(>) ;	
+}
+
+actions Rez
+{
+	$(REZ) -o "$(<)" "$(>)" ;
+}
+
+rule RezObjects
+{
+	local rsrcs = $(1) ;
+	local rsrc ;
+	for rsrc in $(rsrcs) {
+		SEARCH on $(rsrc) = $(SEARCH_SOURCE) ;
+		RezObject $(rsrc:B) : $(rsrc) ;
+	}
+}
+
+rule RezObject
+{
+	local _rsrc = $(1).rsrc ;
+	local _r = $(2) ;
+	HDRS on $(_r) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
+	HDRS on $(_rsrc) = [ on $(_r) FIncludes $(HDRS) ] ;
+	MakeLocate $(_rsrc) : $(LOCATE_TARGET) ;
+	PreProcessRez $(_rsrc) : $(_r) ;
+	Clean clean : $(_rsrc) ;
+}
+
+rule PreProcessRez
+{
+	local _tmp = $(<)_tmp ;
+	MakeLocate $(_tmp) : $(LOCATE_TARGET) ;
+	Depends $(_tmp) : $(>) ;
+	Depends $(<) : $(_tmp) ;
+	RmTemps $(<) : $(_tmp) ;
+}
+
+if $(OSPLAT) = PPC {
+actions PreProcessRez
+{
+	mwcc -preprocess -o "$(<)_tmp" $(HDRS) $(>) ;
+	$(REZ) -t -o "$(<)" $(HDRS) "$(<)_tmp" ;
+}
+} else {
+actions PreProcessRez
+{
+	gcc -E -x c -o - $(HDRS) $(>) | sed 's/^#.*//g' > "$(<)_tmp" ;
+	$(REZ) -o "$(<)" -t $(HDRS) "$(<)_tmp" ;
+}
+}
+
+rule RezHeader
+{
+	# RezHeader : <hdr> : <rsrc>
+	#
+	# generates a header from a given resource file.
+	#
+	local _hdr = $(1) ;
+	local _rsrc = $(2) ;
+	SEARCH on $(_rsrc) = $(SEARCH_SOURCE) ;
+	HDRS on $(_rsrc) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
+	HDRS on $(_hdr) = [ FIncludes $(SEARCH_SOURCE) ] ;
+	MakeLocate $(_hdr) : $(LOCATE_TARGET) ;
+	RezH $(_hdr) : $(_rsrc) ;
+	Clean clean : $(_hdr) ;
+}
+
+rule RezH
+{
+	Depends $(<) : $(>) ;
+}
+
+actions RezH
+{
+	$(REZ) -h -o "$(<)" $(HDRS) "$(>)" ;
+}
+
+rule PreCompile
+{
+	# PreCompile <hdr> : <src>
+	#
+	# precompiles the given src (a headerfile) into the specified header.
+	#
+	local _hdr = $(1) ;
+	local _src = $(2) ;
+	MakeLocate $(_hdr) : $(LOCATE_TARGET) ;
+	PreComp $(_hdr) : $(_src) ;
+	Clean clean : $(_hdr) ;
+}
+
+rule PreComp
+{
+	Depends $(<) : $(>) ;
+}
+
+actions PreComp
+{
+	mwcc -precompile $(<) -lang cplus "$(>)" ;
+}
+
+rule PeLanguage
+{
+	# PeLanguage <language> : <srcs> : <libs> : <rsrc> 
+	#
+	# generates a SharedLib which extends Pe with syntax-highlighting for 
+	# that specific language.
+	#
+	local lang = $(1) ;
+	local srcs = $(2) ;
+	local libs = $(3) ;
+	local rsrc = $(4) ;		# contains keywords
+
+	LOCATE_TARGET on $(lang) = [ FDirName $(DISTRO_DIR) Languages ] ;
+	Depends $(rsrc:B).rsrc : $(REZ) ;
+	SharedLibrary $(lang) : $(srcs) : $(libs) ;
+	XRes $(lang) :	$(rsrc) ;
+}
+
+rule PeExtension
+{
+	# PeExtension <extension> : <srcs> : <libs> : <rsrcs> 
+	#
+	# generates a SharedLib which extends Pe with a specific feature.
+	#
+	local ext = $(1) ;
+	local srcs = $(2) ;
+	local libs = $(3) ;
+	local rsrc = $(4) ;		# optional resource file
+
+	if $(rsrc) {
+		Depends $(rsrc:B).r.h : $(REZ) ;
+		Depends $(ext) : $(rsrc:B).r.h ;
+		Depends $(srcs) : $(rsrc:B).r.h ;
+		RezHeader $(rsrc:B).r.h : $(rsrc) ;
+	}
+	SharedLibrary $(ext) : $(srcs) : $(libs) ;
+}
+
+rule SubDirSysHdrs
+{
+	# SubDirSysHdrs <dirs> ;
+	#
+	# Adds directories to the system include search paths for the current
+	# subdirectory. Counterpart of SubDirHdrs which adds non-system include
+	# search paths.
+	#
+	# <dirs>: The directories to be added to the current subdir's system
+	#         include search paths.
+	#
+	SUBDIRSYSHDRS += [ FDirName $(1) ] ;
+}
+
+rule ObjectSysHdrs
+{
+	# SubDirSysHdrs <sources or objects> : <dirs> ;
+	#
+	# Adds directories to the system include search paths for the given
+	# sources or objects. Counterpart of ObjectHdrs which adds non-system
+	# include search paths.
+	#
+	# NOTE: This rule must be invoked *after* the rule that generates the
+	# objects.
+	#
+	# <sources or objects>: The targets for which to add system include
+	#                       search paths.
+	# <dirs>: The directories to be added to the given objects' system
+	#         include search paths.
+	#
+
+	local s ;
+	for s in [ FGristFiles $(<:S=$(SUFOBJ)) ] {
+		SYSHDRS on $(s) += $(>) ;
+		CCHDRS on $(s) = [ on $(s) FIncludes $(HDRS) ]
+			$(HDRS_INCLUDES_SEPARATOR) [ on $(s) FSysIncludes $(SYSHDRS) ] ;
+	}
+}
+
+
+# FSysIncludes <dirs> ;
+#
+# Counterpart of FIncludes for system include search paths.
+#
+if $(OSPLAT) = X86 {
+	rule FSysIncludes { return -I$(<) ; }
+} else {
+	rule FSysIncludes { return "-i "$(<) ; }
+}
+
+# Variable referring to the STL.
+if $(OSPLAT) = X86 {
+	STDC++LIB = stdc++.r4 ;
+} else {
+	STDC++LIB = mslcpp_4_0 ;
+}

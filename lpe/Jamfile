@@ -1,8 +1,7 @@
 
 SubDir TOP lpe ;
 
-Main lpe :
-	lpe.cpp
+Application lpe 
+	: lpe.cpp
+	: be $(STDC++LIB)
 	;
-MakeLocate lpe : [ FDirName $(TOP) bin ] ;
-ForceUpdateMimeset lpe ;

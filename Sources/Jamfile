@@ -1,118 +1,130 @@
 
 SubDir TOP Sources ;
 
-Library libhekkel :
-	HAppResFile.cpp
-	HBox.cpp
-	HButtonBar.cpp
-	HColorControl.cpp
-	HColorPicker2.cpp
-	HColorUtils.cpp
-	HDialog.cpp
-	HDlogView.cpp
-	HError.cpp
-	HHelpWindow.cpp
-	HLazyObject.cpp
-	HPreferences.cpp
-	HStream.cpp
-	HTabSheet.cpp
-	MAlert.cpp
-	MTextAddOn.cpp
-	MThread.cpp
-	;
-MakeLocate libhekkel.a : [ FDirName $(TOP) ] ;
-ForceUpdateMimeset libhekkel.a ;
+SubDirHdrs $(OBJECTS_DIR) Sources ;
 
-Main pe :
-	Benaphore.cpp
-	CCharObject.cpp
-	CConvertDialog.cpp
-	CDiff.cpp
-	CDiffWindow.cpp
-	CDoc.cpp
-	CFindDialog.cpp
-	CFtpDialog.cpp
-	CFtpListItem.cpp
-	CFtpStream.cpp
-	CGlossary.cpp
-	CGoToLine.cpp
-	CGrepBox.cpp
-	CHTMLBar.cpp
-	CInfoDialog.cpp
-	CKeyCapturer.cpp
-	CKeyMapper.cpp
-	CKeywords.cpp
-	CLangIntf.cpp
-	CLanguageAddOn.cpp
-	CLineObject.cpp
-	CListBox.cpp
-	CLogin.cpp
-	CMenuItem.cpp
-	CMessageItem.cpp
-	CMimeBox.cpp
-	COpenSelection.cpp
-	CPathsBox.cpp
-	CPrefsDialog.cpp
-	CStdErrBox.cpp
-	CStdErrParser.cpp
-	CUrlOpener.cpp
-	FontStyle.cpp
-	PAbout.cpp
-	PApp.cpp
-	PCmd.cpp
-	PDoc.cpp
-	PErrorWindow.cpp
-	PGlossyWindow.cpp
-	PGroupWindow.cpp
-	PItalicMenuItem.cpp
-	PKeyDownFilter.cpp
-	PLongAction.cpp
-	PMessageWindow.cpp
-	PProjectWindow.cpp
-	PScrollBar.cpp
-	PSplitter.cpp
-	PStatus.cpp
-	PText.cpp
-	PTextBuffer.cpp
-	PToolBar.cpp
-	PTypeAHeadList.cpp
-	Sstdio.cpp
-	Utils.cpp
-	utf-support.cpp
+if $(OSPLAT) = X86 {
+	C++FLAGS += -Wno-sign-compare -Wno-overloaded-virtual ;
+} else {
+	# generate precompiled pe-headers on PPC:
+	Depends libhekkel.a : $(PREFIX_FILE) ;
+	PreCompile $(PREFIX_FILE) : pe.pch++ ;
+	C++FLAGS += -prefix $(PREFIX_FILE) ;
+
+	SubDirSysHdrs $(TOP) regex ;
+}
+
+Library libhekkel 
+	:  HAppResFile.cpp
+		HBox.cpp
+		HButtonBar.cpp
+		HColorControl.cpp
+		HColorPicker2.cpp
+		HColorUtils.cpp
+		HDialog.cpp
+		HDlogView.cpp
+		HError.cpp
+		HHelpWindow.cpp
+		HLazyObject.cpp
+		HPreferences.cpp
+		HStream.cpp
+		HTabSheet.cpp
+		MAlert.cpp
+		MTextAddOn.cpp
+		MThread.cpp
 	;
-LinkLibraries pe :
-	libhekkel
+
+Application pe 
+	:	Benaphore.cpp
+		CCharObject.cpp
+		CConvertDialog.cpp
+		CDiff.cpp
+		CDiffWindow.cpp
+		CDoc.cpp
+		CFindDialog.cpp
+		CFtpDialog.cpp
+		CFtpListItem.cpp
+		CFtpStream.cpp
+		CGlossary.cpp
+		CGoToLine.cpp
+		CGrepBox.cpp
+		CHTMLBar.cpp
+		CInfoDialog.cpp
+		CKeyCapturer.cpp
+		CKeyMapper.cpp
+		CKeywords.cpp
+		CLangIntf.cpp
+		CLanguageAddOn.cpp
+		CLineObject.cpp
+		CListBox.cpp
+		CLogin.cpp
+		CMenuItem.cpp
+		CMessageItem.cpp
+		CMimeBox.cpp
+		COpenSelection.cpp
+		CPathsBox.cpp
+		CPrefsDialog.cpp
+		CStdErrBox.cpp
+		CStdErrParser.cpp
+		CUrlOpener.cpp
+		FontStyle.cpp
+		PAbout.cpp
+		PApp.cpp
+		PCmd.cpp
+		PDoc.cpp
+		PErrorWindow.cpp
+		PGlossyWindow.cpp
+		PGroupWindow.cpp
+		PItalicMenuItem.cpp
+		PKeyDownFilter.cpp
+		PLongAction.cpp
+		PMessageWindow.cpp
+		PProjectWindow.cpp
+		PScrollBar.cpp
+		PSplitter.cpp
+		PStatus.cpp
+		PText.cpp
+		PTextBuffer.cpp
+		PToolBar.cpp
+		PTypeAHeadList.cpp
+		Sstdio.cpp
+		Utils.cpp
+		utf-support.cpp
+	:	libhekkel.a $(RX_LIB) be $(STDC++LIB) tracker mail textencoding 
 	;
-LINKLIBS on pe = $(LINKLIBS) -ltracker -lmail -ltextencoding ;
-MakeLocate pe : [ FDirName $(TOP) ] ;
-XRes pe :
-	menus.rsrc
-	fonttabs.rsrc
-	find.rsrc
-	prefs.rsrc
-	wrap.rsrc
-	icons.rsrc
-	colorpicker.rsrc
-	openfile.rsrc
-	gotoline.rsrc
-	changecase.rsrc
-	info.rsrc
-	convert.rsrc
-	Bindings.rsrc
-	UTF-Tables.rsrc
-	UTF-Mappings.rsrc
-	ToolBar.rsrc
-	WordBreakTable.rsrc
-	RHTMLBar.rsrc
-	RDiffToolbar.rsrc
-	ftp.rsrc
-	login.rsrc
-	RCursor.rsrc
-	RFtpOpenDialog.rsrc
-	RProject.rsrc
-	RMimeinfo.rsrc
+if $(OSPLAT) = X86 {
+	# avoid warning about strftime("%x") in CGlossary:
+	ObjectC++Flags CGlossary.cpp : -Wno-format ;
+}
+
+XRes pe 
+	:	menus.rsrc
+		fonttabs.rsrc
+		find.rsrc
+		prefs.rsrc
+		wrap.rsrc
+		icons.rsrc
+		colorpicker.rsrc
+		openfile.rsrc
+		gotoline.rsrc
+		changecase.rsrc
+		info.rsrc
+		convert.rsrc
+		Bindings.rsrc
+		UTF-Tables.rsrc
+		UTF-Mappings.rsrc
+		ToolBar.rsrc
+		WordBreakTable.rsrc
+		RHTMLBar.rsrc
+		RDiffToolbar.rsrc
+		ftp.rsrc
+		login.rsrc
+		RCursor.rsrc
+		RFtpOpenDialog.rsrc
+		RProject.rsrc
+		RMimeinfo.rsrc
 	;
-Rez pe : 
-	[ FDirName $(TOP) Resources Now.r ]
-	;
-ForceUpdateMimeset pe ;
+
+Rez pe : [ FDirName $(TOP) Resources Now.r ] ;
+
+MimeSet pe ;
