@@ -79,10 +79,15 @@ ScanForFunctions(CLanguageProxy& proxy)
 			proxy.SetNestLevel(0);
 			proxy.AddFunction(diffLine.String(), diffLine.String(), pos-text, false);
 		} else if (strncmp(pos, "@@", 2) == 0) {
+			pos += 2;
+				// skip over "@@"
 			const char* lineEnd = strchr(pos, '\n');
 			if (!lineEnd)
 				lineEnd = pos + strlen(pos);
-			BString diffLine(pos, lineEnd-pos);
+			else
+				lineEnd -= 2;	
+					// skip back over "@@"
+			BString diffLine(pos, lineEnd-(pos));
 			proxy.SetNestLevel(1);
 			proxy.AddFunction(diffLine.String(), diffLine.String(), pos-text, false);
 		}
