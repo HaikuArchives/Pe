@@ -2,19 +2,6 @@
 #
 # Jam rules that need to be overridden for good reasons.
 
-# Overridden to support objects as source files for main targets.
-rule UserObject
-{
-	switch $(2)
-	{
-#		case *.o    : return ;
-#		case *.r.h  : return ;
-#		case *.r 	: RezObject $(<) : $(>) ;
-#		case *.pch++ :  PreCompile $(<) : $(>) ;
-		case *      : ECHO "unknown suffix on" $(2) ;
-	}
-}
-
 # Overridden to allow for spaces in file names and to support resources.
 # Also set the on target LINKFLAGS variable to prevent later changes to
 # the global variable from having an effect on the setting for the target.
