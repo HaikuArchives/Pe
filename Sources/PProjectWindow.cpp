@@ -467,7 +467,7 @@ void PProjectWindow::ReadAttr(BFile& file)
 	if (fm) free(fm);
 } /* PProjectWindow::ReadAttr */
 
-void PProjectWindow::WriteData(BPositionIO& file)
+void PProjectWindow::WriteData(BPositionIO& /*file*/)
 {
 	if (! fFile)
 		THROW(("Can only write to a local file"));

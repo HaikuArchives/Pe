@@ -72,7 +72,7 @@ CMessageItem::~CMessageItem()
 	delete fFile;
 } // CMessageItem::~CMessageItem
 
-void CMessageItem::DrawItem(BView *owner, BRect bounds, bool complete)
+void CMessageItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 {
 	if (IsSelected())
 		owner->SetLowColor(gColor[kSelectionColor]);

@@ -175,7 +175,7 @@ void Work(const char *file)
 	fclose(yyin);
 } /* Work */
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	yyin = stdin;
 

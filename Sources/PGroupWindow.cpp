@@ -62,7 +62,7 @@ PGroupStatus::~PGroupStatus()
 	if (fText) free(fText);
 } /* PGroupStatus::~PGroupStatus */
 
-void PGroupStatus::Draw(BRect update)
+void PGroupStatus::Draw(BRect /*update*/)
 {
 	BRect b(Bounds());
 	
@@ -506,7 +506,7 @@ void PGroupWindow::ReadAttr(BFile& file)
 	if (fm) free(fm);
 } /* PGroupWindow::ReadAttr */
 
-void PGroupWindow::WriteData(BPositionIO& file)
+void PGroupWindow::WriteData(BPositionIO& /*file*/)
 {
 	if (! fFile)
 		THROW(("Can only write to a local file"));

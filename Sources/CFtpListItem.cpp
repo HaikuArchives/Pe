@@ -109,7 +109,7 @@ CFtpListItem::~CFtpListItem()
 	free(fName);
 } // CFtpListItem::~CFtpListItem
 
-void CFtpListItem::DrawItem(BView *owner, BRect bounds, bool complete)
+void CFtpListItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 {
 	try
 	{

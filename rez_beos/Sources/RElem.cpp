@@ -180,8 +180,7 @@ int RElem::FindIdentifier(int v)
 	RSValue *vstate = fState ? dynamic_cast<RSValue*>(fState) : NULL;
 	int id = v;
 	
-	if (vstate && vstate->ResolveIdentifier(v))
-		return v;
-	else
+	if (!(vstate && vstate->ResolveIdentifier(v)))
 		error("Unknown identifier: %s", ST_Ident(id));
+	return v;
 } /* RElem::FindIdentifier */

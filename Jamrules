@@ -14,22 +14,23 @@ if $(DEBUG) = 1 {
 	OPTIM ?= -O0 ;
 } else {
 	ALL_LOCATE_TARGET ?= [ FDirName $(TOP) Obj.NoDebug ] ;
-	if $(METROWERKS) {
+	if $(OSPLAT) = PPC {
 		OPTIM ?= -O7 ;
 	} else {
 		OPTIM ?= -O2 ;
 	}
 }
 
-if $(METROWERKS) {
+if $(OSPLAT) = PPC {
 	LINKLIBS += -L. ;
 	CC ?= mwcc ;
 	C++ ?= mwcc ;
-	WARNINGS ?= -w all -w nonotinlined -w noimplicit ;
+	WARNINGS ?= -w all -w nonotinlined -w noimplicit -w nohiddenvirtual ;
 	LINKLIBS += -lmslcpp_4_0 -lrx ;
 	HDRS += [ FDirName $(TOP) regex ] ;
 	PREFIX ?= [ FDirName $(ALL_LOCATE_TARGET) pe.headers ] ;
-	CCFLAGS += -prefix $(PREFIX) ;
+	CCFLAGS += -prefix ../$(PREFIX) ;
+	C++FLAGS += -prefix ../$(PREFIX) ;
 	LINKFLAGS += -map pe.xMAP -sym full -nodup -export all ;
 } else {
 	# check for BONE...
@@ -98,7 +99,7 @@ rule PreProcessRez
 	Clean clean : $(_tmp) ;
 }
 
-if $(METROWERKS) {
+if $(OSPLAT) = PPC {
 actions PreProcessRez
 {
 	mwcc -preprocess -o "$(<)_tmp" $(HDRS) $(>) ;

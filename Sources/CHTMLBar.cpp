@@ -326,7 +326,7 @@ void CHTMLSimpleButton::Draw()
 	CHTMLButton::Draw();
 } /* CHTMLSimpleButton::Draw */
 
-void CHTMLSimpleButton::Click(BPoint where)
+void CHTMLSimpleButton::Click(BPoint /*where*/)
 {
 	if (TrackClick())
 	{
@@ -384,7 +384,7 @@ void CHTMLMenu::Draw()
 	fPane->EndLineArray();
 } /* CHTMLMenu::Draw */
 
-void CHTMLMenu::Click(BPoint where)
+void CHTMLMenu::Click(BPoint /*where*/)
 {
 	BRect r(fFrame);
 	r.bottom -= 2;
@@ -423,7 +423,7 @@ CHTMLCmdButton::CHTMLCmdButton(BRect frame, BPositionIO& data, CHTMLButtonPane *
 	data >> fCmd;
 } /* CHTMLCmdButton::CHTMLCmdButton */
 			
-void CHTMLCmdButton::Click(BPoint where)
+void CHTMLCmdButton::Click(BPoint /*where*/)
 {
 	if (TrackClick())
 	{
@@ -447,7 +447,7 @@ CHTMLDialog::~CHTMLDialog()
 	free(fExt);
 } /* CHTMLDialog::~CHTMLDialog */
 
-void CHTMLDialog::Click(BPoint where)
+void CHTMLDialog::Click(BPoint /*where*/)
 {
 	if (TrackClick())
 	{

@@ -1529,7 +1529,7 @@ void PText::ScrollToOffset(int offset, int part)
 	}
 } /* PText::ScrollToOffset */
 
-void PText::FrameResized(float w, float h)
+void PText::FrameResized(float /*w*/, float /*h*/)
 {
 	AdjustScrollBars();
 	fBounds = Bounds();

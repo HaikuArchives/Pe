@@ -136,7 +136,7 @@ void CKeyCapturer::FilterKeyDown(unsigned long modifiers, unsigned long key)
 	Draw(Bounds());
 } /* CKeyCapturer::FilterKeyDown */
 
-void CKeyCapturer::MouseDown(BPoint where)
+void CKeyCapturer::MouseDown(BPoint /*where*/)
 {
 	MakeFocus(true);
 } /* CKeyCapturer::MouseDown */

@@ -88,7 +88,7 @@ void CPathItem::SetPath(const char *path)
 	}
 } // CPathItem::SetPath
 
-void CPathItem::DrawItem(LView *owner, BRect bounds, bool complete)
+void CPathItem::DrawItem(LView *owner, BRect bounds, bool /*complete*/)
 {
 	char buf[256];
 	strncpy(buf, fPath, 255);

@@ -139,6 +139,8 @@ long REval::Evaluate(RElem *head)
 		default:
 			error("internal error 2");
 	}
+
+	return 0;	// dummy value
 } /* REval::Evaluate */
 
 void REval::SetElement(RElem *elem)

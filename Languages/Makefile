@@ -63,7 +63,7 @@ ifeq ($(CPU), x86)
 	STRIP		= strip
 else
 	CFLAGS		= -c -ISources -I../Sources -prefix BeHeaders \
-				-prefix /boot/home/projects/pe/Languages/Sources/CLangIncl.h -O7
+				-prefix ../Sources/CLangIncl.h -O7
 	LDFLAGS		= -lbe -lroot -shared -export pragma -nodup
 	STRIP		= ls	# hmm...
 endif

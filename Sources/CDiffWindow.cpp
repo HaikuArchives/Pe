@@ -267,7 +267,7 @@ void CDiffWindow::MessageReceived(BMessage* msg)
 	}
 } /* CDiffWindow::MessageReceived */
 
-void CDiffWindow::AddFile(int fileNr, BPoint where, bool showAlways, BPoint msgWhere)
+void CDiffWindow::AddFile(int fileNr, BPoint where, bool showAlways, BPoint /*msgWhere*/)
 {
 	unsigned long cmd = fileNr == 1 ? msg_DiffFile1 : msg_DiffFile2;
 	
@@ -813,7 +813,7 @@ void CDiffWindow::CopyFiles()
 #pragma mark -
 #pragma mark CDiffItem
 
-void CDiffItem::DrawItem(BView *owner, BRect bounds, bool complete)
+void CDiffItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 {
 	char s[256];
 	
@@ -864,7 +864,7 @@ void CDiffItem::DrawItem(BView *owner, BRect bounds, bool complete)
 #pragma mark -
 #pragma mark CDiffItem
 
-void CDiffDItem::DrawItem(BView *owner, BRect bounds, bool complete)
+void CDiffDItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 {
 	char s[256];
 	

@@ -50,6 +50,7 @@
 #include <InterfaceDefs.h>
 #include <ListItem.h>
 #include <ListView.h>
+#include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <OutlineListView.h>

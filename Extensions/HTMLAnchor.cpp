@@ -174,6 +174,7 @@ long Anchor(MTextAddOn *addon)
 	end += strlen(s);
 	addon->Select(end, end);
 	addon->Insert("</a>");
+	return B_OK;
 } /* Anchor */
 
 char *RelativePath(entry_ref& a, entry_ref& b)
