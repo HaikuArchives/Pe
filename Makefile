@@ -41,7 +41,7 @@ TARGET			= pe
 # DEBUG should be either 1 or 0
 DEBUG			= 1
 DEFINES			= # BETA DEMO
-LIBS			= hekkel tracker devel mail textencoding
+LIBS			= hekkel tracker mail textencoding
 LIBPATHS		= .
 INCPATHS		= 
 ifeq ($(CPU), x86)
@@ -298,7 +298,7 @@ libhekkel.a: $(HOBJS)
 librx:
 ifeq ($(CPU), ppc)
 	cd regex && $(MAKE) librx.so
-	mv regex/librx.so .
+	cp regex/librx.so .
 endif
 
 lang:

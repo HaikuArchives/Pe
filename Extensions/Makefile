@@ -42,7 +42,7 @@ DEFS		= -DDEBUG=$(DEBUG)
 LIBS		= hekkel mail
 LIBPATHS	= ..
 LDFLAGS		= 
-CFLAGS		= -c -I. -I../Sources -I- -I../regex_0_12 
+CFLAGS		= -c -I. -I../Sources -I- -I../regex 
 
 ifeq ($(CPU), x86)
 	ifeq ($(DEBUG), 1)
