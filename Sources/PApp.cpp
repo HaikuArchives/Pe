@@ -253,8 +253,11 @@ PApp::PApp()
 		gRestoreCWD = gPrefs->GetPrefInt("restore cwd", 1);
 		gSavedState = gPrefs->GetPrefInt("saved state", 0);
 		
-		if (gPrefs->GetIxPrefString("mimetype", 0) == NULL)
+		if (gPrefs->GetIxPrefString("mimetype", 0) == NULL) {
 			gPrefs->SetIxPrefString("mimetype", 0, "text/plain");
+			gPrefs->SetIxPrefString("mimetype", 1, "text/html");
+			gPrefs->SetIxPrefString("mimetype", 2, "text/x-source-code");
+		}
 		
 		strcpy(gTabChar, gPrefs->GetPrefString("tab char", "»"));
 		strcpy(gReturnChar, gPrefs->GetPrefString("return char", "¬"));
