@@ -87,6 +87,18 @@ PeLanguage ShellExt
 	: keywords.sh.rsrc 
 	;
 
+PeLanguage JamExt 
+	: CLang_jam.cpp 
+	: be 
+	: keywords.jam.rsrc 
+	;
+
+PeLanguage JamExt 
+	: CLang_jam.cpp 
+	: be 
+	: keywords.jam.rsrc 
+	;
+
 PeLanguage LuaExt 
 	: CLang_lua.cpp CluaPopup.cpp 
 	: be 

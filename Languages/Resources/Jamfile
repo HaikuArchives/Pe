@@ -5,6 +5,7 @@ RezObjects
 	keywords.cpp.r
 	keywords.html.r
 	keywords.html-js.r
+	keywords.jam.r
 	keywords.java.r
 	keywords.lua.r
 	keywords.m.r
