@@ -36,6 +36,7 @@
 #ifndef CLANGINTF_H
 #define CLANGINTF_H
 
+class CFunctionScanHandler;
 class CLanguageProxy;
 
 class CLangIntf {
@@ -45,7 +46,7 @@ public:
 
 		void Balance(PText& text);
 		bool Balance(PText& text, int& start,  int& end);
-		void ScanForFunctions(PText& text, vector<void*>& incl, vector<void*>& func);
+		void ScanForFunctions(PText& text, CFunctionScanHandler& handler);
 		void ColorLine(const char *buf, int size,
 				int& state, int *starts, rgb_color *colors);
 		int FindNextWord(PText& text, int offset, int& mlen);
@@ -114,5 +115,16 @@ inline const char *CLangIntf::Name() const
 {
 	return fLanguage;
 } /* CLangIntf::Name */
+
+
+class CFunctionScanHandler {
+public:
+		CFunctionScanHandler();
+virtual	~CFunctionScanHandler();
+
+virtual	void AddFunction(const char *name, const char *match, int offset, bool italic);
+virtual	void AddInclude(const char *name, const char *open, bool italic);
+virtual	void AddSeparator();
+};
 
 #endif // CLANGINTF_H

@@ -54,6 +54,7 @@
 #include "HStream.h"
 #include "CAlloca.h"
 #include "HButtonBar.h"
+#include "PItalicMenuItem.h"
 #include "PSplitter.h"
 #include "CGlossary.h"
 #include "KeyBindings.h"
@@ -2062,11 +2063,47 @@ class CSortMenuInfo
 	}
 };
 
+struct MenuFunctionScanHandler : public CFunctionScanHandler {
+	void AddFunction(const char *name, const char *match, int offset,
+		bool italic)
+	{
+		BMessage *msg = new BMessage(msg_JumpToProcedure);
+		msg->AddInt32("offset", offset);
+		msg->AddString("function", match);
+		
+		if (italic)
+			functions.push_back(new PItalicMenuItem(name, msg));
+		else
+			functions.push_back(new BMenuItem(name, msg));
+	}
+	
+	void AddInclude(const char *name, const char *open, bool italic)
+	{
+		BMessage *msg = new BMessage(msg_OpenInclude);
+		msg->AddString("include", open);
+		
+		if (italic)
+			includes.push_back(new PItalicMenuItem(name, msg));
+		else
+			includes.push_back(new BMenuItem(name, msg));
+	}
+	
+	void AddSeparator()
+	{
+		functions.push_back(new BSeparatorItem);
+	}
+
+	vector<void*> includes, functions;
+};
+
 void PText::ShowFunctionMenu(BPoint where)
 {
-	vector<void*> includes, functions;
+	MenuFunctionScanHandler handler;
 
-	ScanForFunctions(includes, functions);
+	vector<void*>& includes = handler.includes;
+	vector<void*>& functions = handler.functions;
+
+	ScanForFunctions(handler);
 	
 	key_info ki;
 	
@@ -2938,9 +2975,9 @@ void PText::SmartBrace()
 	}
 } /* PText::SmartBrace */
 
-void PText::ScanForFunctions(vector<void*>& incl, vector<void*>& func)
+void PText::ScanForFunctions(CFunctionScanHandler& handler)
 {
-	fLangIntf->ScanForFunctions(*this, incl, func);
+	fLangIntf->ScanForFunctions(*this, handler);
 } /* PText::ScanForFunctions */
 
 void PText::HashLines(vector<int>& hv, bool ignoreCase, bool ignoreWhite)

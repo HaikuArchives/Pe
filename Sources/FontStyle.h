@@ -36,6 +36,10 @@
 #ifndef FONTSTYLE_H
 #define FONTSTYLE_H
 
+#include <vector>
+
+#include <Font.h>
+
 #include "Benaphore.h"
 typedef float f_unit_t;
 

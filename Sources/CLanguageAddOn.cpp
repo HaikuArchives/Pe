@@ -55,22 +55,20 @@ CLanguageProxy::CLanguageProxy(CLangIntf& intf, const char *text, int size,
 	fText = text;
 	fSize = size;
 	fEncoding = encoding;
-	fFunctions = NULL;
-	fIncludes = NULL;
+	fFunctionScanHandler = NULL;
 	fStarts = starts;
 	fColors = colors;
 } /* CLanguageProxy::CLanguageProxy */
 
-CLanguageProxy::CLanguageProxy(CLangIntf& intf, PText& text, vector<void*>* includes,
-	vector<void*>* functions)
+CLanguageProxy::CLanguageProxy(CLangIntf& intf, PText& text,
+	CFunctionScanHandler* handler)
 	: fInterface(intf)
 {
 	fCIndx = 0;
 	fText = text.Text();
 	fSize = text.Size();
 	fEncoding = text.Encoding();
-	fFunctions = functions;
-	fIncludes = includes;
+	fFunctionScanHandler = handler;
 	fStarts = NULL;
 	fColors = NULL;
 } /* CLanguageProxy::CLanguageProxy */
@@ -123,35 +121,20 @@ void CLanguageProxy::SetColor(int start, int color)
 
 void CLanguageProxy::AddFunction(const char *name, const char *match, int offset, bool italic)
 {
-	FailNilMsg(fFunctions, "Not a valid call in this context");
-
-	BMessage *msg = new BMessage(msg_JumpToProcedure);
-	msg->AddInt32("offset", offset);
-	msg->AddString("function", match);
-	
-	if (italic)
-		fFunctions->push_back(new PItalicMenuItem(name, msg));
-	else
-		fFunctions->push_back(new BMenuItem(name, msg));
+	FailNilMsg(fFunctionScanHandler, "Not a valid call in this context");
+	fFunctionScanHandler->AddFunction(name, match, offset, italic);
 } /* CLanguageProxy::AddFunction */
 
 void CLanguageProxy::AddInclude(const char *name, const char *open, bool italic)
 {
-	FailNilMsg(fIncludes, "Not a valid call in this context");
-	
-	BMessage *msg = new BMessage(msg_OpenInclude);
-	msg->AddString("include", open);
-	
-	if (italic)
-		fIncludes->push_back(new PItalicMenuItem(name, msg));
-	else
-		fIncludes->push_back(new BMenuItem(name, msg));
+	FailNilMsg(fFunctionScanHandler, "Not a valid call in this context");
+	fFunctionScanHandler->AddInclude(name, open, italic);
 } /* CLanguageProxy::AddFunction */
 
 void CLanguageProxy::AddSeparator()
 {
-	FailNilMsg(fFunctions, "Not a valid call in this context");
-	fFunctions->push_back(new BSeparatorItem);
+	FailNilMsg(fFunctionScanHandler, "Not a valid call in this context");
+	fFunctionScanHandler->AddSeparator();
 } /* CLanguageProxy::AddSeparator */
 
 bool CLanguageProxy::Includes() const

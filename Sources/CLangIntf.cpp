@@ -440,11 +440,11 @@ void CLangIntf::ColorLine(const char *text, int size, int& state,
 	}
 } /* CLangIntf::ColorLine */
 
-void CLangIntf::ScanForFunctions(PText& text, vector<void*>& incl, vector<void*>& func)
+void CLangIntf::ScanForFunctions(PText& text, CFunctionScanHandler& handler)
 {
 	try
 	{
-		CLanguageProxy proxy(*this, text, &incl, &func);
+		CLanguageProxy proxy(*this, text, &handler);
 
 		if (fScanForFunctions)
 			fScanForFunctions(proxy);
@@ -618,3 +618,29 @@ CLangIntf* CLangIntf::FindByName(const char *language)
 	
 	return sDefault;
 } // CLangIntf::FindByName
+
+
+// #pragma mark -
+
+CFunctionScanHandler::CFunctionScanHandler()
+{
+} // CFunctionScanHandler::CFunctionScanHandler
+
+CFunctionScanHandler::~CFunctionScanHandler()
+{
+} // CFunctionScanHandler::~CFunctionScanHandler()
+
+void CFunctionScanHandler::AddFunction(const char *name, const char *match,
+	int offset, bool italic)
+{
+} // CFunctionScanHandler::AddFunction
+
+void CFunctionScanHandler::AddInclude(const char *name, const char *open,
+	bool italic)
+{
+} // CFunctionScanHandler::AddInclude
+
+void CFunctionScanHandler::AddSeparator()
+{
+}
+

@@ -201,7 +201,8 @@ Resource 'Cmnd' (4, "Search Menu") {
 		msg_FindSelection,											"Find Selection",
 		msg_FindAgainBackward,									"Find Again Backwards",
 		msg_FindAgain,												"Find Again",
-		msg_FindCmd,												"Find…"
+		msg_FindCmd,												"Find…",
+		msg_FindFunction,										"Find Function…"
 	}
 };
 

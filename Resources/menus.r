@@ -115,7 +115,8 @@ resource 'MENU' (3, "Search Menu") {
 		Separator	{},
 		Item		{ "Jump to Next Error", msg_FindNextError, none, noKey },
 		Item		{ "Go To Line…", msg_GoToLine, none, ',' },
-		Separator	{},
+		Item		{ "Find Function…", msg_FindFunction, shift, 'F' },
+ 		Separator	{},
 		Item		{ "Find Differences…", msg_FindDifferences, none, noKey }
 	}
 };

@@ -68,6 +68,7 @@ enum {
 	kLEndColor // just a marker, same as kLTextColor if you care
 };
 
+class CFunctionScanHandler;
 class CLangIntf;
 class PText;
 
@@ -82,7 +83,7 @@ class PText;
 class CLanguageProxy {
 public:
 		CLanguageProxy(CLangIntf& intf, const char *text, int size, int encoding, int *starts = NULL, rgb_color *colors = NULL);
-		CLanguageProxy(CLangIntf& intf, PText& text, vector<void*> *includes = NULL, vector<void*> *functions = NULL);
+		CLanguageProxy(CLangIntf& intf, PText& text, CFunctionScanHandler* handler = NULL);
 		
 /*
 	Use the next two methods to recognize keywords in the text.
@@ -153,7 +154,7 @@ private:
 		int fCIndx;
 		int *fStarts;
 		rgb_color *fColors;
-		vector<void*> *fFunctions, *fIncludes;
+		CFunctionScanHandler* fFunctionScanHandler;
 };
 
 /*

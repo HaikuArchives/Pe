@@ -36,6 +36,8 @@
 
 typedef float g_unit_t;
 
+#include <View.h>
+
 #include "PTextBuffer.h"
 #include "FontStyle.h"
 
@@ -45,6 +47,7 @@ class PCmd;
 class PStatus;
 class PExec;
 class CLangIntf;
+class CFunctionScanHandler;
 class PSplitter;
 class PDoc;
 
@@ -161,7 +164,7 @@ virtual	void FrameResized(float w, float h);
 			int FindTheOther(int offset, int ch);
 			void AutoIndent(int offset);
 			void SmartBrace();
-			void ScanForFunctions(vector<void*>& incl, vector<void*>& func);
+			void ScanForFunctions(CFunctionScanHandler& handler);
 			void HashLines(vector<int>& hv, bool ignoreCase, bool ignoreWhite);
 			
 			int Offset2Line(int offset);

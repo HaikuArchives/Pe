@@ -149,6 +149,7 @@
 	
 #define msg_GoToLine						'GoTo'
 #define msg_DoGoToLine					'DGTo'
+#define msg_FindFunction				'FndF'
 	
 #define msg_Info								'Info'
 	

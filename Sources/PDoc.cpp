@@ -67,6 +67,7 @@
 #include "CCharObject.h"
 #include "HDefines.h"
 #include "MAlert.h"
+#include "PFindFunctionDialog.h"
 
 static long sDocCount = 0;
 
@@ -935,7 +936,7 @@ BRect PDoc::NextPosition(bool inc)
 	r.top = 25 + (cnt % 8) * 20;
 	r.left = 40 - (cnt % 8) * 4 + (cnt / 8) * 8;
 	r.right = min((double)sr.right - 100,
-		r.left + 80 * textFont.StringWidth(" ") + B_V_SCROLL_BAR_WIDTH + 3);
+		r.left + 80 * textFont.StringWidth(" ") + B_V_SCROLL_BAR_WIDTH + 5);
 	float lh;
 	font_height fh;
 	be_fixed_font->GetHeight(&fh);
@@ -1433,6 +1434,12 @@ void PDoc::MessageReceived(BMessage *msg)
 				const char *ext;
 				FailOSErr(msg->FindString("ext", &ext));
 				PerformExtension(ext);
+				break;
+			}
+
+			case msg_FindFunction:
+			{
+				new(nothrow) PFindFunctionDialogController(fText);
 				break;
 			}
 			

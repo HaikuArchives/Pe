@@ -41,6 +41,7 @@ Application pe
 		CDiff.cpp
 		CDiffWindow.cpp
 		CDoc.cpp
+		CFilterChoiceDialog.cpp
 		CFindDialog.cpp
 		CFtpDialog.cpp
 		CFtpListItem.cpp
@@ -73,6 +74,7 @@ Application pe
 		PCmd.cpp
 		PDoc.cpp
 		PErrorWindow.cpp
+		PFindFunctionDialog.cpp
 		PGlossyWindow.cpp
 		PGroupWindow.cpp
 		PItalicMenuItem.cpp
