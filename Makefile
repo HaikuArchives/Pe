@@ -303,6 +303,9 @@ endif
 lang:
 	cd Languages && $(MAKE)
 
-ext: libhekkel.a
+ext: pe libhekkel.a
+ifeq ($(CPU), x86)
+	cp pe _APP_
+endif
 	cd Extensions && $(MAKE)
 
