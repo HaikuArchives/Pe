@@ -1,7 +1,7 @@
 
 SubDir TOP Sources ;
 
-Library hekkel :
+Library libhekkel :
 	HAppResFile.cpp
 	HBox.cpp
 	HButtonBar.cpp
@@ -20,7 +20,7 @@ Library hekkel :
 	MTextAddOn.cpp
 	MThread.cpp
 	;
-MakeLocate hekkel : [ FDirName $(TOP) ] ;
+MakeLocate libhekkel.a : [ FDirName $(TOP) ] ;
 
 Main pe :
 	Benaphore.cpp
@@ -81,8 +81,33 @@ Main pe :
 	;
 LinkLibraries pe :
 	libhekkel
-	libtracker
-	libmail
-	libtextencoding
 	;
+LINKLIBS on pe = $(LINKLIBS) -ltracker -lmail -ltextencoding ;
 MakeLocate pe : [ FDirName $(TOP) ] ;
+XRes pe :
+	menus.rsrc
+	fonttabs.rsrc
+	find.rsrc
+	prefs.rsrc
+	wrap.rsrc
+	icons.rsrc
+	colorpicker.rsrc
+	openfile.rsrc
+	gotoline.rsrc
+	changecase.rsrc
+	info.rsrc
+	convert.rsrc
+	Bindings.rsrc
+	UTF-Tables.rsrc
+	UTF-Mappings.rsrc
+	ToolBar.rsrc
+	WordBreakTable.rsrc
+	RHTMLBar.rsrc
+	RDiffToolbar.rsrc
+	ftp.rsrc
+	login.rsrc
+	RCursor.rsrc
+	RFtpOpenDialog.rsrc
+	RProject.rsrc
+	RMimeinfo.rsrc
+	;
