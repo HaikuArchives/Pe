@@ -45,9 +45,9 @@
 const char
 	kAboutText[] =
 #if __INTEL__
-		"Pe 2.2.3d (x86) Open Source Version\n\n"
+		"Pe 2.3 (x86) Open Source Version\n\n"
 #else
-		"Pe 2.2.3d (PPC) Open Source Version\n\n"
+		"Pe 2.3 (PPC) Open Source Version\n\n"
 #endif
 		"a high performance editor\n"
 		"created by Maarten Hekkelman.\n"
@@ -58,6 +58,10 @@ const char
 		"Your help is invaluable.\n\n"
 		"Special thanks to\nTom Hays\nfor improving the TeX addon\n\n"
 		"and Be of course\nfor making this wonderful OS.\n\n"
+		"-\n\n"
+		"This is the Open Source version of Pe\n"
+		"which lives on http://www.beunited.org\n"
+		"Thanks to all contributors.\n\n"
 		"-\n\n"
 		"compiled on:\n%s\n\n",
 	kAboutText2[] = "BeOS Rules!";
