@@ -98,6 +98,8 @@ public:
 			void CreateField(int kind, BPositionIO& data, BView*& inside);
 virtual	void MessageReceived(BMessage *msg);
 
+virtual	void Show();
+
 virtual	bool OKClicked();
 virtual	bool CancelClicked();
 virtual	void UpdateFields();

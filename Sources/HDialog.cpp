@@ -144,6 +144,34 @@ void HDialog::MessageReceived(BMessage *inMessage)
 	}
 } /* HDialog::MessageReceived */
 
+// Make sure dialog comes up under cursor for us FFM lovers - CP 040324
+// [zooey]: moved into HDialog so that *every* Pe-dialog uses this.
+void HDialog::Show() {
+	if (focus_follows_mouse()) {
+		Lock();
+		BView* v = ChildAt(0); 	// grab some BView to obtain mouse position
+		if (v) {
+			BPoint mousePos;
+			uint32 mbuttons;
+			v->GetMouse(&mousePos, &mbuttons, false);
+			v->ConvertToScreen(&mousePos);
+			BRect r = ConvertToScreen(Bounds());
+			float w = r.Width();
+			float h = r.Height();
+			BScreen screen(this);
+			BRect sr = screen.Frame();
+			float sw = sr.Width();
+			float sh = sr.Height();
+			// try to avoid showing window-parts offscreen:
+			float x = MAX(5.0, MIN(sw-w-5, mousePos.x-w/2));
+			float y = MAX(20.0, MIN(sh-h-5, mousePos.y-h/2));
+			MoveTo(x, y);
+		}
+		Unlock();
+	}
+	BWindow::Show();
+}
+
 bool HDialog::OKClicked()
 {
 	return true;
@@ -465,3 +493,4 @@ void HDialog::SetLabel(const char *id, const char *label)
 	else
 		THROW(("Control '%s' not found", id));
 } // HDialog::SetLabel
+
