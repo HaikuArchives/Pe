@@ -125,15 +125,7 @@ void CLanguageProxy::SetColor(int start, int color)
 void CLanguageProxy::AddFunction(const char *name, const char *match, int offset, bool italic)
 {
 	FailNilMsg(fFunctionScanHandler, "Not a valid call in this context");
-	if (fNestLevel)
-	{
-		char nameBuf[kMaxNameSize];
-		int indent = 4 * fNestLevel;
-		memset(nameBuf, ' ', indent);
-		strcpy(nameBuf+indent, name);
-		fFunctionScanHandler->AddFunction(nameBuf, match, offset, italic);
-	} else
-		fFunctionScanHandler->AddFunction(name, match, offset, italic);
+	fFunctionScanHandler->AddFunction(name, match, offset, italic, fNestLevel);
 } /* CLanguageProxy::AddFunction */
 
 void CLanguageProxy::AddInclude(const char *name, const char *open, bool italic)

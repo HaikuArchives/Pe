@@ -18,6 +18,7 @@ public:
 	virtual bool IsSeparator() const;
 	virtual bool IsItalic() const;
 	virtual const char *Name() const = 0;
+	virtual uint32 NestLevel() const;
 };
 
 // CSeparatorFilterChoiceItem

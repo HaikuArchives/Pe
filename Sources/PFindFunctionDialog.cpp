@@ -11,18 +11,38 @@
 
 // Choice
 struct PFindFunctionDialogController::Choice : public CFilterChoiceItem {
-	Choice(const char *name, uint32 what, bool isSeparator, bool italic)
-		: name(name), message(what), isSeparator(isSeparator), italic(italic) {}
+	Choice(const char *name, uint32 what, bool isSeparator, bool italic, 
+		uint32 nestLevel = 0);
 
 	virtual bool IsSeparator() const	{ return isSeparator; }
 	virtual bool IsItalic() const		{ return italic; }
 	virtual const char *Name() const	{ return name.String(); }
+	virtual uint32 NestLevel() const	{ return nestLevel; }
 
 	BString		name;
 	BMessage	message;
 	bool		isSeparator;
 	bool		italic;
+	uint32		nestLevel;
 };
+
+// constructor
+PFindFunctionDialogController::Choice::Choice(const char *nm, uint32 what, 
+	bool isSeparator, bool italic, uint32 nestLevel)
+	: name(nm),
+	  message(what), 
+	  isSeparator(isSeparator), 
+	  italic(italic),
+	  nestLevel(nestLevel)
+{
+	if (nestLevel)
+	{
+		int indent = 4 * nestLevel;
+		name.Prepend(' ', indent);
+	}
+}
+
+
 
 // ChoiceModel
 class PFindFunctionDialogController::ChoiceModel : public CFilterChoiceModel {
@@ -152,10 +172,10 @@ PFindFunctionDialogController::FilterChoiceDialogAborted(
 // AddFunction
 void
 PFindFunctionDialogController::AddFunction(const char *name, const char *match,
-	int offset, bool italic)
+	int offset, bool italic, uint32 nestLevel)
 {
 	Choice *choice = new(nothrow) Choice(name, msg_JumpToProcedure, false,
-		italic);
+		italic, nestLevel);
 	FailNil(choice);
 	choice->message.AddInt32("offset", offset);
 	choice->message.AddString("function", match);

@@ -23,7 +23,7 @@ private:
 	virtual void FilterChoiceDialogAborted(CFilterChoiceDialog *dialog);
 
 	virtual	void AddFunction(const char *name, const char *match, int offset,
-		bool italic);
+		bool italic, uint32 nestLevel);
 	virtual	void AddInclude(const char *name, const char *open, bool italic);
 	virtual	void AddSeparator();
 

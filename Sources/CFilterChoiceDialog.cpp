@@ -66,6 +66,14 @@ CFilterChoiceItem::IsItalic() const
 	return false;
 }
 
+// NestLevel
+uint32
+CFilterChoiceItem::NestLevel() const
+{
+	return 0;
+}
+
+
 
 // CSeparatorFilterChoiceItem
 

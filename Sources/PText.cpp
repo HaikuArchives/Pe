@@ -36,6 +36,7 @@
 #include "pe.h"
 
 #include <signal.h>
+#include <String.h>
 
 #include "PText.h"
 #include "FontStyle.h"
@@ -2065,16 +2066,23 @@ class CSortMenuInfo
 
 struct MenuFunctionScanHandler : public CFunctionScanHandler {
 	void AddFunction(const char *name, const char *match, int offset,
-		bool italic)
+		bool italic, uint32 nestLevel)
 	{
 		BMessage *msg = new BMessage(msg_JumpToProcedure);
 		msg->AddInt32("offset", offset);
 		msg->AddString("function", match);
 		
+		BString indName(name);
+		if (nestLevel)
+		{
+			int indent = 4 * nestLevel;
+			indName.Prepend(' ', indent);
+		}
+
 		if (italic)
-			functions.push_back(new PItalicMenuItem(name, msg));
+			functions.push_back(new PItalicMenuItem(indName.String(), msg));
 		else
-			functions.push_back(new BMenuItem(name, msg));
+			functions.push_back(new BMenuItem(indName.String(), msg));
 	}
 	
 	void AddInclude(const char *name, const char *open, bool italic)
