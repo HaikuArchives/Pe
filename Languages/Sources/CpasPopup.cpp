@@ -35,15 +35,12 @@
 	Created: 03/05/2003
 */
 
-#include <SupportDefs.h>
-#include <string.h>
-#include <ctype.h>
 #include "CLanguageAddOn.h"
-
-
 
 const int kMaxNameSize = 256;
 
+static bool prototype = true;	// while true, methods are just declarations.
+static bool protoadded = false;	// true just after the first proto was added.
 
 const char *comment(const char *text)
 {
@@ -63,17 +60,18 @@ const char *comment(const char *text)
 			while (*text && *text != '*' && text[1] != ')') text++;
 			if (*text) text += 2;
 		}
+		else if (*text == '/' && text[1] == '/')
+		{
+			while (*text && *text != '\n') text++;
+			if (*text) text++;
+		}
 		else break;
 	}
 	while (*text);
 
 	return text;
-} /* comment */
+}
 
-
-/*
- * PROCEDURE id [ '(' .... ')' ] ';'
- */
 const char *parseFunction(const char *text, CLanguageProxy& proxy)
 {
 	char nameBuf[kMaxNameSize], *name = nameBuf;
@@ -92,33 +90,58 @@ const char *parseFunction(const char *text, CLanguageProxy& proxy)
 			else text++;
 	}
 	*name = 0;
+
 	if (size)
-		proxy.AddFunction(nameBuf, nameBuf, offset, false);
+	{
+		if (proxy.Prototypes() && prototype)
+		{
+		 	proxy.AddFunction(nameBuf, nameBuf, offset, true);
+		 	protoadded = true;
+		}
+		else if (!prototype)
+	 		proxy.AddFunction(nameBuf, nameBuf, offset, false);
+	}
 
 	return text;
 }
 
+//------------------------------------------------------------------------------
+
 void ScanForFunctions(CLanguageProxy& proxy)
 {
-
 	const char *text = proxy.Text(), *max = text + proxy.Size();
-	if (*max != 0)
-		return;
-	
+
+	if (*max != 0) return;
+
 	while (text < max)
 	{
 		text = comment(text);
 		
 		switch (*text++)
 		{
-		case 'f':
-		case 'F':
-			if (!strncasecmp(text, "unction", 7)) text = parseFunction(text + 7, proxy);
+			case 'i':
+			case 'I':
+				if (!strncasecmp(text, "mplementation", 13))
+				{
+					prototype = false;
+					if (proxy.Prototypes() && protoadded)
+						proxy.AddSeparator();
+				}
 			break;
-		case 'p':
-		case 'P':
-			if (!strncasecmp(text, "rocedure", 8)) text = parseFunction(text + 8, proxy);
+
+			case 'f':
+			case 'F':
+				if (!strncasecmp(text, "unction", 7))
+					text = parseFunction(text + 7, proxy);
+			break;
+
+			case 'p':
+			case 'P':
+				if (!strncasecmp(text, "rocedure", 8))
+					text = parseFunction(text + 8, proxy);
 			break;
 		}
 	}
 }
+
+//------------------------------------------------------------------------------
