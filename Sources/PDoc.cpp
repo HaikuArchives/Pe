@@ -930,10 +930,12 @@ BRect PDoc::NextPosition(bool inc)
 	if (inc)
 		cnt++;
 	
+	BFont textFont;
+	gPrefs->InitTextFont(&textFont);
 	r.top = 25 + (cnt % 8) * 20;
 	r.left = 40 - (cnt % 8) * 4 + (cnt / 8) * 8;
-	r.right = min(sr.right - 100,
-		r.left + 80 * be_fixed_font->StringWidth(" ") + 3);
+	r.right = min((double)sr.right - 100,
+		r.left + 80 * textFont.StringWidth(" ") + B_V_SCROLL_BAR_WIDTH + 3);
 	float lh;
 	font_height fh;
 	be_fixed_font->GetHeight(&fh);

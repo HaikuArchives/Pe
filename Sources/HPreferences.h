@@ -79,6 +79,8 @@ public:
 	
 	void RemovePref(const char *name);
 	
+	void InitTextFont(BFont* font);
+
 	void ReadPrefFile();
 	void WritePrefFile();
 	void ResetAll();

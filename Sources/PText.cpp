@@ -125,16 +125,8 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fVScrollBar1->SetTarget(this);
 	fVScrollBar2->SetTarget(this);
 
-	font_family ff;
-	font_style fs;
-	be_plain_font->GetFamilyAndStyle(&ff, &fs);
-	
-	strcpy(ff, gPrefs->GetPrefString("font family", ff));
-	strcpy(fs, gPrefs->GetPrefString("font style", fs));
-	
-	fFont.SetFamilyAndStyle(ff, fs);
-	fFont.SetSize(gPrefs->GetPrefDouble("font size", be_plain_font->Size()));
-	
+	gPrefs->InitTextFont(&fFont);
+
 	SetViewColor(gColor[kLowColor]);
 	
 	fTabStops = gPrefs->GetPrefInt("spaces per tab", 4);

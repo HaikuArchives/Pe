@@ -370,3 +370,15 @@ void HPreferences::ResetAll()
 
 	fPrefs.erase(fPrefs.begin(), fPrefs.end());
 } // HPreferences::ResetAll
+
+void HPreferences::InitTextFont(BFont* font) {
+	font_family ff;
+	font_style fs;
+	be_plain_font->GetFamilyAndStyle(&ff, &fs);
+	
+	strcpy(ff, GetPrefString("font family", ff));
+	strcpy(fs, GetPrefString("font style", fs));
+	
+	font->SetFamilyAndStyle(ff, fs);
+	font->SetSize(GetPrefDouble("font size", be_plain_font->Size()));
+}	
