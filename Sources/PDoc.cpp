@@ -1391,10 +1391,10 @@ void PDoc::MessageReceived(BMessage *msg)
 			{
 				int c = 1 << current_workspace();
 				
-				pa->FindDialog()->Show();
-				
 				if (gPrefs->GetPrefInt("window to workspace", 1))
 					pa->FindDialog()->SetWorkspaces(c);
+				
+				pa->FindDialog()->Show();
 				
 				pa->FindDialog()->Activate(true);
 				break;
