@@ -100,7 +100,7 @@ inline bool KeyShortcut::operator==(const KeyShortcut& ks) const
 	return prefix == ks.prefix && combo == ks.combo;
 } /* KeyShortcut::operator== */
 
-#define MODIFIERMASK	(B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY | B_MENU_KEY)
+#define MODIFIERMASK	(B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY | B_MENU_KEY | B_NUM_LOCK)
 #define BINDINGMASK ((MODIFIERMASK << 16) | 0x000000ff)
 
 #endif // CKEYMAPPER_H

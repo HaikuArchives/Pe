@@ -174,6 +174,7 @@ void CKeyCapturer::DescribeKeys(const KeyShortcut& ks, char *desc)
 		if (keys[i] & (B_CONTROL_KEY << 16))		strcat(desc, "Ctrl-");
 		if (keys[i] & (B_OPTION_KEY << 16))		strcat(desc, "Opt-");
 		if (keys[i] & (B_MENU_KEY << 16))			strcat(desc, "Menu-");
+		if (keys[i] & (B_NUM_LOCK << 16))		strcat(desc, "Numlock-");
 		
 		switch (keys[i] & 0x000000FF)
 		{
@@ -207,6 +208,16 @@ void CKeyCapturer::DescribeKeys(const KeyShortcut& ks, char *desc)
 			case 0x0d:					strcat(desc, "F12");			break;
 			case 0x0e:					strcat(desc, "Print");			break;
 			case 0x0f:					strcat(desc, "Scroll");			break;
+			case 0x37:					strcat(desc, "KP_Home");		break;
+			case 0x38:					strcat(desc, "KP_Up");			break;
+			case 0x39:					strcat(desc, "KP_PgUp");		break;
+			case 0x48:					strcat(desc, "KP_Left");		break;
+			case 0x4a:					strcat(desc, "KP_Right");		break;
+			case 0x58:					strcat(desc, "KP_End");			break;
+			case 0x59:					strcat(desc, "KP_Down");		break;
+			case 0x5a:					strcat(desc, "KP_PgDn");		break;
+			case 0x64:					strcat(desc, "KP_Ins");			break;
+			case 0x65:					strcat(desc, "KP_Del");			break;
 			default:
 			{								
 											char k[8], *sk, *dk = k;
