@@ -75,7 +75,20 @@ void CKeyMapper::InitKeymap()
 
 int CKeyMapper::GetCmd(PText *txt, int modifiers, int rawchar, int key)
 {
-	int keycode = ((modifiers & MODIFIERMASK) << 16) | key;
+	int modcode = (modifiers & MODIFIERMASK);
+	if (key == 0x37 || key == 0x38 || key == 0x39 
+		|| key == 0x48 || key == 0x49 || key == 0x4a	
+		|| key == 0x58 || key == 0x59 || key == 0x5a 
+		|| key == 0x64 || key == 0x65)
+		// it's a keypad key which may have two meanings, depending on the
+		// numlock-state. In order to find out, we add B_NUM_LOCK to the 
+		// modifier-mask:
+		modcode = (modifiers & (MODIFIERMASK | B_NUM_LOCK));
+	else
+		// default behaviour, we don't care about B_NUM_LOCK:
+		modcode = (modifiers & MODIFIERMASK);
+	
+	int keycode = (modcode << 16) | key;
 	KeyShortcut ks;
 	int cmd = msg_Nothing;
 	
