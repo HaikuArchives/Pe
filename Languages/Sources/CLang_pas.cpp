@@ -88,15 +88,24 @@ bool isNumeric(char c)
 	return false;
 }
 
+bool isHexNum(char c)
+{
+	if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+		return true;
+
+	return false;
+}
+
 _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 {
 	const char *text = proxy.Text();
 	int size = proxy.Size();
-	int i = 0, s = 0, kws, cc_cnt, esc = 0;
+	int i = 0, s = 0, kws = 0, esc = 0;
 	char c;
 	bool leave = false;
 	bool floating_point = false;
-	
+	bool hex_num = false;
+
 	if (state == COMMENT1 || state == COMMENT2 || state == LCOMMENT)
 		proxy.SetColor(0, kLCommentColor);
 	else
@@ -142,7 +151,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else if (c == '\'')
 					state = STRING;
 
-				else if (isNumeric(c) && !(isalpha(text[i])))
+				else if (isNumeric(c) || (c == '$' && isHexNum(text[i])))
 				{
 					state = NUMERIC;	
 				}
@@ -278,11 +287,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			
 			case NUMERIC:
 				proxy.SetColor(s, kLNumberColor);
-				if (isNumeric(text[i - 1]))
+				if (isNumeric(text[i - 1]) || (hex_num && isHexNum(text[i - 1])))
 					;
 				else
 					if (text[i - 1] == '.' && floating_point == false)
 						floating_point = true;
+					else if (isHexNum(text[i - 1]) && hex_num == false)
+						hex_num = true;
 					else
 					{
 						s = i - 1;

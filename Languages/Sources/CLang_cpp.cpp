@@ -82,6 +82,14 @@ bool isNumeric(char c)
 	return false;
 }
 
+bool isHexNum(char c)
+{
+	if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+		return true;
+
+	return false;
+}
+
 _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 {
 	const char *text = proxy.Text();
@@ -353,7 +361,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case NUMERIC:
 			{
 				proxy.SetColor(s, kLNumberColor);
-				if (isNumeric(text[i-1]))
+				if (isNumeric(text[i-1]) || (hex_num && isHexNum(text[i - 1])))
 					;
 				else
 					if (text[i-1]=='.' && floating_point==false && hex_num==false)
@@ -364,6 +372,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					{
 						s=i-1;
 						i--;
+						hex_num = false;
 						state = START;
 					}
 			}
