@@ -3148,7 +3148,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 			catchOffset = false;
 			break;
 		case kmsg_Move_to_Top_of_Page:
-			if (line > topline)
+			if (line > topline + 1)
 				line = topline;
 			else
 				line = max(0, line - linesPerPage);
