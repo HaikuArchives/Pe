@@ -134,8 +134,13 @@ struct CFilterChoiceDialog::ChoiceItemInfo {
 	CFilterChoiceItem	*choiceItem;
 	BListItem			*listItem;
 	bool				isSeparator;
+	bool				isSelectable;
 
 	bool IsGroupSeparator() const	{ return (isSeparator && !choiceItem); }
+	int NestLevel() const	{ return (choiceItem ? choiceItem->NestLevel() : 0); }
+
+	bool IsSelectable() const	{ return (!isSeparator && isSelectable); }
+	void SetSelectable(bool selectable)	{ isSelectable = selectable; }
 };
 
 
@@ -180,7 +185,13 @@ CFilterChoiceDialog::ChoiceListItem::DrawItem(BView *owner, BRect frame,
 {
 	if (fFont)
 		owner->SetFont(fFont);
+	rgb_color highColor = owner->HighColor();
+	bool selectable = fItemInfo->IsSelectable();
+	if (!selectable)
+		owner->SetHighColor(tint_color(highColor, B_LIGHTEN_2_TINT));
 	BStringItem::DrawItem(owner, frame, complete);
+	if (!selectable)
+		owner->SetHighColor(highColor);
 }
 
 // Update
@@ -277,13 +288,55 @@ CFilterChoiceDialog::Listener::FilterChoiceDialogAborted(
 {
 }
 
+// #pragma mark -
+// #pragma mark ----- Filter -----
+
+class CFilterChoiceDialog::Filter {
+public:
+	Filter(const char *filterString);
+
+	bool Accept(const ChoiceItemInfo* info, bool& matched);
+
+private:
+	BString	fFilterString;
+	int		fLastLevel;
+};
+
+// constructor
+CFilterChoiceDialog::Filter::Filter(const char *filterString)
+	: fFilterString(filterString),
+	  fLastLevel(0)
+{
+}
+
+// Accept
+bool
+CFilterChoiceDialog::Filter::Accept(const ChoiceItemInfo* info, bool& matched)
+{
+	if (!info)
+		return false;
+	matched = false;
+	if (info->isSeparator || !info->choiceItem)
+		return true;
+	if (fFilterString.Length() > 0) {
+		BString name(info->choiceItem->Name());
+		matched = (name.IFindFirst(fFilterString) >= 0);
+	} else
+		matched = true;
+	int nestLevel = info->NestLevel();
+	bool accept = matched || (nestLevel < fLastLevel);
+	if (accept)
+		fLastLevel = nestLevel;
+	return accept;
+}
+
 
 // #pragma mark -
 // #pragma mark ----- CFilterChoiceDialog -----
 
 // constructor
 CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
-	CFilterChoiceModel *model, BRect centerOver)
+	CFilterChoiceModel *model, BRect centerOver, int defaultSelectGroup)
 	: BWindow(BRect(0, 0, kDefaultDialogWidth, kDefaultDialogHeight), title,
 			  B_MODAL_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
@@ -359,7 +412,7 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 		fItemCount += itemCount + 1;
 			// + 1 for group separator item
 	}
-	// populate the list
+	// get the item infos
 	fItemInfos = new(nothrow) ChoiceItemInfo[fItemCount];
 	FailNil(fItemInfos);
 	for (int groupIndex = 0; groupIndex < fGroupCount; groupIndex++) {
@@ -390,6 +443,15 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 		}
 	}
 	_RebuildList();
+	// try to select the first item of the supplied group
+	if (defaultSelectGroup >= 0 && defaultSelectGroup < fGroupCount) {
+		int index = fGroupInfos[defaultSelectGroup].index;
+		if (index < fItemCount) {
+			ChoiceItemInfo& info = fItemInfos[index];
+			if (fChoicesList->HasItem(info.listItem))
+				_SelectItem(fChoicesList->IndexOf(info.listItem), true);
+		}
+	}
 	_SelectAnyVisibleItem();
 	_PlaceWindow(centerOver);
 }
@@ -686,21 +748,36 @@ CFilterChoiceDialog::_DispatchMouseDown(BMessage *message, BHandler *handler)
 void
 CFilterChoiceDialog::_SetFilter(const char *newFilterString)
 {
-	
 	BString oldFilterString(fFilterString);
 	fFilterString = newFilterString;
 	if (fFilterString.ICompare(oldFilterString) == 0)
 		return;
 	if (oldFilterString.Length() == 0
 		|| fFilterString.IFindFirst(oldFilterString) >= 0) {
+		ChoiceListItem *selectedItem = dynamic_cast<ChoiceListItem*>(
+			fChoicesList->ItemAt(fChoicesList->CurrentSelection()));
 		// new string contains the old one: we can filter the current items
 		int count = fChoicesList->CountItems();
+		Filter filter(newFilterString);
 		for (int i = count - 1; i >= 0; i--) {
 			BListItem *listItem = fChoicesList->ItemAt(i);
-			if (!_FilterItem(_InfoForItem(listItem)))
-				fChoicesList->RemoveItem(i);
+			if (ChoiceItemInfo *info = _InfoForItem(listItem)) {
+				bool matched;
+				if (!filter.Accept(info, matched))
+					fChoicesList->RemoveItem(i);
+				else
+					info->SetSelectable(matched);
+			}
+		}
+		// if an item is selected, we deselect it if it doesn't match anymore
+		int32 selectedIndex = (selectedItem
+			? fChoicesList->IndexOf(selectedItem) : -1);
+		if (selectedIndex >= 0 && !_InfoForItem(selectedItem)->IsSelectable()) {
+			fChoicesList->Deselect(selectedIndex);
+			_SelectItem(selectedIndex, true);
 		}
 		_CoalesceSeparators();
+		fChoicesList->Invalidate();
 	} else {
 		// new string does not contain the old one: we filter all items
 		_RebuildList();
@@ -715,15 +792,26 @@ CFilterChoiceDialog::_RebuildList()
 	ChoiceListItem *selectedItem = dynamic_cast<ChoiceListItem*>(
 		fChoicesList->ItemAt(fChoicesList->CurrentSelection()));
 	fChoicesList->MakeEmpty();
-	for (int i = 0; i < fItemCount; i++) {
+	// get the items the filter accepts
+	BList acceptedItems;
+	Filter filter(fFilterString.String());
+	for (int i = fItemCount - 1; i >= 0; i--) {
 		ChoiceItemInfo& info = fItemInfos[i];
-		if (_FilterItem(&info))
-			fChoicesList->AddItem(info.listItem);
+		bool matched;
+		if (filter.Accept(&info, matched)) {
+			acceptedItems.AddItem(info.listItem);
+			info.SetSelectable(matched);
+		}
+	}
+	// add the list items
+	for (int i = acceptedItems.CountItems() - 1; i >= 0; i--) {
+		ChoiceListItem *item = (ChoiceListItem*)acceptedItems.ItemAt(i);
+		fChoicesList->AddItem(item);
 	}
 	// if an item was selected before, we select it again
 	int32 selectedIndex = (selectedItem
 		? fChoicesList->IndexOf(selectedItem) : -1);
-	if (selectedIndex >= 0) {
+	if (selectedIndex >= 0 && _InfoForItem(selectedItem)->IsSelectable()) {
 		fChoicesList->Select(selectedIndex);
 		fChoicesList->ScrollToSelection();
 	}
@@ -760,8 +848,6 @@ CFilterChoiceDialog::_CoalesceSeparators()
 				wasGroupSeparator = false;
 			}
 		}
-		if (!_FilterItem(_InfoForItem(listItem)))
-			fChoicesList->RemoveItem(i);
 	}
 	// remove the first item, if it is a separator
 	count = fChoicesList->CountItems();
@@ -850,7 +936,7 @@ bool
 CFilterChoiceDialog::_IsSelectableItem(int32 index) const
 {
 	ChoiceItemInfo *info = _InfoForItem(fChoicesList->ItemAt(index));
-	return (info && !info->isSeparator && info->choiceItem);
+	return (info && info->IsSelectable());
 }
 
 // _SelectItem
@@ -923,13 +1009,13 @@ CFilterChoiceDialog::_SelectNextItem()
 void
 CFilterChoiceDialog::_SelectFirstVisibleItem()
 {
-	_SelectItem(_FirstVisibleIndex(), false);
+	_SelectItem(_FirstVisibleIndex(), true);
 }
 
 // _SelectLastVisibleItem
 void
 CFilterChoiceDialog::_SelectLastVisibleItem()
 {
-	_SelectItem(_LastVisibleIndex(), true);
+	_SelectItem(_LastVisibleIndex(), false);
 }
 

@@ -60,7 +60,7 @@ public:
 
 public:
 	CFilterChoiceDialog(const char *title, CFilterChoiceModel *model,
-		BRect centerOver);
+		BRect centerOver, int defaultSelectGroup = 0);
 	virtual ~CFilterChoiceDialog();
 
 	virtual void MessageReceived(BMessage *message);
@@ -82,6 +82,7 @@ private:
 	class ChoiceListItem;
 	struct ChoiceItemInfo;
 	class SeparatorListItem;
+	class Filter;
 
 	void _PlaceWindow(BRect centerOver);
 

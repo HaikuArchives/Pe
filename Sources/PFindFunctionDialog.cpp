@@ -43,7 +43,6 @@ PFindFunctionDialogController::Choice::Choice(const char *nm, uint32 what,
 }
 
 
-
 // ChoiceModel
 class PFindFunctionDialogController::ChoiceModel : public CFilterChoiceModel {
 public:
@@ -140,7 +139,7 @@ PFindFunctionDialogController::PFindFunctionDialogController(PText *text)
 	FailNil(fChoiceModel);
 	text->ScanForFunctions(*this);
 	fDialog = new(nothrow) CFilterChoiceDialog("Find Function", fChoiceModel,
-		text->ConvertToScreen(text->Bounds().OffsetToCopy(B_ORIGIN)));
+		text->ConvertToScreen(text->Bounds().OffsetToCopy(B_ORIGIN)), 1);
 	FailNil(fDialog);
 	fDialog->SetListener(this);
 	fDialog->Show();
