@@ -41,8 +41,24 @@ else
 endif
 
 ifeq ($(CPU), x86)
-	CFLAGS		= -c -I Sources -I ../Sources -include Sources/CLangIncl.h -O3
-	LDFLAGS		= -lbe -lroot -nostart -gdwarf-2
+	ifeq ($(DEBUG), 1)
+		DBG		= -gdwarf-2
+		OPT		= -O0
+	else
+		DBG		= 
+		OPT		= -O1
+	endif
+
+	ifneq ($(wildcard /boot/develop/headers/be/bone/arpa/inet.h),)
+		CFLAGS		= -c -DBONE_BUILD -I Sources -I ../Sources \
+						  -I /boot/develop/headers/be/bone -I /boot/develop/headers/be/bone/sys \
+						  -include Sources/CLangIncl.h $(DBG) $(OPT)
+		LDFLAGS		= -lbe -lsocket -lbind -lroot -nostart -gdwarf-2
+	else
+		CFLAGS		= -c -I Sources -I ../Sources -include Sources/CLangIncl.h $(DBG) $(OPT)
+		LDFLAGS		= -lbe -lroot -nostart $DBG
+	endif
+
 	LIBS		= -lstdc++.r4
 	STRIP		= strip
 else

@@ -33,6 +33,11 @@
 MACHINE		= $(shell uname -m)
 ifeq ($(MACHINE), BePC)
 	CPU	= x86
+	ifneq ($(wildcard /boot/develop/headers/be/bone/arpa/inet.h),)
+		BONE_LIBS	= socket bind
+		BONE_DEFS	= -DBONE_BUILD
+		BONE_INCS	= /boot/develop/headers/be/bone /boot/develop/headers/be/bone/sys
+	endif
 else
 	CPU	= ppc
 endif
@@ -41,9 +46,9 @@ TARGET			= pe
 # DEBUG should be either 1 or 0
 DEBUG			= 1
 DEFINES			= # BETA DEMO
-LIBS			= hekkel tracker mail textencoding
+LIBS			= hekkel tracker mail textencoding $(BONE_LIBS)
 LIBPATHS		= .
-INCPATHS		= 
+INCPATHS		= $(BONE_INCS)
 ifeq ($(CPU), x86)
 	WARNINGS	=  -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-sign-compare
 	LIBS		+= be root stdc++.r4 
@@ -179,7 +184,7 @@ ifeq ($(CPU), x86)
 		OBJDIR	= Obj.Debug
 	else
 		DBG		= 
-		OPT		= -O3
+		OPT		= -O1
 		OBJDIR	= Obj.NoDebug
 	endif
 else
@@ -237,7 +242,7 @@ CFLAGS	+= $(DBG) $(OPT)
 ifeq ($(CPU), x86)
 CFLAGS	+= -fpic
 endif
-CFLAGS	+= $(foreach define, $(DEFINES), $(addprefix -D, $(define)))
+CFLAGS	+= $(foreach define, $(DEFINES), $(addprefix -D, $(define))) $(BONE_DEFS)
 
 all: $(OBJDIR) rez_compiler librx $(TARGET) lang ext
 
@@ -281,7 +286,7 @@ $(OBJDIR)/%.d: %.cpp $(PREFIXFILE)
 	@ test -d $(OBJDIR) || mkdir $(OBJDIR)
 	@ echo "-> "$(@F)
 ifeq ($(CPU), x86)
-	@ $(SHELL) -ec '$(CC) -M $(INCLUDES) $< | sed '\''s/\(.*\.o\)[ :]*/$(OBJDIR)\/\1 $(@F): /g'\'' > $@'
+	@ $(SHELL) -ec '$(CC) $(BONE_DEFS) -M $(INCLUDES) $< | sed '\''s/\(.*\.o\)[ :]*/$(OBJDIR)\/\1 $(@F): /g'\'' > $@'
 else
 	@ $(SHELL) -ec '$(CC) -prefix $(PREFIXFILE) -make $(INCLUDES) $< | sed '\''s/\(.*\.o\)[ :]*/$(OBJDIR)\/\1 $(@F): /g'\'' > $@'
 endif

@@ -32,13 +32,22 @@ if $(METROWERKS) {
 	CCFLAGS += -prefix $(PREFIX) ;
 	LINKFLAGS += -map pe.xMAP -sym full -nodup -export all ;
 } else {
+	# check for BONE...
+	local haveBone = [ GLOB /boot/develop/headers/be/bone/arpa : inet.h ] ;
+
 	CC ?= gcc ;
 	C++ ?= g++ ;
 	LINK ?= g++ ;
 	WARNINGS ?= -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-sign-compare -Wno-unknown-pragmas ;
-	LINKLIBS += -lbe -lroot -lstdc++.r4 ;
-	CCFLAGS += -fpic ;
-	C++FLAGS += -fpic ;
+	if $(haveBone)	{
+		LINKLIBS += -lbe -lsocket -lbind -lroot -lstdc++.r4 ;
+		CCFLAGS += -fpic -DBONE_BUILD -I /boot/develop/headers/be/bone -I /boot/develop/headers/be/bone/sys ;
+		C++FLAGS += -fpic -DBONE_BUILD -I /boot/develop/headers/be/bone -I /boot/develop/headers/be/bone/sys ;
+	} else {
+		LINKLIBS += -lbe -lroot -lstdc++.r4 ;
+		CCFLAGS += -fpic ;
+		C++FLAGS += -fpic ;
+	}
 }
 CCFLAGS += $(WARNINGS) $(DEFINES) ;
 C++FLAGS += $(WARNINGS) $(DEFINES) ;

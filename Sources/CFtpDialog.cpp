@@ -43,6 +43,9 @@
 #include "CLogin.h"
 #include "HError.h"
 #include "HPreferences.h"
+#ifdef BONE_BUILD
+	#define closesocket(X)	close(X)
+#endif
 #include <socket.h>
 #include <netdb.h>
 

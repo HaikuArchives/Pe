@@ -50,7 +50,13 @@ ifeq ($(CPU), x86)
 		OPT		= -O0
 	else
 		DBG		= 
-		OPT		= -O3
+		OPT		= -O1
+	endif
+
+	ifneq ($(wildcard /boot/develop/headers/be/bone/arpa/inet.h),)
+		CFLAGS		+= -DBONE_BUILD -I /boot/develop/headers/be/bone \
+		               -I /boot/develop/headers/be/bone/sys
+		LIBS			+= socket bind
 	endif
 
 	CFLAGS	+= -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-sign-compare -fpic
