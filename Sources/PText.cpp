@@ -1426,7 +1426,7 @@ void PText::AdjustScrollBars()
 	
 	g_unit_t h, y;
 	
-	int lines = LineCount() + 1;
+	int lines = LineCount();
 
 	if (fSplitAt > 0)
 	{
