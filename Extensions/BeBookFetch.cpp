@@ -1,15 +1,22 @@
 //-----------------------------------------------------------------------------
-// BeBookFetch: looks up the selected text again BeBook's doc bookmarks.
+// BeBookFetch: looks up the selected text against BeBook's doc bookmarks.
 //
 // Contains (legally) stolen code from:
 //  - Alan Ellis's Be API Fetch for Eddie (http://www.bebits.com/app/6).
+//
+// Pe version and new bugs by Oscar Lesta.
+//
+// ToDo: improve the popup display by reading doc_bookmark attributes to avoid
+//       duplicates items (append, for example, "be:kit_name" attr content).
 //-----------------------------------------------------------------------------
 
 #include <vector>
 #include <ctype.h>
 
 #include <Alert.h>
+#include <AppDefs.h>
 #include <MenuItem.h>
+#include <Messenger.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Query.h>
@@ -36,8 +43,6 @@
 #define kNoMatch       "Nothing was found for: "
 #define kAlertName     "Pe's BeAPI Fetcher Alert"
 #define kBtnText       "Mmmm"
-
-#define kFuncDirName   "CodeName"
 #define kPopupName     "API Selections"
 
 //------------------------------------------------------------------------------
@@ -59,6 +64,7 @@ uint32	FetchQuery(query_op Op, const char* Selection, vector<BString>& Results, 
 void	DisplayResults(vector<BString>& Results, MTextAddOn *addon);
 BString	FormatResultString(const BString& ResultPath);
 void	PopUpSelection(vector<BString>& Results, MTextAddOn *addon);
+void	OpenDoc(char* arg);
 
 //-----------------------------------------------------------------------------
 
@@ -85,10 +91,10 @@ long perform_edit(MTextAddOn *addon)
 		pos++;
 	}
 
-	if (pos > 0)
-		selection.Truncate(pos);
-	else
-		return B_ERROR;
+	if (!pos) return B_ERROR;
+
+	selection.Truncate(pos);
+	selection.ToLower(); // Improves the chances of getting something.
 
 	vector <BString> results;
 
@@ -187,16 +193,36 @@ void DisplayResults(vector<BString>& Results, MTextAddOn *addon)
 	if (Results.size() < 2)
 	{
 		char* arg = (char *)Results[0].String();
-
-		// This one has an issue: if you happen to have another Tracker exec
-		// somewhere on your boot volume... it will get executed instead of
-		// just calling the already-running-Tracker's ArgRecv method.
-		be_roster->Launch(kTrackerSig, 1, &arg);
+		OpenDoc(arg);
 	}
 	else
 	{
 		PopUpSelection(Results, addon);
 	}
+}
+
+//-----------------------------------------------------------------------------
+
+void OpenDoc(char* arg)
+{
+// Note:
+// I don't just call be_roster->Launch() here because:
+// if you happen to have another Tracker exec somewhere on your boot volume...
+// it will get executed instead of just calling the already-running-Tracker's
+// ArgRecv method. And that's bad, because you get two Tracker running, and it
+// takes too long to get the results :-)
+
+	BMessage msg(B_ARGV_RECEIVED);
+	msg.AddString("cwd", "/"); // OT's TTracker::ArgvReceived fault.
+	msg.AddString("argv", "Tracker");
+	msg.AddString("argv", arg);
+	msg.AddInt32("argc", 2);
+
+	BMessenger messenger(kTrackerSig);
+	if (messenger.IsValid())
+		messenger.SendMessage(&msg);
+	else
+		be_roster->Launch(kTrackerSig, 1, &arg);
 }
 
 //-----------------------------------------------------------------------------
@@ -237,7 +263,7 @@ void PopUpSelection(vector<BString>& Results, MTextAddOn *addon)
 		selections.AddItem(item);
 	}
 
-	// Gotta love C++ syntaxis, sight... Anyway, here we get a nice BPoint to
+	// Gotta love C++ syntaxis, sigh... Anyway, here we get a nice BPoint to
 	// popup the results.
 	float x = (dynamic_cast<PDoc*>(addon->Window()))->ButtonBar()->Frame().right + 2;
 	float y = (dynamic_cast<PDoc*>(addon->Window()))->ToolBar()->Frame().Height() - 2;
@@ -250,7 +276,7 @@ void PopUpSelection(vector<BString>& Results, MTextAddOn *addon)
 	{
 		int index = item->Command();
 		char* arg = (char *)Results[index].String();
-		be_roster->Launch(kTrackerSig, 1, &arg);
+		OpenDoc(arg);
 	}
 }
 
