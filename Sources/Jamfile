@@ -1,0 +1,88 @@
+
+SubDir TOP Sources ;
+
+Library hekkel :
+	HAppResFile.cpp
+	HBox.cpp
+	HButtonBar.cpp
+	HColorControl.cpp
+	HColorPicker2.cpp
+	HColorUtils.cpp
+	HDialog.cpp
+	HDlogView.cpp
+	HError.cpp
+	HHelpWindow.cpp
+	HLazyObject.cpp
+	HPreferences.cpp
+	HStream.cpp
+	HTabSheet.cpp
+	MAlert.cpp
+	MTextAddOn.cpp
+	MThread.cpp
+	;
+MakeLocate hekkel : [ FDirName $(TOP) ] ;
+
+Main pe :
+	Benaphore.cpp
+	CCharObject.cpp
+	CConvertDialog.cpp
+	CDiff.cpp
+	CDiffWindow.cpp
+	CDoc.cpp
+	CFindDialog.cpp
+	CFtpDialog.cpp
+	CFtpListItem.cpp
+	CFtpStream.cpp
+	CGlossary.cpp
+	CGoToLine.cpp
+	CGrepBox.cpp
+	CHTMLBar.cpp
+	CInfoDialog.cpp
+	CKeyCapturer.cpp
+	CKeyMapper.cpp
+	CKeywords.cpp
+	CLangIntf.cpp
+	CLanguageAddOn.cpp
+	CLineObject.cpp
+	CListBox.cpp
+	CLogin.cpp
+	CMenuItem.cpp
+	CMessageItem.cpp
+	CMimeBox.cpp
+	COpenSelection.cpp
+	CPathsBox.cpp
+	CPrefsDialog.cpp
+	CStdErrBox.cpp
+	CStdErrParser.cpp
+	CUrlOpener.cpp
+	FontStyle.cpp
+	PAbout.cpp
+	PApp.cpp
+	PCmd.cpp
+	PDoc.cpp
+	PErrorWindow.cpp
+	PGlossyWindow.cpp
+	PGroupWindow.cpp
+	PItalicMenuItem.cpp
+	PKeyDownFilter.cpp
+	PLongAction.cpp
+	PMessageWindow.cpp
+	PProjectWindow.cpp
+	PScrollBar.cpp
+	PSplitter.cpp
+	PStatus.cpp
+	PText.cpp
+	PTextBuffer.cpp
+	PToolBar.cpp
+	PTypeAHeadList.cpp
+	Sstdio.cpp
+	Utils.cpp
+	utf-support.cpp
+	;
+LinkLibraries pe :
+	libhekkel
+	libtracker
+	libmail
+	libtextencoding
+	;
+MakeLocate pe : [ FDirName $(TOP) ] ;

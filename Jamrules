@@ -11,7 +11,7 @@ if $(DEBUG) {
 	CCFLAGS += -g ;
 	C++FLAGS += -g ;
 	LINKFLAGS += -g ;
-	OPTIM ?= - O0 ;
+	OPTIM ?= -O0 ;
 } else {
 	ALL_LOCATE_TARGET ?= [ FDirName $(TOP) Obj.NoDebug ] ;
 	if $(CPU) = X86 {
@@ -22,14 +22,7 @@ if $(DEBUG) {
 }
 
 LINKLIBS += -L. ;
-if $(CPU) = X86 {
-	CC ?= gcc ;
-	C++ ?= g++ ;
-	LINK ?= g++ ;
-	WARNINGS ?= -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-sign-compare ;
-	LINKLIBS += -lbe -lroot -lstdc++.r4 ;
-	CCFLAGS += -fpic ;
-} else {
+if $(METROWERKS) {
 	CC ?= mwcc ;
 	C++ ?= mwcc ;
 	WARNINGS ?= -w all -w nonotinlined -w noimplicit ;
@@ -38,6 +31,13 @@ if $(CPU) = X86 {
 	PREFIX ?= [ FDirName $(ALL_LOCATE_TARGET) pe.headers ] ;
 	CCFLAGS += -prefix $(PREFIX) ;
 	LINKFLAGS += -map pe.xMAP -sym full -nodup -export all ;
+} else {
+	CC ?= gcc ;
+	C++ ?= g++ ;
+	LINK ?= g++ ;
+	WARNINGS ?= -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-sign-compare ;
+	LINKLIBS += -lbe -lroot -lstdc++.r4 ;
+	CCFLAGS += -fpic ;
 }
 CCFLAGS += $(WARNINGS) $(DEFINES) ;
 C++FLAGS += $(WARNINGS) $(DEFINES) ;
