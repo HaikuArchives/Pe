@@ -109,9 +109,7 @@ f_unit_t CFontStyle::operator[](const char *s)
 				return fEscapements[i].escapement;
 			}
 	
-	// should never be true
 			if (i == j) {
-				ASSERT(false);
 				break;
 			}
 			
