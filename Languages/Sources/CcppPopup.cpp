@@ -492,6 +492,8 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 		}
 	}
 	
+	*name = 0;
+
 	if (!destructor && strcmp(id, "operator") == 0)
 	{
 		if (*text == '(')
