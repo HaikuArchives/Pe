@@ -59,11 +59,16 @@ const char
 		"Special thanks to\nTom Hays\nfor improving the TeX addon\n\n"
 		"and Be of course\nfor making this wonderful OS.\n\n"
 		"-\n\n"
-		"This is the Open Source version of Pe\n"
-		"which lives on http://www.beunited.org\n"
-		"Thanks to all contributors.\n\n"
+		"This is the Open Source version of Pe,\n"
+		"compiled on:\n%s\n\n"
+		"Pe now lives at http://www.beunited.org\n\n"
+		"You can reach the current developers\n"
+		"via Pe's mailing-list,\n"
+		"pedevel@freelists.org\n\n"
 		"-\n\n"
-		"compiled on:\n%s\n\n",
+		"Please send suggestions and/or bugreports\n"
+		"to pedevel@hirschkaefer.org\n\n"
+		"Thanks to all contributors.\n\n",
 	kAboutText2[] = "BeOS Rules!";
 
 #if STANDALONE
