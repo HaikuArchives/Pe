@@ -53,10 +53,10 @@ ifeq ($(CPU), x86)
 		CFLAGS		= -c -DBONE_BUILD -I Sources -I ../Sources \
 						  -I /boot/develop/headers/be/bone -I /boot/develop/headers/be/bone/sys \
 						  -include Sources/CLangIncl.h $(DBG) $(OPT)
-		LDFLAGS		= -lbe -lsocket -lbind -lroot -nostart -gdwarf-2
+		LDFLAGS		= -lbe -lsocket -lbind -lroot -nostart $(DBG)
 	else
 		CFLAGS		= -c -I Sources -I ../Sources -include Sources/CLangIncl.h $(DBG) $(OPT)
-		LDFLAGS		= -lbe -lroot -nostart $DBG
+		LDFLAGS		= -lbe -lroot -nostart $(DBG)
 	endif
 
 	LIBS		= -lstdc++.r4
