@@ -38,6 +38,7 @@ if $(METROWERKS) {
 	WARNINGS ?= -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-sign-compare ;
 	LINKLIBS += -lbe -lroot -lstdc++.r4 ;
 	CCFLAGS += -fpic ;
+	C++FLAGS += -fpic ;
 }
 CCFLAGS += $(WARNINGS) $(DEFINES) ;
 C++FLAGS += $(WARNINGS) $(DEFINES) ;
