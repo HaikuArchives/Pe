@@ -137,7 +137,7 @@ long perform_edit(MTextAddOn *addon)
 //-----------------------------------------------------------------------------
 
 uint32 FetchQuery(query_op Op, const char* Selection, vector<BString>& Results,
-                  bool CaseSensitive = true)
+                  bool CaseSensitive)
 {
 	BQuery query;
 
