@@ -114,6 +114,15 @@ actions Rez
 	$(REZ) -o "$(<)" "$(>)" ;
 }
 
+rule ForceUpdateMimeset
+{
+}
+
+actions ForceUpdateMimeset
+{
+	mimeset -f $(<) ;
+}
+
 # thanks OBOS
 rule XRes
 {

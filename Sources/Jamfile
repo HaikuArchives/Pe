@@ -114,3 +114,4 @@ XRes pe :
 Rez pe : 
 	[ FDirName $(TOP) Resources Now.r ]
 	;
+ForceUpdateMimeset pe ;
