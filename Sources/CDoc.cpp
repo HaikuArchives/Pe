@@ -451,9 +451,7 @@ void CDoc::CopyAttributes(BFile& from, BFile& to)
 		
 		while (from.GetNextAttrName(name) == B_OK)
 		{
-			char buf[1000];
 			attr_info ai;
-			off_t o = 0;
 			
 			if (strcmp(name, "pe-info") == 0 ||
 				strcmp(name, "FontSettings") == 0 ||
@@ -462,14 +460,10 @@ void CDoc::CopyAttributes(BFile& from, BFile& to)
 			
 			FailOSErr(from.GetAttrInfo(name, &ai));
 			
-			while (ai.size)
-			{
-				long size = ai.size < 1000 ? ai.size : 1000;
-				from.ReadAttr(name, ai.type, o, buf, size);
-				to.WriteAttr(name, ai.type, o, buf, size);
-				o += size;
-				ai.size -= size;
-			}
+			char *buf = new char [ai.size];
+			from.ReadAttr(name, ai.type, 0, buf, ai.size);
+			to.WriteAttr(name, ai.type, 0, buf, ai.size);
+			delete [] buf;
 		}	
 		
 		mode_t perm;
