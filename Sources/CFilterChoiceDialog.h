@@ -99,6 +99,8 @@ private:
 
 	int32 _FirstVisibleIndex() const;
 	int32 _LastVisibleIndex() const;
+	int32 _FirstVisibleSelectableIndex() const;
+	int32 _LastVisibleSelectableIndex() const;
 	bool _IsSelectableItem(int32 index) const;
 	void _SelectAnyVisibleItem();
 	void _SelectItem(int index, bool searchForward);

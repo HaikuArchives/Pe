@@ -668,15 +668,21 @@ CFilterChoiceDialog::_DispatchKeyDown(BMessage *message, BHandler *handler)
 			_SelectNextItem();
 			break;
 		case B_PAGE_UP:
-			if (fChoicesList->CurrentSelection() == _FirstVisibleIndex())
+		{
+			int32 index = fChoicesList->CurrentSelection();
+			if (index >= 0 && index == _FirstVisibleSelectableIndex())
 				BWindow::DispatchMessage(message, fChoicesList);
 			_SelectFirstVisibleItem();
 			break;
+		}
 		case B_PAGE_DOWN:
-			if (fChoicesList->CurrentSelection() == _LastVisibleIndex())
+		{
+			int32 index = fChoicesList->CurrentSelection();
+			if (index >= 0 && index == _LastVisibleSelectableIndex())
 				BWindow::DispatchMessage(message, fChoicesList);
 			_SelectLastVisibleItem();
 			break;
+		}
 		case 'q':
 		case 'w':
 		{
@@ -911,6 +917,46 @@ CFilterChoiceDialog::_LastVisibleIndex() const
 	if (fChoicesList->ItemFrame(count - 1).Intersects(bounds))
 		return (count - 1);
 	return -1;
+}
+
+// _FirstVisibleSelectableIndex
+int32
+CFilterChoiceDialog::_FirstVisibleSelectableIndex() const
+{
+	int32 count = fChoicesList->CountItems();
+	if (count <= 0)
+		return -1;
+	int32 index = _FirstVisibleIndex();
+	if (index < 0 || index >= count)
+		index = 0;
+	// find the next selectable item
+	bool found = false;
+	while (!found && index < count) {
+		found = _IsSelectableItem(index);
+		if (!found)
+			index++;
+	}
+	return (found ? index : -1);
+}
+
+// _LastVisibleSelectableIndex
+int32
+CFilterChoiceDialog::_LastVisibleSelectableIndex() const
+{
+	int32 count = fChoicesList->CountItems();
+	if (count <= 0)
+		return -1;
+	int32 index = _LastVisibleIndex();
+	if (index < 0 || index >= count)
+		index = count - 1;
+	// find the next selectable item
+	bool found = false;
+	while (!found && index >= 0) {
+		found = _IsSelectableItem(index);
+		if (!found)
+			index--;
+	}
+	return (found ? index : -1);
 }
 
 // _SelectAnyVisibleItem
