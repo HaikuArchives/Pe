@@ -367,7 +367,8 @@ Resource 'Bind' (4, "Bindings for Search Menu") {
 		Cmd, 0x40,				0, 0,		msg_FindAgain,
 		Cmd, 0x3f,				0, 0,		msg_FindCmd,
 		Cmd, 0x2e,				0, 0, 		msg_IncSearch,
-		Cmd | Shift, 0x2e,		0, 0,		msg_IncSearchBackward
+		Cmd | Shift, 0x2e,		0, 0,		msg_IncSearchBackward,
+		Cmd | Shift, 0x3f,		0, 0,		msg_FindFunction
 	}
 };
 
