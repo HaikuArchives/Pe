@@ -48,10 +48,12 @@ inline bool isident(char c)
 }
 
 bool is_template(const char *text);
-const char *comment(const char *text, bool strippp = true);
+const char *comment(const char *text, bool strippp = true,
+	CLanguageProxy* proxy = NULL);
 const char *parens(const char *text, char open);
 const char *skip(const char *text, char ch);
 const char *skip_ne(const char *text, char ch);
+void pragma(const char *&text, int offset, CLanguageProxy& proxy);
 const char *preprocessor(const char *text, CLanguageProxy& proxy);
 const char *ident(const char *text, CLanguageProxy& proxy);
 const char *i_extern(const char *text);
@@ -89,7 +91,7 @@ const char *skip_ne(const char *text, char ch)
 	return text;
 } /* skip_ne */
 
-const char *comment(const char *text, bool strippp)
+const char *comment(const char *text, bool strippp, CLanguageProxy* proxy)
 {
 	do
 	{
@@ -115,7 +117,32 @@ const char *comment(const char *text, bool strippp)
 			}
 			else if (text[1] == '/')
 			{
-				text = skip(text, '\n');
+				text += 2;
+				const char *commentEnd = skip(text, '\n');
+
+				// if a proxy is given, we look for "#pragma mark"
+				if (proxy)
+				{
+					int offset = text - proxy->Text();
+
+					while (isspace(*text) && text < commentEnd)
+						text++;
+
+					if (*text == '#') {
+						text++;
+
+						while (isspace(*text) && text < commentEnd)
+							text++;
+
+						if (strncmp(text, "pragma", 6) == 0)
+						{
+							text += 6;
+							pragma(text, offset, *proxy);
+						}
+					}
+				}
+
+				text = commentEnd;
 			}
 			else
 				break;
@@ -192,6 +219,33 @@ inline void name_append(const char*& text, char*& name, int& size)
 		text++;
 } /* name_append */
 
+void pragma(const char *&text, int offset, CLanguageProxy& proxy)
+{
+	while (isspace(*text))
+		text++;
+
+	if (strncmp(text, "mark", 4) == 0)
+	{
+		text += 4;
+
+		while (isspace(*text))
+			text++;
+		
+		char nameBuf[kMaxNameSize], *name = nameBuf;
+		int size = 0;
+
+		while (*text && *text != '\n')
+			name_append(text, name, size);
+
+		*name = 0;
+
+		if (strcmp(nameBuf, "-") == 0)
+			proxy.AddSeparator();
+		else
+			proxy.AddFunction(nameBuf, nameBuf, offset);
+	}
+} /* pragma */
+
 const char *preprocessor(const char *text, CLanguageProxy& proxy)
 {
 	char nameBuf[kMaxNameSize], *name = nameBuf;
@@ -233,27 +287,7 @@ const char *preprocessor(const char *text, CLanguageProxy& proxy)
 	else if (strncmp(text, "pragma", 6) == 0)
 	{
 		text += 6;
-		
-		while (isspace(*text))
-			text++;
-			
-		if (strncmp(text, "mark", 4) == 0)
-		{
-			text += 4;
-
-			while (isspace(*text))
-				text++;
-			
-			while (*text && *text != '\n')
-				name_append(text, name, size);
-
-			*name = 0;
-			
-			if (strcmp(nameBuf, "-") == 0)
-				proxy.AddSeparator();
-			else
-				proxy.AddFunction(nameBuf, nameBuf, offset);
-		}
+		pragma(text, offset, proxy);
 	}
 	
 	return skip(text, '\n');
@@ -522,7 +556,7 @@ void ScanForFunctions(CLanguageProxy& proxy)
 	
 	while (text < max)
 	{
-		text = comment(text, false);
+		text = comment(text, false, &proxy);
 		
 		switch (*text)
 		{
