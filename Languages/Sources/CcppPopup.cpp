@@ -570,6 +570,17 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 		}
 	}
 	
+	if (*text == '=')
+	{	// eat away assignments that look like function declarations,
+		// as for instance
+		// 	const int kMyConstant = sizeof(int);
+		// which clearly isn't a function declaration...
+		text = comment(text+1);
+		if (isidentf(*text))
+			while (isident(*text))
+				text++;
+	}
+
 	return text;
 } /* ident */
 
