@@ -71,25 +71,32 @@ ScanForFunctions(CLanguageProxy& proxy)
 {
 	const char* text = proxy.Text();
 	for(const char* pos = text; pos != NULL; ) {
-		if (strncmp(pos, "diff", 4) == 0) {
+		if (strncmp(pos, "--- ", 4) == 0 && !isdigit(*(pos+4))) {
+			const char* displayPos = pos + 4;
+				// skip to filename
 			const char* lineEnd = strchr(pos, '\n');
 			if (!lineEnd)
 				lineEnd = pos + strlen(pos);
-			BString diffLine(pos, lineEnd-pos);
+			const char* tabPos = strchr(pos, '\t');
+			if (tabPos && tabPos < lineEnd)
+				// cut line off at tab, in order to drop the date following the filename
+				lineEnd = tabPos;
+			BString matchLine(pos, lineEnd-pos);
+			BString displayLine(displayPos, lineEnd-displayPos);
 			proxy.SetNestLevel(0);
-			proxy.AddFunction(diffLine.String(), diffLine.String(), pos-text, false);
-		} else if (strncmp(pos, "@@", 2) == 0) {
-			pos += 2;
-				// skip over "@@"
+			proxy.AddFunction(displayLine.String(), matchLine.String(), pos-text, false);
+		} else if (strncmp(pos, "@@", 2) == 0
+			|| (strncmp(pos, "--- ", 4) == 0 && isdigit(*(pos+4)))) {
+			const char* displayPos = pos + 2;
+				// skip over "@@" or "--"
 			const char* lineEnd = strchr(pos, '\n');
 			if (!lineEnd)
 				lineEnd = pos + strlen(pos);
-			else
-				lineEnd -= 2;	
-					// skip back over "@@"
-			BString diffLine(pos, lineEnd-(pos));
+			BString matchLine(pos, lineEnd-pos);
+			BString displayLine(displayPos, lineEnd-2-displayPos);
+				// -2 in order to skip back over '@@'
 			proxy.SetNestLevel(1);
-			proxy.AddFunction(diffLine.String(), diffLine.String(), pos-text, false);
+			proxy.AddFunction(displayLine.String(), matchLine.String(), pos-text, false);
 		}
 		if ((pos = strchr(pos+1, '\n')) != NULL)
 			pos++;
