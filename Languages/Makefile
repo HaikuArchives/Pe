@@ -67,7 +67,7 @@ vpath %.l Sources
 .SUFFIXES: .cpp .o .l .r .rsrc .java .ob2 .pl .py .rez .tex .m
 
 all:	CppExt  JavaExt OberonExt PerlExt PythonExt RezExt TexExt \
-	ShellExt HtmlJSExt PascalExt # MathematicaExt 
+	ShellExt HtmlJSExt PascalExt SQLExt # MathematicaExt 
 
 #HtmlExt
 
@@ -83,6 +83,11 @@ PascalExt: CLang_pas.o CpasPopup.o Resources/keywords.pas.rsrc
 	$(CC) -o $@ Sources/CLang_pas.o Sources/CpasPopup.o $(LIBS) $(LDFLAGS)
 	$(STRIP) $@
 	xres -o $@ Resources/keywords.pas.rsrc
+
+SQLExt: CLang_sql.o Resources/keywords.sql.rsrc
+	$(CC) -o $@ Sources/CLang_sql.o $(LIBS) $(LDFLAGS)
+	$(STRIP) $@
+	xres -o $@ Resources/keywords.sql.rsrc
 	
 JavaExt: CLang_java.o CjavaFuncPopup.o Resources/keywords.java.rsrc
 	$(CC) -o $@ Sources/CLang_java.o Sources/CjavaFuncPopup.o $(LIBS) $(LDFLAGS)
@@ -148,6 +153,9 @@ Resources/keywords.cpp.rsrc: Resources/keywords.cpp Resources/keywords.cpp.r
 
 Resources/keywords.pas.rsrc: Resources/keywords.pas Resources/keywords.pas.r
 	cd Resources; $(REZ) -o keywords.pas.rsrc -t keywords.pas.r
+	
+Resources/keywords.sql.rsrc: Resources/keywords.sql Resources/keywords.sql.r
+	cd Resources; $(REZ) -o keywords.sql.rsrc -t keywords.sql.r
 	
 Resources/keywords.html.rsrc: Resources/keywords.html Resources/keywords.html.r
 	cd Resources; $(REZ) -o keywords.html.rsrc -t keywords.html.r
