@@ -92,4 +92,7 @@ rgb_color DistinctColor(rgb_color highColor, rgb_color lowColor);
 void DefineInvColors(rgb_color selectionColor);
 rgb_color LookupDistinctColor(rgb_color highColor);
 
+bool operator==(const rgb_color& a, const rgb_color& b);
+bool operator!=(const rgb_color& a, const rgb_color& b);
+
 #endif // CCOLORUTILS_H

@@ -181,6 +181,8 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 		
 		switch (state) {
 			case START:
+				s = i - 1;
+				proxy.SetColor(s, kLTextColor);
 				if (c == '#')
 				{
 					kws = proxy.Move(c, 1);
@@ -223,30 +225,24 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (c == '\n' || c == 0)
 					leave = true;
-					
-				if (leave || (state != START && s < i))
-				{
-					proxy.SetColor(s, kLTextColor);
-					s = i - 1;
-				}
 				break;
 			
 			case COMMENT:
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == '/')
 				{
-					proxy.SetColor(s - 1, kLCommentColor);
-					s = i + 1;
+					proxy.SetColor(s, kLCommentColor);
+					i++;
 					state = START;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s - 1, kLCommentColor);
+					proxy.SetColor(s, kLCommentColor);
 					leave = true;
 				}
 				break;
 
 			case LCOMMENT:
-				proxy.SetColor(s - 1, kLCommentColor);
+				proxy.SetColor(s, kLCommentColor);
 				leave = true;
 				if (text[size - 1] == '\n')
 					state = START;
@@ -270,11 +266,9 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						}
 					}
 					else
-					{
 						proxy.SetColor(s, kLTextColor);
-					}
 					
-					s = --i;
+					i--;
 					state = START;
 				}
 				else if (kws)
@@ -292,7 +286,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else
 				{
 					proxy.SetColor(s, kLTextColor);
-					s = --i;
+					i--;
 					state = START;
 				}	
 				break;
@@ -370,7 +364,6 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				if (c == '"')
 				{
 					proxy.SetColor(s, kLStringColor);
-					s = i;
 					state = START;
 				}
 				else if (c == '\n' || c == 0)
@@ -385,7 +378,6 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				if (c == '>')
 				{
 					proxy.SetColor(s, kLStringColor);
-					s = i;
 					state = START;
 				}
 				else if (c == '\n' || c == 0)
@@ -400,7 +392,6 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				if (c == '"' && !esc)
 				{
 					proxy.SetColor(s, kLStringColor);
-					s = i;
 					state = START;
 				}
 				else if (c == '\n' || c == 0)
@@ -414,8 +405,6 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						proxy.SetColor(s, kLTextColor);
 						state = START;
 					}
-					
-					s = size;
 					leave = true;
 				}
 				else
@@ -426,7 +415,6 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				if (c == '\t' || c == '\n' || c == 0)	// don't like this
 				{
 					proxy.SetColor(s, kLTextColor);
-					s = i;
 					state = START;
 				}
 				else if (c == '\'' && !esc)
@@ -434,13 +422,12 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					if (cc_cnt != 1 && cc_cnt != 2 && cc_cnt != 4)
 					{
 						proxy.SetColor(s, kLTextColor);
-						s = --i;
+						i--;
 						state = START;
 					}
 					else
 					{
 						proxy.SetColor(s, kLCharConstColor);
-						s = i;
 						state = START;
 					}
 				}
@@ -463,7 +450,6 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						hex_num = true;
 					else
 					{
-						s=i-1;
 						i--;
 						hex_num = false;
 						state = START;
@@ -478,7 +464,6 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					;
 				else
 				{
-					s=i-1;
 					i--;
 					state = START;
 				}
@@ -492,7 +477,6 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					;
 				else
 				{
-					s=i-1;
 					i--;
 					state = START;
 				}
@@ -507,7 +491,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				if (c == '#')
 				{
 					// get the preprocessor keyword
-					while (isspace(c = GETCHAR));
+					while (isspace(GETCHAR));
 					int s = i - 1;
 					int end = s;
 					while (end < size && text[end] != 0 && !isspace(text[end]))
@@ -532,7 +516,6 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						if (ifZeroCounter == 0)
 						{
 							state = START;
-							s = i;
 							leave = true;
 							break;
 						}

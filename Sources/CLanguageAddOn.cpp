@@ -106,15 +106,16 @@ int CLanguageProxy::Size() const
 
 void CLanguageProxy::SetColor(int start, int color)
 {
-	if (fStarts &&
-		(fCIndx == 0 || *(int *)&fColors[fCIndx - 1] != *(int *)&color) &&
-		fCIndx < 99)
+	if (start < 0)
+		start = 0;
+	if (color < kLTextColor || color >= kLEndColor)
+		color = kLTextColor;
+	
+	if (fStarts && fCIndx < 99 &&
+		(fCIndx == 0 || fColors[fCIndx - 1] != gColor[color]))
 	{
 		if (fCIndx && start == fStarts[fCIndx - 1])
 			fCIndx--;
-		
-		if (color < kLTextColor || color >= kLEndColor)
-			color = kLTextColor;
 		
 		fColors[fCIndx] = gColor[color];
 		fStarts[fCIndx] = start;

@@ -209,3 +209,13 @@ rgb_color ro2rgb(roSColor& ro)
 	return f2rgb(ro.m_Red, ro.m_Green, ro.m_Blue);
 } /* ro2rgb */
 
+bool operator==(const rgb_color& a, const rgb_color& b)
+{
+	return (a.red == b.red && a.green == b.green && a.blue == b.blue
+		&& a.alpha == b.alpha);
+} /* operator== */
+
+bool operator!=(const rgb_color& a, const rgb_color& b)
+{
+	return !(a == b);
+} /* operator!= */
