@@ -408,11 +408,11 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 			*name = 0;
 			
 			while (*text != '{' && *text != ';')
-			{	// skip inheritance decls (like 'public x, private y'):
+			{	// skip comments:
 				text = comment(text + 1);
 			}
 			
-			if (*text == '{' && proxy.Types())
+			if (*text == '{')
 			{
 				char match[256];
 				long l = min((long)255, text - start);
@@ -437,11 +437,23 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 				name_append(text, name, size);
 			*name = 0;
 			
+			// [zooey]: ugly *HACK* to avoid something like
+			//	     struct stat *get_stat() {
+			// to be seen as struct-decl when in fact it's a function...
+			const char *delimiterPos = strpbrk( text, ";{(");
+			if (delimiterPos && *delimiterPos == '(') 
+			{	// If '(' is found before ';' or '{', we handle this as
+				// a function, not a type-declaration:
+				return text;
+			}
+				
 			while (*text != '{' && *text != ';')
 			{	// skip inheritance decls (like 'public x, private y'):
+				if (!*text)
+					return text;
 				text = comment(text + 1);
 			}
-			
+
 			if (*text == '{' && proxy.Types())
 			{
 				char match[256];
@@ -705,3 +717,4 @@ bool is_template(const char *text)
 
 	return false;
 } /* is_template */
+
