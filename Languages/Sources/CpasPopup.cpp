@@ -82,7 +82,7 @@ const char *parseFunction(const char *text, CLanguageProxy& proxy)
 	
 	text = comment(text);
 	
-	while (isalpha(*text))
+	while (isalpha(*text) || *text == '.')
 	{
 			if (size < kMaxNameSize - 1)
 			{
