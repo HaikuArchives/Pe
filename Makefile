@@ -51,7 +51,7 @@ ifeq ($(CPU), x86)
 else
 	WARNINGS	= -w all -w nonotinlined -w noimplicit
 	LIBS		+= mslcpp_4_0 rx
-	INCPATHS	+= ./regex_0_12/
+	INCPATHS	+= ./regex/
 	PREFIXFILE	= $(OBJDIR)/pe.headers
 	PREFIX		= -prefix $(PREFIXFILE)
 	LDFLAGS		= -map pe.xMAP -sym full -nodup -export all
@@ -296,8 +296,8 @@ libhekkel.a: $(HOBJS)
 
 librx:
 ifeq ($(CPU), ppc)
-	cd regex_0_12 && $(MAKE) librx.so
-	mv regex_0_12/librx.so .
+	cd regex && $(MAKE) librx.so
+	mv regex/librx.so .
 endif
 
 lang:
