@@ -256,6 +256,8 @@ Resource 'Bind' (0, "Bindings for Editing") {
 	{
 		0, 0x61,					0, 0,		kmsg_Move_Character_Left,
 		0, 0x63,					0, 0,		kmsg_Move_Character_Right,
+		Ctrl, 0x61,				0, 0,		kmsg_Move_Word_Left,
+		Ctrl, 0x63,				0, 0,		kmsg_Move_Word_Right,
 		Opt, 0x61,				0, 0,		kmsg_Move_Word_Left,
 		Opt, 0x63,				0, 0,		kmsg_Move_Word_Right,
 		0, 0x20,					0, 0,		kmsg_Move_to_Beginning_of_Line,
@@ -266,10 +268,14 @@ Resource 'Bind' (0, "Bindings for Editing") {
 		0, 0x36,					0, 0,		kmsg_Move_to_Bottom_of_Page,
 		Ctrl, 0x20,				0, 0,		kmsg_Move_to_Beginning_of_File,
 		Ctrl, 0x35,				0, 0,		kmsg_Move_to_End_of_File,
+		Opt, 0x20,				0, 0,		kmsg_Move_to_Beginning_of_File,
+		Opt, 0x35,				0, 0,		kmsg_Move_to_End_of_File,
 		0, 0x1e,					0, 0,		kmsg_Delete_Character_Left,
 		0, 0x34,					0, 0,		kmsg_Delete_Character_Right,
 		Shift, 0x61,				0, 0,		kmsg_Extend_Selection_with_Character_Left,
 		Shift, 0x63,				0, 0,		kmsg_Extend_Selection_with_Character_Right,
+		Shift | Ctrl, 0x61,		0, 0,		kmsg_Extend_Selection_with_Previous_Word,
+		Shift | Ctrl, 0x63,		0, 0,		kmsg_Extend_Selection_with_Next_Word,
 		Shift | Opt, 0x61,		0, 0,		kmsg_Extend_Selection_with_Previous_Word,
 		Shift | Opt, 0x63,		0, 0,		kmsg_Extend_Selection_with_Next_Word,
 		Shift, 0x57,				0, 0,		kmsg_Extend_Selection_to_Previous_Line,
@@ -280,6 +286,8 @@ Resource 'Bind' (0, "Bindings for Editing") {
 		Shift, 0x36,				0, 0,		kmsg_Extend_Selection_to_End_of_Page,
 		Shift | Ctrl, 0x20,		0, 0,		kmsg_Extend_Selection_to_Beginning_of_File,
 		Shift | Ctrl, 0x35,		0, 0,		kmsg_Extend_Selection_to_End_of_File,
+		Shift | Opt, 0x20,		0, 0,		kmsg_Extend_Selection_to_Beginning_of_File,
+		Shift | Opt, 0x35,		0, 0,		kmsg_Extend_Selection_to_End_of_File,
 		Ctrl, 0x57,				0, 0,		kmsg_Scroll_One_Line_Up,
 		Ctrl, 0x62,				0, 0,		kmsg_Scroll_One_Line_Down
 	}
