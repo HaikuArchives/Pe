@@ -14,15 +14,15 @@ if $(DEBUG) {
 	OPTIM ?= -O0 ;
 } else {
 	ALL_LOCATE_TARGET ?= [ FDirName $(TOP) Obj.NoDebug ] ;
-	if $(CPU) = X86 {
-		OPTIM ?= -O2 ;
-	} else {
+	if $(METROWERKS) {
 		OPTIM ?= -O7 ;
+	} else {
+		OPTIM ?= -O2 ;
 	}
 }
 
-LINKLIBS += -L. ;
 if $(METROWERKS) {
+	LINKLIBS += -L. ;
 	CC ?= mwcc ;
 	C++ ?= mwcc ;
 	WARNINGS ?= -w all -w nonotinlined -w noimplicit ;
@@ -35,7 +35,7 @@ if $(METROWERKS) {
 	CC ?= gcc ;
 	C++ ?= g++ ;
 	LINK ?= g++ ;
-	WARNINGS ?= -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-sign-compare ;
+	WARNINGS ?= -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-sign-compare -Wno-unknown-pragmas ;
 	LINKLIBS += -lbe -lroot -lstdc++.r4 ;
 	CCFLAGS += -fpic ;
 	C++FLAGS += -fpic ;
@@ -60,4 +60,76 @@ actions Make1
 	cd $(2) ;
 	make ;
 	touch $(1) ;
+}
+
+rule UserObject
+{
+	switch $(>)
+	{
+	case *.r	: RezObject $(<) : $(>) ;
+	case *	: ECHO "unknown suffix on" $(>) "see UserObject rule" ;
+	}
+}
+
+rule RezObject
+{
+	local _rsrc = $(>:B).rsrc ;
+	MakeLocate $(_rsrc) : $(LOCATE_TARGET) ;
+	Depends $(<) : $(_rsrc) ;
+	Rez $(_rsrc) : $(>) ;
+	Clean clean : $(_rsrc) ;
+}
+
+rule Rez
+{
+	local _tmp = $(<)_tmp ;
+	MakeLocate $(_tmp) : $(LOCATE_TARGET) ;
+	GenerateTmpRez $(_tmp) : $(>) ;
+	RunRez $(<) : $(_tmp) ;
+	Clean clean : $(_tmp) ;
+}
+
+rule RunRez
+{
+	Depends $(<) : $(>) ;
+}
+
+actions RunRez
+{
+	$(REZ) -t -o "$(<)" "$(>)" ;
+}
+
+rule GenerateTmpRez
+{
+	Depends $(<) : $(>) ;
+}
+
+if $(METROWERKS) {
+actions GenerateTmpRez
+{
+	mwcc -preprocess -o $(>) -I$(>:D) $(<) ;
+}
+} else {
+actions GenerateTmpRez
+{
+	gcc -E -x c -o - -I$(>:D) $(>) | sed 's/^#.*//g' > $(<) ;
+}
+}
+
+# thanks OBOS
+rule XRes
+{
+	# XRes <target> : <resource files>
+	if $(2)
+	{
+		Depends $(1) : $(2) ;
+		XRes1 $(1) : $(2) ;
+	}
+}
+
+rule XRes1 { }
+
+actions XRes1
+{
+	xres -o "$(1)" "$(2)" ;
 }
