@@ -62,12 +62,12 @@ resource 'MENU' (93, "Language menu") {
 };
 
 resource 'DLOG' (132, "Preferences") {
-	{0, 0, 400, 260},
+	{0, 0, 415, 260},
 	"Preferences",
 	B_TITLED_WINDOW,
 	NORMAL,
 	{
-		TabbedBook					{{   0,   0, 400, 260 }, "tabB" },
+		TabbedBook					{{   0,   0, 415, 260 }, "tabB" },
 			TabSheet				{ "Colours", "The colours used for syntax colouring and window layout" },
 				ColorControl		{{   0,   0, 145,  16 }, "lowc", "Background" },
 				ColorControl		{{ 155,   0, 290,  16 }, "txtc", "Normal Text" },
@@ -279,8 +279,8 @@ resource 'DLOG' (132, "Preferences") {
 				
 			TabSheetEnd				{},
 			
-			Button					{{ 330, 224, 390, 244 }, "ok  ", "Apply", 'ok  ' },
-			Button					{{ 260, 224, 320, 244 }, "cncl", "Revert", 'cncl' },
+			Button					{{ 335, 224, 390, 244 }, "ok  ", "Apply", 'ok  ' },
+			Button					{{ 265, 224, 320, 244 }, "cncl", "Revert", 'cncl' },
 		TabbedBookEnd				{}
 	}
 };
