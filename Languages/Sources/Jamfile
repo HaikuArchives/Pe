@@ -111,3 +111,9 @@ PeLanguage DiffExt
 	: keywords.diff.rsrc 
 	;
 
+PeLanguage AntlrExt 
+	: CLang_antlr.cpp CantlrPopup.cpp
+	: be 
+	: keywords.g.rsrc 
+	;
+
