@@ -2873,7 +2873,7 @@ void PText::AutoIndent(int offset)
 		i++;
 	}
 
-	if (gSmartBrace && fText[offset - 1] == '{')
+	if (gSmartBrace && offset>0 && fText[offset - 1] == '{')
 		buf[i++] = '\t';
 
 	if (i > 0)
