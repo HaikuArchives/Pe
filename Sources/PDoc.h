@@ -159,7 +159,7 @@ private:
 			
 			void IDEAddFile();
 			void IDERemoveFile();
-			bool IDEOpenSourceHeader(entry_ref& ref);
+//			bool IDEOpenSourceHeader(entry_ref& ref);
 			
 			void ShowRecentMenu(BPoint where, bool showalways);
 

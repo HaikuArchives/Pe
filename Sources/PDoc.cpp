@@ -978,8 +978,11 @@ void PDoc::OpenPartner()
 {
 	try
 	{
-		if (IDEOpenSourceHeader(*fFile))
-			return;
+		// [zooey]: why did Maarten chose to try open the partner file by BeIDE?
+		//				If it works, a BeIDE window pops up. Not quite what one 
+		//				expects, right? So let's disable that:
+//		if (IDEOpenSourceHeader(*fFile))
+//			return;
 	
 		BEntry e;
 		entry_ref doc;
@@ -2122,6 +2125,7 @@ void PDoc::IDEProject2Group()
 const long cmd_AndyFeature = 4000;
 const char kFileName[] = "File", kTextFileRef[] = "TextRef";
 
+/* [zooey]: deactivated, see my comment in OpenPartner()
 bool PDoc::IDEOpenSourceHeader(entry_ref& ref)
 {
 	entry_ref ide;
@@ -2142,7 +2146,9 @@ bool PDoc::IDEOpenSourceHeader(entry_ref& ref)
 	}
 	else
 		return false;
-} /* PDoc::IDEOpenSourceHeader */
+} 
+*/
+/* PDoc::IDEOpenSourceHeader */
 
 #pragma mark - Positioning
 
