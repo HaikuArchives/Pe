@@ -177,18 +177,20 @@ void PDoc::InitWindow(const char *name)
 	SetSizeLimits(100, 100000, 100, 100000);
 
 	BRect b(Bounds()), r;
-	float mbarHeight;
 	bool showIde = gPrefs->GetPrefInt("ide menu", 1);
 	
 	r = b;
 	fMBar = HResources::GetMenuBar(r, 0);
+
+	// add the BeIDE menu, if desired
+	if (showIde)
+	{
+		BMenu *menu = HResources::GetMenu(7);
+		BMenuItem *ideMenuItem = new CMenuItem(menu);
+		fMBar->AddItem(ideMenuItem);
+	}
+
 	AddChild(fMBar);
-	
-	mbarHeight = fMBar->Bounds().bottom;
-	if (showIde && ++mbarHeight < 19)
-		mbarHeight = 19;
-	
-	b.top += mbarHeight + 1;
 	
 	BMenu *file = fMBar->SubmenuAt(0);
 	int i = 0;
@@ -201,15 +203,8 @@ void PDoc::InitWindow(const char *name)
 	
 	if (!fRecent) THROW(("Resources damaged?"));
 
-	if (showIde)
-	{
-		BMenu *menu = HResources::GetMenu(7);
-		BMenuItem *ideMenuItem = new CMenuItem(menu);
-		fMBar->AddItem(ideMenuItem);
-	}
-
+	b.top += fMBar->Frame().bottom + 1;
 	r = b;
-	
 	r.bottom = r.top + kToolBarHeight;
 
 	fToolBar = new PToolBar(r, "ToolBar");
