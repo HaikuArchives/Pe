@@ -20,6 +20,9 @@ include [ FDirName $(BUILD_DIR) BuildSettings ] ;
 	}
 }
 
+# default to strip generated apps if not specified otherwise:
+STRIP_APPS ?= 1 ;
+
 # Cache files for header scanning and jamfile caching.
 HCACHEFILE = header_cache ;
 JCACHEFILE = jamfile_cache ;

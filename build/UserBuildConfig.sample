@@ -23,6 +23,8 @@
 # OPTIMIZE				- If not set to `0', will turn on optimization, i.e.
 #						  will set the respective C/C++ compiler flags
 #						  (i.e. the OPTIM variable).
+# STRIP_APPS			- if not set to '0', will cause all generated apps to
+#						  be stripped. Default is '0', i.e. no stripping
 # SYSHDRS				- List of directories to be added to the system include
 #						  search paths.
 # WARNINGS				- If not set to `0', will turn on warnings, i.e. will
