@@ -295,9 +295,9 @@ bool CPrefsDialog::OKClicked()
 	cc = dynamic_cast<HColorControl*>(FindView("op2c"));
 	if (cc) { gColor[kAltOperatorColor] = cc->Color(); gPrefs->SetPrefColor("alt operator color", gColor[kAltOperatorColor]); }
 	cc = dynamic_cast<HColorControl*>(FindView("sepc"));
-	if (cc) { gColor[kSeparatorColor] = cc->Color(); gPrefs->SetPrefColor("seperator color", gColor[kSeparatorColor]); }
+	if (cc) { gColor[kSeparatorColor] = cc->Color(); gPrefs->SetPrefColor("separator color", gColor[kSeparatorColor]); }
 	cc = dynamic_cast<HColorControl*>(FindView("se2c"));
-	if (cc) { gColor[kAltSeparatorColor] = cc->Color(); gPrefs->SetPrefColor("alt seperator color", gColor[kAltSeparatorColor]); }
+	if (cc) { gColor[kAltSeparatorColor] = cc->Color(); gPrefs->SetPrefColor("alt separator color", gColor[kAltSeparatorColor]); }
 
 	cc = dynamic_cast<HColorControl*>(FindView("proc"));
 	if (cc) { gColor[kPreProcessorColor] = cc->Color(); gPrefs->SetPrefColor("preprocessor color", gColor[kPreProcessorColor]); }
