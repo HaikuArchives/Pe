@@ -85,6 +85,8 @@ HDialog::HDialog(BRect frame, const char *name, window_type type,
 	
 	BuildIt(data);
 	
+	AddCommonFilter(new BMessageFilter(B_KEY_DOWN,KeyDownFilter));
+
 	if (fOwner)
 	{
 		BMessage m(msg_AddDialog);
@@ -494,3 +496,19 @@ void HDialog::SetLabel(const char *id, const char *label)
 		THROW(("Control '%s' not found", id));
 } // HDialog::SetLabel
 
+filter_result HDialog::KeyDownFilter(BMessage* msg, BHandler**,
+	BMessageFilter* filter)
+{
+	if (msg->what == B_KEY_DOWN) {
+		const char* bytes = msg->FindString( "bytes");
+		if (bytes) {
+			switch( bytes[0]) {
+				case B_ESCAPE: {
+					filter->Looper()->PostMessage( B_QUIT_REQUESTED);
+					return B_SKIP_MESSAGE;
+				}
+			}
+	   }
+	}
+	return B_DISPATCH_MESSAGE;
+}

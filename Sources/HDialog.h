@@ -124,6 +124,10 @@ static		void RegisterFieldCreator(int kind, FieldCreator fieldCreator);
 static		void RegisterFields();
 
 protected:
+			static filter_result HDialog::KeyDownFilter(BMessage* msg, 
+																	  BHandler**,
+																	  BMessageFilter* filter);
+
 			void BuildIt(BPositionIO& data);
 	
 			BView *fMainView;
