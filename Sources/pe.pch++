@@ -33,8 +33,6 @@
 	Created: 11/24/97 13:49:32 by Maarten Hekkelman
 */
 
-#pragma precompile_target "pe.headers"
-
 #ifndef __BEOS__
 #define __BEOS__ 1
 #endif

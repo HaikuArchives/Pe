@@ -313,8 +313,8 @@ static bool InternalBalance(CLanguageProxy& proxy, int& start, int& end)
 		txt = skip(txt + 1);
 	}
 	
-	char ec = 0, oc;
-	stack<int> *s;
+	char ec = 0, oc = 0;
+	stack<int> *s = NULL;
 	
 	int db, dsb, dp;
 	
