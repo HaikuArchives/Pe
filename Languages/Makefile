@@ -68,11 +68,12 @@ vpath %.l Sources
 
 all:	CppExt  JavaExt OberonExt PerlExt PythonExt RezExt TexExt \
 	ShellExt HtmlJSExt PascalExt SQLExt # MathematicaExt 
+	touch languages
 
 #HtmlExt
 
 clean:
-	rm -f Sources/*.o Resources/*.rsrc Sources/*FuncPopup.cpp
+	rm -f Sources/*.o Resources/*.rsrc Sources/*FuncPopup.cpp languages
 
 CppExt: CLang_cpp.o CcppPopup.o Resources/keywords.cpp.rsrc
 	$(CC) -o $@ Sources/CLang_cpp.o Sources/CcppPopup.o $(LIBS) $(LDFLAGS)
