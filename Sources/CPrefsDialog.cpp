@@ -279,7 +279,7 @@ bool CPrefsDialog::OKClicked()
 	cc = dynamic_cast<HColorControl*>(FindView("cmtc"));
 	if (cc) { gColor[kCommentColor] = cc->Color(); gPrefs->SetPrefColor("comment color", gColor[kCommentColor]); }
 	cc = dynamic_cast<HColorControl*>(FindView("cm2c"));
-	if (cc) { gColor[kAltCommentColor] = cc->Color(); gPrefs->SetPrefColor("comment color", gColor[kAltCommentColor]); }
+	if (cc) { gColor[kAltCommentColor] = cc->Color(); gPrefs->SetPrefColor("alt comment color", gColor[kAltCommentColor]); }
 	
 	cc = dynamic_cast<HColorControl*>(FindView("strc"));
 	if (cc) { gColor[kStringColor] = cc->Color(); gPrefs->SetPrefColor("string color", gColor[kStringColor]); }
