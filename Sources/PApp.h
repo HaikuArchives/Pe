@@ -83,6 +83,7 @@ virtual	BHandler* ResolveSpecifier(BMessage *msg, int32 index,
 	thread_id fPrefOpener;
 			HDialog *fFindDialog;
 			HDialog *fPrefsDialog;
+			int32 fWindowCount;
 };
 
 extern BDirectory gAppDir, gCWD, gPrefsDir;
