@@ -47,6 +47,7 @@ class HDialog;
 class HButtonBar;
 class PToolBar;
 class HDialog;
+class BStringView;
 
 template <class T>
 class PDialog

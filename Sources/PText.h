@@ -43,6 +43,7 @@ typedef float g_unit_t;
 
 #include <stack>
 
+class BPopUpMenu;
 class PCmd;
 class PStatus;
 class PExec;

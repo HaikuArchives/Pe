@@ -7,6 +7,7 @@
 #include <Window.h>
 
 class BListView;
+class BListItem;
 class BTextControl;
 
 // CFilterChoiceItem
