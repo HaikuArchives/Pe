@@ -812,40 +812,103 @@ void PDoc::OpenSelection()
 	{
 		char *s;
 		fText->GetSelectedText(s, true);
+		int line1 = -1;
+		int line2 = -1;
 
 		if (!s) {
 			// try to find a filename around the cursor
 			int current = fText->Caret();
 			int front = current;
+			int frontSpace = 0;
 			int back = current;
+			int backSpace = 0;
 			int end = fText->Size();
 			const char * text = fText->Text();
-			int selectOnOpenTopLine = -1;
-			int selectOnOpenBottomLine = -1;
 			
-			// push forward until (a) end of file (b) end of line (c) space
-			//                    (d) double quote (e) greater-than sign (f) colon
-			while ((front < end) && (text[front] != '\n') && (text[front] != ' ') 
-					&& (text[front] != '"') && (text[front] != '>')
-					&& (text[front] != ':')) {
+			// push forward until (a) end of file (b) end of line
+			//                    (c) double quote (d) greater-than sign
+			while ((front < end) && (text[front] != '\n')
+					&& (text[front] != '"') && (text[front] != '>')) {
+				if ((text[front] == ' ') || (text[front] == '\t')) {
+					frontSpace = (frontSpace ? frontSpace : front);
+				}
 				front++;
 			}
-			if ((front < end) && (text[front] == ':')) {
-				// handle possible line number case
+			if ((front >= end) || (text[front] == '\n'))  {
+				// fall back to the first space if one exists
+				front = (frontSpace ? frontSpace : front);
 			}
 			
-			// push back until (a) start of file (b) end of line (c) space
+			// push back until (a) start of file (b) end of line
 			//                 (d) double quote (e) less-than sign
-			while ((back > 0) && (text[back] != '\n') && (text[back] != ' ') 
+			if (back > 0) back--;
+			while ((back >= 0) && (text[back] != '\n') 
 					&& (text[back] != '"') && (text[back] != '<')) {
+				if ((text[back] == ' ') || (text[back] == '\t')) {
+					backSpace = (backSpace ? backSpace : back);
+				}
 				back--;
 			}
+			if ((back < 0) || (text[back] == '\n')) {
+				// fall back to the first space if one exists
+				back = (backSpace ? backSpace : back);
+			}
 			
+			int filenameFront = front;
+			// check to ensure matching double quote or angle brackets
+			// otherwise fall back to whitespace marker if possible
+			if ((back >= 0) && (front < end)) {
+				if ((text[back] == '"') && (text[front] != '"') ||
+					(text[back] != '"') && (text[front] == '"')) {
+					front = (frontSpace ? frontSpace : front);
+					back = (backSpace ? backSpace : back);
+				}
+				if ((text[back] == '<') && (text[front] != '>') ||
+					(text[back] != '<') && (text[front] == '>')) {
+					front = (frontSpace ? frontSpace : front);
+					back = (backSpace ? backSpace : back);
+				}
+				
+				// should look for colon delimiters here for line zooming
+				int colon1 = back;
+				while ((colon1 < front) && (text[colon1] != ':')) colon1++;
+				if (colon1 < front) {
+					char * firstNumberEnd = (char*)&(text[front]);
+					line1 = strtol(&text[colon1+1],&firstNumberEnd,10);
+					if ((line1 == 0) && (text[colon1+1] != '0')) {
+						// no number found, mark the line to zero
+						line1 = -1;
+					} else if (firstNumberEnd == &(text[front])) {
+						// we found a number, and that's the end of the
+						// string, so move the front back to the colon
+						filenameFront = colon1;
+					} else if (*firstNumberEnd != ':') {
+						// there's more, but it isn't a colon, so abort
+						line1 = -1;
+					} else {
+						firstNumberEnd++;
+						char * secondNumberEnd = (char*)&(text[front]);
+						line2 = strtol(firstNumberEnd,&secondNumberEnd,10);
+						if (((line2 != 0) || (*secondNumberEnd == '0'))
+							&& (secondNumberEnd == &(text[front]))) {
+							// we found another number, and it's the end
+							// so move front back to the first colon
+							filenameFront = colon1;
+						} else {
+							// otherwise abort
+							line1 = -1;
+							line2 = -1;
+						}
+					}
+				}
+			}
 			if (front > back+1) {
-				// found something, select it
-				fText->Select(back+1,front,true,false);
+				// found something, grab the filename portion
+				fText->Select(back+1,filenameFront,true,false);
 				fText->GetSelectedText(s, true);
-			}			
+				// after we get the text, reselect the whole string
+				fText->Select(back+1,front,true,false);
+			}
 		}
 		
 		if (s)
