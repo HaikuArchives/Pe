@@ -64,6 +64,13 @@
 #include "HDefines.h"
 #include "HColorUtils.h"
 
+#if defined(__BEOS__) && defined(__INTEL__)
+	// [zooey]: BeOS' glibs is messing up iscntrl, as it reports all values>127 as
+	// being control-chars, too (but they are *not*). We fix that:
+	#undef iscntrl
+	#define iscntrl(c)	((((unsigned char)(c))<128) && __isctype((c), _IScntrl))
+#endif
+
 PText* PText::sfDragSource = NULL;
 
 struct PSettings {
@@ -3094,13 +3101,8 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 				else if (numBytes > 1)
 					CharKeyDown(bytes, numBytes);
 				else if (ch != B_FUNCTION_KEY &&
-						 !(modifiers & (B_CONTROL_KEY | B_COMMAND_KEY))
-//						 (!iscntrl(bytes[0]) || ch == B_RETURN || ch == B_TAB))
-						// [zooey]: does anyone happen to know what above line
-						//          were meant to do? I deactivated it as it busts
-						//          entering non-ASCII characters in encodings other
-						//          than UTF8.
-				)
+						 !(modifiers & (B_CONTROL_KEY | B_COMMAND_KEY)) &&
+						 (!iscntrl(bytes[0]) || ch == B_RETURN || ch == B_TAB))
 				{
 					CharKeyDown(bytes, numBytes);
 				}
@@ -5082,6 +5084,7 @@ void PText::MessageReceived(BMessage *msg)
 {
 	try
 	{
+
 		unsigned long what = msg->what;
 		void *args = &msg;
 		
