@@ -25,6 +25,14 @@
 // dealings in this Software without prior written authorization of the
 // copyright holder.
 
+/*
+ * This file provides syntax-highlighting and "function"-scanning (here:
+ * patch-scanning) for diffs (aka patch-files).
+ * It supports context and unified diffs, but the support for unified diffs
+ * is better, as the patch-scanner can recognize individual patches within
+ * each diffed file, too.
+ */
+
 #include "CLanguageAddOn.h"
 #include <String.h>
 
@@ -43,11 +51,12 @@ _EXPORT
 void
 ColorLine(CLanguageProxy& proxy, int& /*state*/)
 {
-	if (strncmp(proxy.Text(), "diff", 4) == 0) {
+	if (strncmp(proxy.Text(), "diff", 4) == 0
+	|| strncmp(proxy.Text(), "@@", 2) == 0) {
 		proxy.SetColor(0, kLCommentColor);
-	} else if (*proxy.Text() == '-') {
+	} else if (*proxy.Text() == '-' || *proxy.Text() == '<') {
 		proxy.SetColor(0, kLStringColor);
-	} else if (*proxy.Text() == '+') {
+	} else if (*proxy.Text() == '+' || *proxy.Text() == '>') {
 		proxy.SetColor(0, kLErrorColor);
 	} else
 		proxy.SetColor(0, kLTextColor);
@@ -67,6 +76,14 @@ ScanForFunctions(CLanguageProxy& proxy)
 			if (!lineEnd)
 				lineEnd = pos + strlen(pos);
 			BString diffLine(pos, lineEnd-pos);
+			proxy.SetNestLevel(0);
+			proxy.AddFunction(diffLine.String(), diffLine.String(), pos-text, false);
+		} else if (strncmp(pos, "@@", 2) == 0) {
+			const char* lineEnd = strchr(pos, '\n');
+			if (!lineEnd)
+				lineEnd = pos + strlen(pos);
+			BString diffLine(pos, lineEnd-pos);
+			proxy.SetNestLevel(1);
 			proxy.AddFunction(diffLine.String(), diffLine.String(), pos-text, false);
 		}
 		if ((pos = strchr(pos+1, '\n')) != NULL)
