@@ -109,7 +109,7 @@ void OpenInPe(entry_ref& doc)
 		DoError("No Thread ID in reply");
 } /* OpenInPe */
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	if (argc < 2) Usage();
 	
