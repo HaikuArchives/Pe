@@ -2088,7 +2088,16 @@ void PText::ShowFunctionMenu(BPoint where)
 		sort(functions.begin(), functions.end(), CSortMenuInfo());
 	}
 	
-	BPopUpMenu * popup = new BPopUpMenu("Funcs");
+#if (B_BEOS_VERSION <= B_BEOS_VERSION_4)
+	// BeOS < R4.5 has no AsyncAutoDestruct, so we simulate that (kind of):
+	static BPopUpMenu * popup = NULL;
+	if (popup)
+		delete popup;
+	popup = new BPopUpMenu("Funcs");
+#else
+	BPopUpMenu *popup = new BPopUpMenu("Funcs");
+	popup->SetAsyncAutoDestruct(true);
+#endif
 	popup->SetFont(be_plain_font);
 	
 	if (includes.size() == 0 && functions.size() == 0)
@@ -2112,11 +2121,7 @@ void PText::ShowFunctionMenu(BPoint where)
 		}
 	}
 
-	BRect r;
-	
-	r.Set(where.x - 4, where.y - 20, where.x + 24, where.y + 4);
-
-	popup->SetAsyncAutoDestruct(true);
+	BRect r(where.x - 4, where.y - 20, where.x + 24, where.y + 4);
 	popup->SetTargetForItems(this);
 	popup->Go(where, true, true, r, true);
 
@@ -2383,9 +2388,9 @@ int PText::LinePosition2Offset(int line, g_unit_t position)
 	int l = LineStart(line);
 	int m = (line < LineCount() - 1) ? LineStart(line + 1) - 1 : fText.Size();
 	
-	float x = 0, lx;
+	float x = 0, lx = 0;
 	int o = 0;
-	int s = l, cl;
+	int s = l, cl = 0;
 
 	while (o + l < m && x < position)
 	{
@@ -3636,7 +3641,7 @@ bool PText::FindNext(const unsigned char *what, int& offset, bool ignoreCase,
 {
 	int skip[256], wl = strlen((char *)what);
 	bool wrapped = false;
-	const regex_t *pb;
+	const regex_t *pb = NULL;
 	
 	ASSERT(what);
 	
@@ -3787,7 +3792,7 @@ void PText::FindNextError(bool backward)
 		regex_t rx;
 		char err[100];
 		entry_ref ref;
-		int line, size;
+		int line = 0, size;
 		const char *text;
 		bool found = false;
 
@@ -4144,7 +4149,7 @@ long PExec::Execute()
 						}
 					}
 					
-					char sc;
+					char sc = 0;
 					
 					if (state)
 					{

@@ -2098,7 +2098,12 @@ void PDoc::IDEProject2Group()
 		
 		int32 c = 0;
 		entry_ref ref;
+#if (B_BEOS_VERSION > B_BEOS_VERSION_5)
+		// BeOS > R5 wants the name as const char *, we obey...
+		const char *name;
+#else
 		char *name;
+#endif
 		type_code type;
 		
 		FailOSErr(reply.GetInfo(B_REF_TYPE, 0, &name, &type));
