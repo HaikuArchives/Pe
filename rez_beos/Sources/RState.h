@@ -45,6 +45,7 @@ enum {
 	tString, tInt, tIdent, tCase, tArray, tArrayEnd, tRaw
 };
 
+class BList;
 class RState;
 struct RElem;
 
