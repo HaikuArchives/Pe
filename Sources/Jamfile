@@ -8,7 +8,7 @@ if $(OSPLAT) = X86 {
 } else {
 	# generate precompiled pe-headers on PPC:
 	Depends libhekkel.a : $(PREFIX_FILE) ;
-	PreCompile $(PREFIX_FILE) : pe.pch++ ;
+	PreCompile $(PREFIX_FILE) : [ FDirName $(TOP) Sources pe.pch++ ] ;
 	C++FLAGS += -prefix $(PREFIX_FILE) ;
 
 	SubDirSysHdrs $(TOP) regex ;

@@ -5,9 +5,6 @@ SubDirHdrs $(OBJECTS_DIR) Sources ;
 
 if $(OSPLAT) = X86 {
 	C++FLAGS += -Wno-uninitialized -Wno-unused ;
-} else {
-	# include preprocess headers on PPC:
-	C++FLAGS += -prefix $(PREFIX_FILE) ;
 }
 
 REZ = [ FDirName $(TOP) rez rez ] ;
