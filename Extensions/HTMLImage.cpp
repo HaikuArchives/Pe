@@ -34,7 +34,7 @@
 */
 
 #include "PeAddOn.h"
-#include "HTMLImage.dlog.h"
+#include "HTMLImage.dlog.r.h"
 
 #if __INTEL__
 extern "C" _EXPORT long perform_edit(MTextAddOn *addon);

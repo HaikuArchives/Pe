@@ -56,8 +56,6 @@ void ReplaceGlossary(string& text, const char *filename, const char *lws);
 
 long perform_edit(MTextAddOn *addon)
 {
-	long result = B_NO_ERROR;
-	
 	Parse(*addon);
 	
 	return B_NO_ERROR;
@@ -186,7 +184,7 @@ void Parse(MTextAddOn& ao)
 
 void ReplaceGlossary(string& str, const char *filename, const char *lws)
 {
-	int is;
+	unsigned int is;
 	
 	while ((is = str.find("$file$")) != string::npos)
 	{

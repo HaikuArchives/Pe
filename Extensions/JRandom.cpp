@@ -85,7 +85,7 @@ short jrLinearShort(register jrPtr theJRPtr,
 		j = (NRANDOMSLOTS*theJRPtr->value) / NDISTINCTRANDOMVALUES;
 		theJRPtr->value = theJRPtr->seeds[j];
 		theJRPtr->seeds[j] = theJRPtr->dummy = NEXTVAL(theJRPtr->dummy);
-		if (theJRPtr->value < partitionSize * interval) {
+		if (theJRPtr->value < (unsigned long)(partitionSize * interval)) {
 			return lowest + theJRPtr->value/partitionSize;
 		}
 	}

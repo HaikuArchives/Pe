@@ -34,7 +34,7 @@
 */
 
 #include "PeAddOn.h"
-#include "PrefixLines.dlog.h"
+#include "prefix.r.h"
 
 #if __INTEL__
 extern "C" _EXPORT long perform_edit(MTextAddOn *addon);

@@ -34,7 +34,7 @@
 */
 
 #include "PeAddOn.h"
-#include "HTMLAnchor.dlog.h"
+#include "HTMLAnchor.dlog.r.h"
 
 #if __INTEL__
 extern "C" _EXPORT long perform_edit(MTextAddOn *addon);
@@ -157,7 +157,7 @@ long perform_edit(MTextAddOn *addon)
 
 long Anchor(MTextAddOn *addon)
 {
-	char s[2048], *sp;
+	char s[2048];
 	
 	long st, end, len;
 	addon->GetSelection(&st, &end);

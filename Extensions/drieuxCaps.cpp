@@ -29,7 +29,7 @@ long perform_edit(MTextAddOn *addon)
 {
 	long result = B_OK;
 	long s, e, len;
-	unsigned char *r, *t;
+	unsigned char *r;
 	
 	addon->GetSelection(&s, &e);
 	

@@ -35,7 +35,7 @@
 
 #include "PeAddOn.h"
 #include "regex.h"
-#include "CopyContaining.dlog.h"
+#include "copycon.r.h"
 
 #if __INTEL__
 extern "C" _EXPORT long perform_edit(MTextAddOn *addon);

@@ -34,7 +34,7 @@
 */
 
 #include "PeAddOn.h"
-#include "Pipe.dlog.h"
+#include "Pipe.dlog.r.h"
 #include <cerrno>
 
 #if __INTEL__
