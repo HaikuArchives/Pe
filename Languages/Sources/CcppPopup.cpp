@@ -435,6 +435,22 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 		{
 			while (isident(*text))
 				name_append(text, name, size);
+
+			// may be a class member ( ("::" <identifier>)* )
+			while (*text == ':' && text[1] == ':')
+			{
+				name_append(text, name, size);
+				name_append(text, name, size);
+				
+				text = comment(text);
+				
+				if (isidentf(*text))
+					while (isident(*text))
+						name_append(text, name, size);
+				
+				text = comment(text);
+			}
+
 			*name = 0;
 			
 			// [zooey]: ugly *HACK* to avoid something like
