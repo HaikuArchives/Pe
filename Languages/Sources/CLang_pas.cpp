@@ -32,6 +32,7 @@
 
 	Created: 12/07/97 22:01:11 by Maarten Hekkelman
 	Modified from CLang_cpp.cpp for pascal by Kelvin W Sherlock
+	Merged with BiPolar's CLang_pascal.cpp based on m7m's "Pe on steroids" CLang_cpp.cpp
 */
 
 #include "CLanguageAddOn.h"
@@ -40,21 +41,52 @@
 
 extern "C" {
 _EXPORT const char kLanguageName[] = "Pascal";
-_EXPORT const char kLanguageExtensions[] = "pas";
-_EXPORT const char kLanguageCommentStart[] = "{";
-_EXPORT const char kLanguageCommentEnd[] = "}";
+_EXPORT const char kLanguageExtensions[] = "pas;pp;inc";
+_EXPORT const char kLanguageCommentStart[] = "//";
+_EXPORT const char kLanguageCommentEnd[] = "";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.pas";
 }
 
 enum {
 	START, 
-	IDENT, OTHER, 
+	IDENT, 
 	COMMENT1, 		// { ... }
 	COMMENT2, 		// (* ... *)
-	STRING
+	STRING,
+	LCOMMENT, 
+	NUMERIC, 
+	OPERATOR, 
+	SYMBOL, 
+	COMPILERDIRECTIVE,
 };
 
 #define GETCHAR			(c = (i++ < size) ? text[i - 1] : 0)
+
+bool isOperator(char c)
+{
+	if (c == '+' || c == '-' || c == '*' || c == '/' || c == ':' || c == '=' ||
+		c == '<' || c == '>' || c == '@' || c == '^')
+		return true;
+			
+	return false;
+}
+
+bool isSymbol(char c)
+{
+	if (c == '(' || c == ')' || c == '[' || c == ']' || c == '&' || 
+		c == '.' || c == ',' || c == ';' || c == '$' || c == '#')
+		return true;
+	
+	return false;
+}
+
+bool isNumeric(char c)
+{
+	if (c >= '0' && c <= '9')
+		return true;
+
+	return false;
+}
 
 _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 {
@@ -63,8 +95,9 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 	int i = 0, s = 0, kws, cc_cnt, esc = 0;
 	char c;
 	bool leave = false;
+	bool floating_point = false;
 	
-	if (state == COMMENT1 || state == COMMENT2)
+	if (state == COMMENT1 || state == COMMENT2 || state == LCOMMENT)
 		proxy.SetColor(0, kLCommentColor);
 	else
 		proxy.SetColor(0, kLTextColor);
@@ -79,23 +112,48 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 		switch (state) {
 			case START:
 
-				if (isalpha(c) )
+				if (isalpha(c) || c == '_')
 				{
 					kws = proxy.Move(tolower(c), 1);
 					state = IDENT;
 				}
 				else if (c == '{')
 				{
-					state=COMMENT1;	
+					if ((text[i] == '$') && isalpha(text[i+1]))
+					{
+						kws = proxy.Move(c, 1);
+						state = COMPILERDIRECTIVE;
+					}
+					else
+					{
+						state = COMMENT1;	
+					}
 				}
 				else if (c == '(' && text[i] == '*')
 				{
 					i++;
 					state = COMMENT2;
 				}
+				else if (c == '/' && text[i] == '/')
+				{
+					i++;
+					state = LCOMMENT;
+				}
 				else if (c == '\'')
 					state = STRING;
 
+				else if (isNumeric(c) && !(isalpha(text[i])))
+				{
+					state = NUMERIC;	
+				}
+				else if (isOperator(c))
+				{
+					state = OPERATOR;	
+				}
+				else if (isSymbol(c))
+				{
+					state = SYMBOL;
+				}
 				else if (c == '\n' || c == 0)
 					leave = true;
 					
@@ -134,10 +192,17 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					leave = true;
 				}
 				break;
+			// // format comments
+			case LCOMMENT:
+				proxy.SetColor(s - 1, kLCommentColor);
+				leave = true;
+				if (text[size - 1] == '\n')
+					state = START;
+				break;
 
 			
 			case IDENT:
-				if (!isalnum(c))
+				if (!isalnum(c) && c != '_')
 				{
 					int kwc;
 
@@ -152,24 +217,39 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 							case 5:	proxy.SetColor(s, kLUser4); break;
 //							default:	ASSERT(false);
 						}
+						s = --i;
+						state = START;
 					}
-					else
+					else if (c != '.')
 					{
 						proxy.SetColor(s, kLTextColor);
+						s = --i;
+						state = START;
 					}
 					
-					s = --i;
-					state = START;
 				}
 				else if (kws)
 					kws = proxy.Move((int)(unsigned char)tolower(c), kws);
 				break;
 			
+			case COMPILERDIRECTIVE:
+				if (c == '}')
+				{
+					proxy.SetColor(s, kLCharConstColor);
+					s = i;
+					state = START;
+				}
+				else if (c == '\n' || c == 0)
+				{
+					proxy.SetColor(s, kLCharConstColor);
+					leave = true;
+				}
+				break;
 
 			
 			// ' ... ' '' indicates is how we escape a single quote, so we can ignore it.
 			case STRING:
-				if (c == '\'')
+				if (c == '\'' && !esc)
 				{
 					proxy.SetColor(s, kLStringColor);
 					s = i;
@@ -177,12 +257,63 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLTextColor);
-					state = START;
+					if (text[i - 2] == '\\' && text[i - 3] != '\\')
+					{
+						proxy.SetColor(s, kLStringColor);
+					}
+					else
+					{
+						proxy.SetColor(s, kLTextColor);
+						state = START;
+					}
+							
 					s = size;
 					leave = true;	
 				}
+				else
+				{
+					esc = !esc && (c == '\\');
+				}
 				break;
+			
+			case NUMERIC:
+				proxy.SetColor(s, kLNumberColor);
+				if (isNumeric(text[i - 1]))
+					;
+				else
+					if (text[i - 1] == '.' && floating_point == false)
+						floating_point = true;
+					else
+					{
+						s = i - 1;
+						i--;
+						state = START;
+					}
+				break;
+		
+			case OPERATOR:
+				proxy.SetColor(s, kLOperatorColor);
+				if (isOperator(text[i - 1]))
+					;
+				else
+				{
+					s = i - 1;
+					i--;
+					state = START;
+				}
+				break;
+		
+			case SYMBOL:
+				proxy.SetColor(s, kLSeparatorColor);
+				if (isSymbol(text[i - 1]))
+					;
+				else
+				{
+					s = i - 1;
+					i--;
+					state = START;
+				}
+				break;			
 			
 			default:	// error condition, gracefully leave the loop
 				leave = true;
