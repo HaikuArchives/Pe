@@ -205,7 +205,7 @@ int municode(const char *s) {
 			PRINT(("char (%s) is %d bytes long!\n", s, mcharlen(s)));
 			break;
 	}
-	
+
 	return unicode;
 } /* municode */
 
@@ -227,6 +227,9 @@ bool isalpha_uc(int unicode)
 	int byte, bit;
 	
 	byte = unicode >> 3;
+	if (byte >= 8192)
+		// index exceeds our table size, we assume false!
+		return false;
 	bit = unicode & 0x07;
 	
 	return (alphaTable[byte] & (1 << bit)) != 0;
@@ -237,6 +240,9 @@ bool isnum_uc(int unicode)
 	int byte, bit;
 	
 	byte = unicode >> 3;
+	if (byte >= 8192)
+		// index exceeds our table size, we assume false!
+		return false;
 	bit = unicode & 0x07;
 	
 	return (numTable[byte] & (1 << bit)) != 0;
@@ -247,6 +253,9 @@ bool isalnum_uc(int unicode)
 	int byte, bit;
 	
 	byte = unicode >> 3;
+	if (byte >= 8192)
+		// index exceeds our table size, we assume false!
+		return false;
 	bit = unicode & 0x07;
 	
 	return (alnumTable[byte] & (1 << bit)) != 0;
