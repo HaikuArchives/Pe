@@ -38,6 +38,16 @@
 
 namespace HResources {
 
+#if (B_BEOS_VERSION <= B_BEOS_VERSION_4)
+// UGLY HACK WARNING!
+// [zooey]:
+// On BeOS R4, the first entry of this namespace - GetMenuBar() -
+// is magically renamed into GetMenuBar_() by gcc. Why this is the
+// case, I do not know. If anyone *does* know, please tell me!
+// We fix (cough) this by introducing a dummy entry:
+	void R4_Dummy();
+#endif
+
 BMenuBar* GetMenuBar(BRect frame, int id);
 BMenu* GetMenu(int id, bool popup = false);
 
