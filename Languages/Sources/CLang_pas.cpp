@@ -100,7 +100,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 {
 	const char *text = proxy.Text();
 	int size = proxy.Size();
-	int i = 0, s = 0, kws = 0, esc = 0;
+	int i = 0, s = 0, kws = 0;
 	char c;
 	bool leave = false;
 	bool floating_point = false;
@@ -118,7 +118,8 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 	{
 		GETCHAR;
 		
-		switch (state) {
+		switch (state)
+		{
 			case START:
 
 				if (isalpha(c) || c == '_')
@@ -171,7 +172,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					proxy.SetColor(s, kLTextColor);
 					s = i - 1;
 				}
-				break;
+			break;
 			
 			// {. .. } format comments
 			case COMMENT1:
@@ -186,7 +187,8 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					proxy.SetColor(s, kLCommentColor);
 					leave = true;	
 				}
-				break;
+			break;
+
 			// (* ... *) format comments
 			case COMMENT2:
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == ')')
@@ -200,15 +202,15 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					proxy.SetColor(s - 1, kLCommentColor);
 					leave = true;
 				}
-				break;
+			break;
+
 			// // format comments
 			case LCOMMENT:
 				proxy.SetColor(s - 1, kLCommentColor);
 				leave = true;
 				if (text[size - 1] == '\n')
 					state = START;
-				break;
-
+			break;
 			
 			case IDENT:
 				if (!isalnum(c) && c != '_')
@@ -224,7 +226,6 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 							case 3:	proxy.SetColor(s, kLUser2); break;
 							case 4:	proxy.SetColor(s, kLUser3); break;
 							case 5:	proxy.SetColor(s, kLUser4); break;
-//							default:	ASSERT(false);
 						}
 						s = --i;
 						state = START;
@@ -239,7 +240,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (kws)
 					kws = proxy.Move((int)(unsigned char)tolower(c), kws);
-				break;
+			break;
 			
 			case COMPILERDIRECTIVE:
 				if (c == '}')
@@ -253,12 +254,11 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					proxy.SetColor(s, kLCharConstColor);
 					leave = true;
 				}
-				break;
+			break;
 
-			
-			// ' ... ' '' indicates is how we escape a single quote, so we can ignore it.
+			// ' ... '
 			case STRING:
-				if (c == '\'' && !esc)
+				if (c == '\'')
 				{
 					proxy.SetColor(s, kLStringColor);
 					s = i;
@@ -266,41 +266,29 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (c == '\n' || c == 0)
 				{
-					if (text[i - 2] == '\\' && text[i - 3] != '\\')
-					{
-						proxy.SetColor(s, kLStringColor);
-					}
-					else
-					{
-						proxy.SetColor(s, kLTextColor);
-						state = START;
-					}
+					proxy.SetColor(s, kLTextColor);
+					state = START;
 							
 					s = size;
 					leave = true;	
 				}
-				else
-				{
-					esc = !esc && (c == '\\');
-				}
-				break;
+			break;
 			
 			case NUMERIC:
 				proxy.SetColor(s, kLNumberColor);
 				if (isNumeric(text[i - 1]) || (hex_num && isHexNum(text[i - 1])))
 					;
-				else
-					if (text[i - 1] == '.' && floating_point == false)
+				else if (text[i - 1] == '.' && floating_point == false)
 						floating_point = true;
-					else if (isHexNum(text[i - 1]) && hex_num == false)
+				else if (isHexNum(text[i - 1]) && hex_num == false)
 						hex_num = true;
-					else
-					{
-						s = i - 1;
-						i--;
-						state = START;
-					}
-				break;
+				else
+				{
+					s = i - 1;
+					i--;
+					state = START;
+				}
+			break;
 		
 			case OPERATOR:
 				proxy.SetColor(s, kLOperatorColor);
@@ -312,7 +300,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					i--;
 					state = START;
 				}
-				break;
+			break;
 		
 			case SYMBOL:
 				proxy.SetColor(s, kLSeparatorColor);
@@ -324,11 +312,11 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					i--;
 					state = START;
 				}
-				break;			
+			break;			
 			
-			default:	// error condition, gracefully leave the loop
+			default:
 				leave = true;
-				break;
+			break;
 		}
 	}
-} /* ColorLine */
+}
