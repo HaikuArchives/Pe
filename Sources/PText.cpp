@@ -2065,6 +2065,11 @@ class CSortMenuInfo
 };
 
 struct MenuFunctionScanHandler : public CFunctionScanHandler {
+	MenuFunctionScanHandler(bool sorted)
+		: sorted(sorted)
+	{
+	}
+
 	void AddFunction(const char *name, const char *match, int offset,
 		bool italic, uint32 nestLevel, const char *params)
 	{
@@ -2098,28 +2103,31 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 	
 	void AddSeparator()
 	{
-		functions.push_back(new BSeparatorItem);
+		if (!sorted)
+			functions.push_back(new BSeparatorItem);
 	}
 
 	vector<void*> includes, functions;
+	bool sorted;
 };
 
 void PText::ShowFunctionMenu(BPoint where)
 {
-	MenuFunctionScanHandler handler;
+	key_info ki;
+	
+	FailOSErr(get_key_info(&ki));
+	
+	bool optionDown = (ki.modifiers & (B_OPTION_KEY | B_SHIFT_KEY | B_COMMAND_KEY)) != 0;
+	bool sorted = (optionDown != gPrefs->GetPrefInt("sortpopup"));
+
+	MenuFunctionScanHandler handler(sorted);
 
 	vector<void*>& includes = handler.includes;
 	vector<void*>& functions = handler.functions;
 
 	ScanForFunctions(handler);
 	
-	key_info ki;
-	
-	FailOSErr(get_key_info(&ki));
-	
-	bool optionDown = (ki.modifiers & (B_OPTION_KEY | B_SHIFT_KEY | B_COMMAND_KEY)) != 0;
-	
-	if (optionDown != gPrefs->GetPrefInt("sortpopup"))
+	if (sorted)
 	{
 		sort(includes.begin(), includes.end(), CSortMenuInfo());
 		sort(functions.begin(), functions.end(), CSortMenuInfo());
