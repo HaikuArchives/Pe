@@ -60,6 +60,7 @@ text
 ax bx cx dx ex si di bp sp ss es ds cs ip
 al ah bl bh ch cl dh dl eh el
 eax ebx ebp ecx edi edx esi esp
+mm0 mm1 mm2 mm3 mm4 mm5 mm6 mm7
 xmm0 xmm1 xmm2 xmm3 xmm4 xmm5 xmm6 xmm7
 - User set 3:
 absolute align alignb at
