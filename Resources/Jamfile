@@ -1,0 +1,31 @@
+SubDir TOP Resources ;
+
+SubDirHdrs $(TOP) Sources ;
+
+Objects
+	menus.r
+	fonttabs.r
+	find.r
+	prefs.r
+	wrap.r
+	icons.r
+	colorpicker.r
+	openfile.r
+	gotoline.r
+	changecase.r
+	info.r
+	convert.r
+	Bindings.r
+	UTF-Tables.r
+	UTF-Mappings.r
+	ToolBar.r
+	WordBreakTable.r
+	RHTMLBar.r
+	RDiffToolbar.r
+	ftp.r
+	login.r
+	RCursor.r
+	RFtpOpenDialog.r
+	RProject.r
+	RMimeinfo.r
+	;
