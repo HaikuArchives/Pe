@@ -92,7 +92,7 @@ Application pe
 		Sstdio.cpp
 		Utils.cpp
 		utf-support.cpp
-	:	libhekkel.a $(RX_LIB) be $(STDC++LIB) tracker mail textencoding 
+	:	libhekkel.a $(RX_LIB) be net $(STDC++LIB) tracker mail textencoding 
 	;
 if $(OSPLAT) = X86 {
 	# avoid warning about strftime("%x") in CGlossary:
