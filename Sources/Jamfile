@@ -21,6 +21,7 @@ Library libhekkel :
 	MThread.cpp
 	;
 MakeLocate libhekkel.a : [ FDirName $(TOP) ] ;
+ForceUpdateMimeset libhekkel.a ;
 
 Main pe :
 	Benaphore.cpp

@@ -8,3 +8,4 @@ SubInclude TOP lpe ;
 
 File _APP_ : pe ;
 MakeLocate _APP_ : [ FDirName $(TOP) ] ;
+ForceUpdateMimeset _APP_ ;
