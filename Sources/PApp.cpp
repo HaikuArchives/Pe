@@ -685,10 +685,10 @@ void PApp::MessageReceived(BMessage *msg)
 			{
 				int c = 1 << current_workspace();
 				
-				FindDialog()->Show();
-				
 				if (gPrefs->GetPrefInt("window to workspace", 1))
 					FindDialog()->SetWorkspaces(c);
+				
+				FindDialog()->Show();
 				
 				FindDialog()->Activate(true);
 				break;
