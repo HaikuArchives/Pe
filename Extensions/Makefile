@@ -98,7 +98,7 @@ LDFLAGS += $(LINK_PATHS) $(LINK_LIBS)
 #	-lbe -lroot
 
 all: PrefixLines Copy\ Lines\ Containing Cut\ Lines\ Containing Pipe HTMLImage \
-	HTMLAnchor ROT13 drieuxCaps HTMLUpdate
+	HTMLAnchor ROT13 drieuxCaps HTMLUpdate BeBookFetch
 	touch extensions
 
 clean:
@@ -113,6 +113,10 @@ PrefixLines.dlog.h: prefix.r
 
 .cpp.o:
 	$(CC) $(CFLAGS) -o $@ $<
+
+BeBookFetch: BeBookFetch.o
+	$(CC) -o $@ BeBookFetch.o $(LDFLAGS)
+	$(STRIP) $@
 
 Copy\ Lines\ Containing: CopyContaining.dlog.h CopyContaining.o
 	$(CC) -o clc CopyContaining.o $(LDFLAGS)
