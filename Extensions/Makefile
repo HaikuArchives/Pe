@@ -93,9 +93,10 @@ LDFLAGS += $(LINK_PATHS) $(LINK_LIBS)
 
 all: PrefixLines Copy\ Lines\ Containing Cut\ Lines\ Containing Pipe HTMLImage \
 	HTMLAnchor ROT13 drieuxCaps HTMLUpdate
+	touch extensions
 
 clean:
-	rm -f *.o *.rsrc *.xMAP *.dlog.h
+	rm -f *.o *.rsrc *.xMAP *.dlog.h extensions
 
 PrefixLines: PrefixLines.dlog.h PrefixLines.o
 	$(CC) -o $@ PrefixLines.o $(LDFLAGS)
