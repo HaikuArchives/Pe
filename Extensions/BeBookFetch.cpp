@@ -285,8 +285,8 @@ void PopUpSelection(vector<BString>& Results, MTextAddOn *addon)
 
 	// Gotta love C++ syntaxis, sigh... Anyway, here we get a nice BPoint to
 	// popup the results.
-	float x = (dynamic_cast<PDoc*>(addon->Window()))->ButtonBar()->Frame().right + 2;
-	float y = (dynamic_cast<PDoc*>(addon->Window()))->ToolBar()->Frame().Height() - 2;
+	float x = addon->Window()->FindView("ButtonBar")->Frame().right + 2;
+	float y = addon->Window()->FindView("ToolBar")->Frame().Height() - 2;
 
 	BPoint menupos = addon->Window()->Frame().LeftTop() + BPoint(x, y);
 
