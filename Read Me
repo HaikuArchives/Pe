@@ -1,0 +1,12 @@
+Pe has now been released as open source under a BSD style license.
+
+To build Pe you theoretically only need to execute make in the base directory of the pe distribution. To flip between debug and non-debug builds you can change the value of the DEBUG variable in the Makefile.
+
+I've tried to gather all code for the 2.2.3d release, however I'm not sure everything made it since I forgot to tag that release in cvs. The code is quite old and may contain bugs here and there. This version of Pe does not contain any changes I made since the 2.2.3d release. Development of Pe stopped after this release and I went on to develop Pepper which is available as commercial software for MacOS, Win2k and soon X11.
+
+If you make changes to this source code I would appreciate it very much if you could send those changes to me. There is no obligation to do so however.
+
+- Maarten Hekkelman
+- mailto:maarten@hekkelman.com
+- 4 jun 2002
+
