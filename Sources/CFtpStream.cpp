@@ -331,16 +331,28 @@ void CFtpStream::Automaton(int action)
 					if (state == 4 && (r / 100) != 2)
 						THROW(("Failed to change directory: %s", msg));
 					
-					memset(&sa, 0, sizeof(sa));
-					sa.sin_family = AF_INET;
-//					sa.sin_addr = INADDR_ANY;
-					FailSockErr(bind(data, (struct sockaddr *)&sa, sizeof(sa)));
+					struct sockaddr_in saData;
+					memset(&saData, 0, sizeof(saData));
+					saData.sin_family = AF_INET;
+					FailSockErr(bind(data, (struct sockaddr *)&saData, sizeof(saData)));
 					FailSockErr(listen(data, 5));
 					
-					int size = sizeof(sa);
-					FailSockErr(getsockname(data, (struct sockaddr *)&sa, &size));
-					unsigned char *sap = (unsigned char *)&sa.sin_addr.s_addr, *pap = (unsigned char *)&sa.sin_port;
-					
+					// [zooey]: calling getsockname() on a socket that has been bound to 
+					// IN_ADDR_ANY (the wildcard-address) will *not* return any IP-address,
+					// as this will only be setup by the system during connect or accept.
+					// 		[refer to W.R. Stevens - Unix Network Programming, Vol 1, p. 92]
+					// BeOS R5 however, *does* fill in the IP-address at this stage (that's
+					// why this code worked for R5 but didn't work for BONE).
+					// In order to fix this problem, we simply use the IP-address of the
+					// command-socket for the PORT-command:
+					int size = sizeof(saData);
+					// fetch port from data-socket:
+					FailSockErr(getsockname(data, (struct sockaddr *)&saData, &size));
+					unsigned char *pap = (unsigned char *)&saData.sin_port;
+					// fetch ip-address from cmd-socket:
+					FailSockErr(getsockname(csSock->sSocket, (struct sockaddr *)&sa, &size));
+					unsigned char *sap = (unsigned char *)&sa.sin_addr.s_addr;
+		
 					s_printf(csSock, "port %d,%d,%d,%d,%d,%d\r\n", sap[0], sap[1], sap[2], sap[3], pap[0], pap[1]);
 					state = 5;
 					break;
