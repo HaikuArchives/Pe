@@ -336,25 +336,25 @@ bool PApp::QuitRequested()
 
 void PApp::DispatchMessage(BMessage *msg, BHandler *handler)
 {
-       if ( msg->what == B_ARGV_RECEIVED ) {
-               int32 argc;
-               if (msg->FindInt32("argc",&argc) != B_OK) {
-                       argc=0;
-               }
-               const char ** argv = new (const char*)[argc];
-               for (int arg = 0; (arg < argc) ; arg++) {
-                       if (msg->FindString("argv",arg,&argv[arg]) != B_OK) {
-                               argv[arg] = "";
-                       }
-               }
-               const char * cwd;
-               if (msg->FindString("cwd",&cwd) != B_OK) {
-                       cwd = "";
-               }
-               ArgvReceived(argc, argv, cwd);
-       } else {
-               BApplication::DispatchMessage(msg,handler);
-       }
+	if ( msg->what == B_ARGV_RECEIVED ) {
+		int32 argc;
+		if (msg->FindInt32("argc",&argc) != B_OK) {
+			argc=0;
+		}
+		const char ** argv = new (const char*)[argc];
+		for (int arg = 0; (arg < argc) ; arg++) {
+			if (msg->FindString("argv",arg,&argv[arg]) != B_OK) {
+				argv[arg] = "";
+			}
+		}
+		const char * cwd;
+		if (msg->FindString("cwd",&cwd) != B_OK) {
+			cwd = "";
+		}
+		ArgvReceived(argc, argv, cwd);
+	} else {
+		BApplication::DispatchMessage(msg,handler);
+	}
 } /* PApp::DispatchMessage */
 
 void PApp::ReadyToRun()
