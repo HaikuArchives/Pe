@@ -33,7 +33,7 @@ rule MakeDistro
 {
 	# MakeDistro <target> 
 
-	local target = $(1) ;
+	local target = $1 ;
 
 	NotFile $(target) ;
 	Always $(target) ;
@@ -41,8 +41,9 @@ rule MakeDistro
 
 actions MakeDistro
 {
-	rm -rf generated/distro/Documentation ;
-	cp -a doc generated/distro/Documentation ;
-	ln -sf /boot/home/config/bin/ generated/distro/\(drag\ lpe\ here\ to\ install\) ;
+	echo "making distro $(DISTRO_DIR)" ;
+	rm -rf $(DISTRO_DIR)/Documentation ;
+	cp -a $(TOP)/doc $(DISTRO_DIR)/Documentation ;
+	ln -sf /boot/home/config/bin/ $(DISTRO_DIR)/\(drag\ lpe\ here\ to\ install\) ;
 }
 
