@@ -148,43 +148,43 @@ CFtpDialog::CFtpDialog(BRect frame, const char *name, window_type type, int flag
 						BString extStr(extCStr);
 						extStr.ToLower();
 						if (extStr.ByteAt(0) == '.')  extStr.Remove(0, 1);
-						fExtMime.insert(entry(extCStr, mimCStr));
+						fExtMime[extCStr] = mimCStr;
 					}
 				}
 			}
 		}
 	// perhaps it's better to go with some predefiend types
 	} else {
-		fExtMime.insert(entry("aiff", "audio/x-aiff"));
-		fExtMime.insert(entry("bz2", "application/x-bzip2"));
-		fExtMime.insert(entry("cc", "text/x-source-code"));
-		fExtMime.insert(entry("cpp", "text/x-source-code"));
-		fExtMime.insert(entry("css", "text/css"));
-		fExtMime.insert(entry("gif", "image/gif"));
-		fExtMime.insert(entry("gz", "application/x-gzip"));
-		fExtMime.insert(entry("h", "text/x-source-code"));
-		fExtMime.insert(entry("htm", "text/html"));
-		fExtMime.insert(entry("html", "text/html"));
-		fExtMime.insert(entry("jpeg", "image/jpeg"));
-		fExtMime.insert(entry("jpg", "image/jpeg"));
-		fExtMime.insert(entry("mod", "audio/x-mod"));
-		fExtMime.insert(entry("mov", "video/quicktime"));
-		fExtMime.insert(entry("mp3", "audio/x-mpeg"));
-		fExtMime.insert(entry("ogg", "audio/ogg.vorbis"));
-		fExtMime.insert(entry("pdf", "application/pdf"));
-		fExtMime.insert(entry("php", "text/x-php"));
-		fExtMime.insert(entry("pl", "text/x-perl"));
-		fExtMime.insert(entry("pkg", "application/x-scode-UPkg"));
-		fExtMime.insert(entry("png", "image/png"));
-		fExtMime.insert(entry("py", "text/x-source-code"));
-		fExtMime.insert(entry("rar", "application/x-rar"));
-		fExtMime.insert(entry("swf", "application/x-shockwave-flash"));
-		fExtMime.insert(entry("tar", "application/x-tar"));
-		fExtMime.insert(entry("tga", "image/x-targa"));
-		fExtMime.insert(entry("tgz", "application/x-gzip"));
-		fExtMime.insert(entry("txt", "text/plain"));
-		fExtMime.insert(entry("xml", "text/xml"));
-		fExtMime.insert(entry("zip", "application/zip"));
+		fExtMime["aiff"] = "audio/x-aiff";
+		fExtMime["bz2"] = "application/x-bzip2";
+		fExtMime["cc"] = "text/x-source-code";
+		fExtMime["cpp"] = "text/x-source-code";
+		fExtMime["css"] = "text/css";
+		fExtMime["gif"] = "image/gif";
+		fExtMime["gz"] = "application/x-gzip";
+		fExtMime["h"] = "text/x-source-code";
+		fExtMime["htm"] = "text/html";
+		fExtMime["html"] = "text/html";
+		fExtMime["jpeg"] = "image/jpeg";
+		fExtMime["jpg"] = "image/jpeg";
+		fExtMime["mod"] = "audio/x-mod";
+		fExtMime["mov"] = "video/quicktime";
+		fExtMime["mp3"] = "audio/x-mpeg";
+		fExtMime["ogg"] = "audio/ogg.vorbis";
+		fExtMime["pdf"] = "application/pdf";
+		fExtMime["php"] = "text/x-php";
+		fExtMime["pl"] = "text/x-perl";
+		fExtMime["pkg"] = "application/x-scode-UPkg";
+		fExtMime["png"] = "image/png";
+		fExtMime["py"] = "text/x-source-code";
+		fExtMime["rar"] = "application/x-rar";
+		fExtMime["swf"] = "application/x-shockwave-flash";
+		fExtMime["tar"] = "application/x-tar";
+		fExtMime["tga"] = "image/x-targa";
+		fExtMime["tgz"] = "application/x-gzip";
+		fExtMime["txt"] = "text/plain";
+		fExtMime["xml"] = "text/xml";
+		fExtMime["zip"] = "application/zip";
 	}
 
 } // CFtpDialog::CFtpDialog
@@ -215,8 +215,7 @@ BBitmap* CFtpDialog::GetIcon(const char *mimeType, const char *tryExtension)
 		BBitmap* bm = new BBitmap(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
 		if (BMimeType(mimeType).GetIcon(bm, B_MINI_ICON) != B_OK)
 			BMimeType("application/octet-stream").GetIcon(bm, B_MINI_ICON);
-		pair<string,BBitmap*> p1(mimeType, bm);
-		fIcons.insert(p1);
+		fIcons[mimeType] = bm;
 		return bm;
 	}
 	else

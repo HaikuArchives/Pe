@@ -94,7 +94,7 @@ CFtpListItem::CFtpListItem(CFtpDialog* dialog, const char *s)
 			if (pos != string::npos)
 			{
 				ext = nam.substr(pos+1);
-				cout << "Extension(" << nam << ") .: '" << ext << "'" << endl;
+//				cout << "Extension(" << nam << ") .: '" << ext << "'" << endl;
 			}
 			fIconNew = dialog->GetIcon("application/octet-stream", ext.c_str());
 	}
