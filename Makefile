@@ -239,7 +239,7 @@ CFLAGS	+= -fpic
 endif
 CFLAGS	+= $(foreach define, $(DEFINES), $(addprefix -D, $(define)))
 
-all: rez_compiler librx $(TARGET) lang ext
+all: $(OBJDIR) rez_compiler librx $(TARGET) lang ext
 
 $(TARGET): $(OBJDIR) libhekkel.a $(OBJS) $(RSRC)
 	$(CC) -o $(TARGET) $(OBJS) $(LDFLAGS)
@@ -276,7 +276,7 @@ ifeq ($(CPU),ppc)
 	mwcc -precompile $(PREFIXFILE) -lang cplus Sources/pe.pch++ $(INCLUDES)
 endif
 
-$(OBJDIR)/%.d: %.cpp $(PREFIXFILE)
+$(OBJDIR)/%.d: $(OBJDIR) %.cpp $(PREFIXFILE)
 	@ test -d $(OBJDIR) || mkdir $(OBJDIR)
 	@ echo "-> "$(@F)
 ifeq ($(CPU), x86)
