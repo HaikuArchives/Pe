@@ -932,12 +932,12 @@ void PApp::MessageReceived(BMessage *msg)
 
 					int c = 1 << current_workspace();
 					
-					if (fPrefsDialog->IsHidden())
-						fPrefsDialog->Show();
-					
 					if (gPrefs->GetPrefInt("window to workspace", 1))
 						fPrefsDialog->SetWorkspaces(c);
 
+					if (fPrefsDialog->IsHidden())
+						fPrefsDialog->Show();
+					
 					fPrefsDialog->Activate(true);
 				}
 				else
@@ -959,11 +959,11 @@ void PApp::MessageReceived(BMessage *msg)
 			case msg_ShowHTMLPalette:
 			{
 				BWindow *w = CHTMLBar::Instance();
+				BAutolock lock(w);
 
 				if (gPrefs->GetPrefInt("window to workspace", 1))
 					w->SetWorkspaces(1 << current_workspace());
 
-				BAutolock lock(w);
 				if (w->IsHidden())
 					w->Show();
 				break;
