@@ -80,10 +80,10 @@ vpath %.rsrc Resources
 vpath %.r Resources
 vpath %.l Sources
 
-.SUFFIXES: .cpp .o .l .r .rsrc .java .ob2 .pl .py .rez .tex .m
+.SUFFIXES: .cpp .o .l .r .rsrc .java .ob2 .pl .py .rez .tex .m .asm .lua
 
 all:	CppExt  JavaExt OberonExt PerlExt PythonExt RezExt TexExt \
-	ShellExt HtmlJSExt PascalExt SQLExt # MathematicaExt 
+	ShellExt HtmlJSExt PascalExt SQLExt AsmExt LuaExt # MathematicaExt 
 	touch languages
 
 #HtmlExt
@@ -158,6 +158,18 @@ ShellExt: CLang_shell.o Resources/keywords.sh.rsrc
 	$(STRIP) $@
 	xres -o $@ Resources/keywords.sh.rsrc
 	
+LuaExt: CLang_lua.o CluaPopup.o Resources/keywords.lua.rsrc
+	cd Resources; $(REZ) -o keywords.lua.rsrc -t keywords.lua.r
+	$(CC) -o $@ Sources/CLang_lua.o Sources/CluaPopup.o $(LIBS) $(LDFLAGS)
+	$(STRIP) $@
+	xres -o $@ Resources/keywords.lua.rsrc
+
+AsmExt: CLang_asm.o Resources/keywords.asm.rsrc
+	cd Resources; $(REZ) -o keywords.asm.rsrc -t keywords.asm.r
+	$(CC) -o $@ Sources/CLang_asm.o $(LIBS) $(LDFLAGS)
+	$(STRIP) $@
+	xres -o $@ Resources/keywords.asm.rsrc
+
 
 CLang_cpp.o:	CLang_cpp.cpp ../Sources/CLanguageAddOn.h
 
@@ -200,6 +212,12 @@ Resources/keywords.tex.rsrc: Resources/keywords.tex Resources/keywords.tex.r
 
 Resources/keywords.sh.rsrc: Resources/keywords.sh Resources/keywords.sh.r
 	cd Resources; $(REZ) -o keywords.sh.rsrc -t keywords.sh.r
+
+Resources/keywords.lua.rsrc: Resources/keywords.lua Resources/keywords.lua.r
+	cd Resources; $(REZ) -o keywords.lua.rsrc -t keywords.lua.r
+
+Resources/keywords.asm.rsrc: Resources/keywords.asm Resources/keywords.asm.r
+	cd Resources; $(REZ) -o keywords.asm.rsrc -t keywords.asm.r
 
 Sources/CjavaFuncPopup.cpp: Sources/CjavaFuncPopup.l
 	flex -oSources/CjavaFuncPopup.cpp -Pjava_ Sources/CjavaFuncPopup.l
