@@ -252,6 +252,10 @@ Resource 'Cmnd' (9, "Extensions") {
 	}
 };
 
+// Ctrl = left Ctrl key on intel keyboard
+// Opt = right Ctrl key on intel keyboard
+// Cmd = either Alt key on intel keyboard
+
 Resource 'Bind' (0, "Bindings for Editing") {
 	{
 		0, 0x61,					0, 0,		kmsg_Move_Character_Left,
@@ -289,7 +293,9 @@ Resource 'Bind' (0, "Bindings for Editing") {
 		Shift | Opt, 0x20,		0, 0,		kmsg_Extend_Selection_to_Beginning_of_File,
 		Shift | Opt, 0x35,		0, 0,		kmsg_Extend_Selection_to_End_of_File,
 		Ctrl, 0x57,				0, 0,		kmsg_Scroll_One_Line_Up,
-		Ctrl, 0x62,				0, 0,		kmsg_Scroll_One_Line_Down
+		Ctrl, 0x62,				0, 0,		kmsg_Scroll_One_Line_Down,
+		Opt, 0x57,				0, 0,		kmsg_Scroll_One_Line_Up,
+		Opt, 0x62,				0, 0,		kmsg_Scroll_One_Line_Down
 	}
 };
 
