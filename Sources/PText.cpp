@@ -3243,7 +3243,20 @@ bool PText::DoKeyCommand(BMessage *msg)
 		case kmsg_Extend_Selection_to_Beginning_of_Page:
 			extend = true;
 			if (line > topline)
-				line = topline;
+			{
+				// Move caret to the top of the page, unless the current
+				// selection extends beyond the top and the caret is located
+				// at the beginning of the second visible line. We do this
+				// to work around a feature of ScrollToOffset() -- when the
+				// caret is at the beginning of the line, it scrolls such
+				// that the last line of the selection is visible.
+				if (line == topline + 1 && fCaret > fAnchor
+					&& fCaret == LineStart(line)
+					&& Offset2Line(fAnchor) < topline)
+					line = max(0, line - linesPerPage);
+				else
+					line = topline;
+			}
 			else
 				line = max(0, line - linesPerPage);
 			newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
