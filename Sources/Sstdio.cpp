@@ -117,7 +117,7 @@ char *s_gets(char *str, int size, struct SOCK *sock)
 		if (*bp == '\n' && sock->sIgnoreNextLF)
 		{
 			sock->sIgnoreNextLF = FALSE;
-			*bp++;
+			bp++;
 			sock->sBufContentSize--;
 		}
 

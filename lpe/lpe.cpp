@@ -148,7 +148,8 @@ main(int argc, char *argv[])
 	for (ti = threads.begin(); ti != threads.end(); ti++)
 	{
 		long l;
-		status_t err = wait_for_thread((*ti), &l);
+		wait_for_thread((*ti), &l);
+//		status_t err = wait_for_thread((*ti), &l);
 //		if (err) DoError("Error waiting for thread: %s", strerror(err));
 	}
 	

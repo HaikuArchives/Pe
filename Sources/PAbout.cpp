@@ -174,10 +174,9 @@ PAboutBox::PAboutBox()
 {
 	fOffscreen = new BBitmap(Bounds(), B_RGB_32_BIT, true);
 	
-	const char *u = "Any User";
 	fAboutText = (char *)malloc(strlen(kAboutText) + strlen(Now()) + strlen(u) + 1);
 	FailNil(fAboutText);
-	sprintf(fAboutText, kAboutText, Now(), u);
+	sprintf(fAboutText, kAboutText, Now());
 	
 	fPFont.SetFamilyAndStyle("Baskerville", "Roman");
 	fPFont.SetSize(60);
