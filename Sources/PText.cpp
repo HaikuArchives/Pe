@@ -3138,7 +3138,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 				newAnchor = newCaret = LineStart(line - 1) + LinePosition2Offset(line - 1, fWalkOffset);
 			else
 				newAnchor = newCaret = 0;
-			catchOffset = false;
+			catchOffset = extend;
 			break;
 		case kmsg_Move_to_Next_Line:
 			if (extend)
@@ -3147,7 +3147,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 				newAnchor = newCaret = LineStart(line + 1) + LinePosition2Offset(line + 1, fWalkOffset);
 			else
 				newAnchor = newCaret = fText.Size();
-			catchOffset = false;
+			catchOffset = extend;
 			break;
 		case kmsg_Move_to_Top_of_Page:
 			if (line > topline + 1)
