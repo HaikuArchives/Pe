@@ -309,6 +309,7 @@ private:
 			int fLineEndType;
 			PSplitter *fSplitter;
 			g_unit_t fSplitAt;
+			bool fSplitCursorShown;
 			int fActivePart, fOPCaret, fOPAnchor, fOPMark;
 			BPoint fLastMouseDown;
 			int fIncSearch;

@@ -87,6 +87,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	: BView(frame, "text view", B_FOLLOW_ALL_SIDES, B_ASYNCHRONOUS_CONTROLS |
 		B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED | B_FRAME_EVENTS)
 	, fText(txt)
+	, fSplitCursorShown(false)
 {
 	fAnchor = fCaret = 0;
 	fBlockSelect = false;
@@ -1874,12 +1875,31 @@ void PText::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
 	{
 		if (fWindowActive)
 		{
-			if (fSplitAt > 0 && where.y >= fSplitAt - kSplitterHeight && where.y <= fSplitAt)
-				be_app->SetCursor(PSplitter::Cursor());
-			else if (Bounds().Contains(where))
-				be_app->SetCursor(B_I_BEAM_CURSOR);
-			else
+			if (code == B_EXITED_VIEW)
+			{
 				be_app->SetCursor(B_HAND_CURSOR);
+				fSplitCursorShown = false;
+			}
+			else
+			{
+				// set the splitter cursor when the mouse is over it
+				if (fSplitAt > 0
+					&& where.y >= fSplitAt - kSplitterHeight
+					&& where.y <= fSplitAt)
+				{
+					if (!fSplitCursorShown)
+					{
+						be_app->SetCursor(PSplitter::Cursor());
+						fSplitCursorShown = true;
+					}
+				}
+				else if (code == B_ENTERED_VIEW
+					|| (code == B_INSIDE_VIEW && fSplitCursorShown))
+				{
+					be_app->SetCursor(B_I_BEAM_CURSOR);
+					fSplitCursorShown = false;
+				}
+			}
 		}
 	}
 	else if (a_message->HasData("text/plain", B_MIME_DATA) ||
