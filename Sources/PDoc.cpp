@@ -957,7 +957,8 @@ bool PDoc::IsSourceFile()
 	if (e)
 	{
 		e++;
-		if (strcmp(e, "c") && strcmp(e, "C") && strcmp(e, "cp") && strcmp(e, "cpp") && strcmp(e, "cc"))
+		if (strcmp(e, "c") && strcmp(e, "C") && strcmp(e, "cc")
+		    && strcmp(e, "cpp") && strcmp(e, "cxx") && strcmp(e, "cp"))
 			return false;
 		return true;
 	}
@@ -970,7 +971,8 @@ bool PDoc::IsHeaderFile()
 	if (e)
 	{
 		e++;
-		if (strcmp(e, "h") && strcmp(e, "H") && strcmp(e, "hh") && strcmp(e, "hpp"))
+		if (strcmp(e, "h") && strcmp(e, "H") && strcmp(e, "hh")
+		    && strcmp(e, "hpp") && strcmp(e, "hxx") && strcmp(e, "hp"))
 			return false;
 		return true;
 	}
