@@ -82,7 +82,7 @@ void OpenInPe(entry_ref& doc)
 		msg.AddInt32("line", lineNr);
 
 	entry_ref pe;
-	if (be_roster->FindApp("application/x-vnd.Hekkel-Pe", &pe))
+	if (be_roster->FindApp("application/x-vnd.beunited.pe", &pe))
 		DoError("Could not find Pe!");
 	
 	if (! be_roster->IsRunning(&pe))

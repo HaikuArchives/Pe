@@ -133,24 +133,10 @@ long CPrefOpener::Execute()
 } /* CPrefOpened::Execute */
 
 PApp::PApp()
-	: BApplication("application/x-vnd.Hekkel-Pe")
+	: BApplication("application/x-vnd.beunited.pe")
 {
 #if BETA
-	time_t expire = 916480172, now;
-	time(&now);
-	
-	if (now > expire)
-	{
-		MInfoAlert a("This version of Pe has expired...");
-		a.Go();
-		exit(1);
-	}
-
-	MInfoAlert a(
-		"This is a beta release of Pe, PLEASE DO NOT REDISTRIBUTE!!!\n\n" 
-		"Pe can be purchased from the BeDepot website. "
-		"Please take a look at http://www.hekkelman.com "
-		"for more information on Pe.");
+	MInfoAlert a("This is a beta release of Pe.\n");
 	a.Go();
 #endif
 
@@ -348,6 +334,29 @@ bool PApp::QuitRequested()
 	return true;
 } /* PApp::QuitRequested */
 
+void PApp::DispatchMessage(BMessage *msg, BHandler *handler)
+{
+       if ( msg->what == B_ARGV_RECEIVED ) {
+               int32 argc;
+               if (msg->FindInt32("argc",&argc) != B_OK) {
+                       argc=0;
+               }
+               const char ** argv = new (const char*)[argc];
+               for (int arg = 0; (arg < argc) ; arg++) {
+                       if (msg->FindString("argv",arg,&argv[arg]) != B_OK) {
+                               argv[arg] = "";
+                       }
+               }
+               const char * cwd;
+               if (msg->FindString("cwd",&cwd) != B_OK) {
+                       cwd = "";
+               }
+               ArgvReceived(argc, argv, cwd);
+       } else {
+               BApplication::DispatchMessage(msg,handler);
+       }
+} /* PApp::DispatchMessage */
+
 void PApp::ReadyToRun()
 {
 	PDoc *doc = PDoc::TopWindow();
@@ -489,7 +498,7 @@ static void Usage()
 	fprintf(stderr, "Usage: pe [\"+\"linenr] file1 file2 ...\n");
 } /* Usage */
 
-void PApp::ArgvReceived(int32 argc, char *argv[])
+void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 {
 	try
 	{
@@ -507,6 +516,8 @@ void PApp::ArgvReceived(int32 argc, char *argv[])
 						if (d && d->Lock())
 							d->Quit();
 						d = OpenWorksheet();
+					} else {
+						Usage();
 					}
 					break;
 				
@@ -517,10 +528,17 @@ void PApp::ArgvReceived(int32 argc, char *argv[])
 				
 				default:
 				{
+					BPath path;
+					if (argv[i][0] == '/') {
+						path.SetTo(argv[i]);
+					} else {
+						path.SetTo(cwd,argv[i]);
+					}
+					FailOSErr (path.InitCheck());
 					entry_ref doc;
 					PDoc *d;
 	
-					FailOSErr (get_ref_for_path(argv[i], &doc));
+					FailOSErr (get_ref_for_path(path.Path(), &doc));
 					
 					BEntry e;
 					FailOSErr(e.SetTo(&doc));

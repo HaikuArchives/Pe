@@ -71,7 +71,7 @@ HButton::HButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const 
 			switch (resID)
 			{
 				case -1:
-					FailOSErr(mt.SetTo("application/x-vnd.Hekkel-Pe"));
+					FailOSErr(mt.SetTo("application/x-vnd.beunited.pe"));
 					FailOSErr(mt.GetIconForType("text/plain", &bm, B_MINI_ICON));
 					break;
 				case -2:

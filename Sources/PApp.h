@@ -57,10 +57,12 @@ virtual	~PApp();
 
 	virtual	void ReadyToRun();
 
-virtual	void ArgvReceived(int32 argc, char **argv);
+virtual	void ArgvReceived(int32 argc, const char **argv, const char * cwd);
 virtual	void RefsReceived(BMessage *msg);
 virtual	void MessageReceived(BMessage *msg);
 virtual	bool QuitRequested();
+
+virtual	void DispatchMessage(BMessage *an_event, BHandler *handler);
 
 			void FindAndOpen(const char *file);
 			PDoc* OpenWorksheet();
