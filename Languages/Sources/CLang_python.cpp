@@ -43,10 +43,34 @@ _EXPORT const char kLanguageKeywordFile[] = "keywords.py";
 
 enum {
 	START, IDENT, OTHER, COMMENT, LCOMMENT, STRING1, STRING2, STRING3,
-	CHAR_CONST, LEAVE, PRAGMA1, PRAGMA2, PRAGMA3
+	CHAR_CONST, LEAVE, PRAGMA1, PRAGMA2, PRAGMA3, NUMERIC, OPERATOR, SYMBOL
 };
 
 #define GETCHAR			(c = (i++ < size) ? text[i - 1] : 0)
+
+bool isOperator(char c)
+{
+	if (c == '+' || c=='-' || c=='*' || c=='/' || c=='%' || c=='=' || c=='>' || c=='<' || c=='&' || c=='|' || c=='!' || c=='.' || c==':' )
+		return true;
+			
+	return false;
+}
+
+bool isSymbol(char c)
+{
+	if (c=='{' || c=='}' || c=='(' || c==')' || c=='[' || c==']' || c==',' ||  c==';')
+		return true;
+	
+	return false;
+}
+
+bool isNumeric(char c)
+{
+	if (c>='0' && c<='9')
+		return true;
+
+	return false;
+}
 
 _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 {
@@ -55,6 +79,12 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 	int i = 0, s = 0, kws, esc = 0;
 	char c;
 	bool leave = false;
+	
+	// floating point flag, true when the NUMERIC: label finds a . inside a number, and checks to make sure that a number with two '.' is invalid. (and not highlighted as numeric)
+	bool floating_point = false;
+	// same flag, only for hex numbers. allows proper highlighting only for 1 x per number. (0x21 is ok. 0x023x31 is not. will look wierd.)
+	bool hex_num = false;
+
 	
 	switch (state)
 	{
@@ -94,6 +124,20 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					else
 						state = STRING2;
 				}
+				// m7m: pe-on-steroids highlighting plugin starts
+				else if (isNumeric(c))
+				{
+					state = NUMERIC;
+				}
+				else if (isOperator(c))
+				{
+					state = OPERATOR;
+				}
+				else if (isSymbol(c))
+				{
+					state = SYMBOL;
+				}
+				// steroids end.
 				else if (c == '\n' || c == 0)
 					leave = true;
 					
@@ -231,6 +275,53 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					leave = true;
 				}
 				break;
+				
+			case NUMERIC:
+			{
+				proxy.SetColor(s, kLNumberColor);
+				if (isNumeric(text[i-1]))
+					;
+				else
+					if (text[i-1]=='.' && floating_point==false && hex_num==false)
+						floating_point = true;
+					else if (text[i-1]=='x' && hex_num==false && floating_point==false)
+						hex_num = true;
+					else
+					{
+						s=i-1;
+						i--;
+						state = START;
+					}
+			}
+			break;
+			
+			case OPERATOR:
+			{
+				proxy.SetColor(s, kLOperatorColor);
+				if (isOperator(text[i-1]))
+					;
+				else
+				{
+					s=i-1;
+					i--;
+					state = START;
+				}
+			}
+			break;
+			
+			case SYMBOL:
+			{
+				proxy.SetColor(s, kLSeparatorColor);
+				if (isSymbol(text[i-1]))
+					;
+				else
+				{
+					s=i-1;
+					i--;
+					state = START;
+				}
+			}
+			break;			
 			
 			default:	// error condition, gracefully leave the loop
 				leave = true;
