@@ -861,7 +861,7 @@ bool PDoc::IsSourceFile()
 	if (e)
 	{
 		e++;
-		if (strcmp(e, "c") && strcmp(e, "C") && strcmp(e, "cp") && strcmp(e, "cpp"))
+		if (strcmp(e, "c") && strcmp(e, "C") && strcmp(e, "cp") && strcmp(e, "cpp") && strcmp(e, "cc"))
 			return false;
 		return true;
 	}
@@ -874,7 +874,7 @@ bool PDoc::IsHeaderFile()
 	if (e)
 	{
 		e++;
-		if (strcmp(e, "h") && strcmp(e, "H"))
+		if (strcmp(e, "h") && strcmp(e, "H") && strcmp(e, "hh") && strcmp(e, "hpp"))
 			return false;
 		return true;
 	}
@@ -907,6 +907,12 @@ void PDoc::OpenPartner()
 			else if (strcpy(x, ".H"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
 			
+			else if (strcpy(x, ".hh"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
+				FailOSErr(d.FindEntry(t, &e, true));
+			
+			else if (strcpy(x, ".hpp"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
+				FailOSErr(d.FindEntry(t, &e, true));
+			
 			free(t);
 		}
 		else if (IsHeaderFile())
@@ -919,13 +925,16 @@ void PDoc::OpenPartner()
 			if (strcpy(x, ".c"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
 			
-			else if (strcpy(x, ".cpp"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
-				FailOSErr(d.FindEntry(t, &e, true));
-			
 			else if (strcpy(x, ".C"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
 			
 			else if (strcpy(x, ".cp"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
+				FailOSErr(d.FindEntry(t, &e, true));
+			
+			else if (strcpy(x, ".cpp"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
+				FailOSErr(d.FindEntry(t, &e, true));
+			
+			else if (strcpy(x, ".cc"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
 			
 			free(t);
