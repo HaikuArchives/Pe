@@ -58,9 +58,9 @@ HTabSheet::HTabSheet(BRect frame, const char *name)
 	
 	fEntries = new BListView(fListArea, "entries");
 	fEntries->SetSelectionMessage(new BMessage(msg_Flip));
-	AddChild(new BScrollView("scroller", fEntries));
+	AddChild(new BScrollView("scroller", fEntries, B_FOLLOW_ALL_SIDES, 0, false, true));
 	
-//	fListArea.right += B_V_SHROLL_BAR_WIDTH;
+	fListArea.right += B_V_SCROLL_BAR_WIDTH;
 
 	font_height fh;
 	be_plain_font->GetHeight(&fh);
