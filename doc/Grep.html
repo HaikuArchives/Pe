@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+
+		<H1>Grep</H1>
+		
+		<p>Pe uses the GNU regex-0.12 library for regular-expression search. Source code for this library is included, so you can replace or alter this library if you need to. (If you wish to replace this lib, alter the source code and compile it into a shared library with the name librx.so and place it in ~/config/lib.)
+		
+		<p>The syntax used for regular expression is the so-called POSIX extended syntax. You can find extensive explanation of this syntax in several sources; <a href="http://www.ora.com">O'Reilly</a> has a book dedicated to this subject.
+
+		<p>A specification of the extended POSIX regular expression syntax can be found on the website of <a href="http://www.opengroup.org">The Open Group</a>. Another source of info might be the documentation supplied with the regex-0.12 package. Look in the directory containing this package for the docs directory.
+		
+		<p>Pe has some minor differences, however. Before passing an expression to the regex compiler, it scans the search string for these four sequences:
+		
+		<table border=1>
+		<tr>
+			<td><strong>These characters...</strong></td>
+			<td><strong>...are replaced by</strong></td>
+		</tr>
+		<tr>
+			<td>\n</td>
+			<td>linefeed</td>
+		</tr>
+		<tr>
+			<td>\r</td>
+			<td>carriage return</td>
+		</tr>
+		<tr>
+			<td>\t</td>
+			<td>tab</td>
+		</tr>
+		<tr>
+			<td>\\</td>
+			<td>single backslash</td>
+		</tr>
+		</table> 
+
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 05/17/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+
+		<H1>Glossary</H1> 
+
+		<p>The glossary is a place where you can tie often-typed pieces of text to a single keystroke. The interface to this mechanism is a bit awkward as yet, but a nice graphical shell will be yours in a future release. 
+		<table>
+		<tr>
+			<td>
+				<p>Another way to enter glossary text into the edit window is by using the Glossary window. This is a window that shows all the entries in the Glossary that have names. If you double click an item in this window its text will be entered in the frontmost edit window.
+
+				<p>As it is now, all the glossary entries are stored inside one text file located in the ~/config/settings/pe/ directory. You can open this file with Pe and edit it. If you change parts of it you can test the result directly without restarting Pe by simply reloading the Glossary with the <a href="./PrefGlossary.html">Preferences Panel</a>. 
+			</td>
+			<td>
+				<img src="./gifs/screen34.gif" alt="screen34">
+			</td>
+		</tr>
+		</table> 
+
+		<p>The Glossary file is a structured file; it should always have the same header line and the items are identified by their own tags as well. Here you see a sample from the default Glossary as supplied with your copy of Pe: 
+
+<pre>### pe Glossary
+## option-f ## For Loop
+for ($insert$;;)
+{
+	;
+}
+## command-option-w ## While Loop
+while ($insert$)
+{
+	
+}
+## control-f8 ## Function Body
+void $selection$($insert$)
+{
+	
+} /* $selection$ */
+## shift-f8 ## File Header
+/*
+	$file$
+	
+	Copyright $name$
+	
+	Created: $date$ $time$
+*/
+
+$insert$
+## f12 ## Hello World!
+Hello, World!
+## option-shift-a ## HTML Anchor
+&lt;a href="$insert$"&gt;$selection$&lt;/a&gt;
+## option-shift-i ## HTML Image
+&lt;img src="./$insert$"&gt;
+## option-shift-1 ## HTML Heading 1
+&lt;h1&gt;$selection$&lt;/h1&gt;
+## option-shift-2 ## HTML Heading 2
+&lt;h2&gt;$selection$&lt;/h2&gt;
+## option-shift-3 ## HTML Heading 3
+&lt;h3&gt;$selection$&lt;/h3&gt;
+</pre>
+
+		<p>As you can see, the first line identifies this file as a valid Glossary file. The second line contains the first entry to the Glossary. It starts with two number signs (#), followed by the description of the shortcut that is assigned to this entry. The shortcut can be any ascii character or function key optionally prepended with one or more modifier keys.<br>
+		Optionally, this line can be continued with yet another pair of  number signs and a name. This name will show up in the Glossary window. If the name is not present, this item will not be entered in this window.<br>
+		The supported modifier keys are: option, command, shift, menu and control. 
+		
+		<p>Beware though, Pe checks in an early stage whether a keydown is a glossary key. This means you can replace any key combination with your own text, thus making it even impossible to type text.
+
+		<p>The text entered by Pe will be indented to the same level as the line where the caret was at the moment of insertion.
+
+		<p>Pe's Glossary capability is extended by its ability to assign values to certain variables. At the moment of insertion, these variables are replaced with their current value. 
+
+		<p>These are the currently supported variables: <a name="Variables">
+		<table border=1>
+		<tr>
+			<td><strong>Variable</strong></td>
+			<td><strong>Value when inserted</strong></td>
+		</tr>
+		<tr>
+			<td>$date$</td>
+			<td>the current date</td>
+		</tr>
+		<tr>
+			<td>$dir$</td>
+			<td>the dirname part of the path of the document being edited</td>
+		</tr>
+		<tr>
+			<td>$file$</td>
+			<td>the basename part of the path of the document being edited</td>
+		</tr>
+		<tr>
+			<td>$file_define$</td>
+			<td>the base name of the file in uppercase with non alpha numeric characters replaced with underscores.
+		</tr>
+		<tr>
+			<td>$insert$</td>
+			<td>this one has no value, it only directs Pe to place the caret at this position when done</td>
+		</tr>
+		<tr>
+			<td>$name$</td>
+			<td>the real name entered in the first pop account, the one you seen when you open the e-mail control panel</td>
+		</tr>
+		<tr>
+			<td>$selection$</td>
+			<td>the text that was selected when you pressed the key to activate the Glossary</td>
+		</tr>
+		<tr>
+			<td>$time$</td>
+			<td>the current time</td>
+		</tr>
+		</table>
+
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 11/13/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+
+		<H1>Dialogs</H1> 
+		
+		<p>Pe has several dialogs. Three of them are described here, the other two have their own pages. <a href="./Preferences.html">Preferences</a> and <a href="./WindowOptions.html">Window Options</a>.
+		
+		<h2><a name="OpenFromServer">Open from Server</a></h2>
+		<img src="./gifs/screen52.gif" width=386 height=230 alt="screen52">
+		
+		<p>You can use this dialog to navigate the directories of a remote FTP server. The Checkbox "Show All" can be used to include files whose name starts with a dot (".") in the list. This dialog works pretty much the same as a normal File Open dialog except for the fact that you have to connect to a server by typing in the server name, your user name and your password and then click the Connect button.
+		</p>
+		
+		<h2><a name="OpenSelection">Open Selection</a></h2>
+		<img src="./gifs/screen11.gif" alt="screen11">
+		
+		<p>This dialog is presented when you choose Open Selection from the File menu without first having made a selection. Here you can type the name of the file you wish to open. Pe will search for the file with the name you typed in the folders defined by the settings in the <a href="./PrefSearching.html">Search Paths pane</a> in the preferences dialog.
+
+		<h2><a name="SaveOnServer">Save On Server</a></h2>
+		<img src="./gifs/screen53.gif" width=386 height=230 alt="screen53">
+
+		<p>This dialog is similar to the <a href="#OpenFromServer">Open from Server</a> dialog with the notable exception that you use this dialog to save a file instead of opening it.
+		</p>
+		
+
+		<h2><a name="ChangeEncoding">Change Encoding</a></h2>
+		<img src="./gifs/screen12.gif" alt="screen12">
+		
+		<p>The Change Encoding is used to transliterate text. There are many character sets around, and docs originating from other platforms tend to have their characters encoded in different ways from the way they are usually encoded in BeOS. You can use this dialog to convert them to their closest match in another character set.
+		
+		<p>BeOS uses default the UTF-8 character set. Apart from UTF-8 the menus in this dialog offer 13 other character set encodings. E.g. Macintosh Roman is the default character set used on Macintosh computers and the earlier versions of BeOS. If you have documents created with DR8 you can change them to UTF-8 with this dialog.
+		
+		<p><em>Note:</em> This option really changes the text, replacing each character by a character from the destination set, if necessary. You can use the Window Options dialog if you only wish to change the character set used for displaying (in fact interpreting) the text without changing it.
+		
+		<h2><a name="GoToLine">Go To Line</a></h2>
+		<img src="./gifs/screen13.gif" alt="screen13">
+		
+		<p>The Go To Line dialog can be used to move the caret to a specified line. Just enter the number of the line you want to go to and click OK. 
+
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 09/10/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>
+

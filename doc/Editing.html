@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+
+		<H1>Editing</H1> 
+
+		<p>You can use Pe to create and edit text files. Well, at least Pe was designed to do that. Editing mainly entails typing text and performing occasional other tasks like drag&amp;drop, cut&amp;paste and other things.
+		
+		<h2>Typing and Navigation</h2>
+		
+		<p>Not much to say about typing, just type away. Navigation needs a bit more explanation. There are several standards for moving around in a text document and since BeOS users tend to come from all kinds of other OS's they all want the keybinding they are used to. New in version 2.0 is full configurability of the various keybindings. Even hardcore emacs users have confessed they find Pe an acceptable editor, and I take that as a compliment. To see how you can customize keybindings, see the <a href="./PrefKeybindings.html">Keybindings Preferences</a>.
+		
+		<h2>Selecting Text</h2>
+		
+		<p>You can select text in Pe using either the keyboard or the mouse. With the keyboard all you have to do is keep the shiftkey down  while navigating through the text in the usual way. The text will be selected from the point where you started (the anchor) to where your caret is.
+
+		<p>Another way of selecting is with the mouse. Just click and drag the mouse over the text you want to select. Double clicking follows the mouse by selecting words one at the time. Triple clicking selects lines.
+		
+		<h2>Drag&amp;Drop</h2>
+		
+		<p>You can edit text in Pe by using drag&amp;drop. This means that when you have made a selection in the text you can click in it and drag the text to another position or even to another window. While you drag the text, the caret shows the position where the text will be dropped when you release the mousebutton.
+		
+		<h2>Cut, Copy, Paste &amp; Clear</h2>
+		
+		<p>I don't think these functions require explanation. They just work as expected.
+		
+		<h2>Undo and Redo</h2>
+		
+		<p>Pe has unlimited Undo. This means you can always undo an action, whether it concerns typing text, cutting text or even running an extension on the text, unlimited undo always works. All given commands end up on a stack. When you choose undo, the command lying on top of the stack is undone and laid on the redo stack. You can continue choosing undo until the undostack is empty; all the items will then have moved to the redostack. Choosing redo works in the opposite direction: it takes the command lying on top of the redostack and puts it back on the undostack.
+		
+		<p>Some actions can use up quite some memory. For example, if you choose change case for the entire text of a 1Mb document, you will fill the undo buffer with the same amount of bytes. Choosing the same command again adds another 1Mb to this buffer. As a result, unlimited is in fact limited by the memory that is still available. If you run out of memory, just close the document and reopen it to empty its undo buffer.
+
+		<h2>Emacs emulation</h2>
+		
+		<p>Pe recognizes several commands to emulate emacs. First of all, Pe is familiar with the concept of Mark and Point. You can set the Mark with a keystroke, typically Control-Space. You can then move the point with the usual keys and then cut/copy/clear the region between the Mark and the current position of the Caret (Point). Cut and Copied text ends up in the same clipboard as text copied in the regular way. You can therefore paste (or yank) it anywhere else.
+
+		<p>As an aid for all this, Pe colours the position of the Mark blue. If you don't like this, you can choose the same colour for the mark as the background, (by dragging the background colour onto the Mark colour e.g.) 
+		
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 05/17/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+
+		<H1>Files</h1>
+		<img src="./gifs/screen21.gif" width=411 height=284 alt="screen21">
+		
+		<p>Use this pane to set various options having to do with stored files on disk. 
+		
+		<p>If you check restore attributes, Pe will copy all the attributes from the original file to the new one. This is useful e.g. for e-mail documents, where the information on sender and so on is stored inside attributes. 
+		
+		<p>When Pe saves a file it first makes a backup of the file with the same name of the original, except that it attaches a tilde (~) to it. If you want to keep this file around, check the option "make backup". Otherwise Pe will delete this file when it has succesfully saved the new file. 
+		
+		<p>End with newline, when checked, will force a file to have a newline character after the last line. Some programs require all text files to have these. 
+		
+		<p>Verify open files, when checked, will keep an eye on the file on the disk which corresponds to the one displayed. Whenever this file changes, Pe will notify the user of this event and give the user the option to reload the file.
+		
+		<p>Nr of Recent Documents controls the size of the Open Recent submenu. You can optionally leave temporary files out of this list, temp files are files created in your local tmp directory. 
+		
+		<p>Full Path in Window Title will display the full path of the current file in the Title bar of the Window. 
+
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 05/17/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+
+		<h2>Various Tips</h2> 
+		
+		<p>What follows is a list of features that didn't fit in any of the previous chapters, or just interesting sections from them that I thought were worth mentioning here. 
+		
+		<p>If you click the right mouse button inside an Edit window, you get a context menu with several options. If you click the middle or third button of the mouse, the function popup is displayed at the current mouse position. 
+		
+		<p>If you drag a file from the Tracker into an open edit window, the contents of the file being dragged will be dropped inside the edit window. If you keep a modifier button down while dropping, the file will be opened in a new window instead of being inserted. 
+		
+		<p>If you click the caret position pane in the lower left corner, a Go To dialog will pop up. If you click and hold the mouse on this pane, a menu is displayed with all the folders and the disk of the path to this file. Choosing a folder from this list will open that folder in the Tracker. 
+		
+		<p>Double clicking on a (curly-)bracket or parenthesis will select the text between this bracket/parenthesis and its counter opening/closing pair. 
+		
+		<p>When you have executed a command in a window, you can choose Undo to remove the output and restore the window to the state before the execution. Choosing Redo will re-insert the output and leave it selected. You can then cut it to place it somewhere else. 
+		
+		<p>Incremental search is a powerful feature, which you can start by a keystroke or by clicking the Incremental Search button. When Pe is in Incremental Search mode, every character you type is added to a search string and Pe will immediately try to find that string. By default Incremental Search is case insensitive but you can change this.<br>
+		The search pattern will be entered into the Find Dialog, so if you feel the need to see the search string you entered, you can find it there. If you type the Incremental Search command twice, the last search pattern will be re-used.
+
+		<p>During installation a commandline application called lpe was installed in the config/bin directory. You can use this app to use Pe as if it was a commandline editor. To let other commandline based applications like CVS use this you should set the environmental variable EDITOR to /boot/home/config/bin/lpe. You can do that by adding the following line to your UserSetupenvironment file (which you can find in the ~/config/boot directory).
+<code><pre>
+export EDITOR=/boot/home/config/bin/lpe
+</pre></code>
+
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 05/17/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>

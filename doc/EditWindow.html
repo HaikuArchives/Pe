@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+		
+		<H1><a name="Window">Edit Window</a></H1>
+		
+		<p>Here you see a screen dump of the edit window of Pe.  
+		
+		<p><img src="./gifs/screen01.gif" width=404 height=253 alt="screen01">
+		
+		<p>There are several elements that need to be discussed. Apart from the usual stuff found in any Be window, like title tabs and menu bar, there are some elements that are specific to Pe. The most prominent one is the toolbar you can find under the menu.
+		
+		<h2>Toolbar</h2>
+		<img src="./gifs/screen02.gif" width=257 height=24 alt="screen02">
+		
+		<p>This toolbar contains several icons that can act as buttons. If you move the mouse over them they will appear to pop up. These are the icons and their meanings: 
+		<menu> 
+		
+			<li>The File icon, which, when clicked, will create a new document 
+			
+			<li>The Folder icon, which, when clicked, will bring up an Open File dialog 
+			
+			<li>The Floppy icon will save the current document; this icon is disabled when the document contains no changes. 
+			
+			<li>Checkmark which, when clicked, sends the currently selected text to a shell for processing (if you have nothing selected, the text on the line where the caret is positioned will be used instead). 
+			
+			<li>The icon bearing the text "f(x)". This is the function popup menu. If you click this icon, it will display a menu containing all the defined functions in a source file if you are editing a source file. Other kinds of files can put similar information in this menu. This menu can be used for quick navigation through large files.  
+			
+			<li>The Looking glass icon, which will bring to the front the Find Dialog  
+			
+			<li>Another Looking glass with an increment operator. When you click on this button Pe will switch to Incremental Search mode. This means that any character you type will be added to a search pattern that will be immediately searched for.
+			
+			<li>The pencil, which can appear with a large red bar through it. This icon tells you whether the file is read-only or not. If it displays the bar through the pencil, the file is read-only and cannot be edited. You can click this icon to toggle this read-only state and Pe will try to change it. This will not always be possible though: Pe will report an error, for example, if you try to cancel the read-only state of a file stored on CD-ROM.  
+			
+			<li>An icon that contains a blue 'i'. When clicked, Pe displays a dialog with information about the file displayed. You can use this dialog to change several options like syntax colouring, whether or not to show tabstops, etc.
+			
+			<li>The last icon can be used to turn on or off softwrapping.
+		</menu>
+		
+		<h2>Caret Position Pane</h2> 
+		
+		<p><img src="./gifs/screen03.gif" alt="screen03"> 
+		
+		<p>In the lower left corner of the window you can find the Caret Position Pane. It displays the current position of the caret (the place where text will be entered when you type). It tells you the line nr. of the caret's position as well as the column before which it is positioned.
+		
+		<h2>Tabstops</h2> 
+		
+		<p><img src="./gifs/screen04.gif" width=266 height=68 alt="screen04">
+		
+		<p>If you've turned on 'show tabstops' for the file you're editing, the toolbar will be a little higher and will indicate the various positions of the tabstops with small lines.
+		
+		<h2>Splitter</h2> 
+		
+		<p>There is a small dark grey square above the vertical scrollbar on the right-hand side of the window. Dragging this little square down allows you to split a window into two views, both representing the same document.  
+		
+		<p>Here you see an example of a split window: 
+		
+		<p><img src="./gifs/screen05.gif" width=418 height=217 alt="screen05">  
+		
+		<p>That's all there is to say about the elements you can find in the Edit Window. Now you can continue with the discussion of the various <a href="./Menus.html">Menu Items</a>.
+
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 05/17/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>

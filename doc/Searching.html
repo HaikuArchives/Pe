@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+
+		<H1>Searching</H1> 
+		
+		<p>This chapter discusses the items found in the Find Dialog. It also gives some details on multi file search. If you are looking for information on grep, see the chapter on <a href="./Grep.html">regular expressions</a>. 
+		
+		<p>This is the Find Dialog: 
+		
+		<p><img src="./gifs/screen06.gif" alt="screen06"> 
+		
+		<p>As you can see, there are quite some options in this dialog. I'll try to explain all of them here.  <h2>Find and Replace Edit Fields</h2>
+		
+		<p>The two big edit fields on the upper half of the dialog can be used to enter the text to find and the text that should replace the found text. 
+		
+		<p>As you can see the Find: label is actually a popup menu. If you click this, a menu will be presented containing several grep patterns. You can edit this list in the preferences dialog. You can also use this popup to add the current search patterns to this list. 
+		
+		<h2>Ignore Case</h2>
+		
+		<p>If this option is checked, the search will be done case insensitive. This means that the words "Hi" and "hi" will be considered of equal value. 
+		
+		<h2>Wrap Around</h2>
+		
+		<p>When this option is checked and the text could not be found starting from the current position in the document, the search will restart at the beginning (or end if Backwards is checked) of the document. 
+		
+		<h2>Backwards</h2>
+		
+		<p>When this option is checked, the search will be done in reverse order, moving towards the top of the document, and start from the current position, as usual. 
+		
+		<h2>Entire Word</h2>
+		
+		<p>When this option is checked, only text marked by a word boundary will be found. I.e. the first and the last character of the found text must be alphanumeric and the last character before and immediately after the found text must not be alphanumeric. 
+		
+		<h2>Grep</h2>
+		
+		<p>If this option is <em>not</em> checked, the text to be found must be exactly the same as the text in the Find edit box. However, if this option is checked, the text in the Find edit box will be regarded as a regular expression and Pe will search for text matching that pattern.<br> See the chapter on <a href="./Grep.html">regular expressions</a> for more info on this interesting subject. 
+		
+		<h2>Batch</h2>
+		
+		<p>When this option is checked, all the found items will be put in a separate list shown in a new window. This is especially useful if you are searching through multiple files. 
+		
+		<h2>Find Button</h2>
+		
+		<p>The find button starts the search. 
+		
+		<h2>Replace Button</h2>
+		
+		<p>The replace button replaces the currently-found text. This button is only enabled when the text selected matches the text entered in the Find field. 
+		
+		<h2>Replace &amp; Find</h2>
+		
+		<p>The replace &amp; find button is an alternative way of clicking replace and then find. 
+		
+		<h2>Replace All</h2>
+		
+		<p>Replace all replaces all occurrences of the text in Find with the text in Replace. Mind the word 'all', Pe starts replacing from the top of the document onwards, no matter where the current caret is positioned.
+		
+		<h1>Multi File Search Options</h1>
+		
+		<p>One of the strengths of Pe lies in its multi-file search capabilities. You can use Pe to search through all the Be Header files, e.g. or all the e-mail stored on your harddisk.<br> You turn on this capability by checking the Multi-File Checkbox. 
+		
+		<h2>Method</h2>
+		
+		<p>The method popup menu currently gives you three choices:
+		<dl>
+			<dt><b>$BEINCLUDES</b>
+			<dd>This option scans all the files that can be found in the paths contained in this environmental variable. This includes all the Be Header files used for compiling, the ones you <code>#include</code> with <code>&lt;&gt;</code>.
+			<dt><b>Open Windows</b>
+			<dd>This option searches through all the opened windows.
+			<dt><b>Directory</b>
+			<dd>Directory scans the files in a particular directory. If you choose this option, several other options will become available:
+		</dl>
+		
+		 <h2>Starting Directory</h2>
+		
+		<p>This popup menu can be used to choose the directory to be scanned. If you conducted a multi-file search beforehand, the directories used during the search will be part of this popup menu. You can also choose Other... which will bring up a dialog with which you can choose a new directory.<br>
+		The list of directories can be manipulated with the Preferences Panel. 
+		
+		<h2>Recursive</h2>
+		
+		<p>If this option is checked, all the directories found beneath the starting directory will also be scanned. This means that if you choose /boot as the starting directory, all the directories on your harddisk will be scanned. 
+		
+		<h2>Text Files Only</h2>
+		
+		<p>This option, when checked, will limit the files to be searched to those having a mimetype starting with "text/". The effectiveness of this option depends on the correctness of the mimetypes. Files that have no type at all will be skipped. 
+		
+		<h2>File Name Filter</h2>
+		
+		<p>The last popup and edit box in the find dialog allows you to filter the files to be searched by way of their names. If you choose "File Name ends with" from the popup and type ".cpp" in the editbox, only files whose name end with ".cpp" will be searched. 
+
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 05/17/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>

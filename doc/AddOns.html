@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	 </tr>
+	 <tr>
+		 <td colspan=3 valign=top>
+		 	<br clear=all>
+
+			<H1>Extending Pe</H1>
+			
+			<h2>Extensions</h2>
+			
+			<p>Pe has the capability of using plug-ins called Extensions. These Extensions have the same format as the ones used for BeIDE. Therefore, you can use any Extension written for BeIDE with Pe. A more capable Extension interface will be developed for the next version of Pe.
+			
+			<p>As an extra you can also put executables (programs or scripts) in the Extensions directory. These scripts or programs will then be called when you choose them from the Extensions menu. They will get the current selection, or the entire content, as stdin input and stdout is captured and put in the document.
+			
+			<p>When Pe launches, it scans the Directory called Extensions, which is located in the same directory as the Pe application, for valid extensions and loads them. After that Pe tries to find the Extensions directory of BeIDE and scans that one too.
+			
+			<p>Pe is currently distributed with these Extensions:
+			
+			<dl>
+				<dt><b>Cut Lines Containing and Copy LinesContaining</b>
+				<dd>These extensions cut or copy lines from the text that satisfy a certain regular expression/search pattern.
+				
+				<dt><b>Prefix Lines</b>
+				<dd>This extension can place a string in front of or behind the selected lines
+				
+				<dt><b>Pipe</b>
+				<dd>This extension can be used to pipe the selected text through a shell command. You can use this to sort lines e.g.
+
+				<dt><b>ROT13</b>
+				<dd>Use ROT13 to do a extremely simple encryption on the selected text. This encryption scheme is popular on news groups e.g.
+				
+				<dt><b>drieuxCaps</b>
+				<dd>This extension capitalizes words in the selection in some random way. Don't know why this is useful but it is based on the code supplied with a BBEdit extension with the same name written by Jamie McCarthy.
+			</dl>
+			
+			<H2>Language Add-Ons</H2> 
+			
+			<p>If you feel the need, you can write your own add-ons for Pe to do syntax colouring, function gathering for the popup and determine word breaks for softwrapping. An interface file is supplied when you have installed the Pe Goodies. If you need extra information to make these add-ons, don't hesitate to ask for more information or even an example.
+	
+			<hr>
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 05/17/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+</body>
+</html>

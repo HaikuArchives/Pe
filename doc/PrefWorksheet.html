@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+
+		<H1>Worksheet</h1>
+		<img src="./gifs/screen30.gif" width=411 height=284 alt="screen30">
+		
+		<p>This pane gives you the option to redirect output sent to stderr to a separate window. If this option is not checked, stderr output will be typed in the window just like normal output. Any commandline application can write to the terminal in which it is executed via two channels, stdout and stderr. stdout is used for normal output and stderr is used for error output. 
+		
+		<p>If you choose to redirect stderr and suppose you are compiling a source file containing errors, a window will popup containing a list with all the errors found. Just double click an item in this list and the corresponding source file will be opened and the position causing the error will be selected. 
+		
+		<p><img src="./gifs/screen10.gif" alt="screen10"> 
+		
+		<p>Always keep a Worksheet open, when checked, instructs Pe to open the Worksheet at launch time. Also, when you choose to close all windows, this Worksheet will stay open. If you accidentally close a Worksheet you can quickly reopen it by choosing Worksheet from the Window Menu, or by typing Command-0. 
+
+		<p>And then comes the difficult part, you can modify the patterns used to parse stderr output. You do this by entering a regular expression that matches an error. An error contains several useful elements and Pe needs to know where to find them in the message. Therefore you have to construct a regular expression that results in several groups, each group containing a different part of the message. Next you enter for the group number for the four elements file, line nr, message description and whether or not this is a warning in the four corresponding edit boxes.
+		</p>
+		
+		<p>Default Pe recognizes these two classes of error messages:
+		</p>
+
+		<p>For the gcc like way of formatting errors:
+		</p>
+		
+
+<code><pre>
+file.c:1: An error was found on line 1 in file.c
+
+or
+
+file.c:2: warning: A warning was generated for line two in file.c
+</pre></code>
+
+		<p>... and for metrowerks ...
+		</p>
+
+<code><pre>
+### mwcc Error
+# An error was found on line of file file.c
+#----------------
+File "/boot/home/file.c"; Line 1
+#----------------
+</pre></code>
+
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 11/13/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>

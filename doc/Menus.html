@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+
+		<h1>Menus</h1>
+		
+		<p>A Pe edit window can have six to eight menus. Two are optional: the Extensions menu only shows up when Pe was able to find extensions during launching, and the BeIDE menu can be switched off with the Preferences Panel. 
+		
+		<h2>The File Menu</h2>
+		
+		<p>The File menu contains the following items: 
+		
+		<menu>
+			<li>New will create a new document.
+			<li>New Group will create a new <a href="./GroupWindow.html">Group Window</a>.
+			<li>Open... brings up the default Open File Panel.
+			<li>Open from Server... brings up the <a href="./Dialogs.html#OpenFromServer">Open from Server dialog</a>. You can use this dialog to navigate the directories on a remote FTP server and open a file from this server.
+			<li>Open Selection tries to open the file whose name is selected in the edit window. If you have nothing selected it will bring up a dialog where you can type a file name. Pe will then try to find the file in several directories, depending on the settings in the Preferences Panel.
+			 <li>Open Recent contains a submenu where the most recently opened docs are recorded. The nr. of files displayed can be changed in the Prefences Panel.
+			 <li>Close closes the document.
+			 <li>Save saves the document.
+			 <li>Save As... brings up the default Save File Panel where you can give the document a new name
+			 <li>Save on Server... brings up the <a href="./Dialogs.html#SaveOnServer">Save on Server dialog</a> that you can use to save the current file on a remote FTP server.
+			<li>Save a Copy As... also brings up this Save File Panel, but when the file is saved the window still displays the originally opened document, and not the one just saved. Revert discards all changes made to the document since the last time it was saved.
+			<li>Quit quits Pe.
+		</menu>
+		
+		<p>There are no printing items in this menu as yet. I'm waiting with implementing printing until the printing architecture in BeOS is fixed.
+		
+		<h2>The Edit Menu</h2>
+		
+		<p>The Edit menu contains the following items:
+		
+		<menu>
+			<li>Undo/Redo xxx undoes/redoes the action named xxx. Pe has unlimited undo.
+			<li>Cut, Copy, Paste, Clear all work as expected.
+			<li>Select All and Select Line also do what you would expect them to.
+		</menu>
+		
+		<h2>The Text Menu</h2>
+		
+		<p>The Text menu contains the following items:
+		
+		<menu>
+			<li>Balance tries to find the closest matching pairs of either parenthesis <code>"()"</code>, brackets <code>"[]"</code> or curly brackets <code>"{}"</code>. This is especially useful for programmers.
+			<li>Twiddle reverses characters depending on the position of the Caret:
+			<menu>
+				<li>When the Caret is between two characters, the character before the Caret is swapped with the one after the Caret.
+				<li>When the Caret is at the end of a line, the two characters just before the end of the line are swapped.
+				<li>Similarly, when the Caret is at the beginning of a line, the two characters at the beginning of the line are swapped.
+				<li>When there is a selection, all the characters are reversed in their order.
+			</menu>
+			<li>Change Case has a submenu containing several options to change the casing of either the selected text or the entire document.
+			<li>Change Encoding brings up a dialog where you can choose two character sets: the set to encode from and the set to encode to. This is useful for converting UTF-8 encoded documents to ISO encoded documents for use on a Website.
+			<li>Shift Left/Right shifts the selected text one tab to the left or right.
+			<li>Comment/Uncomment comments or uncomments the selected lines with language dependent comment characters.
+			<li>Insert Linebreaks will put a line break character after each softwrap.
+			<li>Remove Linebreaks will remove the line break characters from the selected text. It also removes leading white space.
+			<li>Show in browser launches your favourite browser and sends it for display to the current document.
+		</menu>
+		
+		<h2>The Search Menu</h2>
+		
+		<p>The Search Menu contains the following items: (See the section on <a href="./Searching.html"> Searching</a> for more info on the extended searching capabilities of Pe. There are also a lot of custom keybindings available for searching, see the <a href="./PrefKeybindings.html">Keybinding Preferences</a> for more details)
+		
+		<menu>
+			<li>Find... brings up the <a href="./Searching.html">Find Dialog</a>.
+			<li>Find Again tries to find the next occurrence of the find string entered in the Find Dialog.
+			<li>Find Selection enters the selected text in the Find Dialog and tries to find the next occurrence.
+			<li>Enter Search String enters the selected text in the Find Dialog.
+			<li>Replace replaces the currently-found text with the replace string.
+			<li>Replace &amp; Find Replaces the currently-found text with the replace string and tries to find the next occurrence.
+			<li>Replace All replaces all occurrences in the current file with the replace string.
+			<li>Jump to Next Error searches the file for the next occurrence of<br>
+				<code>File "/a/path/to/a/file"; Line 12</code><br>
+				and opens the file and selects the line.
+			<li>Go To Line... brings up a dialog where you can enter the line number of the line to which you want to move next. </menu>
+		
+		<h2>The Extensions Menu</h2>
+		
+		<p>The Extensions Menu contains all the Extensions Pe was able to find when it was launched. See <a href="./AddOns">Add-Ons</a> for more info on this subject. 
+		
+		<h2>The Window Menu</h2>
+		
+		<p>The Window Menu contains the following items:
+		
+		<menu>
+			<li>File Options... brings up the same dialog as when you click the blue "i" button in the toolbar. Use this dialog to change options such as font family and style, font size, character encoding, line breaks, whether or not to use syntax colouring, show tabs or show invisibles.
+			<li>Preferences brings up the <a href="./Preferences.html">Preferences Dialog</a>.
+			<li>Working Directory brings up an Open File Panel with which you can choose a directory. This directory will be the current directory for the next command you will issue from this window.
+			<li>Stack and Tile arrange the windows on screen.
+			<li>Zoom zooms the front window.
+			<li>Worksheet opens the default worksheet for Pe.
+			<li>Any other item displayed here is the name of an open window. Choose it to bring the corresponding window to the foreground.
+		</menu> 
+		
+		<h2>The Help Menu</h2>
+		
+		<p>The Help Menu contains the following items: 
+		
+		<menu>
+			<li>Help... launches your favourite browser and displays these docs.
+			<li>About... brings up a window where you can see copyright and other interesting information about this program.
+		</menu>
+		
+		<h2>The BeIDE Menu</h2>
+		
+		<p>The BeIDE menu is optional. You can turn it on on the Connections page in the preferences dialog. This menu contains the following items:
+		
+		<menu>
+			<li>Bring to Front which activates Metrowerks BeIDE
+			<li>Add File adds the current file to the currently opened project
+			<li>Remove File removes the current file from the currently opened project
+			<li>Project -&gt; Group opens a Group Window filled with all the files in the currently opened project.
+			<li>Make tells BeIDE to do a Make.
+		</menu>
+		
+		<p>Next item in this manual is <a href="./Editing.html">Editing</a>.
+
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 09/10/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>

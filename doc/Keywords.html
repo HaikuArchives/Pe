@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+
+
+		<H1>Keywords</H1>
+		
+		<p>When Pe performs the syntax-highlighting feature it scans the text for keywords, and if it finds any, it colours them according to the preferences you choose. To recognize keywords quickly, Pe uses tables that are built from keyword files. Since every language has its own set of keywords, there are keyword files for any supported language.
+		
+		<p>Languages tend to change over time and keywords will be added. Pe gives you the chance to alter the keyword set of any language. Pe can also recognize four user-defined keyword sets. (And I've already received a request for more.)
+		
+		<p>If you want to edit the keyword sets, you should open the keyword file belonging to the language whose keyword set you wish to alter. All the keyword files are located in ~/config/settings/pe/. The keyword files are structured text files, which can be edited with Pe.
+
+		<p>Here is a (shortened) example of the C/C++ keyword file:
+		<pre>#define #else ... wchar_t while explicit
+- User set 1:
+BPoint BRect ....
+- User set 2:
+- User set 3:
+- User set 4:</pre>
+		
+		<p>In this example you see that all the words that appear before the line "- User set 1" are the real keywords of the language. The keywords following the lines beginning with "- User set..." are user sets. Lines starting with a hyphen (-) are considered to be separators between sets of keywords.
+
+		<p><em>Tip:</em> When programming for BeOS, it is useful to enter all the classnames of Be classes in one user set. If you do this, you have a quick check for avoiding typos like BPopopMenu instead of BPopUpMenu.
+
+		<hr>
+
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 05/17/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>

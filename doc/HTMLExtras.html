@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+	<title>Pe Manual</title>
+</head>
+
+<body bgcolor="#ffffff" background="./gifs/background.gif">
+
+	<table width=610 border=0 cellspacing=0 cellpadding=0>
+	<tr>
+		<td rowspan=2 valign=top width=130 height=2 align=bottom>
+			<!-- #include "./nav_bar_incl.html" -->
+			<img src="./gifs/invisiblebar.gif" width=130 height=1>
+			<map name="popup">
+				<area shape=rect coords="0,0,88,15" href="./index.html">
+				<area shape=rect coords="0,15,88,30" href="./EditWindow.html">
+				<area shape=rect coords="0,30,88,45" href="./Menus.html">
+				<area shape=rect coords="0,45,88,60" href="./Editing.html">
+				<area shape=rect coords="0,60,88,75" href="./Searching.html">
+				<area shape=rect coords="0,75,88,90" href="./GroupWindow.html">
+				<area shape=rect coords="0,90,88,105" href="./ErrorWindow.html">
+				<area shape=rect coords="0,105,88,120" href="./Dialogs.html">
+				<area shape=rect coords="0,120,88,135" href="./HTMLExtras.html">
+				
+				<area shape=rect coords="0,150,88,165" href="./Glossary.html">
+				<area shape=rect coords="0,165,88,180" href="./Keywords.html">
+				<area shape=rect coords="0,180,88,195" href="./Grep.html">
+				<area shape=rect coords="0,195,88,210" href="./BeIDEInterface.html">
+				<area shape=rect coords="0,210,88,225" href="./AddOns.html">
+				<area shape=rect coords="0,225,88,240" href="./VariousTips.html">
+			</map>
+			<img src="./gifs/menu.gif" width=102 height=241 border=0 alt="menu" usemap=#popup>
+			<!-- end include -->
+		</td>
+		<td width=480 valign=top>
+			<img src="./gifs/bar.gif" alt="bar" align=center width=480 height=6>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3 valign=top>
+		
+		<br clear=all>
+		
+		<H1><a name="HTMLExtras">HTML Extra's</a></H1>
+		
+		<table>
+		<tr>
+			<td>
+				<p>Since one of the main targets of Pe is the editing of HTML files there are several features build in that are specific to HTML. First of all there is a so-called HTML Palette. This is a floating window that contains several buttons
+				</p>
+				
+				<p>There are three kinds of buttons on this palette. There are ordinary buttons that when pressed insert a tag or execute a single command like opening the current document in a browser (Preview).
+				</p>
+				
+				<p>The second class of buttons has a small triangle on the right side, these buttons are in fact popup menu's and can contain tags and commands.
+				</p>
+				
+			
+				<p>Then there are buttons with three dots appended to their names. These buttons bring up a dialog where you can supply additional arguments for a command.
+				</p>
+				
+			</td>
+			<td>
+				<img src="./gifs/screen49.gif" width=93 height=248 alt="screen49">
+			</td>
+		</tr>
+		</table>
+		
+		<p>The <em>Image</em> button brings up a dialog where you can specify several parameters for inserting an image link. You can also drag and drop a GIF image file on this dialog to fill in these values. (I know, I should have added other graphic formats as well).
+		</p>
+		
+		<p>The <em>Anchor</em> button is in fact a stripped down Image button, use it to quickly paste in a <code>&lt;A HREF&gt;</code> tag with a relative path to another document.
+		</p>
+		
+		<p>The <em>Update</em> button calls the HTMLUpdate addon. This addon scans the file for occurences of:
+		</p>
+
+<pre>&lt;!-- #include "./anotherfilename.html" --&gt;
+	bla bla
+&lt;!-- end include--&gt;
+</pre>
+		
+		<p>When it finds such an occurence it will replace the text between the two comments with the content of the file whose name is in the first comment. You can have variables in this include file and these will be replaced with their current value. Possible variables are: $date$, $time$, $name$ and $file$. See the <a href="./Glossary.html#Variables">Glossary</a> for an explanation of these variables.
+		</p>
+		
+		<p>To see an example of the usage of these include files, have a look at these HTML pages themselves in Pe. You can see that every page includes two parts, the menubar on the lefthand side and the signature on the bottom of each page.
+		</p>
+		
+		
+		<hr>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td colspan=3>
+			<!-- #include "./addr_incl.html" -->
+			<address>
+				<p>Last updated: 05/17/98<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
+				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+			</address>
+			<!-- end include -->
+		</td>
+	</tr>
+	</table>
+
+</body>
+</html>
