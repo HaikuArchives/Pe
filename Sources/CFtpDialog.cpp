@@ -138,16 +138,17 @@ CFtpDialog::CFtpDialog(BRect frame, const char *name, window_type type, int flag
 		BMimeType mimTyp;
 		int32 mimIdx = -1;
 		int32 extIdx = 0;
-		BString mimStr;
-		BString extStr;
+		const char* mimCStr;
+		const char* extCStr;
 		if (BMimeType::GetInstalledTypes(&mimDat) == B_OK) {
-			while (mimDat.FindString("types", ++mimIdx, &mimStr) == B_OK) {
-				if ((mimTyp.SetTo(mimStr.String()) == B_OK) && (mimTyp.GetFileExtensions(&extDat) == B_OK)) {
+			while (mimDat.FindString("types", ++mimIdx, &mimCStr) == B_OK) {
+				if ((mimTyp.SetTo(mimCStr) == B_OK) && (mimTyp.GetFileExtensions(&extDat) == B_OK)) {
 					extIdx = -1;
-					while (extDat.FindString("extensions", ++extIdx, &extStr) == B_OK) {
+					while (extDat.FindString("extensions", ++extIdx, &extCStr) == B_OK) {
+						BString extStr(extCStr);
 						extStr.ToLower();
 						if (extStr.ByteAt(0) == '.')  extStr.Remove(0, 1);
-						fExtMime.insert(entry(extStr.String(), mimStr.String()));
+						fExtMime.insert(entry(extCStr, mimCStr));
 					}
 				}
 			}
