@@ -40,6 +40,8 @@ const int kDistinctColorTresholdSquare = 10000;
 
 rgb_color DistinctColor(rgb_color highColor, rgb_color lowColor);
 
+rgb_color gColor[kLastColor], gInvColor[kLastColor];
+
 //
 // This comes from Pavel Cisler:
 //

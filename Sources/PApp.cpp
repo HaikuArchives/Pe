@@ -65,7 +65,6 @@ static char *rcsid = "$Id$";
 BDirectory gAppDir, gCWD, gPrefsDir;
 BFile gAppFile;
 PApp *gApp;
-rgb_color gColor[kLastColor], gInvColor[kLastColor];
 bool gAutoIndent, gSyntaxColoring, gBalance, gBlockCursor, gFlashCursor, gSmartBrace;
 bool gPopupIncludes, gPopupProtos, gPopupFuncs;
 int gSpacesPerTab;
