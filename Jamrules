@@ -74,46 +74,44 @@ rule UserObject
 rule RezObject
 {
 	local _rsrc = $(>:B).rsrc ;
+	HDRS on $(_rsrc) = [ on $(<) FIncludes $(HDRS) ] ;
 	MakeLocate $(_rsrc) : $(LOCATE_TARGET) ;
 	Depends $(<) : $(_rsrc) ;
-	Rez $(_rsrc) : $(>) ;
+	PreProcessRez $(_rsrc) : $(>) ;
 	Clean clean : $(_rsrc) ;
+}
+
+rule PreProcessRez
+{
+	local _tmp = $(<)_tmp ;
+	MakeLocate $(_tmp) : $(LOCATE_TARGET) ;
+	Depends $(_tmp) : $(>) ;
+	Depends $(<) : $(_tmp) ;
+	Clean clean : $(_tmp) ;
+}
+
+if $(METROWERKS) {
+actions PreProcessRez
+{
+	mwcc -preprocess -o "$(<)_tmp" $(HDRS) $(>) ;
+	$(REZ) -t -o "$(<)" -I$(>:D) "$(<)_tmp" ;
+}
+} else {
+actions PreProcessRez
+{
+	gcc -E -x c -o - $(HDRS) $(>) | sed 's/^#.*//g' > "$(<)_tmp" ;
+	$(REZ) -o "$(<)" -t -I$(>:D) "$(<)_tmp" ;
+}
 }
 
 rule Rez
 {
-	local _tmp = $(<)_tmp ;
-	MakeLocate $(_tmp) : $(LOCATE_TARGET) ;
-	GenerateTmpRez $(_tmp) : $(>) ;
-	RunRez $(<) : $(_tmp) ;
-	Clean clean : $(_tmp) ;
+	Depends $(<) : $(>) ;	
 }
 
-rule RunRez
+actions Rez
 {
-	Depends $(<) : $(>) ;
-}
-
-actions RunRez
-{
-	$(REZ) -t -o "$(<)" "$(>)" ;
-}
-
-rule GenerateTmpRez
-{
-	Depends $(<) : $(>) ;
-}
-
-if $(METROWERKS) {
-actions GenerateTmpRez
-{
-	mwcc -preprocess -o $(>) -I$(>:D) $(<) ;
-}
-} else {
-actions GenerateTmpRez
-{
-	gcc -E -x c -o - -I$(>:D) $(>) | sed 's/^#.*//g' > $(<) ;
-}
+	$(REZ) -o "$(<)" "$(>)" ;
 }
 
 # thanks OBOS

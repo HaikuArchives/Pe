@@ -111,3 +111,6 @@ XRes pe :
 	RProject.rsrc
 	RMimeinfo.rsrc
 	;
+Rez pe : 
+	[ FDirName $(TOP) Resources Now.r ]
+	;
