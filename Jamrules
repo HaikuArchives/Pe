@@ -41,6 +41,8 @@ rule MakeDistro
 
 actions MakeDistro
 {
+	rm -rf generated/distro/Documentation ;
+	cp -a doc generated/distro/Documentation ;
 	ln -sf /boot/home/config/bin/ generated/distro/\(drag\ lpe\ here\ to\ install\) ;
 }
 
