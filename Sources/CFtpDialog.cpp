@@ -34,6 +34,7 @@
 */
 
 #include "pe.h"
+#include "PApp.h"
 #include "CFtpDialog.h"
 #include "CFtpListItem.h"
 #include "CFtpStream.h"
@@ -185,7 +186,7 @@ bool CFtpDialog::OKClicked()
 			else
 			{
 				URLData url(GetText("srvr"), GetText("user"), tv->Text(), fPath, *i);
-				new PDoc(url);
+				gApp->NewWindow(url);
 			}
 		}
 		catch (HErr& e)

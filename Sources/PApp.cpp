@@ -179,11 +179,12 @@ PApp::PApp()
 		BPath dir;
 		FailOSErr(appName.GetParent(&dir));
 		FailOSErr(gAppDir.SetTo(dir.Path()));
-		FailOSErr(gCWD.SetTo(dir.Path()));
 	
-		fOpenPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL,
-				0, true, new BMessage(B_REFS_RECEIVED));
+		fOpenPanel = new BFilePanel();
 		FailNil(fOpenPanel);
+		entry_ref cwd_ref;
+		fOpenPanel->GetPanelDirectory(&cwd_ref);
+		FailOSErr(gCWD.SetTo(&cwd_ref));
 		
 		PDoc::LoadAddOns();
 
@@ -361,42 +362,61 @@ void PApp::ReadyToRun()
 	PDoc *doc = PDoc::TopWindow();
 	if (!doc || doc->IsWorksheet())
 	{
+		// what to do when pe is launched
 		switch (gPrefs->GetPrefInt("startup"))
 		{
-			case 1:
+			case 1: // Create New Document
 				if (CDoc::CountDocs() == 0 || (doc && doc->IsWorksheet() && CDoc::CountDocs() == 1))
 					NewWindow();
 				break;
-
-			case 2:
+	
+			case 2: // Show Open Dialog
 				PostMessage(msg_Open);
 				break;
-
-			default:
+	
+			default: // Do Nothing (only effective in combination with a worksheet)
 				if (CDoc::CountDocs() == 0)
 					NewWindow();
 				break;
 		}
 	}
 	
-	BPath p;
-	if (find_directory(B_USER_DIRECTORY, &p) == B_OK)
-		gCWD.SetTo(p.Path());
+//	BPath p;
+//	if (find_directory(B_USER_DIRECTORY, &p) == B_OK)
+//		gCWD.SetTo(p.Path());
 	
 	if (gPrefs->GetPrefInt("showglossary", 0))
 		PostMessage(msg_ShowGlossary);
 } /* PApp::ReadyToRun */
 
-void PApp::NewWindow()
+PDoc* PApp::NewWindow(const entry_ref *ref, bool show)
 {
+	printf("PApp::NewWindow()\n");
+	PDoc * doc = 0;
 	try
 	{
-		new PDoc;
+		doc = new PDoc(ref,show);
 	}
 	catch (HErr& e)
 	{
 		e.DoError();
 	}
+	return doc;
+} /* PApp::NewWindow */
+
+PDoc* PApp::NewWindow(URLData& url)
+{
+	printf("PApp::NewWindow()\n");
+	PDoc * doc = 0;
+	try
+	{
+		doc = new PDoc(url);
+	}
+	catch (HErr& e)
+	{
+		e.DoError();
+	}
+	return doc;
 } /* PApp::NewWindow */
 
 CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
@@ -450,7 +470,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 				return CDoc::FindDoc(doc);
 			}
 			else
-				return new PDoc(&doc, show);
+				return NewWindow(&doc, show);
 		}
 	}
 	catch (HErr& e)
@@ -546,7 +566,7 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						d = dynamic_cast<PDoc*>(OpenWindow(doc));
 					else
 					{
-						d = new PDoc;
+						d = NewWindow();
 						BAutolock lock(d);
 						
 						if (lock.IsLocked()) 
@@ -793,7 +813,7 @@ void PApp::MessageReceived(BMessage *msg)
 					w = dynamic_cast<BWindow*>(OpenWindow(doc));
 				else
 				{
-					w = new PDoc;
+					w = NewWindow();
 					BAutolock lock(w);
 					
 					if (lock.IsLocked()) 
@@ -824,8 +844,9 @@ void PApp::MessageReceived(BMessage *msg)
 				break;
 			}
 			
+			case B_SILENT_RELAUNCH:
 			case msg_New:
-				new PDoc();
+				NewWindow();
 				break;
 			
 			case msg_Select:

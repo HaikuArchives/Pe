@@ -34,6 +34,7 @@
 */
 
 #include "pe.h"
+#include "PApp.h"
 #include "CUrlOpener.h"
 #include "CLogin.h"
 #include "CFtpStream.h"
@@ -74,7 +75,7 @@ long CUrlOpener::Execute()
 			return 0;
 		
 		URLData url2(url.Server(), username, password, url.Path(), url.File());
-		new PDoc(url2);
+		gApp->NewWindow(url2);
 	}
 	catch (HErr& e)
 	{

@@ -36,7 +36,7 @@
 #ifndef PAPP_H
 #define PAPP_H
 
-
+class URLData;
 class CDoc;
 
 class HDialog;
@@ -52,7 +52,8 @@ public:
 			PApp();
 virtual	~PApp();
 		
-			void NewWindow();
+			PDoc* NewWindow(const entry_ref *ref = NULL, bool show = true);
+			PDoc* NewWindow(URLData& url);
 			CDoc* OpenWindow(const entry_ref& doc, bool show = true);
 
 	virtual	void ReadyToRun();

@@ -216,7 +216,7 @@ void PProjectWindow::MessageReceived(BMessage *msg)
 				break;
 			
 			case msg_EditAsText:
-				new PDoc(fFile);
+				gApp->NewWindow(fFile);
 				Close();
 				break;
 			
