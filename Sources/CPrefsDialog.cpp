@@ -89,6 +89,7 @@ CPrefsDialog::CPrefsDialog(BRect frame, const char *name, window_type type, int 
 {
 	fPageSetup = NULL;
 	fKBKeys = NULL;
+	fCurrentSuffix = NULL;
 
 	BAutolock lock(this);
 
@@ -176,6 +177,7 @@ CPrefsDialog::CPrefsDialog(BRect frame, const char *name, window_type type, int 
 		fDefLanguage->AddItem(new BMenuItem(intf->Name(), new BMessage(msg_FieldChanged)));
 	}
 
+	fLang = -1; // mark as unitialized, will be initialized when "lang" is set
 	SetValue("lang", 1);
 	
 	BTextControl *c = static_cast<BTextControl*>(FindView("sufx"));
@@ -230,6 +232,8 @@ bool CPrefsDialog::QuitRequested()
 		MWarningAlert a("The preferences have changed. Save changes before closing?", "Save", "Discard");
 		if (a == 1)
 			OKClicked();
+		else
+			CancelClicked();
 	}
 
 	Hide();
@@ -238,10 +242,6 @@ bool CPrefsDialog::QuitRequested()
 
 bool CPrefsDialog::OKClicked()
 {
-	int v = GetValue("lang") - 1;
-	if (v >= 0 && v < fSuffixes.size())
-		fSuffixes[v] = GetText("sufx");
-
 	BMenuItem *item = fFont->FindMarked();
 	if (item)
 	{
@@ -670,8 +670,6 @@ void CPrefsDialog::UpdateFields()
 
 	UpdateKBPage();
 	
-	SetEnabled("ok  ", true);
-	SetEnabled("cncl", true);
 } /* CPrefsDialog::UpdateFields */
 
 void CPrefsDialog::GetDefPageSetup()
@@ -713,20 +711,14 @@ void CPrefsDialog::MessageReceived(BMessage *msg)
 			gGlossary = new CGlossary;
 			if (gGlossyWindow)
 				gGlossyWindow->PostMessage(msg_ReloadGlossary);
-			SetEnabled("ok  ", true);
-			SetEnabled("cncl", true);
 			break;
 	
 		case msg_SelectedKBCommand:
 			UpdateKBPage();
-			SetEnabled("ok  ", true);
-			SetEnabled("cncl", true);
 			break;
 	
 		case msg_SelectedKBBinding:
 			UpdateKBCapturer();
-			SetEnabled("ok  ", true);
-			SetEnabled("cncl", true);
 			break;
 		
 		case msg_AddKB:
@@ -748,21 +740,39 @@ void CPrefsDialog::MessageReceived(BMessage *msg)
 			break;
 		
 		case msg_StoreSuffix:
-			if (fSuffixes.size())
+			if (fSuffixes.size()) {
 				fSuffixes[GetValue("lang") - 1] = GetText("sufx");
-			UpdateFields();
-			SetEnabled("ok  ", true);
-			SetEnabled("cncl", true);
+			}
+			if (fCurrentSuffix != 0) {
+				if (strcmp(fCurrentSuffix,fSuffixes[fLang].c_str()) != 0) {
+					SetEnabled("ok  ", true);
+					SetEnabled("cncl", true);
+				}
+			}
 			break;
 		
 		case msg_LanguageSelected:
-			if (fSuffixes.size())
-				SetText("sufx", fSuffixes[GetValue("lang") - 1].c_str());
-			UpdateFields();
-			SetEnabled("ok  ", true);
-			SetEnabled("cncl", true);
+			fLang = GetValue("lang") - 1;
+			{
+				int cookie = 0, i = 0;
+				CLangIntf *intf = NULL;
+				while ((intf = CLangIntf::NextIntf(cookie)) != NULL) {
+					if (i == fLang) {
+						fCurrentSuffix = intf->Extensions();
+						break;
+					}
+					i++;
+				}
+			}
+			if (fSuffixes.size()) {
+				SetText("sufx", fSuffixes[fLang].c_str());
+			}
 			break;
 	
+		case msg_FieldChanged:
+			SetEnabled("ok  ", true);
+			SetEnabled("cncl", true);
+			// fall through
 		default:
 			HDialog::MessageReceived(msg);
 	}

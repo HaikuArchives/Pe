@@ -87,6 +87,7 @@ private:
 		CKeyCapturer *fCap;
 		keymap fKeymap;
 	vector<string> fSuffixes;
+	const char * fCurrentSuffix;
 	CPathsBox *fSearchPaths, *fIncludePaths;
 	CStdErrBox *fStdErrBox;
 };
