@@ -1,0 +1,8 @@
+
+SubDir TOP lpe ;
+
+Main lpe :
+	lpe.cpp
+	;
+MakeLocate lpe : [ FDirName $(TOP) bin ] ;
+ForceUpdateMimeset lpe ;
