@@ -81,7 +81,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 
 				if (isalpha(c) )
 				{
-					kws = proxy.Move(c, 1);
+					kws = proxy.Move(tolower(c), 1);
 					state = IDENT;
 				}
 				else if (c == '{')
