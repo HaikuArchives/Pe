@@ -105,3 +105,9 @@ PeLanguage AsmExt
 	: keywords.asm.rsrc 
 	;
 
+PeLanguage DiffExt 
+	: CLang_diff.cpp 
+	: be 
+	: keywords.diff.rsrc 
+	;
+
