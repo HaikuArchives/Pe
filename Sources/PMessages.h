@@ -34,6 +34,8 @@
 #ifndef PMESSAGES_H
 #define PMESSAGES_H
 
+#include "CMessages.h"
+
 #define msg_New								'New '
 #define msg_NewProject					'NewP'
 #define msg_Open							'Open'
@@ -41,7 +43,6 @@
 #define msg_BtnOpen						'BOpn'
 #define msg_CommandLineOpen			'Cmdl'
 #define msg_OpenRecent					'OpnR'
-#define msg_DocClosed						'DCls'
 #define msg_FtpSave						'FtSv'
 #define msg_DoFtpSave						'DFtS'
 #define msg_Save							'Save'

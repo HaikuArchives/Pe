@@ -134,8 +134,6 @@ long CPrefOpener::Execute()
 PApp::PApp()
 	: BApplication("application/x-vnd.beunited.pe")
 {
-	fWindowCount = 0;
-	
 #if BETA
 	MInfoAlert a("This is a beta release of Pe.\n");
 	a.Go();
@@ -397,7 +395,6 @@ PDoc* PApp::NewWindow(const entry_ref *ref, bool show)
 	try
 	{
 		doc = new PDoc(ref,show);
-		if (doc) fWindowCount++;
 	}
 	catch (HErr& e)
 	{
@@ -412,7 +409,6 @@ PDoc* PApp::NewWindow(URLData& url)
 	try
 	{
 		doc = new PDoc(url);
-		if (doc) fWindowCount++;
 	}
 	catch (HErr& e)
 	{
@@ -863,8 +859,7 @@ void PApp::MessageReceived(BMessage *msg)
 			}
 			
 			case msg_DocClosed:
-				fWindowCount--;
-				if (fWindowCount == 0)
+				if (CDoc::CountDocs() == 0)
 					Quit();
 				break;
 			

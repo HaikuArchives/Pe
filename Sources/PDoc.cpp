@@ -152,8 +152,6 @@ PDoc::~PDoc()
 		(*i)->Lock();
 		(*i)->Quit();
 	}
-	
-	be_app->PostMessage(msg_DocClosed);
 } /* PDoc::~PDoc */
 
 bool PDoc::QuitRequested()

@@ -40,6 +40,7 @@
 #include "HError.h"
 #include "MAlert.h"
 #include "HPreferences.h"
+#include "CMessages.h"
 #include <fs_attr.h>
 
 doclist CDoc::sfDocList;
@@ -108,6 +109,8 @@ CDoc::~CDoc()
 	
 	if (fSavePanel) delete fSavePanel;
 	if (fFile) delete fFile;
+	
+	be_app->PostMessage(msg_DocClosed);
 } /* CDoc::~CDoc */
 
 bool CDoc::QuitRequested()

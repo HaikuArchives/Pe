@@ -120,8 +120,6 @@ PProjectWindow::~PProjectWindow()
 	
 	free(fHeader);
 	free(fFooter);
-
-	be_app->PostMessage(msg_DocClosed);
 } /* PProjectWindow::~PProjectWindow */
 
 bool PProjectWindow::QuitRequested()

@@ -713,38 +713,54 @@ void CPrefsDialog::MessageReceived(BMessage *msg)
 			gGlossary = new CGlossary;
 			if (gGlossyWindow)
 				gGlossyWindow->PostMessage(msg_ReloadGlossary);
+			SetEnabled("ok  ", true);
+			SetEnabled("cncl", true);
 			break;
 	
 		case msg_SelectedKBCommand:
 			UpdateKBPage();
+			SetEnabled("ok  ", true);
+			SetEnabled("cncl", true);
 			break;
 	
 		case msg_SelectedKBBinding:
 			UpdateKBCapturer();
+			SetEnabled("ok  ", true);
+			SetEnabled("cncl", true);
 			break;
 		
 		case msg_AddKB:
 			AddKeybinding();
+			SetEnabled("ok  ", true);
+			SetEnabled("cncl", true);
 			break;
 	
 		case msg_DeleteKB:
 			DeleteKeybinding();
+			SetEnabled("ok  ", true);
+			SetEnabled("cncl", true);
 			break;
 		
 		case 'addP':
 			fGrepBox->DoCancel();
+			SetEnabled("ok  ", true);
+			SetEnabled("cncl", true);
 			break;
 		
 		case msg_StoreSuffix:
 			if (fSuffixes.size())
 				fSuffixes[GetValue("lang") - 1] = GetText("sufx");
 			UpdateFields();
+			SetEnabled("ok  ", true);
+			SetEnabled("cncl", true);
 			break;
 		
 		case msg_LanguageSelected:
 			if (fSuffixes.size())
 				SetText("sufx", fSuffixes[GetValue("lang") - 1].c_str());
 			UpdateFields();
+			SetEnabled("ok  ", true);
+			SetEnabled("cncl", true);
 			break;
 	
 		default:

@@ -291,8 +291,6 @@ PGroupWindow::~PGroupWindow()
 		delete fPanel;
 		fPanel = NULL;
 	}
-
-	be_app->PostMessage(msg_DocClosed);
 } /* PGroupWindow::~PGroupWindow */
 
 bool PGroupWindow::QuitRequested()
