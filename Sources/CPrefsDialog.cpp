@@ -240,7 +240,7 @@ bool CPrefsDialog::OKClicked()
 {
 	int v = GetValue("lang") - 1;
 	if (v >= 0 && v < fSuffixes.size())
-		fSuffixes[GetValue("lang")] = GetText("sufx");
+		fSuffixes[v] = GetText("sufx");
 
 	BMenuItem *item = fFont->FindMarked();
 	if (item)
