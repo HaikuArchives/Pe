@@ -82,7 +82,7 @@ enum {
 };
 
 PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
-	: BView(frame, "text view", B_FOLLOW_ALL_SIDES,
+	: BView(frame, "text view", B_FOLLOW_ALL_SIDES, B_ASYNCHRONOUS_CONTROLS |
 		B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED | B_FRAME_EVENTS)
 	, fText(txt)
 {
@@ -2088,27 +2088,27 @@ void PText::ShowFunctionMenu(BPoint where)
 		sort(functions.begin(), functions.end(), CSortMenuInfo());
 	}
 	
-	BPopUpMenu popup("Funcs");
-	popup.SetFont(be_plain_font);
+	BPopUpMenu * popup = new BPopUpMenu("Funcs");
+	popup->SetFont(be_plain_font);
 	
 	if (includes.size() == 0 && functions.size() == 0)
 	{
-		popup.AddItem(new BMenuItem("Nothing Found", NULL));
+		popup->AddItem(new BMenuItem("Nothing Found", NULL));
 	}
 	else
 	{
 		vector<void*>::iterator i;
 		for (i = includes.begin(); i != includes.end(); i++)
 		{
-			popup.AddItem((BMenuItem *)*i);
+			popup->AddItem((BMenuItem *)*i);
 		}
 		
 		if (i && functions.size())
-			popup.AddSeparatorItem();
+			popup->AddSeparatorItem();
 		
 		for (i = functions.begin(); i != functions.end(); i++)
 		{
-			popup.AddItem((BMenuItem *)*i);
+			popup->AddItem((BMenuItem *)*i);
 		}
 	}
 
@@ -2116,8 +2116,9 @@ void PText::ShowFunctionMenu(BPoint where)
 	
 	r.Set(where.x - 4, where.y - 20, where.x + 24, where.y + 4);
 
-	popup.SetTargetForItems(this);
-	popup.Go(where, true, true, r);
+	popup->SetAsyncAutoDestruct(true);
+	popup->SetTargetForItems(this);
+	popup->Go(where, true, true, r, true);
 
 	Doc()->ButtonBar()->SetDown(msg_FuncPopup, false);
 } /* PText::ShowFunctionMenu */
