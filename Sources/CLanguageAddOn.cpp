@@ -44,6 +44,8 @@
 #include "PText.h"
 #include "Utils.h"
 #include "HError.h"
+#include "HColorUtils.h"
+
 
 CLanguageProxy::CLanguageProxy(CLangIntf& intf, const char *text, int size,
 	int encoding, int *starts, rgb_color *colors)

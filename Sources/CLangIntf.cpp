@@ -44,6 +44,7 @@
 #include "HError.h"
 #include "HAppResFile.h"
 #include "HPreferences.h"
+#include "HColorUtils.h"
 #include <algorithm>
 
 unsigned char *CLangIntf::sfWordBreakTable = NULL;

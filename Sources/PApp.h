@@ -97,26 +97,6 @@ inline HDialog* PApp::PrefsDialog() {
 
 extern PApp *gApp;
 
-enum {
-	kLowColor,
-	kSelectionColor,
-	kInvisiblesColor,
-	kTextColor,
-	kKeyWordColor,
-	kCommentColor,
-	kStringColor,
-	kCharConstColor,
-	kUser1, kUser2, kUser3, kUser4,
-	kTagColor,
-	kAnchorColor,
-	kImageColor,
-	kTagStringColor,
-	kMarkColor,
-	kLastColor
-};
-
-extern rgb_color gColor[kLastColor], gInvColor[kLastColor];
-
 extern bool gAutoIndent, gSyntaxColoring, gBalance, gBlockCursor, gFlashCursor, gSmartBrace;
 extern int gSpacesPerTab;
 extern bool gPopupIncludes, gPopupProtos, gPopupFuncs;

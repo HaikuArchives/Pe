@@ -35,7 +35,6 @@
 
 #include "pe.h"
 #include "HColorUtils.h"
-#include "PApp.h"
 
 const int kDistinctColorTresholdSquare = 10000;
 

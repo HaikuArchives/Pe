@@ -45,6 +45,26 @@ struct roSColor
     float  m_Hue;
 };
 
+enum {
+	kLowColor,
+	kSelectionColor,
+	kInvisiblesColor,
+	kTextColor,
+	kKeyWordColor,
+	kCommentColor,
+	kStringColor,
+	kCharConstColor,
+	kUser1, kUser2, kUser3, kUser4,
+	kTagColor,
+	kAnchorColor,
+	kImageColor,
+	kTagStringColor,
+	kMarkColor,
+	kLastColor
+};
+
+extern rgb_color gColor[kLastColor], gInvColor[kLastColor];
+
 extern unsigned char gSelectedMap[256];
 extern unsigned char gDisabledMap[256];
 void InitSelectedMap();

@@ -39,6 +39,7 @@
 #include "PApp.h"
 #include "HAppResFile.h"
 #include "HError.h"
+#include "HColorUtils.h"
 
 unsigned char *CMessageItem::fInfoIcon, *CMessageItem::fWarningIcon, *CMessageItem::fErrorIcon;
 
