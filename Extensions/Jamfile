@@ -29,6 +29,11 @@ PeExtension Cut\ Lines\ Containing
 	: libhekkel.a $(RX_LIB) be $(STDC++LIB) 
 	;
 
+PeExtension HeaderGuard
+	: HeaderGuard.cpp 
+	: be
+	;
+
 PeExtension Pipe
 	: Pipe.cpp 
 	: libhekkel.a be $(STDC++LIB) 
