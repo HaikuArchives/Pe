@@ -133,7 +133,7 @@ const char *comment(const char *text, bool strippp)
 const char *parens(const char *text, char open)
 {
 	int c;
-	char close;
+	char close = '\0';
 	
 	switch (open)
 	{
