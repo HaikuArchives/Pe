@@ -374,7 +374,7 @@ void HPreferences::ResetAll()
 void HPreferences::InitTextFont(BFont* font) {
 	font_family ff;
 	font_style fs;
-	be_plain_font->GetFamilyAndStyle(&ff, &fs);
+	be_fixed_font->GetFamilyAndStyle(&ff, &fs);
 	
 	strcpy(ff, GetPrefString("font family", ff));
 	strcpy(fs, GetPrefString("font style", fs));
