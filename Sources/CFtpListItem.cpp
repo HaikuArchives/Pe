@@ -35,33 +35,15 @@
 
 #include "pe.h"
 #include "CFtpListItem.h"
+#include "CFtpDialog.h"
 #include "HDefines.h"
 #include "HError.h"
 #include "HColorUtils.h"
 #include <parsedate.h>
 
-CFtpListItem::CFtpListItem(const char *s)
+CFtpListItem::CFtpListItem(CFtpDialog* dialog, const char *s)
+: fDirectory(false), fValid(true), fDotFile(false)
 {
-	BBitmap bm(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
-	
-	if (s[0] == 'd')
-	{
-		fDirectory = true;
-		BMimeType("application/x-vnd.Be-directory").GetIcon(&bm, B_MINI_ICON);
-	}
-	else if (s[0] == 'l')
-	{
-		fDirectory = false;
-		BMimeType("application/x-vnd.Be-symlink").GetIcon(&bm, B_MINI_ICON);
-	}
-	else
-	{
-		fDirectory = false;
-		BMimeType("application/octet-stream").GetIcon(&bm, B_MINI_ICON);
-	}
-	
-	memcpy(fIcon, bm.Bits(), 256);
-	
 	char name[NAME_MAX], date[64];
 	int d, n;
 
@@ -93,6 +75,30 @@ CFtpListItem::CFtpListItem(const char *s)
 	}
 	else
 		fName = strdup(s);
+
+	fDotFile = (*fName == '.');
+
+	// Get the Icon
+	switch (s[0]) {
+		case 'd':
+			fDirectory = true;
+			fIconNew = dialog->GetIcon("application/x-vnd.Be-directory");
+			break;
+		case 'l':
+			fIconNew = dialog->GetIcon("application/x-vnd.Be-symlink");
+			break;
+		default:
+			string nam = fName;
+			string ext = "";
+			string::size_type pos = nam.rfind(".", nam.length());
+			if (pos != string::npos)
+			{
+				ext = nam.substr(pos+1);
+				cout << "Extension(" << nam << ") .: '" << ext << "'" << endl;
+			}
+			fIconNew = dialog->GetIcon("application/octet-stream", ext.c_str());
+	}
+
 //	char name[NAME_MAX];
 //	
 //	if (sscanf(s + 10, "%*d%*s%*s%d%*s%*d%*d:%*d%s", &fSize, name) == 2)
@@ -113,31 +119,16 @@ void CFtpListItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 {
 	try
 	{
-		BBitmap bm(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
-	
-		if (IsSelected())
-		{
-			unsigned char icon[256];
-			for (int i = 0; i < 256; i++)
-				icon[i] = gSelectedMap[fIcon[i]];
-			bm.SetBits(icon, 256, 0, B_COLOR_8_BIT);
-			owner->SetLowColor(kShadow);
-		}
-		else
-		{
-			bm.SetBits(fIcon, 256, 0, B_COLOR_8_BIT);
-			owner->SetLowColor(kWhite);
-		}
-	
+		owner->SetLowColor(IsSelected() ? kShadow : kWhite);
 		BRect r(bounds);
 		owner->FillRect(r, B_SOLID_LOW);
 		r.InsetBy(1, 1);
 	
 		font_height fh;
 		be_plain_font->GetHeight(&fh);
-	
+		
 		owner->SetDrawingMode(B_OP_OVER);
-		owner->DrawBitmap(&bm, BPoint(r.left + 2, r.top));
+		owner->DrawBitmap(fIconNew, BPoint(r.left + 2, r.top));
 		owner->SetDrawingMode(B_OP_COPY);
 		
 		owner->DrawString(fName, BPoint(r.left + 22, r.bottom - fh.descent));
@@ -151,3 +142,10 @@ void CFtpListItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 		beep();
 	}
 } // CFtpListItem::DrawItem
+
+void CFtpListItem::Update(BView */*owner*/, const BFont */*font*/)
+{
+	font_height fh;
+	be_plain_font->GetHeight(&fh);
+	SetHeight(max((float)18.0, 4 + fh.descent + fh.ascent));
+} // CFtpListItem::Update

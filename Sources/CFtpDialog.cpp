@@ -48,6 +48,7 @@
 #endif
 #include <socket.h>
 #include <netdb.h>
+#include <String.h>
 
 const unsigned long
 	msg_SelectedListItem = 'slct',
@@ -128,6 +129,63 @@ CFtpDialog::CFtpDialog(BRect frame, const char *name, window_type type, int flag
 	static_cast<BControl*>(FindView("dotf"))->SetMessage(new BMessage(msg_ToggleDot));
 	
 	FindView("name")->Hide();
+
+	// Build Extension->Mimetype list // Takes looong
+	typedef pair<string,string> entry;
+	if (0) {
+		BMessage mimDat;
+		BMessage extDat;
+		BMimeType mimTyp;
+		int32 mimIdx = -1;
+		int32 extIdx = 0;
+		BString mimStr;
+		BString extStr;
+		if (BMimeType::GetInstalledTypes(&mimDat) == B_OK) {
+			while (mimDat.FindString("types", ++mimIdx, &mimStr) == B_OK) {
+				if ((mimTyp.SetTo(mimStr.String()) == B_OK) && (mimTyp.GetFileExtensions(&extDat) == B_OK)) {
+					extIdx = -1;
+					while (extDat.FindString("extensions", ++extIdx, &extStr) == B_OK) {
+						extStr.ToLower();
+						if (extStr.ByteAt(0) == '.')  extStr.Remove(0, 1);
+						fExtMime.insert(entry(extStr.String(), mimStr.String()));
+					}
+				}
+			}
+		}
+	// perhaps it's better to go with some predefiend types
+	} else {
+		fExtMime.insert(entry("aiff", "audio/x-aiff"));
+		fExtMime.insert(entry("bz2", "application/x-bzip2"));
+		fExtMime.insert(entry("cc", "text/x-source-code"));
+		fExtMime.insert(entry("cpp", "text/x-source-code"));
+		fExtMime.insert(entry("css", "text/css"));
+		fExtMime.insert(entry("gif", "image/gif"));
+		fExtMime.insert(entry("gz", "application/x-gzip"));
+		fExtMime.insert(entry("h", "text/x-source-code"));
+		fExtMime.insert(entry("htm", "text/html"));
+		fExtMime.insert(entry("html", "text/html"));
+		fExtMime.insert(entry("jpeg", "image/jpeg"));
+		fExtMime.insert(entry("jpg", "image/jpeg"));
+		fExtMime.insert(entry("mod", "audio/x-mod"));
+		fExtMime.insert(entry("mov", "video/quicktime"));
+		fExtMime.insert(entry("mp3", "audio/x-mpeg"));
+		fExtMime.insert(entry("ogg", "audio/ogg.vorbis"));
+		fExtMime.insert(entry("pdf", "application/pdf"));
+		fExtMime.insert(entry("php", "text/x-php"));
+		fExtMime.insert(entry("pl", "text/x-perl"));
+		fExtMime.insert(entry("pkg", "application/x-scode-UPkg"));
+		fExtMime.insert(entry("png", "image/png"));
+		fExtMime.insert(entry("py", "text/x-source-code"));
+		fExtMime.insert(entry("rar", "application/x-rar"));
+		fExtMime.insert(entry("swf", "application/x-shockwave-flash"));
+		fExtMime.insert(entry("tar", "application/x-tar"));
+		fExtMime.insert(entry("tga", "image/x-targa"));
+		fExtMime.insert(entry("tgz", "application/x-gzip"));
+		fExtMime.insert(entry("txt", "text/plain"));
+		fExtMime.insert(entry("xml", "text/xml"));
+		fExtMime.insert(entry("zip", "application/zip"));
+	}
+
 } // CFtpDialog::CFtpDialog
 
 CFtpDialog::~CFtpDialog()
@@ -135,9 +193,34 @@ CFtpDialog::~CFtpDialog()
 	delete[] fReply;
 	delete[] fPath;
 	
+	map<string,BBitmap*>::iterator iter;
+	for (iter = fIcons.begin(); iter != fIcons.end(); iter++)
+		delete iter->second;
+	
 	if (fSocket >= 0)
 		closesocket(fSocket);
 } // CFtpDialog::~CFtpDialog
+
+BBitmap* CFtpDialog::GetIcon(const char *mimeType, const char *tryExtension)
+{
+	map<string,string>::iterator iterExt;
+	map<string,BBitmap*>::iterator iterBmp;
+
+	if (*tryExtension != '\0' && (iterExt = fExtMime.find(tryExtension)) != fExtMime.end())
+		return GetIcon(iterExt->second.c_str());
+	
+	if ((iterBmp = fIcons.find(mimeType)) == fIcons.end())
+	{
+		BBitmap* bm = new BBitmap(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
+		if (BMimeType(mimeType).GetIcon(bm, B_MINI_ICON) != B_OK)
+			BMimeType("application/octet-stream").GetIcon(bm, B_MINI_ICON);
+		pair<string,BBitmap*> p1(mimeType, bm);
+		fIcons.insert(p1);
+		return bm;
+	}
+	else
+		return iterBmp->second;
+} // CFtpDialog::GetIcon
 
 void CFtpDialog::MakeItSave(const char *name)
 {
@@ -483,25 +566,24 @@ void CFtpDialog::ListDirectory()
 						
 						try
 						{
-							CFtpListItem *i;
+							CFtpListItem *item;
 							char s[256];
-							
-							if (!s_gets(s, 256, dsf))
-								THROW(("Could not get listing."));
-							
 							bool showAll = IsOn("dotf");
+							int  entryCount = 0;
 							
 							while (s_gets(s, 256, dsf))
 							{
-								i = new CFtpListItem(s);
-								if (showAll || *(const char *)*i != '.')
+								entryCount++;
+								item = new CFtpListItem(this, s);
+								if (item->IsValid() && (showAll || !item->IsDotFile()))
 								{
-									fList->AddItem(i);
-									i->SetHeight(18);
+									fList->AddItem(item);
 								}
 								else
-									delete i;
+									delete item;
 							}
+							if (entryCount == 0)
+								THROW(("Could not get listing."));
 
 							fList->Invalidate();
 							UpdateIfNeeded();

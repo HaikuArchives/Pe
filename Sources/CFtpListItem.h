@@ -39,10 +39,11 @@
 class CFtpListItem : public BListItem
 {
   public:
-	CFtpListItem(const char *s);
+	CFtpListItem(class CFtpDialog* dialog, const char *s);
 	~CFtpListItem();
 	
 	virtual	void DrawItem(BView *owner, BRect bounds, bool complete);
+	virtual void Update(BView *owner, const BFont *font);
 	
 	operator const char * () const
 		{ return fName; }
@@ -50,14 +51,21 @@ class CFtpListItem : public BListItem
 		{ return fMod; }
 	bool IsDirectory() const
 		{ return fDirectory; }
-  
+	bool IsValid() const
+		{ return fValid; }
+	bool IsDotFile() const
+		{ return fDotFile; }
+
   private:
  
- 	unsigned char fIcon[256]; 	
 	char *fName;
 	int fSize;
 	time_t fMod;
 	bool fDirectory;
+	bool fValid;
+	bool fDotFile;
+	char* fMimeType;
+	BBitmap* fIconNew;
 };
 
 #endif // CFTPLISTITEM_H

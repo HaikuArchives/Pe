@@ -62,6 +62,7 @@ class CFtpDialog : public HDialog
 	virtual void MessageReceived(BMessage *msg);
 	
 	void MakeItSave(const char *name);
+	BBitmap* GetIcon(const char *mimeType, const char *tryExtension="");
 	
   private:
   	
@@ -79,6 +80,8 @@ class CFtpDialog : public HDialog
 	SOCK *fSocketFD;
 	char *fReply;
 	bool fSave;
+	map<string,BBitmap*> fIcons;
+	map<string,string> fExtMime;
 };
 
 #endif // CFTPDIALOG_H
