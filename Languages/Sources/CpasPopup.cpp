@@ -39,14 +39,11 @@
 
 const int kMaxNameSize = 256;
 
-static bool prototype = true;	// while true, methods are just declarations.
-static bool protoadded = false;	// true just after the first proto was added.
-
-const char *comment(const char *text)
+const char* comment(const char* text)
 {
 	do
 	{
-		while (isspace (*text))
+		while (isspace(*text))
 			text++;
 			
 		if (*text == '{') 
@@ -72,35 +69,107 @@ const char *comment(const char *text)
 	return text;
 }
 
-const char *parseFunction(const char *text, CLanguageProxy& proxy)
+const char* parseFunction(const char* text, CLanguageProxy& proxy)
 {
-	char nameBuf[kMaxNameSize], *name = nameBuf;
+	char nameBuf[kMaxNameSize];
+	char* name = nameBuf;
 	int size = 0;
 	int offset = text - proxy.Text();
 	
 	text = comment(text);
 	
-	while (isalpha(*text) || *text == '.' || *text == '_')
+	// Valid identifiers can contain numbers, but not in the first position.
+	if (!isdigit(*text))
 	{
+		while (isalnum(*text) || *text == '.' || *text == '_')
+		{
 			if (size < kMaxNameSize - 1)
 			{
 				*name++ = *text++;
 				size++;
 			}
 			else text++;
+		}
 	}
+
 	*name = 0;
 
 	if (size)
 	{
-		if (proxy.Prototypes() && prototype)
-		{
-		 	proxy.AddFunction(nameBuf, nameBuf, offset, true);
-		 	protoadded = true;
-		}
-		else if (!prototype)
-	 		proxy.AddFunction(nameBuf, nameBuf, offset, false);
+ 		proxy.AddFunction(nameBuf, nameBuf, offset, false);
 	}
+
+	return text;
+}
+
+//------------------------------------------------------------------------------
+
+const char* parseUses(const char* text, CLanguageProxy& proxy)
+{
+	char nameBuf[kMaxNameSize];
+	char filenameBuf[kMaxNameSize];
+	char* name = nameBuf;
+	char* filename = filenameBuf;
+
+	// init buffers
+	memset(nameBuf, '\0', sizeof(nameBuf));
+	memset(filenameBuf, '\0', sizeof(filenameBuf));
+
+	int size = 0;
+	int offset = text - proxy.Text();
+
+	// units are listed from "uses" to the first ";"
+	do
+	{
+		// skip spaces
+		while (isspace(*text))
+			text++;
+			
+		// skip comments
+		text = comment(text);
+		
+		while (isalpha(*text) || *text == '_')
+		{
+			if (size < kMaxNameSize - 1)
+			{
+				*name++ = *text++;
+				// As symbol are not case sensitive in pascal, we consider
+				// all unit filenames in lower case on case sensitive file systems
+				// like BFS
+				*filename++ = tolower(nameBuf[size]);
+				size++;
+			}
+			else text++;
+		}
+
+		if (size)
+		{
+			// Append .pp extension to unit name to get unit filename
+			// (only if there is enough space !)
+			if (size < kMaxNameSize - 5)
+			{
+				*filename++ = '.';
+				*filename++ = 'p';
+				*filename++ = 'p';
+				*filename++ = '\0';
+			}
+			if (proxy.Includes())
+			  proxy.AddInclude(nameBuf, filenameBuf, false);
+
+			// Reset buffers
+			memset(nameBuf, '\0', sizeof (nameBuf));
+			memset(filenameBuf, '\0', sizeof (filenameBuf));
+
+			// seek to begin of buffers
+			name = nameBuf;
+			filename = filenameBuf;
+			size = 0;
+		}
+	}
+	while (*text++ != ';');
+
+	*name = 0;
+	*filename = 0;
 
 	return text;
 }
@@ -119,14 +188,14 @@ void ScanForFunctions(CLanguageProxy& proxy)
 		
 		switch (*text++)
 		{
-			case 'i':
-			case 'I':
-				if (!strncasecmp(text, "mplementation", 13))
-				{
-					prototype = false;
-					if (proxy.Prototypes() && protoadded)
-						proxy.AddSeparator();
-				}
+			case 'c':
+			case 'C':
+				if (!strncasecmp(text, "onstructor", 10)) text = parseFunction(text + 10, proxy);
+			break;
+
+			case 'd':
+			case 'D':
+				if (!strncasecmp(text, "estructor", 9)) text = parseFunction(text + 9, proxy);
 			break;
 
 			case 'f':
@@ -139,6 +208,11 @@ void ScanForFunctions(CLanguageProxy& proxy)
 			case 'P':
 				if (!strncasecmp(text, "rocedure", 8))
 					text = parseFunction(text + 8, proxy);
+			break;
+
+			case 'u':
+			case 'U':
+				if (!strncasecmp(text, "ses", 3)) text = parseUses(text + 3, proxy);
 			break;
 		}
 	}
