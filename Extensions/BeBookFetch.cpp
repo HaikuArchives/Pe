@@ -80,6 +80,16 @@ long perform_edit(MTextAddOn *addon)
 
 	int length = selEnd - selStart;
 
+	// Do _NOT_ Query if we have less than 3 chars. It works, but takes ages and
+	// yields to an unuseful giant popup menu.
+	if (length < 3)
+	{
+		(new BAlert("BeBookFetch", "The text selection is too short.\n"
+		"Please select three or more characters.", "Ok"))->Go(NULL);
+
+		return B_ERROR;
+	}
+
 	BString selection;
 	selection.SetTo(addon->Text() + selStart, length);
 
@@ -94,6 +104,17 @@ long perform_edit(MTextAddOn *addon)
 	if (!pos) return B_ERROR;
 
 	selection.Truncate(pos);
+
+	// Do _NOT_ Query if we have less than 3 chars. It works, but takes ages and
+	// yields to an unuseful giant popup menu.
+	if (selection.CountChars() < 3)
+	{
+		(new BAlert("BeBookFetch", "The text selection is too short.\n"
+			"Make sure the selection doesn't contains puntuations or symbols.",
+			"Ok"))->Go(NULL);
+
+		return B_ERROR;
+	}
 
 	vector <BString> results;
 
