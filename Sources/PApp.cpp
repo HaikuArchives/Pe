@@ -365,7 +365,7 @@ void PApp::ReadyToRun()
 		switch (gPrefs->GetPrefInt("startup"))
 		{
 			case 1:
-				if (CDoc::CountDocs() == 0 || (doc->IsWorksheet() && CDoc::CountDocs() == 1))
+				if (CDoc::CountDocs() == 0 || (doc && doc->IsWorksheet() && CDoc::CountDocs() == 1))
 					NewWindow();
 				break;
 
@@ -423,7 +423,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 				return CDoc::FindDoc(doc);
 			}
 			else
-				new PGroupWindow(&doc);
+				return new PGroupWindow(&doc);
 		}
 		else if (strcmp(mime, "text/x-makefile") == 0)
 		{
@@ -437,7 +437,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 				return CDoc::FindDoc(doc);
 			}
 			else
-				new PProjectWindow(&doc);
+				return new PProjectWindow(&doc);
 		}
 		else
 		{
