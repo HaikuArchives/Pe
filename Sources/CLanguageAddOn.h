@@ -109,7 +109,7 @@ virtual	int IsKeyWord(int state);
 
 virtual	const char *Text() const;
 virtual	int Size() const;
-		
+
 /*
 	Call SetColor only while doing syntax colouring, nasty things will happen otherwise.
 	You pass the offset from the beginning of the text and the colour the text should
@@ -147,6 +147,9 @@ virtual	bool isalpha_uc(int unicode) const;
 virtual	bool isalnum_uc(int unicode) const;
 virtual	bool isspace_uc(int unicode) const;
 
+virtual	void IncNestLevel();
+virtual	void DecNestLevel();
+		
 private:
 		const char *fText;
 		int fSize, fEncoding;
@@ -155,6 +158,7 @@ private:
 		int *fStarts;
 		rgb_color *fColors;
 		CFunctionScanHandler* fFunctionScanHandler;
+		uint32 fNestLevel;
 };
 
 /*

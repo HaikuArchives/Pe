@@ -46,6 +46,7 @@
 #include "HError.h"
 #include "HColorUtils.h"
 
+const int kMaxNameSize = 256;
 
 CLanguageProxy::CLanguageProxy(CLangIntf& intf, const char *text, int size,
 	int encoding, int *starts, rgb_color *colors)
@@ -58,6 +59,7 @@ CLanguageProxy::CLanguageProxy(CLangIntf& intf, const char *text, int size,
 	fFunctionScanHandler = NULL;
 	fStarts = starts;
 	fColors = colors;
+	fNestLevel = 0;
 } /* CLanguageProxy::CLanguageProxy */
 
 CLanguageProxy::CLanguageProxy(CLangIntf& intf, PText& text,
@@ -71,6 +73,7 @@ CLanguageProxy::CLanguageProxy(CLangIntf& intf, PText& text,
 	fFunctionScanHandler = handler;
 	fStarts = NULL;
 	fColors = NULL;
+	fNestLevel = 0;
 } /* CLanguageProxy::CLanguageProxy */
 
 int CLanguageProxy::Move(int ch, int state)
@@ -122,7 +125,15 @@ void CLanguageProxy::SetColor(int start, int color)
 void CLanguageProxy::AddFunction(const char *name, const char *match, int offset, bool italic)
 {
 	FailNilMsg(fFunctionScanHandler, "Not a valid call in this context");
-	fFunctionScanHandler->AddFunction(name, match, offset, italic);
+	if (fNestLevel)
+	{
+		char nameBuf[kMaxNameSize];
+		int indent = 4 * fNestLevel;
+		memset(nameBuf, ' ', indent);
+		strcpy(nameBuf+indent, name);
+		fFunctionScanHandler->AddFunction(nameBuf, match, offset, italic);
+	} else
+		fFunctionScanHandler->AddFunction(name, match, offset, italic);
 } /* CLanguageProxy::AddFunction */
 
 void CLanguageProxy::AddInclude(const char *name, const char *open, bool italic)
@@ -180,3 +191,12 @@ bool CLanguageProxy::isspace_uc(int unicode) const
 {
 	return ::isspace_uc(unicode);
 } /* isspace_uc */
+
+void CLanguageProxy::IncNestLevel() {
+	fNestLevel++;
+} /* IncNestLevel */
+
+void CLanguageProxy::DecNestLevel() {
+	if (fNestLevel)
+		fNestLevel--;
+} /* DecNestLevel */

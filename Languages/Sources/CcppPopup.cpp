@@ -323,7 +323,12 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 	
 	if (strcmp(nameBuf, "extern") == 0)
 		return i_extern(text);
-	else if (strcmp(nameBuf, "class") == 0 || strcmp(nameBuf, "struct") == 0 || strcmp(nameBuf, "union") == 0)
+	else if (strcmp(nameBuf, "using") == 0)
+	{	// skip over 'using namespace' - directives:
+		text = skip(text, ';');
+		return text;
+	}
+	else if (strcmp(nameBuf, "namespace") == 0)
 	{
 		*name++ = ' ';
 		
@@ -333,21 +338,39 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 				name_append(text, name, size);
 			*name = 0;
 			
-			text = comment(text);
-			
-			if (*text == ':')
-			{
+			while (*text != '{' && *text != ';')
+			{	// skip inheritance decls (like 'public x, private y'):
 				text = comment(text + 1);
+			}
+			
+			if (*text == '{' && proxy.Types())
+			{
+				char match[256];
+				long l = min((long)255, text - start);
 				
-				while (isident(*text))
-					text++;
-				
-				text = comment(text);
-				
-				while (isident(*text))
-					text++;
-				
-				text = comment(text);
+				strncpy(match, start, l);
+				match[l] = 0;
+		
+				proxy.AddFunction(nameBuf, match, offset, false);
+				proxy.IncNestLevel();
+			}
+		}
+		return text+1;
+	}
+	else if (strcmp(nameBuf, "class") == 0 || strcmp(nameBuf, "struct") == 0
+		|| strcmp(nameBuf, "union") == 0)
+	{
+		*name++ = ' ';
+		
+		if (isidentf(*text))
+		{
+			while (isident(*text))
+				name_append(text, name, size);
+			*name = 0;
+			
+			while (*text != '{' && *text != ';')
+			{	// skip inheritance decls (like 'public x, private y'):
+				text = comment(text + 1);
 			}
 			
 			if (*text == '{' && proxy.Types())
@@ -576,6 +599,9 @@ void ScanForFunctions(CLanguageProxy& proxy)
 			case '#':
 				text = preprocessor(text + 1, proxy);
 				break;
+			case '}':
+				text++;
+				proxy.DecNestLevel();
 			default:
 				if (isidentf(*text))
 					text = ident(text, proxy);
