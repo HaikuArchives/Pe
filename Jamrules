@@ -1,0 +1,62 @@
+REZ ?= [ FDirName $(TOP) rez rez ] ;
+
+# debug
+DEBUG ?= 1 ;
+
+# DEFINES ?= -DBETA -DDEMO ;
+
+# set up debug flags
+if $(DEBUG) {
+	ALL_LOCATE_TARGET ?= [ FDirName $(TOP) Obj.Debug ] ;
+	CCFLAGS += -g ;
+	C++FLAGS += -g ;
+	LINKFLAGS += -g ;
+	OPTIM ?= - O0 ;
+} else {
+	ALL_LOCATE_TARGET ?= [ FDirName $(TOP) Obj.NoDebug ] ;
+	if $(CPU) = X86 {
+		OPTIM ?= -O2 ;
+	} else {
+		OPTIM ?= -O7 ;
+	}
+}
+
+LINKLIBS += -L. ;
+if $(CPU) = X86 {
+	CC ?= gcc ;
+	C++ ?= g++ ;
+	LINK ?= g++ ;
+	WARNINGS ?= -Wall -Wno-multichar -Wno-ctor-dtor-privacy -Wno-sign-compare ;
+	LINKLIBS += -lbe -lroot -lstdc++.r4 ;
+	CCFLAGS += -fpic ;
+} else {
+	CC ?= mwcc ;
+	C++ ?= mwcc ;
+	WARNINGS ?= -w all -w nonotinlined -w noimplicit ;
+	LINKLIBS += -lmslcpp_4_0 -lrx ;
+	HDRS += [ FDirName $(TOP) regex ] ;
+	PREFIX ?= [ FDirName $(ALL_LOCATE_TARGET) pe.headers ] ;
+	CCFLAGS += -prefix $(PREFIX) ;
+	LINKFLAGS += -map pe.xMAP -sym full -nodup -export all ;
+}
+CCFLAGS += $(WARNINGS) $(DEFINES) ;
+C++FLAGS += $(WARNINGS) $(DEFINES) ;
+
+rule Make
+{
+	Depends all : $(1) $(SUBDIR) ;
+	MakeLocate $(1) : $(SUBDIR) ;
+	Make1 $(1) : $(SUBDIR) ;
+}
+
+rule Make1
+{
+
+}
+
+actions Make1
+{
+	cd $(2) ;
+	make ;
+	touch $(1) ;
+}
