@@ -263,14 +263,38 @@ private:
 
 class PShiftCmd : public PCmd {
 public:
-		PShiftCmd(PText *txt, bool right);
+		PShiftCmd(const char *name, PText *txt);
+
+		int FirstLine() const;
+		int LastLine() const;
+
+protected:
+		int fFrom;			// start offset
+		int fTo;			// end offset (excl.)
+};
+
+class PShiftLeftCmd : public PShiftCmd {
+public:
+		PShiftLeftCmd(PText *txt);
+		~PShiftLeftCmd();
 
 virtual	void Do();
 virtual	void Undo();
 
+		bool IsNoOp();
+
 private:
-		int fFrom, fTo;
-		bool fShiftRight;
+		int fLineCount;		// hard lines
+		char *fFirstChars;	// first char of each hard line
+		bool fNoOp;
+};
+
+class PShiftRightCmd : public PShiftCmd {
+public:
+		PShiftRightCmd(PText *txt);
+
+virtual	void Do();
+virtual	void Undo();
 };
 
 class PTwiddleCmd : public PCmd {

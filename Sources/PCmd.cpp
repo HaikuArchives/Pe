@@ -923,94 +923,199 @@ long PScriptCmd::Piper(void *data)
 	return 0;
 } /* PScriptCmd::Piper */
 
+#pragma mark -
 #pragma mark --- Shift Command ---
 
-PShiftCmd::PShiftCmd(PText *txt, bool right)
-	: PCmd("Shift", txt)
+PShiftCmd::PShiftCmd(const char *name, PText *txt)
+	: PCmd(name, txt)
 {
-	fShiftRight = right;
-	
 	fFrom = min(fText->Caret(), fText->Anchor());
 	fTo = max(fText->Caret(), fText->Anchor());
-	if (fTo == fFrom || fTo > fText->LineStart(fText->Offset2Line(fTo)))
-	{
-		int lt = fText->Offset2Line(fTo);
-		if (lt < fText->LineCount() - 1)
-			fTo = fText->LineStart(lt + 1);
-		else
-			fTo = fText->Size();
-	}
+	int fromLine = fText->Offset2Line(fFrom);
+	int toLine = fText->Offset2Line(fTo);
+	// our first line may be a soft wrapped one: find the preceding hard wrap
+	while (fromLine > 0 && fText->SoftStart(fromLine))
+		fromLine--;
+	// find the hard wrap of the last line
+	if (fromLine == toLine || fText->LineStart(toLine) < fTo)
+		toLine++;
+	while (toLine < fText->LineCount() && fText->SoftStart(toLine))
+		toLine++;
+	// now get the real offsets
+	fFrom = fText->LineStart(fromLine);
+	fTo = (toLine < fText->LineCount() ? fText->LineStart(toLine)
+									   : fText->Size());
 } /* PShiftCmd::PShiftCmd */
 
-void PShiftCmd::Do()
+int PShiftCmd::FirstLine() const
 {
-	int i, lf, c;
-	
-	c = fText->LineCount();
-	lf = fText->Offset2Line(fFrom);
+	return fText->Offset2Line(fFrom);
+} /* PShiftCmd::FirstLine */
 
-	for (i = lf; i < fText->Offset2Line(fTo); i++)
+int PShiftCmd::LastLine() const
+{
+	if (fTo == fText->Size())
 	{
-		if (! fText->SoftStart(i))
-		{
-			int ix = fText->LineStart(i);
-			if (fShiftRight)
-			{
-				fText->Insert("\t", 1, ix);
-				fTo++;
-			}
-			else if (fText->TextBuffer()[ix] == '\t')
-			{
-				fText->Delete(ix, ix + 1);
-				fTo--;
-			}
-		}
+		// If the text's last line is empty, it shall only be included if
+		// the selection is empty.
+		int lineCount = fText->LineCount();
+		if (fFrom < fTo && fTo == fText->LineStart(lineCount - 1))
+			return lineCount - 1;
+		return lineCount;
 	}
-	
-	fText->Select(fText->LineStart(lf), fText->LineStart(fText->Offset2Line(fTo)), true, false);
-	fFrom = min(fText->Caret(), fText->Anchor());
-	fTo = max(fText->Caret(), fText->Anchor());
-	
-	if (fText->LineCount() != c)
-		Redraw();
-	else
-		Update();
-} /* PShiftCmd::Do */
+	return fText->Offset2Line(fTo);
+} /* PShiftCmd::LastLine */
 
-void PShiftCmd::Undo()
+PShiftLeftCmd::PShiftLeftCmd(PText *txt)
+	: PShiftCmd("Shift Left", txt)
 {
-	int i, lf, c;
-	
-	c = fText->LineCount();
-	lf = fText->Offset2Line(fFrom);
-	
-	for (i = lf; i < fText->Offset2Line(fTo); i++)
+	// count the involved hard lines
+	int firstLine = FirstLine();
+	int lastLine = LastLine();
+	fLineCount = 0;
+	for (int i = firstLine; i < lastLine; i++)
 	{
-		if (! fText->SoftStart(i))
-		{
-			int ix = fText->LineStart(i);
-			if (fShiftRight)
+		if (!fText->SoftStart(i))
+			fLineCount++;
+	}
+	// Get the first character of each hard line. If it's not a tab or a space,
+	// we mark it 0.
+	fFirstChars = new(nothrow) char[fLineCount];
+	FailNil(fFirstChars);
+	fNoOp = true;
+	int hardIndex = 0;
+	for (int i = firstLine; i < lastLine; i++)
+	{
+		if (!fText->SoftStart(i)) {
+			char c = fText->TextBuffer()[fText->LineStart(i)];
+			if (c == '\t' || c == ' ')
 			{
-				fText->Delete(ix, ix + 1);
-				fTo--;
+				fFirstChars[hardIndex] = c;
+				fNoOp = false;
 			}
 			else
-			{
-				fText->Insert("\t", 1, ix);
-				fTo++;
-			}
+				fFirstChars[hardIndex] = 0;
+			hardIndex++;
 		}
 	}
+} /* PShiftLeftCmd::PShiftLeftCmd */
 
-	fText->Select(fText->LineStart(lf), fText->LineStart(fText->Offset2Line(fTo)), true, false);
-	fFrom = min(fText->Caret(), fText->Anchor());
-	fTo = max(fText->Caret(), fText->Anchor());
+PShiftLeftCmd::~PShiftLeftCmd()
+{
+	delete[] fFirstChars;
+} /* PShiftLeftCmd::~PShiftLeftCmd */
 
-	if (fText->LineCount() != c)
+void PShiftLeftCmd::Do()
+{
+	if (fNoOp)
+		return;
+	// remove the tabs/spaces
+	int lineCount = fText->LineCount();
+	int firstLine = FirstLine();
+	int hardIndex = fLineCount - 1;
+	for (int i = LastLine() - 1; i >= firstLine; i--)
+	{
+		if (!fText->SoftStart(i))
+		{
+			if (fFirstChars[hardIndex])
+			{
+				int ix = fText->LineStart(i);
+				fText->Delete(ix, ix + 1);
+				fTo--;
+			}
+			hardIndex--;
+		}
+	}
+	// select and update the affected lines
+	fText->Select(fFrom, fTo, true, false);
+	if (fText->LineCount() != lineCount)
 		Redraw();
 	else
 		Update();
-} /* PShiftCmd::Undo */
+} /* PShiftLeftCmd::Do */
+
+void PShiftLeftCmd::Undo()
+{
+	if (fNoOp)
+		return;
+	// insert the tabs/spaces
+	int lineCount = fText->LineCount();
+	int firstLine = FirstLine();
+	int hardIndex = fLineCount - 1;
+	for (int i = LastLine() - 1; i >= firstLine; i--)
+	{
+		if (!fText->SoftStart(i))
+		{
+			if (fFirstChars[hardIndex])
+			{
+				fText->Insert(fFirstChars + hardIndex, 1, fText->LineStart(i));
+				fTo++;
+			}
+			hardIndex--;
+		}
+	}
+	// select and update the affected lines
+	fText->Select(fFrom, fTo, true, false);
+	if (fText->LineCount() != lineCount)
+		Redraw();
+	else
+		Update();
+} /* PShiftLeftCmd::Undo */
+
+
+bool PShiftLeftCmd::IsNoOp()
+{
+	return fNoOp;
+} /* PShiftLeftCmd::IsNoOp */
+
+
+PShiftRightCmd::PShiftRightCmd(PText *txt)
+	: PShiftCmd("Shift Right", txt)
+{
+} /* PShiftRightCmd::PShiftRightCmd */
+
+void PShiftRightCmd::Do()
+{
+	// insert the tabs
+	int lineCount = fText->LineCount();
+	int firstLine = FirstLine();
+	for (int i = LastLine() - 1; i >= firstLine; i--)
+	{
+		if (!fText->SoftStart(i))
+		{
+			fText->Insert("\t", 1, fText->LineStart(i));
+			fTo++;
+		}
+	}
+	// select and update the affected lines
+	fText->Select(fFrom, fTo, true, false);
+	if (fText->LineCount() != lineCount)
+		Redraw();
+	else
+		Update();
+} /* PShiftRightCmd::Do */
+
+void PShiftRightCmd::Undo()
+{
+	// remove the tabs
+	int lineCount = fText->LineCount();
+	int firstLine = FirstLine();
+	for (int i = LastLine() - 1; i >= firstLine; i--)
+	{
+		if (!fText->SoftStart(i))
+		{
+			int ix = fText->LineStart(i);
+			fText->Delete(ix, ix + 1);
+			fTo--;
+		}
+	}
+	// select and update the affected lines
+	fText->Select(fFrom, fTo, true, false);
+	if (fText->LineCount() != lineCount)
+		Redraw();
+	else
+		Update();
+} /* PShiftRightCmd::Undo */
 
 #pragma mark -
 #pragma mark --- Twiddle Command ---

@@ -5041,11 +5041,15 @@ void PText::MessageReceived(BMessage *msg)
 				break;
 
 			case msg_ShiftLeft:
-				RegisterCommand(new PShiftCmd(this, false));
+			{
+				PShiftLeftCmd *cmd = new PShiftLeftCmd(this);
+				if (!cmd->IsNoOp())
+					RegisterCommand(cmd);
 				break;
+			}
 
 			case msg_ShiftRight:
-				RegisterCommand(new PShiftCmd(this, true));
+				RegisterCommand(new PShiftRightCmd(this));
 				break;
 
 			case msg_Undo:
