@@ -272,11 +272,12 @@ $(OBJDIR)/%.o: %.cpp $(PREFIXFILE)
 include $(OBJS:%.o=%.d)
 
 $(PREFIXFILE): Sources/pe.pch++
+	@ test -d $(OBJDIR) || mkdir $(OBJDIR)
 ifeq ($(CPU),ppc)
 	mwcc -precompile $(PREFIXFILE) -lang cplus Sources/pe.pch++ $(INCLUDES)
 endif
 
-$(OBJDIR)/%.d: $(OBJDIR) %.cpp $(PREFIXFILE)
+$(OBJDIR)/%.d: %.cpp $(PREFIXFILE)
 	@ test -d $(OBJDIR) || mkdir $(OBJDIR)
 	@ echo "-> "$(@F)
 ifeq ($(CPU), x86)
