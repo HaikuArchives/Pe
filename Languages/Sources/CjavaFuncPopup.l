@@ -61,6 +61,7 @@ ident		[a-zA-Z_][a-zA-Z0-9_]*{ws}
 params		\([a-zA-Z0-9 \t\n&*,\[\]_<>\.]*\){ws}
 oper		operator{ws}[-+*/=!><|&%^()\[\]~]+{ws}
 throws		throws{ws}{ident}({ws},{ws}{ident})*{ws}
+implements	implements{ws}({ident}{ws}\,{ws})*{ident}
 
 %x block
 %x class
@@ -70,7 +71,7 @@ throws		throws{ws}{ident}({ws},{ws}{ident})*{ws}
 
 %%
 												int blocklevel = 0, cc_caller = 0, string_caller = 0, cc_cnt = 0;
-class{ws}{ident}+\{								EnterNewClass(); BEGIN(class);
+class{ws}{ident}+{implements}?\{				EnterNewClass(); BEGIN(class);
 <class>{ident}{params}/{throws}?\{				AddFunction(proxy);
 <class>{ident}{params}/{throws}?;				AddPrototype(proxy);
 <class>\{										blocklevel = 1; BEGIN(block);
