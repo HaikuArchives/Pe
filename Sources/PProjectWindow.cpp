@@ -105,9 +105,14 @@ PProjectWindow::PProjectWindow(const entry_ref *doc)
 	
 	Read();
 	
-	fList->AddFilter(new PKeyDownFilter());
-	fList->MakeFocus();
-	Show();
+	if (fFooter == NULL) {
+		gApp->NewWindow(fFile);
+		Close();
+	} else {
+		fList->AddFilter(new PKeyDownFilter());
+		fList->MakeFocus();
+		Show();
+	}
 } /* PProjectWindow::PProjectWindow */
 
 PProjectWindow::~PProjectWindow()
