@@ -127,13 +127,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case TAGSTRING1:
 				if (c == '"')
 				{
-					proxy.SetColor(s, kLTagStringColor);
+					proxy.SetColor(s, kLAltStringColor);
 					s = i;
 					state = TAG;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLTagStringColor);
+					proxy.SetColor(s, kLAltStringColor);
 					leave = true;
 				}
 				break;
@@ -141,13 +141,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case TAGSTRING2:
 				if (c == '\'')
 				{
-					proxy.SetColor(s, kLTagStringColor);
+					proxy.SetColor(s, kLAltStringColor);
 					s = i;
 					state = TAG;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLTagStringColor);
+					proxy.SetColor(s, kLAltStringColor);
 					leave = true;
 				}
 				break;

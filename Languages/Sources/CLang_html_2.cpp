@@ -151,13 +151,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case JSTAGSTRING1:
 				if (c == '"')
 				{
-					proxy.SetColor(s, kLTagStringColor);
+					proxy.SetColor(s, kLAltStringColor);
 					s = i;
 					state--; // TAG
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLTagStringColor);
+					proxy.SetColor(s, kLAltStringColor);
 					leave = true;
 				}
 				break;
@@ -166,13 +166,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case JSTAGSTRING2:
 				if (c == '\'')
 				{
-					proxy.SetColor(s, kLTagStringColor);
+					proxy.SetColor(s, kLAltStringColor);
 					s = i;
 					state -= 2; // TAG
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLTagStringColor);
+					proxy.SetColor(s, kLAltStringColor);
 					leave = true;
 				}
 				break;

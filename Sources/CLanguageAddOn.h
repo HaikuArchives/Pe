@@ -44,15 +44,28 @@
 */
 enum {
 	kLTextColor = 3,
-	kLKeyWordColor,
-	kLCommentColor,
-	kLStringColor,
-	kLCharConstColor,
+	kLKeyWordColor,    // like c's    : if
+	kLCommentColor,    // like c's    : /* comment */
+	kLStringColor,     // like c's    : "this is a string"
+	kLCharConstColor,  // like c's    : 'c'
 	kLUser1, kLUser2, kLUser3, kLUser4,
-	kLTagColor,
-	kLAnchorColor,
-	kLImageColor,
-	kLTagStringColor
+	kLTagColor,        // like (from <html>) : <image>
+	kLAltKeyWordColor,       // like c++'s  : class
+	kLAltCommentColor,       // like c++'s  : // comment
+	kLAltStringColor,  // like html's : "this is a string"
+	kLSystemIdentifierColor, // like (from java) : java.util.String
+	kLUserIdentifierColor,   // like (from c's int foo;) : foo
+	kLNumberColor,           // like c's : 4.5
+	kLAltNumberColor,        // like c's : 4
+	kLPreProcessorColor,     // like c's : #define
+	kLAltProcessorColor,     // like doxygen's : @param
+	kLErrorColor,            // like c's : 5.4.3
+	kLAltErrorColor,         // like c's : for int (
+	kLOperatorColor,         // like c's : +
+	kLAltOperatorColor,      // like c's : &
+	kLSeparatorColor,        // like c's : {
+	kLAltSeparatorColor,     // like c's : ;
+	kLEndColor // just a marker, same as kLTextColor if you care
 };
 
 class CLangIntf;

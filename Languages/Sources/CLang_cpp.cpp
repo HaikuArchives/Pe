@@ -31,6 +31,12 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 
 	Created: 12/07/97 22:01:11 by Maarten Hekkelman
+
+	"Pe On Steroids Extension" by Guy Haviv
+	(operator, symbol and numeric highlighting)
+	icq:20720206
+	mul_m7m@bezeqint.net
+
 */
 
 #include "CLanguageAddOn.h"
@@ -38,7 +44,7 @@
 
 extern "C" {
 _EXPORT const char kLanguageName[] = "C/C++";
-_EXPORT const char kLanguageExtensions[] = "c;h;cpp;hpp;cp;C;H;cc;hh";
+_EXPORT const char kLanguageExtensions[] = "c;h;C;H;cc;hh;cpp;hpp;cxx;hxx;cp;hp";
 _EXPORT const char kLanguageCommentStart[] = "//";
 _EXPORT const char kLanguageCommentEnd[] = "";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.cpp";
@@ -46,11 +52,35 @@ _EXPORT const char kLanguageKeywordFile[] = "keywords.cpp";
 
 enum {
 	START, IDENT, OTHER, COMMENT, LCOMMENT, STRING,
-	CHAR_CONST, LEAVE, PRAGMA1, PRAGMA2,
+	CHAR_CONST, NUMERIC, OPERATOR, SYMBOL, LEAVE, PRAGMA1, PRAGMA2,
 	INCL1, INCL2, INCL3
 };
 
 #define GETCHAR			(c = (i++ < size) ? text[i - 1] : 0)
+
+bool isOperator(char c)
+{
+	if (c == '+' || c=='-' || c=='*' || c=='/' || c=='%' || c=='=' || c=='>' || c=='<' || c=='&' || c=='|' || c=='!' || c=='.' || c==':' )
+		return true;
+			
+	return false;
+}
+
+bool isSymbol(char c)
+{
+	if (c=='{' || c=='}' || c=='(' || c==')' || c=='[' || c==']' || c==',' ||  c==';')
+		return true;
+	
+	return false;
+}
+
+bool isNumeric(char c)
+{
+	if (c>='0' && c<='9')
+		return true;
+
+	return false;
+}
 
 _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 {
@@ -59,6 +89,10 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 	int i = 0, s = 0, kws, cc_cnt, esc = 0;
 	char c;
 	bool leave = false;
+	// floating point flag, true when the NUMERIC: label finds a . inside a number, and checks to make sure that a number with two '.' is invalid. (and not highlighted as numeric)
+	bool floating_point = false;
+	// same flag, only for hex numbers. allows proper highlighting only for 1 x per number. (0x21 is ok. 0x023x31 is not. will look wierd.)
+	bool hex_num = false;
 	
 	if (state == COMMENT || state == LCOMMENT)
 		proxy.SetColor(0, kLCommentColor);
@@ -100,6 +134,19 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				{
 					state = CHAR_CONST;
 					cc_cnt = 0;
+				}
+				// m7m: here are the 3 magic IFs.
+				else if (isNumeric(c))
+				{
+					state = NUMERIC;	
+				}
+				else if (isOperator(c))
+				{
+					state = OPERATOR;	
+				}
+				else if (isSymbol(c))
+				{
+					state = SYMBOL;
 				}
 				else if (c == '\n' || c == 0)
 					leave = true;
@@ -302,7 +349,54 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					esc = !esc && (c == '\\');
 				}
 				break;
+
+			case NUMERIC:
+			{
+				proxy.SetColor(s, kLNumberColor);
+				if (isNumeric(text[i-1]))
+					;
+				else
+					if (text[i-1]=='.' && floating_point==false && hex_num==false)
+						floating_point = true;
+					else if (text[i-1]=='x' && hex_num==false && floating_point==false)
+						hex_num = true;
+					else
+					{
+						s=i-1;
+						i--;
+						state = START;
+					}
+			}
+			break;
+
+			case OPERATOR:
+			{
+				proxy.SetColor(s, kLOperatorColor);
+				if (isOperator(text[i-1]))
+					;
+				else
+				{
+					s=i-1;
+					i--;
+					state = START;
+				}
+			}
+			break;
 			
+			case SYMBOL:
+			{
+				proxy.SetColor(s, kLSeparatorColor);
+				if (isSymbol(text[i-1]))
+					;
+				else
+				{
+					s=i-1;
+					i--;
+					state = START;
+				}
+			}
+			break;			
+
 			default:	// error condition, gracefully leave the loop
 				leave = true;
 				break;

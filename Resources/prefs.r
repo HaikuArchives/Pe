@@ -71,32 +71,46 @@ resource 'DLOG' (132, "Preferences") {
 			TabSheet				{ "Colours", "The colours used for syntax colouring and window layout" },
 				ColorControl		{{   0,   0, 145,  16 }, "lowc", "Background" },
 				ColorControl		{{ 155,   0, 290,  16 }, "txtc", "Normal Text" },
-				ColorControl		{{   0,  18, 145,  34 }, "selc", "Selection" },
-				ColorControl		{{ 155,  18, 290,  34 }, "mrkc", "Mark" },
+
+				ColorControl		{{   0,  16, 145,  32 }, "selc", "Selection" },
+				ColorControl		{{ 155,  16, 290,  32 }, "mrkc", "Mark" },
 				
-				Line				{{   0,  39, 290,  40 }},
+				Line				{{   0,  36, 290,  37 }},
 
-				ColorControl		{{   0,  45, 145,  61 }, "keyc", "Keywords" },
-				ColorControl		{{ 155,  45, 290,  61 }, "cmtc", "Comments" },
-				ColorControl		{{   0,  63, 145,  79 }, "strc", "Strings" },
-				ColorControl		{{ 155,  63, 290,  79 }, "chcc", "Char Constants" },
+				ColorControl		{{   0,  40, 110,  56 }, "keyc", "Keywords" },
+				ColorControl		{{ 110,  40, 145,  56 }, "ke2c", "" },
+				ColorControl		{{ 155,  40, 255,  56 }, "cmtc", "Comments" },
+				ColorControl		{{ 255,  40, 290,  56 }, "cm2c", "" },
 				
-				Line				{{   0,  84, 290,  85 }},
+				ColorControl		{{   0,  56, 110,  72 }, "strc", "Strings" },
+				ColorControl		{{ 110,  56, 145,  72 }, "tgsc", "" },
+				ColorControl		{{ 155,  56, 255,  72 }, "numc", "Numbers" },
+				ColorControl		{{ 255,  56, 290,  72 }, "nu2c", "" },
 
-				ColorControl		{{   0,  90, 145, 106 }, "us1c", "User defined 1" },
-				ColorControl		{{ 155,  90, 290, 106 }, "us2c", "User defined 2" },
-				ColorControl		{{   0, 108, 145, 124 }, "us3c", "User defined 3" },
-				ColorControl		{{ 155, 108, 290, 124 }, "us4c", "User defined 4" },
+				ColorControl		{{   0,  72, 110,  88 }, "opec", "Operators" },
+				ColorControl		{{ 110,  72, 145,  88 }, "op2c", "" },
+				ColorControl		{{ 155,  72, 255,  88 }, "sepc", "Separators" },
+				ColorControl		{{ 255,  72, 290,  88 }, "se2c", "" },
 				
-				Line				{{   0, 129, 290, 130 }},
+				ColorControl		{{   0,  88, 110, 104 }, "proc", "PreProcessor" },
+				ColorControl		{{ 110,  88, 145, 104 }, "pr2c", "" },
+				ColorControl		{{ 155,  88, 255, 104 }, "errc", "Errors" },
+				ColorControl		{{ 255,  88, 290, 104 }, "er2c", "" },
+				
+				Line				{{   0, 108, 290, 109 }},
+				
+				ColorControl		{{   0, 112, 145, 128 }, "sidc", "System Identifiers" },
+				ColorControl		{{ 155, 112, 290, 128 }, "chcc", "Char Constants" },
+				ColorControl		{{   0, 128, 145, 144 }, "uidc", "User Identifiers" },
+				ColorControl		{{ 155, 128, 290, 144 }, "tagc", "HTML Tags" },
+				
+				Line				{{   0, 148, 290, 149 }},
 
-				ColorControl		{{   0, 135, 145, 151 }, "tagc", "HTML Tags" },
-				ColorControl		{{ 155, 135, 290, 151 }, "tgsc", "HTML Tagstring" },
+				ColorControl		{{   0, 152, 145, 168 }, "us1c", "User defined 1" },
+				ColorControl		{{ 155, 152, 290, 168 }, "us2c", "User defined 2" },
+				ColorControl		{{   0, 168, 145, 184 }, "us3c", "User defined 3" },
+				ColorControl		{{ 155, 168, 290, 184 }, "us4c", "User defined 4" },
 
-//				ColorControl		{{   0, 135, 145, 151 }, "tag color", "HTML Tags" },
-//				ColorControl		{{ 155, 135, 290, 151 }, "anchor color", "HTML Anchor" },
-//				ColorControl		{{   0, 153, 145, 169 }, "image color", "HTML Image" },
-//				ColorControl		{{ 155, 153, 290, 169 }, "tagstring color", "HTML Tagstring" },
 			TabSheetEnd				{},
 
 			TabSheet				{ "Connections", "Options that control the connections to other programs" },

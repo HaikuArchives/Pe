@@ -192,22 +192,42 @@ PApp::PApp()
 
 		rgb_color c = { 0xFF, 0xFF, 0xFF, 0 };			gColor[kLowColor] = gPrefs->GetPrefColor("low color", c);
 		c.red = 0x00; c.green = 0x00; c.blue = 0x00;	gColor[kTextColor] = gPrefs->GetPrefColor("text color", c);
+
+		c.red = 0xff; c.green = 0xec; c.blue = 0x7c;	gColor[kSelectionColor] = gPrefs->GetPrefColor("selection color", c);
+		c.red = 0x00; c.green = 0x00; c.blue = 0xFF;	gColor[kMarkColor] = gPrefs->GetPrefColor("mark color", c);
+
 		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kKeyWordColor] = gPrefs->GetPrefColor("keyword color", c);
+														gColor[kAltKeyWordColor] = gPrefs->GetPrefColor("alt keyword color", c);
 		c.red = 0xA1; c.green = 0x64; c.blue = 0x0E;	gColor[kCommentColor] = gPrefs->GetPrefColor("comment color", c);
+														gColor[kAltCommentColor] = gPrefs->GetPrefColor("alt comment color", c);
+
 		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kStringColor] = gPrefs->GetPrefColor("string color", c);
+		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kAltStringColor] = gPrefs->GetPrefColor("tagstring color", c);
+		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kNumberColor] = gPrefs->GetPrefColor("number color", c);	
+														gColor[kAltNumberColor] = gPrefs->GetPrefColor("alt number color", c);
+
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kOperatorColor] = gPrefs->GetPrefColor("operator color", c);	
+														gColor[kAltOperatorColor] = gPrefs->GetPrefColor("alt operator color", c);
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kSeparatorColor] = gPrefs->GetPrefColor("separator color", c);	
+														gColor[kAltSeparatorColor] = gPrefs->GetPrefColor("alt separator color", c);
+
+		c.red = 0x00; c.green = 0x64; c.blue = 0x00;	gColor[kPreProcessorColor] = gPrefs->GetPrefColor("preprocessor color", c);	
+														gColor[kAltProcessorColor] = gPrefs->GetPrefColor("altprocessor color", c);
+		c.red = 0xFF; c.green = 0x00; c.blue = 0x00;	gColor[kErrorColor] = gPrefs->GetPrefColor("error color", c);	
+														gColor[kAltErrorColor] = gPrefs->GetPrefColor("alt error color", c);
+
+		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kSystemIdentifierColor] = gPrefs->GetPrefColor("system identifier color", c);
 		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kCharConstColor] = gPrefs->GetPrefColor("char constant color", c);
+
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kUserIdentifierColor] = gPrefs->GetPrefColor("user identifier color", c);
+		c.red = 0x88; c.green = 0x88; c.blue = 0x88;	gColor[kTagColor] = gPrefs->GetPrefColor("tag color", c);
+
 		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kUser1] = gPrefs->GetPrefColor("user1", c);
 														gColor[kUser2] = gPrefs->GetPrefColor("user2", c);
 														gColor[kUser3] = gPrefs->GetPrefColor("user3", c);
 														gColor[kUser4] = gPrefs->GetPrefColor("user4", c);
-		c.red = 0x88; c.green = 0x88; c.blue = 0x88;	gColor[kTagColor] = gPrefs->GetPrefColor("tag color", c);
-//		c.red = 0x40; c.green = 0x75; c.blue = 0x75;	gColor[kImageColor] = gPrefs->GetPrefColor("image color", c);
-//		c.red = 0x80; c.green = 0x20; c.blue = 0x20;	gColor[kAnchorColor] = gPrefs->GetPrefColor("anchor color", c);
-		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kTagStringColor] = gPrefs->GetPrefColor("tagstring color", c);
 
-		c.red = 0xff; c.green = 0xec; c.blue = 0x7c;	gColor[kSelectionColor] = gPrefs->GetPrefColor("selection color", c);
 		c.red = 200; c.green = 100; c.blue = 100;		gColor[kInvisiblesColor] = gPrefs->GetPrefColor("invisibles color", c);
-		c.red = 0; c.green = 0; c.blue = 255;				gColor[kMarkColor] = gPrefs->GetPrefColor("mark color", c);
 		
 		DefineInvColors(gColor[kSelectionColor]);
 

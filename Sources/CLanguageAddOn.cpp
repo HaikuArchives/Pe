@@ -112,7 +112,7 @@ void CLanguageProxy::SetColor(int start, int color)
 		if (fCIndx && start == fStarts[fCIndx - 1])
 			fCIndx--;
 		
-		if (color < kLTextColor || color > kLTagStringColor)
+		if (color < kLTextColor || color >= kLEndColor)
 			color = kLTextColor;
 		
 		fColors[fCIndx] = gColor[color];
