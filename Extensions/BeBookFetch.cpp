@@ -60,7 +60,7 @@
 //-----------------------------------------------------------------------------
 
 // Function Prototypes
-uint32	FetchQuery(query_op Op, const char* Selection, vector<BString>& Results, bool CaseSensitive = true);
+uint32	FetchQuery(query_op Op, const char* Selection, vector<BString>& Results, bool CaseSensitive = false);
 void	DisplayResults(vector<BString>& Results, MTextAddOn *addon);
 BString	FormatResultString(const BString& ResultPath);
 void	PopUpSelection(vector<BString>& Results, MTextAddOn *addon);
@@ -94,7 +94,6 @@ long perform_edit(MTextAddOn *addon)
 	if (!pos) return B_ERROR;
 
 	selection.Truncate(pos);
-	selection.ToLower(); // Improves the chances of getting something.
 
 	vector <BString> results;
 
