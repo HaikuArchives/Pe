@@ -2,4 +2,8 @@ SubDir TOP ;
 
 SubInclude TOP Sources ;
 SubInclude TOP Extensions ;
+SubInclude TOP Resources ;
 SubInclude TOP Languages ;
+
+File _APP_ : pe ;
+MakeLocate _APP_ : [ FDirName $(TOP) ] ;
