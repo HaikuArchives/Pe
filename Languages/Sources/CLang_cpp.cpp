@@ -38,7 +38,7 @@
 
 extern "C" {
 _EXPORT const char kLanguageName[] = "C/C++";
-_EXPORT const char kLanguageExtensions[] = "c;h;cpp;cp;C;H";
+_EXPORT const char kLanguageExtensions[] = "c;h;cpp;hpp;cp;C;H;cc;hh";
 _EXPORT const char kLanguageCommentStart[] = "//";
 _EXPORT const char kLanguageCommentEnd[] = "";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.cpp";
