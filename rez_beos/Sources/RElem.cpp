@@ -93,7 +93,7 @@ void RElem::Write()
 
 void RElem::Write(RElem *head, BPositionIO& stream)
 {
-	if (verbose >= 2) printf("Writing %d, this: %08x, next: %08x\n", fType, this, fNext);
+	if (verbose >= 2) printf("Writing %d, this: %08x, next: %08x\n", fType, (uint)this, (uint)fNext);
 	switch (fType)
 	{
 		case relEval:
@@ -123,6 +123,11 @@ void RElem::Write(RElem *head, BPositionIO& stream)
 		}
 		case relString:
 			stream.Write(fString, fSize / 8);
+			break;
+		case relFill:
+			// [zooey]: this has been added because gcc throws a warning
+			//				about relFill not being handled otherwise.
+			//				TODO: shouldn't we actually DO something here?
 			break;
 	}
 } /* RElem::Write */

@@ -259,7 +259,7 @@ void WriteResource(int x)
 
 	long sType = htonl(rh->type);
 	if (verbose) printf("Writing Resource. Type: %4.4s, id: %d, name: %s\n",
-		&sType, rh->id, rh->name);
+		(char*)&sType, rh->id, rh->name);
 
 	if (gDump)
 		fwrite(gResData, gResSize, 1, stdout);
@@ -299,7 +299,7 @@ void WriteResource(const char *file, int type, int id, const char *name)
 	if (!f) error("Error opening file %s: %s", file, strerror(errno));
 	
 	long sType = htonl(type);
-	if (verbose) printf("Writing Resource. Type: %4.4s, id: %d, name: %s\n", &sType, id, name);
+	if (verbose) printf("Writing Resource. Type: %4.4s, id: %d, name: %s\n", (char*)&sType, id, name);
 
 	fseek(f, 0, SEEK_END);
 	s = ftell(f);
@@ -335,7 +335,7 @@ void WriteHeader(unsigned long type, int id, const unsigned char *buf,
 	int b = bufSize;
 	long aType = htonl(type);
 
-	fprintf(gHeader, "const char\n\tk%4.4s%d[%d] = {", &aType, id, bufSize);
+	fprintf(gHeader, "const char\n\tk%4.4s%d[%d] = {", (char*)&aType, id, bufSize);
 	
 	while (bufSize > 0)
 	{
@@ -347,7 +347,7 @@ void WriteHeader(unsigned long type, int id, const unsigned char *buf,
 			fprintf(gHeader, "0x%02x, ", *p++);
 	}
 	
-	fprintf(gHeader, "\n\t};\nconst int k%4.4s%dSize = %d;\n\n", &aType, id, b);
+	fprintf(gHeader, "\n\t};\nconst int k%4.4s%dSize = %d;\n\n", (char*)&aType, id, b);
 } /* WriteHeader */
 
 void Include(const char *file)
