@@ -3028,10 +3028,14 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 				}
 				else if (numBytes > 1)
 					CharKeyDown(bytes, numBytes);
-				else if ((ch != B_FUNCTION_KEY &&
-						 !(modifiers & (B_CONTROL_KEY | B_COMMAND_KEY))) &&
-//						 (!iscntrl(ch) || ch == B_RETURN || ch == B_TAB))
-						 (!iscntrl(bytes[0]) || ch == B_RETURN || ch == B_TAB))
+				else if (ch != B_FUNCTION_KEY &&
+						 !(modifiers & (B_CONTROL_KEY | B_COMMAND_KEY))
+//						 (!iscntrl(bytes[0]) || ch == B_RETURN || ch == B_TAB))
+						// [zooey]: does anyone happen to know what above line
+						//          were meant to do? I deactivated it as it busts
+						//          entering non-ASCII characters in encodings other
+						//          than UTF8.
+				)
 				{
 					CharKeyDown(bytes, numBytes);
 				}
