@@ -852,9 +852,6 @@ void PDoc::OpenSelection()
 				back = (backSpace ? backSpace : back);
 			}
 			
-			int filenameFront = front;
-			// check to ensure matching double quote or angle brackets
-			// otherwise fall back to whitespace marker if possible
 			if ((back >= 0) && (front < end)) {
 				if ((text[back] == '"') && (text[front] != '"') ||
 					(text[back] != '"') && (text[front] == '"')) {
@@ -866,36 +863,36 @@ void PDoc::OpenSelection()
 					front = (frontSpace ? frontSpace : front);
 					back = (backSpace ? backSpace : back);
 				}
-				
+			}
+						
+			int filenameFront = front;
+			// check to ensure matching double quote or angle brackets
+			// otherwise fall back to whitespace marker if possible
+			if ((back+1 < end) && (front <= end)) {
 				// should look for colon delimiters here for line zooming
-				int colon1 = back;
+				int colon1 = back+1;
 				while ((colon1 < front) && (text[colon1] != ':')) colon1++;
 				if (colon1 < front) {
+					filenameFront = colon1;
 					char * firstNumberEnd = (char*)&(text[front]);
 					line1 = strtol(&text[colon1+1],&firstNumberEnd,10);
 					if ((line1 == 0) && (text[colon1+1] != '0')) {
 						// no number found, mark the line to zero
 						line1 = -1;
-					} else if (firstNumberEnd == &(text[front])) {
-						// we found a number, and that's the end of the
-						// string, so move the front back to the colon
-						filenameFront = colon1;
-					} else if (*firstNumberEnd != ':') {
-						// there's more, but it isn't a colon, so abort
-						line1 = -1;
-					} else {
+						// move the front back to behind the colon
+						front = colon1;
+					} else if ((firstNumberEnd != &(text[front]))
+					           && (*firstNumberEnd == ':')) {
+						// there's another colon, so check for second digit
 						firstNumberEnd++;
 						char * secondNumberEnd = (char*)&(text[front]);
 						line2 = strtol(firstNumberEnd,&secondNumberEnd,10);
-						if (((line2 != 0) || (*secondNumberEnd == '0'))
-							&& (secondNumberEnd == &(text[front]))) {
-							// we found another number, and it's the end
-							// so move front back to the first colon
-							filenameFront = colon1;
-						} else {
-							// otherwise abort
-							line1 = -1;
+						if ((line2 == 0) && (*secondNumberEnd != '0')) {
+							// no number found, mark the line to zero
 							line2 = -1;
+							// move the front back to behind the colon
+							firstNumberEnd--;
+							front -= &(text[front]) - firstNumberEnd;
 						}
 					}
 				}
