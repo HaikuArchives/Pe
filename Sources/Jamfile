@@ -65,6 +65,8 @@ Application pe
 		COpenSelection.cpp
 		CPathsBox.cpp
 		CPrefsDialog.cpp
+		CProjectFile.cpp
+		CProjectMakeFile.cpp
 		CStdErrBox.cpp
 		CStdErrParser.cpp
 		CUrlOpener.cpp

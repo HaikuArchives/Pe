@@ -44,16 +44,21 @@ const ulong
 	msg_PAdd				 = 'Add ';
 
 class PGroupStatus;
-class PGroupItem;
+class PEntryItem;
 class PToolBar;
 class HButtonBar;
+
+class CProjectFile;
+class CProjectItem;
+
+class BListItem;
 
 class PProjectWindow
 	: public BWindow
 	, public CDoc
 {
   public:
-	PProjectWindow(const entry_ref *doc);
+	PProjectWindow(const entry_ref *doc, const char* mimetype);
 	~PProjectWindow();
 
 	virtual bool QuitRequested();
@@ -66,23 +71,24 @@ private:
 	virtual void ReadAttr(BFile& file);
 	virtual void WriteData(BPositionIO& file);
 	virtual void WriteAttr(BFile& file);
+	void AddItemsToList(CProjectItem* item, BListItem* parentListItem);
 	
 	void OpenItem();
 	void AddRefs(BMessage *msg);
 	void AddRef(const entry_ref& ref);
 	void AddFiles();
+	void RemoveSelected();
 	
 	const char *AddGroup(const char *e, BDirectory& d);
 	
 	int fLookahead, fTokenLength;
-	char *fHeader, *fFooter;
 	
+	CProjectFile* fPrjFile;
 	BOutlineListView *fList;
 	PGroupStatus *fStatus;
 	PToolBar *fToolBar;
 	HButtonBar *fButtonBar;
 	BFilePanel *fPanel;
-	vector<entry_ref> fSourceFiles, fResourceFiles, fLibraries;
 };
 
 #endif // PPROJECTWINDOW_H

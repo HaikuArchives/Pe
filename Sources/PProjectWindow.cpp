@@ -48,12 +48,14 @@
 #include "HAppResFile.h"
 #include "HButtonBar.h"
 #include "HError.h"
+#include "CProjectMakeFile.h"
 
 const unsigned long msg_Done = 'done';
 
-PProjectWindow::PProjectWindow(const entry_ref *doc)
+PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
 	: BWindow(PDoc::NextPosition(), doc->name, B_DOCUMENT_WINDOW, 0)
-	, CDoc("text/x-makefile", this, doc)
+	, CDoc(mimetype, this, doc)
+	, fPrjFile(NULL)
 {
 	fPanel = NULL;
 	fToolBar = NULL;
@@ -105,7 +107,7 @@ PProjectWindow::PProjectWindow(const entry_ref *doc)
 	
 	Read();
 	
-	if (fFooter == NULL) {
+	if (!fPrjFile || !fPrjFile->HaveProjectInfo()) {
 		gApp->NewWindow(fFile);
 		Close();
 	} else {
@@ -117,14 +119,13 @@ PProjectWindow::PProjectWindow(const entry_ref *doc)
 
 PProjectWindow::~PProjectWindow()
 {
+	delete fPrjFile;
 	if (fPanel)
 	{
 		delete fPanel;
 		fPanel = NULL;
 	}
 	
-	free(fHeader);
-	free(fFooter);
 } /* PProjectWindow::~PProjectWindow */
 
 bool PProjectWindow::QuitRequested()
@@ -173,15 +174,7 @@ void PProjectWindow::MessageReceived(BMessage *msg)
 			
 			case msg_PRemove:
 			{
-				int s = 0;
-				do
-				{
-					if (fList->IsItemSelected(s))
-						delete fList->RemoveItem(s);
-				}
-				while (fList->IsItemSelected(s) ||
-					(s = fList->CurrentSelection(s)) > 0 && s < fList->CountItems());
-				
+				RemoveSelected();
 				Save();
 				break;
 			}
@@ -229,208 +222,67 @@ void PProjectWindow::MessageReceived(BMessage *msg)
 		}
 } /* PProjectWindow::MessageReceived */
 
-//-----------------
-
-const char *skip_to(const char *t, char c);
-const char *skip_white(const char *t);
-const char *next_path(const char *t, const char *& p, int& pl);
-
-const char *skip_to(const char *t, char c)
-{
-	while (*t && *t != c)
-		t++;
-	return t;
-} // skip_to
-
-const char *skip_white(const char *t)
-{
-	while (*t)
-	{
-		if (*t == '\\' && t[1] == '\n')
-			t += 2;
-		if (*t == ' ' || *t == '\t')
-			t++;
-		else if (*t == '#')
-			t = skip_to(t + 1, '\n');
-		else
-			break;
-	}
-
-	return t;
-} // skip_white
-
-const char *next_path(const char *t, const char *& p, int& pl)
-{
-	if (*t == '"')
-	{
-		p = ++t;
-		t = strchr(t, '"');
-		if (t)
-		{
-			pl = t - p;
-			t++;
-		}
-		else
-			p = NULL;
-	}
-	else if (*t == '\'')
-	{
-		p = ++t;
-		t = strchr(t, '\'');
-		if (t)
-		{
-			pl = t - p;
-			t++;
-		}
-		else
-			p = NULL;
-	}
-	else if (*t)
-	{
-		p = t;
-		while (*t && ! isspace(*t))
-			t++;
-		pl = t - p;
-	}
-	else
-		p = NULL;
-	
-	return t;
-} // next_path
-
-const char *PProjectWindow::AddGroup(const char *t, BDirectory& d)
-{
-	t = skip_white(t);
-
-	if (isalnum(*t))
-	{
-		const char *n = t;
-		
-		while (isalnum(*t) || *t == '_')
-			t++;
-		
-		int nl = t - n;
-		
-		t = skip_white(t);
-		
-		if (*t != '=')
-			return skip_to(t, '\n');
-
-		t++;
-		
-		string s(n, nl);
-		BStringItem *group;
-
-		fList->AddItem(group = new BStringItem(s.c_str()));
-		
-		t = skip_white(t);
-		
-		stack<BListItem*> lst;
-		
-		while (true)
-		{
-			const char *p;
-			int pl;
-			
-			t = next_path(t, p, pl);
-			if (p == NULL)
-				break;
-
-			s.assign(p, pl);
-
-			entry_ref ref;
-			BEntry e;
-
-				// do not follow links!!!			
-			if (d.FindEntry(s.c_str(), &e, false) == B_OK && e.GetRef(&ref) == B_OK)
-				lst.push(new PGroupItem(ref));
-			else
-				lst.push(new BStringItem(s.c_str()));
-			
-			t = skip_white(t);
-
-			if (*t == '\n')
-				break;
-		}
-		
-		while (lst.size())
-		{
-			fList->AddUnder(lst.top(), group);
-			lst.pop();
-		}
-	}
-
-	if (*t)
-	{
-		t = skip_to(t, '\n');
-		if (t) t++;
-	}
-
-	return t;
-} // PProjectWindow::AddGroup
-
 void PProjectWindow::ReadData(BPositionIO&)
 {
 	if (!fFile)
 		THROW(("Can only read local makefiles"));
 
-	char *t = NULL;
-	
 	try
 	{
-		BDirectory d;
-		BFile file;
+		BPath path;
 
-		FailOSErr(BEntry(fFile, true).GetParent(&d));
-		FailOSErr(file.SetTo(fFile, B_READ_ONLY));
+		FailOSErr(BEntry(fFile, true).GetPath(&path));
 		
-		size_t size = file.Seek(0, SEEK_END);
-		file.Seek(0, SEEK_SET);
-		
-		t = (char *)malloc(size);
-		
-		if (file.Read(t, size) != size) THROW(("Error reading makefile"));
-
-		const char *s, *e;
-		
-		s = strstr(t, "#%{");
-		e = s ? strstr(s, "#%}") : s;
-		
-		if (s < e)
-		{
-			s = skip_to(s + 3, '\n') + 1;
-			
-			int l = s - t;
-			fHeader = (char *)malloc(l + 1);
-			FailNil(fHeader);
-			memcpy(fHeader, t, l);
-			fHeader[l] = 0;
-			
-			l = t + size - e;
-			fFooter = (char *)malloc(l + 1);
-			FailNil(fFooter);
-			memcpy(fFooter, e, l);
-			fFooter[l] = 0;
-			
-			t[e - t] = 0;
-			
-			while (s < e)
-				s = AddGroup(s, d);
-		}
+		delete fPrjFile;
+		if (!strcmp(MimeType(),"text/x-makefile"))
+			fPrjFile = new CProjectMakeFile(path);
 		else
-		{
-			fHeader = strdup(t);
-			fFooter = NULL;
+			fPrjFile = NULL;
+		if (fPrjFile) {
+			FailOSErr(fPrjFile->Parse());
+			list<CProjectItem*>::iterator iter;
+			for( iter = fPrjFile->begin(); iter != fPrjFile->end(); ++iter)
+				AddItemsToList( *iter, NULL);
 		}
-				
-		free(t);
 	}
 	catch (HErr& e)
 	{
-		free(t);
 		e.DoError();
 	}	
 } /* PProjectWindow::ReadData */
+
+void PProjectWindow::AddItemsToList(CProjectItem* item, 
+												BListItem* parentListItem)
+{
+static int lvl = 0;
+	if (!item)
+		return;
+printf("%*.*sitem: %s / %s", lvl,lvl,"\t\t\t\t\t\t\t\t\t",
+		item->ParentPath().String(), item->LeafName().String());
+	lvl++;
+	BListItem* viewItem = NULL;
+	BPath path(item->ParentPath().String(), item->LeafName().String());
+	BEntry e(path.Path());
+	entry_ref ref;
+	if (e.Exists() && e.GetRef(&ref) == B_OK) {
+		viewItem = new PEntryItem(ref, 0, item);
+printf("...G\n");
+	} else {
+		viewItem = new PProjectItem(item->LeafName().String(), 0, item);
+printf("...S\n");
+	}
+	if (parentListItem)
+		fList->AddUnder( viewItem, parentListItem);
+	else
+		fList->AddItem( viewItem);
+	CProjectGroupItem* groupItem = dynamic_cast<CProjectGroupItem*>(item);
+	if (groupItem) {
+		list<CProjectItem*>::iterator iter;
+		for( iter = groupItem->begin(); iter != groupItem->end(); ++iter)
+			AddItemsToList( *iter, viewItem);
+	}
+	lvl--;
+}
 
 void PProjectWindow::ReadAttr(BFile& file)
 {
@@ -477,39 +329,12 @@ void PProjectWindow::WriteData(BPositionIO& /*file*/)
 		BPath p;
 		FailOSErr(BEntry(fFile).GetPath(&p));
 		
-		FILE *f = fopen(p.Path(), "w");
-		if (!f) THROW(("Failed to open file %s", p.Path()));
+		status_t res = B_OK;
+		if (fPrjFile)
+			res = fPrjFile->WriteToFile(MimeType());
+		if (res != B_OK)
+			THROW(("Failed to open file %s (reason: %s)", p.Path(), strerror(res)));
 		
-		fputs(fHeader, f);
-		fputs("# Pe generated file list:", f);
-
-		int i = 0;
-		
-		while (i < fList->FullListCountItems())
-		{
-			BStringItem *sItem = dynamic_cast<BStringItem*>(fList->FullListItemAt(i));
-			FailNil(sItem);
-
-			PGroupItem *pItem = dynamic_cast<PGroupItem *>(sItem);
-			
-			if (pItem == NULL)
-				fprintf(f, "\n%s = \\\n", sItem->Text());
-			else
-			{
-				char path[PATH_MAX];
-				RelativePath(*fFile, pItem->Ref(), path);
-				fprintf(f, "\t%s \\\n", path);
-			}
-
-			i++;
-		}
-
-		fputs("", f);
-
-		if (fFooter)
-			fputs(fFooter, f);
-		
-		fclose(f);
 	}
 	catch (HErr& e)
 	{
@@ -552,21 +377,66 @@ void PProjectWindow::SaveRequested(entry_ref& directory, const char *name)
 	}
 } /* PProjectWindow::SaveRequested */
 
+static int CompareListItems(const BListItem *a, const BListItem *b)
+{
+	return strcasecmp(
+		((BStringItem *)(a))->Text(),
+		((BStringItem *)(b))->Text());
+}
+
 void PProjectWindow::AddRef(const entry_ref& ref)
 {
-	PGroupItem *item;
+	PEntryItem *item;
 	
-	for (int i = 0; i < fList->CountItems(); i++)
+	for (int i = 0; i < fList->FullListCountItems(); i++)
 	{
-		item = static_cast<PGroupItem*>(fList->ItemAt(i));
+		item = static_cast<PEntryItem*>(fList->FullListItemAt(i));
 		if (item->Ref() == ref)
+			// avoid duplicates
 			return;
 	}
 
-	int ix = fList->FullListCurrentSelection() + 1;
-	if (ix <= 0) ix = fList->FullListCountItems();
+	PProjectItem* selectedItem;
+	PProjectItem* parentItem = NULL;
+	CProjectGroupItem* parentModelItem = NULL;
+	int ix = fList->FullListCurrentSelection();
+	if (ix >= 0) {
+		selectedItem = dynamic_cast<PProjectItem*>(fList->FullListItemAt(ix));
+	} else {
+		selectedItem = dynamic_cast<PProjectItem*>(fList->FullListLastItem());
+	}
+	if (selectedItem) {
+		// set parentItem to the group-item that controls the selected item
+		// (which may very well be the selected item itself).
+		// additionally, parentModelItem is set to the model of that group-item:
+		if (dynamic_cast<CProjectGroupItem*>(selectedItem->ModelItem()))
+			parentItem = selectedItem;
+		else
+			parentItem 
+				= dynamic_cast<PProjectItem*>(fList->Superitem(selectedItem));
+		parentModelItem
+			= parentItem 
+				? dynamic_cast<CProjectGroupItem*>(parentItem->ModelItem())
+				: NULL;
+	}
 
-	fList->AddItem(item = new PGroupItem(ref, 1), ix);
+	BPath parentPath;
+	BPath path(&ref);
+	path.GetParent(&parentPath);
+
+	CProjectItem* modelItem = new CProjectItem( parentPath.Path(), ref.name);
+	item = new PEntryItem(ref, parentModelItem ? 1 : 0, modelItem);
+
+	if (parentModelItem && parentItem) {
+		parentModelItem->AddItem(modelItem);
+		fList->AddUnder(item, parentItem);
+//		typedef int(*sortfunc)(const BListItem*, const BListItem*);
+		fList->SortItemsUnder(parentItem, false, CompareListItems);
+	} else {
+		fPrjFile->AddItem(modelItem);
+		fList->AddItem(item);
+	}
+				
 	Save();
 } /* PProjectWindow::AddRef */
 
@@ -602,10 +472,41 @@ void PProjectWindow::AddRefs(BMessage *msg)
 
 } /* PProjectWindow::AddRefs */
 
+void PProjectWindow::RemoveSelected()
+{
+	int s = 0;
+	do
+	{
+		if (fList->IsItemSelected(s)) {
+			PProjectItem* projectItem 
+				= dynamic_cast<PProjectItem*>(fList->RemoveItem(s));
+			if (projectItem) {
+				CProjectGroupItem* projectGroupItem 
+					= dynamic_cast<CProjectGroupItem*>(projectItem->ModelItem());
+				if (projectGroupItem) {
+					BAlert* alert 
+						= new BAlert( "Pe Message", 
+										  "You can't remove a group-item",
+										  "Ah, Ok", NULL, NULL,
+										  B_WIDTH_AS_USUAL, B_OFFSET_SPACING, 
+										  B_WARNING_ALERT);
+					alert->SetShortcut( 0, B_ESCAPE);
+					alert->Go();
+				} else {
+					fPrjFile->RemoveItem(projectItem->ModelItem());
+					delete projectItem;
+				}
+			}
+		}
+	}
+	while (fList->IsItemSelected(s) ||
+		(s = fList->CurrentSelection(s)) > 0 && s < fList->CountItems());
+}
+
 void PProjectWindow::OpenItem()
 {
-	PGroupItem *gi;
-	gi = dynamic_cast<PGroupItem*>(fList->ItemAt(fList->CurrentSelection()));
+	PEntryItem *gi;
+	gi = dynamic_cast<PEntryItem*>(fList->ItemAt(fList->CurrentSelection()));
 	if (gi)
 	{
 		try
