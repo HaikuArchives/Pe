@@ -70,7 +70,7 @@ class IsLess
 {
   public:
 	IsLess() {}
-	bool operator () (PGroupItem*& item, const string& t)
+	bool operator () (PEntryItem*& item, const string& t)
 		{ return strcasecmp(item->Ref().name, t.c_str()) < 0; }
 };
 
@@ -78,7 +78,7 @@ class IsLessItem
 {
   public:
 	IsLessItem() {}
-	bool operator () (const PGroupItem* const & a, const PGroupItem* const& b) const
+	bool operator () (const PEntryItem* const & a, const PEntryItem* const& b) const
 		{ return *a < *b; }
 };
 
@@ -86,12 +86,12 @@ void PTypeAHeadList::Pulse()
 {
 	if (fLastKeyDown && fLastKeyDown < system_time() - 400000)
 	{
-		PGroupItem **start = (PGroupItem **)Items();
+		PEntryItem **start = (PEntryItem **)Items();
 
-		vector<PGroupItem*> items(start, start + CountItems());
+		vector<PEntryItem*> items(start, start + CountItems());
 		stable_sort(items.begin(), items.end(), IsLessItem());
 		
-		vector<PGroupItem*>::iterator found;
+		vector<PEntryItem*>::iterator found;
 		found = lower_bound(items.begin(), items.end(), fTyped, IsLess());
 		
 		if (found != items.end())
@@ -108,16 +108,16 @@ void PTypeAHeadList::Pulse()
 
 void PTypeAHeadList::HandleTab(bool backward)
 {
-	PGroupItem **start = (PGroupItem **)Items(), *item;
+	PEntryItem **start = (PEntryItem **)Items(), *item;
 
-	item = static_cast<PGroupItem*>(ItemAt(CurrentSelection()));
+	item = static_cast<PEntryItem*>(ItemAt(CurrentSelection()));
 	if (item == NULL)
 		return;
 
-	vector<PGroupItem*> items(start, start + CountItems());
+	vector<PEntryItem*> items(start, start + CountItems());
 	stable_sort(items.begin(), items.end(), IsLessItem());
 	
-	vector<PGroupItem*>::iterator found = find(items.begin(), items.end(), item);
+	vector<PEntryItem*>::iterator found = find(items.begin(), items.end(), item);
 
 	if (backward)
 		--found;
