@@ -467,7 +467,8 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 		}
 		else if (strcmp(mime, "text/x-makefile") == 0)
 		{
-			PProjectWindow *w = dynamic_cast<PProjectWindow*>(CDoc::FindDoc(doc));
+			PProjectWindow *w 
+				= dynamic_cast<PProjectWindow*>(CDoc::FindDoc(doc));
 			if (w)
 			{
 				if (gPrefs->GetPrefInt("window to workspace", 1))
@@ -477,7 +478,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 				return CDoc::FindDoc(doc);
 			}
 			else
-				return new PProjectWindow(&doc);
+				return new PProjectWindow(&doc, "text/x-makefile");
 		}
 		else
 		{
