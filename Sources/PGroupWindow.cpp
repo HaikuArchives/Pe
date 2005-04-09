@@ -171,16 +171,16 @@ void PGroupStatus::SetTypeahead(const char *text)
 
 class PIconFinder : public MThread {
 public:
-		PIconFinder(PGroupWindow *w, vector<PGroupItem*> *items);
+		PIconFinder(PGroupWindow *w, vector<PEntryItem*> *items);
 		~PIconFinder();
 	
 virtual	long Execute();
 
 		PGroupWindow *fWindow;
-		vector<PGroupItem*> *fItems;
+		vector<PEntryItem*> *fItems;
 };
 
-PIconFinder::PIconFinder(PGroupWindow *w, vector<PGroupItem*> *items)
+PIconFinder::PIconFinder(PGroupWindow *w, vector<PEntryItem*> *items)
 	: MThread("icon finder")
 {
 	fWindow = w;
@@ -200,7 +200,7 @@ long PIconFinder::Execute()
 	{
 		try
 		{
-			PGroupItem *item = (*fItems)[i++];
+			PEntryItem *item = (*fItems)[i++];
 
 //			item->GetIcon();
 			
@@ -346,16 +346,7 @@ void PGroupWindow::MessageReceived(BMessage *msg)
 			
 			case msg_Remove:
 			{
-				int s = 0;
-				do
-				{
-					if (fList->IsItemSelected(s))
-						delete fList->RemoveItem(s);
-				}
-				while (fList->IsItemSelected(s) ||
-					(s = fList->CurrentSelection(s)) > 0 && s < fList->CountItems());
-				
-				SetDirty(true);
+				RemoveSelected();
 				break;
 			}
 			
@@ -428,7 +419,7 @@ void PGroupWindow::ReadData(BPositionIO&)
 		if (!fgets(s, 1023, f) || strcmp(s, "### pe Group File\n"))
 			THROW(("Not a group file!"));
 		
-		vector<PGroupItem*> *lst = new vector<PGroupItem*>;
+		vector<PEntryItem*> *lst = new vector<PEntryItem*>;
 
 		while (fgets(s, 1023, f))
 		{
@@ -437,14 +428,14 @@ void PGroupWindow::ReadData(BPositionIO&)
 			char *se = strchr(s, '\n');
 			if (se) *se = 0;
 			
-			PGroupItem *i;
+			PEntryItem *i;
 			entry_ref ref;
 			
 			try
 			{
 				FailOSErr(d.FindEntry(s, &e, true));
 				FailOSErr(e.GetRef(&ref));
-				fList->AddItem(i = new PGroupItem(ref));
+				fList->AddItem(i = new PEntryItem(ref));
 				lst->push_back(i);
 //				i->SetHeight(18);
 			}
@@ -460,7 +451,7 @@ void PGroupWindow::ReadData(BPositionIO&)
 		fIconFinder->Run();
 		
 		if (gPrefs->GetPrefInt("sortgroup", 1))
-			fList->SortItems(PGroupItem::Compare);
+			fList->SortItems(PEntryItem::Compare);
 		fclose(f);
 
 		fButtonBar->SetEnabled(msg_Save, false);
@@ -524,7 +515,7 @@ void PGroupWindow::WriteData(BPositionIO& /*file*/)
 		fputs("### pe Group File\n", f);
 		for (int i = 0; i < fList->CountItems(); i++)
 		{
-			PGroupItem *item = (PGroupItem *)fList->ItemAt(i);
+			PEntryItem *item = (PEntryItem *)fList->ItemAt(i);
 			
 			if (gPrefs->GetPrefInt("relative group paths", 0))
 			{
@@ -584,18 +575,18 @@ void PGroupWindow::SaveRequested(entry_ref& directory, const char *name)
 	}
 } /* PGroupWindow::SaveRequested */
 
-PGroupItem* PGroupWindow::AddRef(entry_ref& ref)
+PEntryItem* PGroupWindow::AddRef(entry_ref& ref)
 {
-	PGroupItem *item;
+	PEntryItem *item;
 	
 	for (int i = 0; i < fList->CountItems(); i++)
 	{
-		item = static_cast<PGroupItem*>(fList->ItemAt(i));
+		item = static_cast<PEntryItem*>(fList->ItemAt(i));
 		if (item->Ref() == ref)
 			return NULL;
 	}
 
-	fList->AddItem(item = new PGroupItem(ref));
+	fList->AddItem(item = new PEntryItem(ref));
 //	fList->LastItem()->SetHeight(18);
 	fList->InvalidateItem(fList->CountItems() - 1);
 
@@ -629,7 +620,7 @@ void PGroupWindow::AddFiles()
 void PGroupWindow::AddRefs(BMessage *msg)
 {
 	if (!fNewItems)
-		fNewItems = new vector<PGroupItem*>;
+		fNewItems = new vector<PEntryItem*>;
 	
 	entry_ref ref;
 	int c = 0;
@@ -638,7 +629,7 @@ void PGroupWindow::AddRefs(BMessage *msg)
 		fNewItems->push_back(AddRef(ref));
 
 	if (gPrefs->GetPrefInt("sortgroup", 1))
-		fList->SortItems(PGroupItem::Compare);
+		fList->SortItems(PEntryItem::Compare);
 
 	fList->Invalidate();
 	
@@ -646,10 +637,24 @@ void PGroupWindow::AddRefs(BMessage *msg)
 		PostMessage(msg_Done);
 } /* PGroupWindow::AddRefs */
 
+void PGroupWindow::RemoveSelected()
+{
+	int s = 0;
+	do
+	{
+		if (fList->IsItemSelected(s))
+			delete fList->RemoveItem(s);
+	}
+	while (fList->IsItemSelected(s) ||
+		(s = fList->CurrentSelection(s)) > 0 && s < fList->CountItems());
+				
+	SetDirty(true);
+}
+
 void PGroupWindow::OpenItem()
 {
-	PGroupItem *gi;
-	gi = dynamic_cast<PGroupItem*>(fList->ItemAt(fList->CurrentSelection()));
+	PEntryItem *gi;
+	gi = dynamic_cast<PEntryItem*>(fList->ItemAt(fList->CurrentSelection()));
 	if (gi)
 	{
 		try

@@ -63,24 +63,36 @@ private:
 			char *fPath, *fText;
 };
 
-class PGroupItem : public BStringItem
+class CProjectItem;
+class PProjectItem : public BStringItem
 {
   public:
-	PGroupItem(const entry_ref& ref, int level = 0)
-		: BStringItem(ref.name, level), fEntry(ref) {}
+	PProjectItem(const char* name, int level = 0, CProjectItem* modelItem=NULL)
+		: BStringItem(name, level), fModelItem(modelItem) {}
+	
+	CProjectItem* ModelItem()				{ return fModelItem; }
+  private:
+   CProjectItem* fModelItem;
+};
+
+class PEntryItem : public PProjectItem
+{
+  public:
+	PEntryItem(const entry_ref& ref, int level = 0, CProjectItem* modelItem=NULL)
+		: PProjectItem(ref.name, level, modelItem), fEntry(ref) {}
 
 	const entry_ref& Ref() const
 		{ return fEntry; }
 
-	bool operator < (const PGroupItem& item) const
+	bool operator < (const PEntryItem& item) const
 		{ return strcasecmp(Text(), item.Text()) < 0; }
 
 	static int Compare(const void *a, const void *b)
 	{
 		return strcasecmp(
-			(*((PGroupItem **)(a)))->fEntry.name,
-			(*((PGroupItem **)(b)))->fEntry.name);
-	} /* PGroupItem::Compare */
+			(*((PEntryItem **)(a)))->fEntry.name,
+			(*((PEntryItem **)(b)))->fEntry.name);
+	} /* PEntryItem::Compare */
 
   private:
 	entry_ref fEntry;
@@ -97,7 +109,7 @@ virtual	bool QuitRequested();
 virtual	void MessageReceived(BMessage *msg);
 virtual	void SaveRequested(entry_ref& directory, const char *name);
 		
-			PGroupItem* AddRef(entry_ref& ref);
+			PEntryItem* AddRef(entry_ref& ref);
 			
 			int CountItems() const;
 
@@ -110,6 +122,7 @@ virtual	void WriteAttr(BFile& file);
 			void OpenItem();
 			void AddRefs(BMessage *msg);
 			void AddFiles();
+			void RemoveSelected();
 			
 virtual	void SetDirty(bool dirty);
 			
@@ -119,7 +132,7 @@ virtual	void SetDirty(bool dirty);
 			HButtonBar *fButtonBar;
 			BFilePanel *fPanel;
 			PIconFinder *fIconFinder;
-			vector<PGroupItem*> *fNewItems;
+			vector<PEntryItem*> *fNewItems;
 };
 
 inline int PGroupWindow::CountItems() const
