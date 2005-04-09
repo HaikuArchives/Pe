@@ -175,6 +175,11 @@ void RelativePath(const entry_ref& a, const entry_ref& b, char* path)
 	FailOSErr(BEntry(&a).GetPath(&pa));
 	FailOSErr(BEntry(&b).GetPath(&pb));
 	
+	RelativePath(pa, pb, path);
+}
+	
+void RelativePath(const BPath& pa, const BPath& pb, char* path)
+{
 	const char *s, *sa, *sb;
 	
 	s = sa = pa.Path();

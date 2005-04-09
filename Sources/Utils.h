@@ -53,6 +53,7 @@ bool RegionIsValid(BRegion& rgn);
 void OpenInTracker(const entry_ref& ref);
 void SendToIDE(const BMessage& msg, BMessage *reply = NULL);
 void RelativePath(const entry_ref& a, const entry_ref& b, char* path);
+void RelativePath(const BPath& pa, const BPath& pb, char* path);
 void TruncPathString(char *path, int textTraitsID, int width);
 
 #endif // UTILS_H
