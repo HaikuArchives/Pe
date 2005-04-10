@@ -13,7 +13,7 @@
  *		#%{
  * 	#%}
  * and interpretes anything between those comments as a list of named
- * groups of source-files. Instead of opening such files as text, Pe treats
+ * groups of source-files. Instead of opening such files as text, Pe 
  * opens a project-window, containing all source-files found.
  * This project-window can then be used to easily open the sources, and
  * add/remove sources, too.
@@ -42,7 +42,6 @@
 
 #include <cctype>
 
-#include <Entry.h>
 #include <Entry.h>
 
 #include "CProjectMakeFile.h"
