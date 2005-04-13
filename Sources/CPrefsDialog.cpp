@@ -432,6 +432,8 @@ bool CPrefsDialog::OKClicked()
 	
 	gPrefs->SetPrefInt("relative group paths", IsOn("rlgp"));
 	gPrefs->SetPrefInt("sortgroup", IsOn("sogr"));
+
+	gPrefs->SetPrefInt("sortproject", IsOn("prso"));
 	
 	fSearchPaths->DoOK();
 	fIncludePaths->DoOK();
@@ -664,6 +666,8 @@ bool CPrefsDialog::CancelClicked()
 	
 	SetOn("sogr", gPrefs->GetPrefInt("sortgroup", 1));
 	SetOn("rlgp", gPrefs->GetPrefInt("relative group paths", 0));
+
+	SetOn("prso", gPrefs->GetPrefInt("sortproject", 1));
 
 	fSearchPaths->DoCancel();
 	fIncludePaths->DoCancel();
