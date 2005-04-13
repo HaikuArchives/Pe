@@ -46,6 +46,8 @@
 
 #include "CProjectMakeFile.h"
 
+#include "HPreferences.h"
+
 CProjectMakeFile::CProjectMakeFile()
 	:	fHaveProjectInfo(false)
 {
@@ -136,10 +138,8 @@ const char *CProjectMakeFile::_AddGroup(const char *t)
 	{
 		const char *n = t;
 
-		BString groupComment(groupStart, n-groupStart);
+		BString groupHeader(groupStart, n-groupStart);
 
-printf("groupComment = %s\n", groupComment.String());
-		
 		while (isalnum(*t) || *t == '_')
 			t++;
 		
@@ -155,8 +155,8 @@ printf("groupComment = %s\n", groupComment.String());
 		BString s(n, nl);
 
 		CProjectGroupItem *group
-			= new CProjectGroupItem(fParentPath.String(), s.String(), 
-											groupComment.String());
+			= new CProjectGroupItem(fParentPath.String(), s.String());
+		group->GroupHeader(groupHeader);
 		fItems.push_back(group);
 		
 		groupStart = NULL;
@@ -178,7 +178,8 @@ printf("groupComment = %s\n", groupComment.String());
 			BEntry e;
 
 			if (s.Length())
-				group->AddItem(new CProjectItem(fParentPath.String(), s.String()));
+				group->AddItem(new CProjectItem(fParentPath.String(), s.String()),
+									gPrefs->GetPrefInt("sortproject", 1) != 0);
 			
 			t = skip_white(t);
 
@@ -214,6 +215,8 @@ status_t CProjectMakeFile::Parse()
 	if (!t)
 		return B_NO_MEMORY;
 	
+	contents.UnlockBuffer(size);
+
 	if (prjFile.Read(t, size) != size)
 		return B_IO_ERROR;
 
@@ -244,14 +247,10 @@ status_t CProjectMakeFile::Parse()
 
 		if (groupStart && s>groupStart)
 			fFooter.Prepend(groupStart, s-groupStart);
-	} else {
-		fHeader.SetTo(t);
-		fFooter.Truncate(0);
+
+		fHaveProjectInfo = true;
 	}
 
-	contents.UnlockBuffer(size);
-
-	fHaveProjectInfo = true;
 
 	return B_OK;
 }
@@ -272,7 +271,7 @@ static void SerializeItemToString(CProjectItem* item,
 static void SerializeGroupItemToString(CProjectGroupItem* item, 
 													const BPath& startPath, BString& str)
 {
-	str << item->GroupComment() << item->LeafName() << " = \\\n";
+	str << item->GroupHeader() << item->LeafName() << " = \\\n";
 	list<CProjectItem*>::iterator iter;
 	for( iter = item->begin(); iter != item->end(); ++iter)
 		SerializeItemToString(*iter, startPath, str);
