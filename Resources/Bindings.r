@@ -142,7 +142,7 @@ Resource 'Cmnd' (1, "File Menu") {
 		msg_OpenSelected,										"Open Selected File",
 		msg_FtpOpen,												"Open from Server…",
 		msg_Open,													"Open…",
-		msg_NewProject,											"New Project",
+		msg_NewGroup,											"New Group",
 		msg_New,													"New"
 	}
 };
@@ -347,7 +347,7 @@ Resource 'Bind' (1, "Bindings for File Menu") {
 		Cmd, 0x3e,				0, 0,		msg_OpenSelected,
 		Cmd | Shift, 0x2f,		0, 0,		msg_FtpOpen,
 		Cmd, 0x2f,				0, 0,		msg_Open,
-//		0, 0,						0, 0,		msg_NewProject,
+//		0, 0,						0, 0,		msg_NewGroup,
 		Cmd, 0x51,				0, 0,		msg_New
 	}
 };

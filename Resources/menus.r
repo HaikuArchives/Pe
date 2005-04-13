@@ -38,7 +38,7 @@ resource 'MENU' (0, "File Menu") {
 	"File",
 	{
 		Item		{ "New", msg_New, none, 'N' },
-		Item		{ "New Project", msg_NewProject, none, noKey },
+		Item		{ "New Group", msg_NewGroup, none, noKey },
 		Item		{ "Open…", msg_Open, none, 'O' },
 		Item		{ "Open from Server…", msg_FtpOpen, none, noKey },
 		Item		{ "Open Selection", msg_OpenSelected, none, 'D' },
@@ -49,6 +49,7 @@ resource 'MENU' (0, "File Menu") {
 		Item		{ "Save As…", msg_SaveAs, none, noKey },
 		Item		{ "Save on Server…", msg_FtpSave, none, noKey },
 		Item		{ "Save a Copy As…", msg_SaveACopy, none, noKey },
+		Item		{ "Save All", msg_SaveAll, none, noKey },
 		Item		{ "Revert…", msg_Revert, none, noKey },
 		Separator	{ },
 //		Item		{ "Page Setup…", msg_PageSetup, none, noKey },
