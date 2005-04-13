@@ -61,6 +61,7 @@ static char *rcsid = "$Id$";
 #include "PProjectWindow.h"
 #include <be_apps/NetPositive/NetPositive.h>
 #include "HPreferences.h"
+#include "CProjectFile.h"
 
 BDirectory gAppDir, gCWD, gPrefsDir;
 BFile gAppFile;
@@ -480,6 +481,21 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 			else
 				return new PProjectWindow(&doc, "text/x-makefile");
 		}
+		else if (strcmp(mime, "text/x-jamfile") == 0)
+		{
+			PProjectWindow *w 
+				= dynamic_cast<PProjectWindow*>(CDoc::FindDoc(doc));
+			if (w)
+			{
+				if (gPrefs->GetPrefInt("window to workspace", 1))
+					w->SetWorkspaces(1 << current_workspace());
+				if (show)
+					w->Activate(true);
+				return CDoc::FindDoc(doc);
+			}
+			else
+				return new PProjectWindow(&doc, "text/x-jamfile");
+		}
 		else
 		{
 			PDoc *d = dynamic_cast<PDoc*>(CDoc::FindDoc(doc));
@@ -736,7 +752,9 @@ void PApp::MessageReceived(BMessage *msg)
 			{
 				const char *i;
 				FailOSErr(msg->FindString("include", &i));
-				FindAndOpen(i);
+				const char *src = NULL;
+				msg->FindString("from-source", &src);
+				FindAndOpen(i, src);
 				break;
 			}
 			
@@ -906,7 +924,7 @@ void PApp::MessageReceived(BMessage *msg)
 				OpenWorksheet();
 				break;
 				
-			case msg_NewProject:
+			case msg_NewGroup:
 				new PGroupWindow;
 				break;
 			
@@ -1084,7 +1102,7 @@ BHandler *PApp::ResolveSpecifier(BMessage *msg, int32 index,
 	return result;
 } /* PApp::ResolveSpecifier */
 
-void PApp::FindAndOpen(const char *file)
+void PApp::FindAndOpen(const char *file, const char* fromSource)
 {
 	char *bi = NULL;
 	bool found = false;
@@ -1102,7 +1120,30 @@ void PApp::FindAndOpen(const char *file)
 			return;
 		}
 		
-		if (gPrefs->GetPrefInt("beincludes"))
+		if (!found && fromSource)
+		{
+			BPath path;
+			entry_ref eref;
+			if (get_ref_for_path(fromSource, &eref) == B_OK) {
+				vector<BString> inclPathVect;
+				if (!ProjectRoster->GetIncludePathsForFile(&eref, inclPathVect))
+					ProjectRoster->GetAllIncludePaths(inclPathVect);
+				
+				for(uint32 i=0; !found && i<inclPathVect.size(); ++i)
+				{
+					if (path.SetTo(inclPathVect[i].String(), file) != B_OK)
+						continue;
+					if (e.SetTo(path.Path(), true) != B_OK)
+						continue;
+					if (e.Exists() && e.IsFile()) {
+						FailOSErr(e.GetRef(&doc));
+						found = true;
+					}
+				}
+			}
+		}
+
+		if (!found && gPrefs->GetPrefInt("beincludes"))
 		{
 			bi = strdup(getenv("BEINCLUDES"));
 			char *ip = bi;
