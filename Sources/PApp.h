@@ -65,7 +65,7 @@ virtual	bool QuitRequested();
 
 virtual	void DispatchMessage(BMessage *an_event, BHandler *handler);
 
-			void FindAndOpen(const char *file);
+			void FindAndOpen(const char *file, const char* fromSource);
 			PDoc* OpenWorksheet();
 	
 			void DisplayInBrowser(const entry_ref& doc);
