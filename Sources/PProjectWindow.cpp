@@ -37,6 +37,7 @@
 #include "PProjectWindow.h"
 #include "PDoc.h"
 #include "Utils.h"
+#include "MAlert.h"
 #include "PApp.h"
 #include "PMessages.h"
 #include "PGroupWindow.h"
@@ -48,12 +49,14 @@
 #include "HAppResFile.h"
 #include "HButtonBar.h"
 #include "HError.h"
+#include "HPreferences.h"
+#include "CProjectJamFile.h"
 #include "CProjectMakeFile.h"
 
 const unsigned long msg_Done = 'done';
 
 PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
-	: BWindow(PDoc::NextPosition(), doc->name, B_DOCUMENT_WINDOW, 0)
+	: BWindow(PDoc::NextPosition(), "", B_DOCUMENT_WINDOW, 0)
 	, CDoc(mimetype, this, doc)
 	, fPrjFile(NULL)
 {
@@ -68,7 +71,8 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
 
 	BMenuBar *mbar;
 	AddChild(mbar = HResources::GetMenuBar(r, 200));
-	
+	mbar->FindItem(msg_Quit)->SetTarget(be_app);
+
 	r.bottom = r.top + kToolBarHeight;
 	r.OffsetBy(0, mbar->Bounds().bottom + 1);
 	
@@ -96,7 +100,11 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
 	
 	if (!doc) THROW(("No document defined!"));
 
-	SetTitle(doc->name);
+	BPath path(doc);
+	if (gPrefs->GetPrefInt("fullpath", 1))
+		SetTitle(path.Path());
+	else
+		SetTitle(doc->name);
 	
 	BEntry e;
 	FailOSErr(e.SetTo(doc));
@@ -172,13 +180,6 @@ void PProjectWindow::MessageReceived(BMessage *msg)
 				OpenItem();
 				break;
 			
-			case msg_PRemove:
-			{
-				RemoveSelected();
-				Save();
-				break;
-			}
-			
 			case msg_Save:
 				Save();
 				break;
@@ -187,31 +188,30 @@ void PProjectWindow::MessageReceived(BMessage *msg)
 				SaveAs();
 				break;
 			
+			case msg_Revert:
+				Revert();
+				break;
+			
 			case msg_PAdd:
 				AddFiles();
 				SetDirty(true);
+				break;
+			
+			case msg_PRemove:
+				RemoveSelected();
 				break;
 			
 			case B_REFS_RECEIVED:
 				AddRefs(msg);
 				break;
 			
-			case B_SAVE_REQUESTED:
-			{
-				entry_ref dir;
-				const char *name;
-				
-				FailOSErr(msg->FindRef("directory", &dir));
-				FailOSErr(msg->FindString("name", &name));
-				SaveRequested(dir, name);
-				break;
-			}
-			
 			case msg_Close:
 				PostMessage(B_QUIT_REQUESTED);
 				break;
 			
 			case msg_EditAsText:
+				if (IsDirty())
+					Save();
 				gApp->NewWindow(fFile);
 				Close();
 				break;
@@ -230,12 +230,16 @@ void PProjectWindow::ReadData(BPositionIO&)
 	try
 	{
 		BPath path;
+		
+		fList->MakeEmpty();
 
 		FailOSErr(BEntry(fFile, true).GetPath(&path));
 		
 		delete fPrjFile;
 		if (!strcmp(MimeType(),"text/x-makefile"))
 			fPrjFile = new CProjectMakeFile(path);
+		else if (!strcmp(MimeType(),"text/x-jamfile"))
+			fPrjFile = new CProjectJamFile(path);
 		else
 			fPrjFile = NULL;
 		if (fPrjFile) {
@@ -244,6 +248,7 @@ void PProjectWindow::ReadData(BPositionIO&)
 			for( iter = fPrjFile->begin(); iter != fPrjFile->end(); ++iter)
 				AddItemsToList( *iter, NULL);
 		}
+		fButtonBar->SetEnabled(msg_Save, false);
 	}
 	catch (HErr& e)
 	{
@@ -254,34 +259,35 @@ void PProjectWindow::ReadData(BPositionIO&)
 void PProjectWindow::AddItemsToList(CProjectItem* item, 
 												BListItem* parentListItem)
 {
-static int lvl = 0;
 	if (!item)
 		return;
-printf("%*.*sitem: %s / %s", lvl,lvl,"\t\t\t\t\t\t\t\t\t",
-		item->ParentPath().String(), item->LeafName().String());
-	lvl++;
 	BListItem* viewItem = NULL;
 	BPath path(item->ParentPath().String(), item->LeafName().String());
 	BEntry e(path.Path());
 	entry_ref ref;
+	uint32 level
+		= parentListItem 
+			? parentListItem->OutlineLevel() + 1
+			: 0;
 	if (e.Exists() && e.GetRef(&ref) == B_OK) {
-		viewItem = new PEntryItem(ref, 0, item);
-printf("...G\n");
+		viewItem = new PEntryItem(ref, level, item);
 	} else {
-		viewItem = new PProjectItem(item->LeafName().String(), 0, item);
-printf("...S\n");
+		viewItem = new PProjectItem(item->LeafName().String(), level, item);
 	}
-	if (parentListItem)
-		fList->AddUnder( viewItem, parentListItem);
-	else
+	if (parentListItem) {
+		// add item to the back of the superitem (at the end of its subitem-list):
+		int32 parentIdx = fList->FullListIndexOf(parentListItem);
+		int32 subCount = fList->CountItemsUnder(parentListItem, false);
+		fList->AddItem( viewItem, parentIdx + subCount + 1);
+	} else
 		fList->AddItem( viewItem);
 	CProjectGroupItem* groupItem = dynamic_cast<CProjectGroupItem*>(item);
 	if (groupItem) {
 		list<CProjectItem*>::iterator iter;
 		for( iter = groupItem->begin(); iter != groupItem->end(); ++iter)
 			AddItemsToList( *iter, viewItem);
+//			fList->SortItemsUnder(viewItem, false, CompareListItems);
 	}
-	lvl--;
 }
 
 void PProjectWindow::ReadAttr(BFile& file)
@@ -360,30 +366,6 @@ void PProjectWindow::WriteAttr(BFile& file)
 	if (fm) free(fm);
 } /* PProjectWindow::WriteAttr */
 
-void PProjectWindow::SaveRequested(entry_ref& directory, const char *name)
-{
-	CDoc::SaveRequested(directory, name);
-	
-	if (fFile)
-	{
-		SetTitle(name);
-		
-		BEntry e;
-		BPath p;
-		FailOSErr(e.SetTo(fFile));
-		FailOSErr(e.GetPath(&p));
-		
-		fStatus->SetPath(p.Path());
-	}
-} /* PProjectWindow::SaveRequested */
-
-static int CompareListItems(const BListItem *a, const BListItem *b)
-{
-	return strcasecmp(
-		((BStringItem *)(a))->Text(),
-		((BStringItem *)(b))->Text());
-}
-
 void PProjectWindow::AddRef(const entry_ref& ref)
 {
 	PEntryItem *item;
@@ -425,19 +407,21 @@ void PProjectWindow::AddRef(const entry_ref& ref)
 	path.GetParent(&parentPath);
 
 	CProjectItem* modelItem = new CProjectItem( parentPath.Path(), ref.name);
-	item = new PEntryItem(ref, parentModelItem ? 1 : 0, modelItem);
+	uint32 level = parentItem ? parentItem->OutlineLevel()+1 : 0;
+	item = new PEntryItem(ref, level, modelItem);
 
 	if (parentModelItem && parentItem) {
-		parentModelItem->AddItem(modelItem);
-		fList->AddUnder(item, parentItem);
-//		typedef int(*sortfunc)(const BListItem*, const BListItem*);
-		fList->SortItemsUnder(parentItem, false, CompareListItems);
+		int32 pos 
+			= parentModelItem->AddItem(modelItem, 
+												gPrefs->GetPrefInt("sortproject", 1));
+		int32 parentIdx = fList->FullListIndexOf(parentItem);
+		fList->AddItem( item, parentIdx + pos + 1);
 	} else {
-		fPrjFile->AddItem(modelItem);
+		fPrjFile->AddItem(modelItem, false);
 		fList->AddItem(item);
 	}
 				
-	Save();
+	SetDirty(true);
 } /* PProjectWindow::AddRef */
 
 void PProjectWindow::AddFiles()
@@ -492,9 +476,11 @@ void PProjectWindow::RemoveSelected()
 										  B_WARNING_ALERT);
 					alert->SetShortcut( 0, B_ESCAPE);
 					alert->Go();
+					return;
 				} else {
 					fPrjFile->RemoveItem(projectItem->ModelItem());
 					delete projectItem;
+					SetDirty(true);
 				}
 			}
 		}
@@ -530,3 +516,31 @@ void PProjectWindow::OpenItem()
 		}
 	}
 } /* PProjectWindow::OpenItem */
+
+void PProjectWindow::Revert() 
+{
+	char title[256];
+	sprintf(title, "Revert to the last saved version of\n\n%s?", Title());
+	
+	MInfoAlert a(title, "OK", "Cancel");
+	if (a == 1)
+	{
+		if (fFile) {
+			BFile dummyFile( fFile, B_READ_ONLY);
+			ReadData(dummyFile);
+		} else
+			THROW(("No file?!?!?!?"));
+	}
+} /* Revert */
+
+void PProjectWindow::SetDirty(bool dirty)
+{
+	CDoc::SetDirty(dirty);
+	fButtonBar->SetEnabled(msg_Save, dirty);
+} /* PProjectWindow::SetDirty */
+
+void PProjectWindow::WindowActivated(bool active)
+{
+	if (active && fPrjFile)
+		fPrjFile->ActivationTime(time(NULL));
+}

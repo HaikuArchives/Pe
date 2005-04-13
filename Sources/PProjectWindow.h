@@ -64,7 +64,8 @@ class PProjectWindow
 	virtual bool QuitRequested();
 
 	virtual void MessageReceived(BMessage *msg);
-	virtual void SaveRequested(entry_ref& directory, const char *name);
+	virtual void SetDirty(bool dirty);
+	virtual void WindowActivated(bool active);
 	
 private:
 	virtual void ReadData(BPositionIO& file);
@@ -74,6 +75,7 @@ private:
 	void AddItemsToList(CProjectItem* item, BListItem* parentListItem);
 	
 	void OpenItem();
+	void Revert();
 	void AddRefs(BMessage *msg);
 	void AddRef(const entry_ref& ref);
 	void AddFiles();
