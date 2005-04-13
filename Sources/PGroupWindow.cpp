@@ -360,7 +360,6 @@ void PGroupWindow::MessageReceived(BMessage *msg)
 			
 			case msg_Add:
 				AddFiles();
-				SetDirty(true);
 				break;
 			
 			case B_REFS_RECEIVED:
@@ -647,7 +646,6 @@ void PGroupWindow::RemoveSelected()
 	}
 	while (fList->IsItemSelected(s) ||
 		(s = fList->CurrentSelection(s)) > 0 && s < fList->CountItems());
-				
 	SetDirty(true);
 }
 
