@@ -41,22 +41,12 @@ Resource 'MENU' (200)
 {
 	"File",
 	{
-		Item		{ "New", msg_New, none, 'N' },
-		Item		{ "New Project", msg_NewProject, none, noKey },
-		Item		{ "Open…", msg_Open, none, 'O' },
-		Item		{ "Open from Server…", msg_FtpOpen, none, noKey },
-		Item		{ "Find and Open…", msg_OpenSelected, none, 'D' },
-		Submenu		{ 10 },
 		Item		{ "Close", msg_Close, none, 'W' },
 		Separator	{ },
+		Item		{ "Save", msg_Save, none, 'S' },
 		Item		{ "Save As…", msg_SaveAs, none, noKey },
-		Item		{ "Save on Server…", msg_FtpSave, none, noKey },
-		Item		{ "Save a Copy As…", msg_SaveACopy, none, noKey },
 		Item		{ "Revert…", msg_Revert, none, noKey },
 		Separator	{ },
-//		Item		{ "Page Setup…", msg_PageSetup, none, noKey },
-//		Item		{ "Print…", msg_Print, none, 'P' },
-//		Separator	{ },
 		Item		{ "Quit", msg_Quit, none, 'Q' }
 	}
 };
@@ -71,8 +61,13 @@ Resource 'MENU' (201)
 };
 
 Resource 'MBAR' (200)
-{
+{	// group file
 	{ 200, 201 }
+};
+
+Resource 'MBAR' (201)
+{	// project file
+	{ 200 }
 };
 
 Resource 'BtnB' (1) {	// group file
@@ -90,6 +85,8 @@ Resource 'BtnB' (1) {	// Project file
 	{
 		20, 'Add ', 0, "Add File",
 		21, 'Rmve', 0, "Remove File",
+		0, 0, space, "",
+		14, msg_Save, 0, "Save Document",
 		0, 0, space, "",
 		22, msg_EditAsText, 0, "Edit Project as Text"
 	}
