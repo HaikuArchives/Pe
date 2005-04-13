@@ -40,7 +40,6 @@
 #include "MAlert.h"
 #include "PApp.h"
 #include "PMessages.h"
-#include "PGroupWindow.h"
 #include "PToolBar.h"
 #include "PKeyDownFilter.h"
 #include "PTypeAHeadList.h"
@@ -286,7 +285,6 @@ void PProjectWindow::AddItemsToList(CProjectItem* item,
 		list<CProjectItem*>::iterator iter;
 		for( iter = groupItem->begin(); iter != groupItem->end(); ++iter)
 			AddItemsToList( *iter, viewItem);
-//			fList->SortItemsUnder(viewItem, false, CompareListItems);
 	}
 }
 

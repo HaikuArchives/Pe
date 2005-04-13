@@ -45,58 +45,8 @@ class PIconFinder;
 class PToolBar;
 class PGroupWindow;
 class HButtonBar;
-
-class PGroupStatus : public BView {
-public:
-			PGroupStatus(BRect frame, const char *name);
-			~PGroupStatus();
-		
-virtual	void Draw(BRect update);
-virtual	void MouseDown(BPoint where);
-virtual	void AttachedToWindow();
-
-			void SetPath(const char *path);
-			void SetTypeahead(const char *text);
-
-private:
-			PGroupWindow *fOwner;
-			char *fPath, *fText;
-};
-
-class CProjectItem;
-class PProjectItem : public BStringItem
-{
-  public:
-	PProjectItem(const char* name, int level = 0, CProjectItem* modelItem=NULL)
-		: BStringItem(name, level), fModelItem(modelItem) {}
-	
-	CProjectItem* ModelItem()				{ return fModelItem; }
-  private:
-   CProjectItem* fModelItem;
-};
-
-class PEntryItem : public PProjectItem
-{
-  public:
-	PEntryItem(const entry_ref& ref, int level = 0, CProjectItem* modelItem=NULL)
-		: PProjectItem(ref.name, level, modelItem), fEntry(ref) {}
-
-	const entry_ref& Ref() const
-		{ return fEntry; }
-
-	bool operator < (const PEntryItem& item) const
-		{ return strcasecmp(Text(), item.Text()) < 0; }
-
-	static int Compare(const void *a, const void *b)
-	{
-		return strcasecmp(
-			(*((PEntryItem **)(a)))->fEntry.name,
-			(*((PEntryItem **)(b)))->fEntry.name);
-	} /* PEntryItem::Compare */
-
-  private:
-	entry_ref fEntry;
-};
+class PGroupStatus;
+class PEntryItem;
 
 class PGroupWindow : public BWindow, public CDoc {
 friend class PIconFinder;
