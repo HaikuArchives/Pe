@@ -39,6 +39,22 @@
 #include "utf-support.h"
 #include <algorithm>
 
+class IsLess
+{
+  public:
+	IsLess() {}
+	bool operator () (BStringItem*& item, const string& t)
+		{ return strcasecmp(item->Text(), t.c_str()) < 0; }
+};
+
+class IsLessItem
+{
+  public:
+	IsLessItem() {}
+	bool operator () (const BStringItem* const & a, const BStringItem* const& b) const
+		{ return strcasecmp(a->Text(), b->Text()) < 0; }
+};
+
 void PTypeAHeadList::KeyDown(const char *bytes, int32 numBytes)
 {
 	if (!iscntrl(*bytes) || (*bytes == B_BACKSPACE && fTyped.length()))
@@ -55,6 +71,21 @@ void PTypeAHeadList::KeyDown(const char *bytes, int32 numBytes)
 	
 		fStatus->SetTypeahead(fTyped.c_str());
 		fLastKeyDown = system_time();
+
+		BStringItem **start = (BStringItem **)Items();
+
+		vector<BStringItem*> items(start, start + CountItems());
+		stable_sort(items.begin(), items.end(), IsLessItem());
+		
+		vector<BStringItem*>::iterator found;
+		found = lower_bound(items.begin(), items.end(), fTyped, IsLess());
+		
+		if (found != items.end())
+			Select(IndexOf(*found));
+		else
+			Select(-1);
+		
+		ScrollToSelection();
 	}
 	else if (*bytes == B_TAB)
 	{
@@ -66,41 +97,10 @@ void PTypeAHeadList::KeyDown(const char *bytes, int32 numBytes)
 		BListView::KeyDown(bytes, numBytes);
 } // PTypeAHeadList::KeyDown
 
-class IsLess
-{
-  public:
-	IsLess() {}
-	bool operator () (PEntryItem*& item, const string& t)
-		{ return strcasecmp(item->Ref().name, t.c_str()) < 0; }
-};
-
-class IsLessItem
-{
-  public:
-	IsLessItem() {}
-	bool operator () (const PEntryItem* const & a, const PEntryItem* const& b) const
-		{ return *a < *b; }
-};
-
 void PTypeAHeadList::Pulse()
 {
-	if (fLastKeyDown && fLastKeyDown < system_time() - 400000)
+	if (fLastKeyDown && fLastKeyDown < system_time() - 1000*1000)
 	{
-		PEntryItem **start = (PEntryItem **)Items();
-
-		vector<PEntryItem*> items(start, start + CountItems());
-		stable_sort(items.begin(), items.end(), IsLessItem());
-		
-		vector<PEntryItem*>::iterator found;
-		found = lower_bound(items.begin(), items.end(), fTyped, IsLess());
-		
-		if (found != items.end())
-			Select(IndexOf(*found));
-		else
-			Select(-1);
-		
-		ScrollToSelection();
-	
 		fStatus->SetTypeahead(NULL);
 		fLastKeyDown = 0;
 	}
@@ -108,16 +108,16 @@ void PTypeAHeadList::Pulse()
 
 void PTypeAHeadList::HandleTab(bool backward)
 {
-	PEntryItem **start = (PEntryItem **)Items(), *item;
+	BStringItem **start = (BStringItem **)Items(), *item;
 
-	item = static_cast<PEntryItem*>(ItemAt(CurrentSelection()));
+	item = static_cast<BStringItem*>(ItemAt(CurrentSelection()));
 	if (item == NULL)
 		return;
 
-	vector<PEntryItem*> items(start, start + CountItems());
+	vector<BStringItem*> items(start, start + CountItems());
 	stable_sort(items.begin(), items.end(), IsLessItem());
 	
-	vector<PEntryItem*>::iterator found = find(items.begin(), items.end(), item);
+	vector<BStringItem*>::iterator found = find(items.begin(), items.end(), item);
 
 	if (backward)
 		--found;
