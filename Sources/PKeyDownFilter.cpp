@@ -66,7 +66,7 @@ filter_result PKeyDownFilter::Filter(BMessage *msg, BHandler **target)
 
 			case msg_New:
 			case msg_Open:
-			case msg_NewProject:
+			case msg_NewGroup:
 			case msg_Quit:
 			case msg_Help:
 			case msg_Preferences:

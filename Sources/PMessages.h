@@ -37,7 +37,6 @@
 #include "CMessages.h"
 
 #define msg_New								'New '
-#define msg_NewProject					'NewP'
 #define msg_Open							'Open'
 #define msg_FtpOpen						'FtOp'
 #define msg_BtnOpen						'BOpn'
