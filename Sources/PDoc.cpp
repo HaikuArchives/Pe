@@ -68,6 +68,7 @@
 #include "HDefines.h"
 #include "MAlert.h"
 #include "PFindFunctionDialog.h"
+#include "CProjectFile.h"
 
 static long sDocCount = 0;
 
@@ -291,7 +292,7 @@ void PDoc::InitWindow(const char *name)
 
 	fMBar->FindItem(msg_Quit)->SetTarget(be_app);
 	fMBar->FindItem(msg_New)->SetTarget(be_app);
-	fMBar->FindItem(msg_NewProject)->SetTarget(be_app);
+	fMBar->FindItem(msg_NewGroup)->SetTarget(be_app);
 	fMBar->FindItem(msg_Open)->SetTarget(be_app);
 	fMBar->FindItem(msg_Help)->SetTarget(be_app);
 	fMBar->FindItem(msg_Preferences)->SetTarget(be_app);
@@ -699,6 +700,40 @@ void PDoc::OpenInclude(const char *incl)
 			return;
 		}
 		
+		if (! found && fText->GetCWD())
+		{
+			FailOSErr(d.SetTo(fText->GetCWD()));
+			
+			if (d.Contains(incl, B_FILE_NODE | B_SYMLINK_NODE))
+			{
+				FailOSErr(d.FindEntry(incl, &e, true));
+				if (!e.IsFile()) THROW((0));
+		
+				FailOSErr(e.GetRef(&doc));
+				found = true;
+			}
+		}
+		
+		if (!found && fFile)
+		{
+			BPath path;
+			vector<BString> inclPathVect;
+			if (!ProjectRoster->GetIncludePathsForFile(fFile, inclPathVect))
+				ProjectRoster->GetAllIncludePaths(inclPathVect);
+
+			for(uint32 i=0; !found && i<inclPathVect.size(); ++i)
+			{
+				if (path.SetTo(inclPathVect[i].String(), incl) != B_OK)
+					continue;
+				if (e.SetTo(path.Path(), true) != B_OK)
+					continue;
+				if (e.Exists() && e.IsFile()) {
+					FailOSErr(e.GetRef(&doc));
+					found = true;
+				}
+			}
+		}
+
 		if (fURL && gPrefs->GetPrefInt("parent"))
 		{
 			URLData url(*fURL);
@@ -747,20 +782,6 @@ void PDoc::OpenInclude(const char *incl)
 				}
 				
 				p = (pe && pe[1]) ? pe + 1 : NULL;
-			}
-		}
-		
-		if (! found && fText->GetCWD())
-		{
-			FailOSErr(d.SetTo(fText->GetCWD()));
-			
-			if (d.Contains(incl, B_FILE_NODE | B_SYMLINK_NODE))
-			{
-				FailOSErr(d.FindEntry(incl, &e, true));
-				if (!e.IsFile()) THROW((0));
-		
-				FailOSErr(e.GetRef(&doc));
-				found = true;
 			}
 		}
 		
@@ -1051,6 +1072,18 @@ void PDoc::SetDirty(bool dirty)
 {
 	CDoc::SetDirty(dirty);
 	fButtonBar->SetEnabled(msg_Save, dirty);
+	BString title = Title();
+	if (dirty) {
+		if (title[0] != '*') {
+			title.Prepend("*");
+			SetTitle(title.String());
+		}
+	} else {
+		if (title[0] == '*') {
+			title.Remove(0,1);
+			SetTitle(title.String());
+		}
+	}
 } /* PDoc::SetDirty */
 
 void PDoc::CreateFilePanel()
@@ -1532,7 +1565,7 @@ void PDoc::MessageReceived(BMessage *msg)
 			
 			case msg_New:
 			case msg_Open:
-			case msg_NewProject:
+			case msg_NewGroup:
 			case msg_Quit:
 			case msg_Help:
 			case msg_Preferences:
