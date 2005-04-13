@@ -243,6 +243,10 @@ resource 'DLOG' (132, "Preferences") {
 				PopupMenu			{{   0, 101, 200, 117 }, "dela", "Default Language:", 93, 90 },
 			TabSheetEnd				{},
 			
+			TabSheet				{ "Projects", "Project window options" },
+				CheckBox			{{   0,   0, 280,  16 }, "prso", "Sort the files inside a project" },
+			TabSheetEnd				{},
+
 			TabSheet				{ "Searching", "Paths in the directory popup of the Find Dialog and more" },
 				PathBox				{{   0,   0, 290, 100 }, "srcP" },
 				
