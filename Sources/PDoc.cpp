@@ -1073,17 +1073,6 @@ void PDoc::SetDirty(bool dirty)
 	CDoc::SetDirty(dirty);
 	fButtonBar->SetEnabled(msg_Save, dirty);
 	BString title = Title();
-	if (dirty) {
-		if (title[0] != '*') {
-			title.Prepend("*");
-			SetTitle(title.String());
-		}
-	} else {
-		if (title[0] == '*') {
-			title.Remove(0,1);
-			SetTitle(title.String());
-		}
-	}
 } /* PDoc::SetDirty */
 
 void PDoc::CreateFilePanel()
