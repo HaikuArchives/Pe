@@ -245,6 +245,7 @@ resource 'DLOG' (132, "Preferences") {
 			
 			TabSheet				{ "Projects", "Project window options" },
 				CheckBox			{{   0,   0, 280,  16 }, "prso", "Sort the files inside a project" },
+				CheckBox			{{   0,  20, 280,  36 }, "prad", "Autodetect mimetypes of 'Jamfile' & 'Makefile'" },
 			TabSheetEnd				{},
 
 			TabSheet				{ "Searching", "Paths in the directory popup of the Find Dialog and more" },
