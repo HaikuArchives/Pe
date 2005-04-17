@@ -39,7 +39,8 @@
 #include "CDoc.h"
 
 const ulong
-	msg_PGroupItemInvoked = 'IvkG',
+	msg_PProjectItemInvoked = 'IvkP',
+	msg_PProjectItemSelected = 'SelP',
 	msg_PRemove			 = 'Rmve',
 	msg_PAdd				 = 'Add ';
 
@@ -58,6 +59,7 @@ class PProjectWindow
 	, public CDoc
 {
   public:
+	static CDoc* Create(const entry_ref *doc, const char* mimetype);
 	PProjectWindow(const entry_ref *doc, const char* mimetype);
 	~PProjectWindow();
 
@@ -72,6 +74,7 @@ private:
 	virtual void ReadAttr(BFile& file);
 	virtual void WriteData(BPositionIO& file);
 	virtual void WriteAttr(BFile& file);
+	void SelectionChanged(void);
 	void AddItemsToList(CProjectItem* item, BListItem* parentListItem);
 	
 	void OpenItem();

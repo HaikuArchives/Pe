@@ -15,12 +15,14 @@ class CProjectMakeFile : public CProjectFile
 	typedef CProjectFile inherited;
 public:
 	CProjectMakeFile();
-	CProjectMakeFile(const BPath& path);
+	CProjectMakeFile(const char* path);
 	virtual ~CProjectMakeFile();
 	
 	virtual status_t Parse();
-	virtual bool HaveProjectInfo()		{ return fHaveProjectInfo; }
-	virtual status_t WriteToFile(const char* mimetype);
+	virtual bool HasBeenParsed() const	{ return true; }
+	virtual bool HaveProjectInfo() const
+													{ return fHaveProjectInfo; }
+	virtual status_t SerializeToFile(BPositionIO* file) const;
 
 private:
 	const char* _AddGroup(const char* name);

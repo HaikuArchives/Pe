@@ -48,12 +48,69 @@
 
 #include "HPreferences.h"
 
+/*
+ * CProjectMakeSerializer
+ *		a struct that implements the serialization of Makefile-items.
+ */
+struct CProjectMakeSerializer : public CProjectSerializer
+{
+	CProjectMakeSerializer( BString& result, const char* startPath);
+	virtual ~CProjectMakeSerializer();
+	virtual void SerializeItem(const CProjectItem* item);
+	virtual void SerializeGroupItem(const CProjectGroupItem* item);
+	virtual void SerializeFile(const CProjectFile* item);
+	BString& fResult;
+	BPath fStartPath;
+};
+
+CProjectMakeSerializer::CProjectMakeSerializer( BString& result, 
+															 	const char* startPath)
+	:	fResult(result)
+	,	fStartPath(startPath)
+{
+}
+
+CProjectMakeSerializer::~CProjectMakeSerializer()
+{
+}
+
+void CProjectMakeSerializer::SerializeItem(const CProjectItem* item)
+{
+	char path[PATH_MAX];
+	BPath itemPath( item->ParentPath().String(), item->LeafName().String());
+	RelativePath(fStartPath, itemPath, path);
+	char quot = (strchr(path, ' ') != NULL ? '"' : ' ');
+	if (path[0]=='.' && path[1]=='/')
+		fResult << "\t" << quot << path+2 << quot << " \\\n";
+	else
+		fResult << "\t" << quot << path << quot << " \\\n";
+}
+
+void CProjectMakeSerializer::SerializeGroupItem(const CProjectGroupItem* item)
+{
+	fResult << item->GroupHeader() << item->LeafName() << " = \\\n";
+	list<CProjectItem*>::const_iterator iter;
+	for( iter = item->begin(); iter != item->end(); ++iter)
+		(*iter)->SerializeTo(this);
+	fResult << "\n";
+}
+
+void CProjectMakeSerializer::SerializeFile(const CProjectFile* item)
+{
+	// each CProjectFile lives in a file of its own right, so we write
+	// this item to its own file:
+	if (item->HasBeenParsed())
+		item->SerializeToFile(NULL);
+}
+
+
+
 CProjectMakeFile::CProjectMakeFile()
 	:	fHaveProjectInfo(false)
 {
 }
 
-CProjectMakeFile::CProjectMakeFile(const BPath& path)
+CProjectMakeFile::CProjectMakeFile(const char* path)
 	:	fHaveProjectInfo(false)
 {
 	SetTo(path);
@@ -255,55 +312,25 @@ status_t CProjectMakeFile::Parse()
 	return B_OK;
 }
 
-static void SerializeItemToString(CProjectItem* item, 
-											 const BPath& startPath, BString& str)
+status_t CProjectMakeFile::SerializeToFile(BPositionIO* file) const
 {
-	char path[PATH_MAX];
-	BPath itemPath( item->ParentPath().String(), item->LeafName().String());
-	RelativePath(startPath, itemPath, path);
-	char quot = (strchr(path, ' ') != NULL ? '"' : ' ');
-	if (path[0]=='.' && path[1]=='/')
-		str << "\t" << quot << path+2 << quot << " \\\n";
-	else
-		str << "\t" << quot << path << quot << " \\\n";
-}
+	status_t res = B_OK;
+	BString contents(fHeader);
 
-static void SerializeGroupItemToString(CProjectGroupItem* item, 
-													const BPath& startPath, BString& str)
-{
-	str << item->GroupHeader() << item->LeafName() << " = \\\n";
-	list<CProjectItem*>::iterator iter;
-	for( iter = item->begin(); iter != item->end(); ++iter)
-		SerializeItemToString(*iter, startPath, str);
-	str << "\n";
-}
-
-status_t CProjectMakeFile::WriteToFile( const char* mimetype)
-{
 	BPath path( fParentPath.String(), fLeafName.String());
-	BFile prjFile;
-	status_t res = prjFile.SetTo(path.Path(), 
-										  B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	if (res != B_OK)
-		return res;
+	CProjectMakeSerializer serializer(contents, path.Path());
 
-	BNodeInfo nodeInfo(&prjFile);
-	nodeInfo.SetType(mimetype);
+	// need to find out now if dirty, since serialization resets the info!
+	bool isDirty = IsDirty();
 
-	BString contents;
-	contents 
-		<< fHeader;
-
-	list<CProjectItem*>::iterator iter;
-	for( iter = fItems.begin(); iter != fItems.end(); ++iter) {
-		CProjectGroupItem* groupItem = dynamic_cast<CProjectGroupItem*>(*iter);
-		if (groupItem)
-			SerializeGroupItemToString(groupItem, path, contents);
-	}
+	list<CProjectItem*>::const_iterator iter;
+	for( iter = fItems.begin(); iter != fItems.end(); ++iter)
+		(*iter)->SerializeTo(&serializer);
 
 	contents << fFooter;
 
-	prjFile.Write(contents.String(), contents.Length());
+	if (file || isDirty)
+		res = WriteToFile(file, contents, "text/x-makefile");
 
-	return B_OK;
+	return res;
 }		

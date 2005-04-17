@@ -16,6 +16,7 @@
 #include <String.h>
 
 class BPositionIO;
+class CProjectSerializer;
 
 /*
  * CProjectItem
@@ -30,14 +31,23 @@ public:
 	virtual ~CProjectItem();
 	//
 	status_t SetTo(const char* path, const char* leafName);
-	status_t SetTo(const BPath& path);
+	status_t SetTo(const char* path);
+	//
+	virtual bool CanBeAddedTo() const	{ return false; }
+	virtual bool CanBeRemoved() const	{ return true; }
+	//
+	virtual bool IsDirty() const			{ return false; }
+	virtual void SerializeTo( CProjectSerializer* serializer) const;
 	//
 	const BString& ParentPath() const	{ return fParentPath; }
 	const BString& LeafName() const		{ return fLeafName; }
+	const BString& DisplayName() const;
+	void DisplayName(const BString& dn)	{ fDisplayName = dn; }
 
 protected:
 	BString fParentPath;
 	BString fLeafName;
+	BString fDisplayName;
 };
 
 
@@ -53,30 +63,40 @@ class CProjectGroupItem : public CProjectItem
 	typedef CProjectItem inherited;
 public:
 	CProjectGroupItem();
-	CProjectGroupItem(const char* path, const char* leafName);
+	CProjectGroupItem(const char* path, const char* ruleName, 
+							const char* groupName = NULL);
 	virtual ~CProjectGroupItem();
 	//
-	list<CProjectItem*>::iterator begin()
+	list<CProjectItem*>::const_iterator begin() const
 													{ return fItems.begin(); }
-	list<CProjectItem*>::iterator end()
+	list<CProjectItem*>::const_iterator end() const
 													{ return fItems.end(); }
 	int32 AddItem(CProjectItem* item, bool sorted);
 	void RemoveItem(CProjectItem* item);
 	//
+	virtual bool CanBeAddedTo() const	{ return true; }
+	virtual bool CanBeRemoved() const	{ return false; }
+	//
+	virtual bool IsDirty() const			{ return fIsDirty; }
+	virtual void SerializeTo( CProjectSerializer* serializer) const;
+	//
 	const BString& GroupHeader() const	{ return fGroupHeader; }
 	const BString& GroupFooter() const	{ return fGroupFooter; }
+	const BString& GroupName() const		{ return fGroupName; }
 	//
 	void GroupHeader( const BString& gh)
 													{ fGroupHeader = gh; }
 	void GroupFooter( const BString& gf)
 													{ fGroupFooter = gf; }
 	//
-	bool ContainsFile(entry_ref* fileRef);
+	bool ContainsFile(entry_ref* fileRef) const;
 
 protected:
 	list<CProjectItem*> fItems;
 	BString fGroupHeader;
 	BString fGroupFooter;
+	BString fGroupName;
+	mutable bool fIsDirty;
 };
 
 
@@ -97,19 +117,42 @@ public:
 	virtual ~CProjectFile();
 	
 	virtual status_t Parse() = 0;
-	virtual bool HaveProjectInfo() = 0;
-	virtual status_t WriteToFile(const char* mimetype) = 0;
+	virtual bool HasBeenParsed() const = 0;
+	virtual bool HaveProjectInfo() const = 0;
+	//
+	virtual bool CanBeAddedTo() const	{ return false; }
+	virtual bool CanBeRemoved() const	{ return false; }
+	//
+	virtual bool IsDirty() const;
+	virtual void SerializeTo( CProjectSerializer* serializer) const;
+	virtual status_t SerializeToFile(BPositionIO* file) const = 0;
+	status_t WriteToFile(BPositionIO* file, const BString& contents,
+								const char* mimetype) const;
 	//
 	time_t ActivationTime() const			{ return fActivationTime; }
 	void ActivationTime(time_t at)		{ fActivationTime = at; }
 	//
-	void GetIncludePaths(vector<BString>& inclPathVect);
+	void GetIncludePaths(vector<BString>& inclPathVect) const;
 protected:
 	void _AddIncludePath(const BString& inclPath)
 													{ fIncludePaths.push_back(inclPath); }
 private:
 	vector<BString> fIncludePaths;
 	time_t fActivationTime;
+};
+
+
+
+/*
+ * CProjectSerializer
+ *		a struct that encapsulates the serialization of items.
+ */
+struct CProjectSerializer
+{
+	virtual ~CProjectSerializer()			{}
+	virtual void SerializeItem(const CProjectItem* item) = 0;
+	virtual void SerializeGroupItem(const CProjectGroupItem* item) = 0;
+	virtual void SerializeFile(const CProjectFile* item) = 0;
 };
 
 
@@ -127,12 +170,12 @@ public:
 	void RemoveProject(CProjectFile* pf);
 	//
 	bool GetIncludePathsForFile(entry_ref* fileRef, 
-										 vector<BString>& inclPathVect);
+										 vector<BString>& inclPathVect) const;
 	bool GetAllIncludePaths(vector<BString>& inclPathVect);
 
 private:
 	list<CProjectFile*> fProjects;
-	BLocker fLocker;
+	mutable BLocker fLocker;
 };
 
 extern CProjectRoster* ProjectRoster;

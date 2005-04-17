@@ -64,11 +64,35 @@ status_t CProjectItem::SetTo(const char* path, const char* leafName)
 /*
  * 
  */
-status_t CProjectItem::SetTo(const BPath& path)
+status_t CProjectItem::SetTo(const char* path)
 {
-	BPath parentPath;
-	path.GetParent(&parentPath);
-	return SetTo(parentPath.Path(), path.Leaf());
+	BString fullPath(path);
+	if (!fullPath.Length())
+		return B_BAD_VALUE;
+	int32 slashPos = fullPath.FindLast('/');
+	if (slashPos < 0)
+		return SetTo("", fullPath.String());
+	BString parentPath(fullPath.String(), slashPos);
+	return SetTo(parentPath.String(), fullPath.String()+slashPos+1);
+}
+
+/*
+ * 
+ */
+void CProjectItem::SerializeTo( CProjectSerializer* serializer) const
+{
+	serializer->SerializeItem(this); 
+}
+
+/*
+ * 
+ */
+const BString& CProjectItem::DisplayName() const
+{
+	if (fDisplayName.Length())
+		return fDisplayName;
+	else
+		return fLeafName;
 }
 
 
@@ -83,8 +107,11 @@ CProjectGroupItem::CProjectGroupItem()
 /*
  * 
  */
-CProjectGroupItem::CProjectGroupItem(const char* path, const char* leafName)
+CProjectGroupItem::CProjectGroupItem(const char* path, const char* leafName,
+												 const char* groupName)
 	:	inherited(path, leafName)
+	,	fGroupName(groupName)
+	,	fIsDirty(false)
 {
 }
 
@@ -102,13 +129,13 @@ CProjectGroupItem::~CProjectGroupItem()
 /*
  * 
  */
-bool CProjectGroupItem::ContainsFile(entry_ref* fileRef)
+bool CProjectGroupItem::ContainsFile(entry_ref* fileRef) const
 {
 	CProjectItem* child;
 	BString fullPath;
 	entry_ref eref;
 	status_t res;
-	list<CProjectItem*>::iterator iter;
+	list<CProjectItem*>::const_iterator iter;
 	for( iter = fItems.begin(); iter != fItems.end(); ++iter) {
 		child = *iter;
 		fullPath.Truncate(0);
@@ -129,6 +156,7 @@ bool CProjectGroupItem::ContainsFile(entry_ref* fileRef)
 int32 CProjectGroupItem::AddItem(CProjectItem* item, bool sorted)
 {
 	int32 pos = 0;
+	fIsDirty = true;
 	if (sorted) {
 		list<CProjectItem*>::iterator iter;
 		for( iter = fItems.begin(); iter != fItems.end(); ++iter, ++pos) {
@@ -162,6 +190,16 @@ void CProjectGroupItem::RemoveItem(CProjectItem* item)
 				groupChild->RemoveItem(item);
 		}
 	}
+	fIsDirty = true;
+}
+
+/*
+ * 
+ */
+void CProjectGroupItem::SerializeTo( CProjectSerializer* serializer) const
+{
+	serializer->SerializeGroupItem(this);
+	fIsDirty = false;
 }
 
 
@@ -186,11 +224,60 @@ CProjectFile::~CProjectFile()
 /*
  * 
  */
-void CProjectFile::GetIncludePaths(vector<BString>& inclPathVect)
+void CProjectFile::GetIncludePaths(vector<BString>& inclPathVect) const
 {
 	inclPathVect.insert(inclPathVect.end(), fIncludePaths.begin(), 
 							  fIncludePaths.end());
 }
+
+/*
+ * 
+ */
+bool CProjectFile::IsDirty() const
+{
+	list<CProjectItem*>::const_iterator iter;
+	for( iter = fItems.begin(); iter != fItems.end(); ++iter) {
+		if ((*iter)->IsDirty())
+			return true;
+	}
+	return false;
+}
+
+/*
+ * 
+ */
+void CProjectFile::SerializeTo( CProjectSerializer* serializer) const
+{
+	serializer->SerializeFile(this); 
+}
+
+/*
+ * 
+ */
+status_t 
+CProjectFile::WriteToFile(BPositionIO* file, const BString& contents,
+								  const char* mimetype) const
+{
+	BFile prjFile;
+	if (!file) {
+		BPath path( fParentPath.String(), fLeafName.String());
+		status_t res 
+			= prjFile.SetTo(path.Path(), 
+								 B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+		if (res != B_OK)
+			return res;
+
+		BNodeInfo nodeInfo(&prjFile);
+		nodeInfo.SetType(mimetype);
+		file = &prjFile;
+	}
+	ssize_t sz = file->Write(contents.String(), contents.Length());
+	if (sz != contents.Length())
+		return sz < 0 ? sz : B_IO_ERROR;
+	else
+		return B_OK;
+}
+
 
 
 
@@ -228,11 +315,11 @@ void CProjectRoster::RemoveProject(CProjectFile* pf)
  *		if such a project is found, passes back these projects include-paths.
  */
 bool CProjectRoster::GetIncludePathsForFile(entry_ref* fileRef, 
-														  vector<BString>& inclPathVect)
+														  vector<BString>& inclPathVect) const
 {
 	inclPathVect.clear();
 	BAutolock lock(&fLocker);
-	list<CProjectFile*>::iterator iter;
+	list<CProjectFile*>::const_iterator iter;
 	for( iter=fProjects.begin(); iter != fProjects.end(); ++iter) {
 		if ((*iter)->ContainsFile(fileRef)) {
 			(*iter)->GetIncludePaths(inclPathVect);
@@ -248,7 +335,7 @@ bool CProjectRoster::GetIncludePathsForFile(entry_ref* fileRef,
  *		have been used recently will be searched first).
  */
 struct ProjectActivationTimeSorter {
-	bool operator() (const CProjectFile* pfl, const CProjectFile* pfr) {
+	bool operator() (const CProjectFile* pfl, const CProjectFile* pfr) const {
 		return pfl->ActivationTime() >= pfr->ActivationTime();
 	}
 };
@@ -258,7 +345,7 @@ bool CProjectRoster::GetAllIncludePaths(vector<BString>& inclPathVect)
 	BAutolock lock(&fLocker);
 	ProjectActivationTimeSorter compFunc;
 	fProjects.sort(compFunc);
-	list<CProjectFile*>::iterator iter;
+	list<CProjectFile*>::const_iterator iter;
 	for( iter=fProjects.begin(); iter != fProjects.end(); ++iter) {
 		(*iter)->GetIncludePaths(inclPathVect);
 	}

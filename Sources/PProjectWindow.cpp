@@ -54,6 +54,21 @@
 
 const unsigned long msg_Done = 'done';
 
+CDoc* PProjectWindow::Create(const entry_ref *doc, const char* mimetype)
+{
+	PProjectWindow* pwin = new PProjectWindow(doc, mimetype);
+	if (!pwin->fPrjFile || !pwin->fPrjFile->HaveProjectInfo()) {
+		CDoc* doc = gApp->NewWindow(pwin->fFile);
+		pwin->Close();
+		return doc;
+	} else {
+		pwin->fList->AddFilter(new PKeyDownFilter());
+		pwin->fList->MakeFocus();
+		pwin->Show();
+		return pwin;
+	}
+}
+
 PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
 	: BWindow(PDoc::NextPosition(), "", B_DOCUMENT_WINDOW, 0)
 	, CDoc(mimetype, this, doc)
@@ -93,7 +108,8 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
 	r.right -= B_V_SCROLL_BAR_WIDTH;
 	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
 	fList = new PTypeAHeadList(r, "group", fStatus);
-	fList->SetInvocationMessage(new BMessage(msg_PGroupItemInvoked));
+	fList->SetInvocationMessage(new BMessage(msg_PProjectItemInvoked));
+	fList->SetSelectionMessage(new BMessage(msg_PProjectItemSelected));
 	
 	AddChild(new BScrollView("scroller", fList, B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER));
 	
@@ -113,15 +129,8 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
 	AddRecent(p.Path());
 	
 	Read();
+	SelectionChanged();
 	
-	if (!fPrjFile || !fPrjFile->HaveProjectInfo()) {
-		gApp->NewWindow(fFile);
-		Close();
-	} else {
-		fList->AddFilter(new PKeyDownFilter());
-		fList->MakeFocus();
-		Show();
-	}
 } /* PProjectWindow::PProjectWindow */
 
 PProjectWindow::~PProjectWindow()
@@ -175,8 +184,12 @@ void PProjectWindow::MessageReceived(BMessage *msg)
 	else
 		switch (msg->what)
 		{
-			case msg_PGroupItemInvoked:
+			case msg_PProjectItemInvoked:
 				OpenItem();
+				break;
+
+			case msg_PProjectItemSelected:
+				SelectionChanged();
 				break;
 			
 			case msg_Save:
@@ -236,14 +249,14 @@ void PProjectWindow::ReadData(BPositionIO&)
 		
 		delete fPrjFile;
 		if (!strcmp(MimeType(),"text/x-makefile"))
-			fPrjFile = new CProjectMakeFile(path);
+			fPrjFile = new CProjectMakeFile(path.Path());
 		else if (!strcmp(MimeType(),"text/x-jamfile"))
-			fPrjFile = new CProjectJamFile(path);
+			fPrjFile = new CProjectJamFile(path.Path());
 		else
 			fPrjFile = NULL;
 		if (fPrjFile) {
 			FailOSErr(fPrjFile->Parse());
-			list<CProjectItem*>::iterator iter;
+			list<CProjectItem*>::const_iterator iter;
 			for( iter = fPrjFile->begin(); iter != fPrjFile->end(); ++iter)
 				AddItemsToList( *iter, NULL);
 		}
@@ -270,8 +283,9 @@ void PProjectWindow::AddItemsToList(CProjectItem* item,
 			: 0;
 	if (e.Exists() && e.GetRef(&ref) == B_OK) {
 		viewItem = new PEntryItem(ref, level, item);
+		((BStringItem*)viewItem)->SetText(item->DisplayName().String());
 	} else {
-		viewItem = new PProjectItem(item->LeafName().String(), level, item);
+		viewItem = new PProjectItem(item->DisplayName().String(), level, item);
 	}
 	if (parentListItem) {
 		// add item to the back of the superitem (at the end of its subitem-list):
@@ -282,7 +296,7 @@ void PProjectWindow::AddItemsToList(CProjectItem* item,
 		fList->AddItem( viewItem);
 	CProjectGroupItem* groupItem = dynamic_cast<CProjectGroupItem*>(item);
 	if (groupItem) {
-		list<CProjectItem*>::iterator iter;
+		list<CProjectItem*>::const_iterator iter;
 		for( iter = groupItem->begin(); iter != groupItem->end(); ++iter)
 			AddItemsToList( *iter, viewItem);
 	}
@@ -323,7 +337,7 @@ void PProjectWindow::ReadAttr(BFile& file)
 	if (fm) free(fm);
 } /* PProjectWindow::ReadAttr */
 
-void PProjectWindow::WriteData(BPositionIO& /*file*/)
+void PProjectWindow::WriteData(BPositionIO& file)
 {
 	if (! fFile)
 		THROW(("Can only write to a local file"));
@@ -335,7 +349,7 @@ void PProjectWindow::WriteData(BPositionIO& /*file*/)
 		
 		status_t res = B_OK;
 		if (fPrjFile)
-			res = fPrjFile->WriteToFile(MimeType());
+			res = fPrjFile->SerializeToFile(&file);
 		if (res != B_OK)
 			THROW(("Failed to open file %s (reason: %s)", p.Path(), strerror(res)));
 		
@@ -502,7 +516,20 @@ void PProjectWindow::OpenItem()
 			
 			char mime[B_MIME_TYPE_LENGTH];
 			
-			if (info.GetType(mime) || strncmp(mime, "text/", 5))
+			CProjectFile* subProject 
+				= dynamic_cast<CProjectFile*>(gi->ModelItem());
+			if (subProject) {
+				if (!subProject->HasBeenParsed()) {
+					status_t res = subProject->Parse();
+					if (res == B_OK) {
+						list<CProjectItem*>::const_iterator iter;
+						for( iter = subProject->begin(); 
+							  iter != subProject->end(); ++iter) {
+							AddItemsToList( *iter, gi);
+						}
+					}
+				}
+			} else if (info.GetType(mime) || strncmp(mime, "text/", 5))
 				OpenInTracker(gi->Ref());
 			else
 				gApp->OpenWindow(gi->Ref());
@@ -542,3 +569,19 @@ void PProjectWindow::WindowActivated(bool active)
 	if (active && fPrjFile)
 		fPrjFile->ActivationTime(time(NULL));
 }
+
+void PProjectWindow::SelectionChanged(void)
+{
+	int32 sel = fList->CurrentSelection(0);
+	BListItem* viewItem = (sel<0) ? NULL : fList->FullListItemAt(sel);
+	PProjectItem* prjViewItem = dynamic_cast<PProjectItem*>(viewItem);
+	CProjectItem* prjItem 
+		= prjViewItem 
+			? dynamic_cast<CProjectItem*>(prjViewItem->ModelItem())
+			: NULL;
+	bool addOk = prjItem ? prjItem->CanBeAddedTo() : false;
+	fButtonBar->SetEnabled(msg_PAdd, addOk);
+	bool removeOk = prjItem ? prjItem->CanBeRemoved() : false;
+	fButtonBar->SetEnabled(msg_PRemove, removeOk);
+}
+

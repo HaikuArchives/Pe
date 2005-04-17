@@ -15,18 +15,23 @@ class CProjectJamFile : public CProjectFile
 	typedef CProjectFile inherited;
 public:
 	CProjectJamFile();
-	CProjectJamFile(const BPath& path);
+	CProjectJamFile(const char* path);
 	virtual ~CProjectJamFile();
 	
 	virtual status_t Parse();
-	virtual bool HaveProjectInfo()		{ return fHaveProjectInfo; }
-	virtual status_t WriteToFile(const char* mimetype);
+	virtual bool HasBeenParsed() const	{ return fHasBeenParsed; }
+	virtual bool HaveProjectInfo() const
+													{ return fHaveProjectInfo; }
+	virtual status_t SerializeToFile(BPositionIO* file) const;
 
 private:
 	void _ParseSources(const BString& contents);
 	bool _ParseIncludeStmt(const char*& t);
 	bool _ParseIncludeBlock(const char* start, const char* end);
 	void _ParseIncludes(const BString& contents);
+	const char* _ParseJamPath( const char* t, BString& jamPath);
+	void _ParseSubJamfiles(const BString& contents);
+	const char* _ParseSubJamfile(const char* start);
 	CProjectGroupItem* _AddGroup(const char* start, const char* end, 
 										  const char* buftop);
 	
@@ -35,6 +40,7 @@ private:
 	BString fJamTopVarName;
 	BString fJamTopPath;
 	bool fHaveProjectInfo;
+	bool fHasBeenParsed;
 };
 
 #endif
