@@ -62,7 +62,7 @@ resource 'MENU' (93, "Language menu") {
 };
 
 resource 'DLOG' (132, "Preferences") {
-	{0, 0, 415, 260},
+	{0, 0, 415, 270},
 	"Preferences",
 	B_TITLED_WINDOW,
 	NORMAL,
@@ -116,6 +116,7 @@ resource 'DLOG' (132, "Preferences") {
 			TabSheet				{ "Connections", "Options that control the connections to other programs" },
 				CheckBox			{{   0,   0, 200,  16 }, "idmn", "Show Metrowerks BeIDE Menu" },
 				CheckBox			{{   0,  20, 200,  36 }, "mwpl", "Load Metrowerks BeIDE Extensions" },
+				CheckBox			{{   0,  50, 200,  66 }, "pftp", "Use Passive FTP by default" },
 			TabSheetEnd				{},
 			
 			TabSheet				{ "Differences", "Options that control the Find Differences command" },

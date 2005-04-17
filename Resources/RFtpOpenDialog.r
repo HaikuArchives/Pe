@@ -50,12 +50,13 @@ resource 'DLOG' (128, "Open from Server") {
 	{
 		Caption			{{  10,  10, 100,  26 }, "csrvr", "Server:" },
 		Edit			{{  10,  30, 100,  46 }, "srvr", "", "", "", 0, 0 },
-		Caption			{{  10,  50, 100,  66 }, "cuser", "User Name:" },
-		Edit			{{  10,  70, 100,  86 }, "user", "", "", "", 24, 0 },
-		Caption			{{  10,  90, 100, 106 }, "csrvr", "Password:" },
-		Edit			{{  10, 110, 100, 126 }, "pass", "", "", "", 128, 0 },
+		CheckBox		{{  12,  48, 100,  64 }, "pssv", "Passive" },
+		Caption			{{  10,  70, 100,  86 }, "cuser", "User Name:" },
+		Edit			{{  10,  90, 100,  106 }, "user", "", "", "", 24, 0 },
+		Caption			{{  10,  110, 100, 126 }, "csrvr", "Password:" },
+		Edit			{{  10, 130, 100, 146 }, "pass", "", "", "", 128, 0 },
 		
-		Button			{{  25, 140,  85, 160 }, "cnct", "Connect", 'cnct' },
+		Button			{{  25, 160,  85, 180 }, "cnct", "Connect", 'cnct' },
 		
 		Line			{{ 106,  10, 107, 160 }},
 		
