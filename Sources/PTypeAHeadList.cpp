@@ -210,9 +210,10 @@ void PTypeAHeadList::KeyDown(const char *bytes, int32 numBytes)
 		
 		if (found != items.end())
 			Select(IndexOf(*found));
+/*	[zooey] let the selection move only if anything has been found:
 		else
 			Select(-1);
-		
+*/		
 		ScrollToSelection();
 	}
 	else if (*bytes == B_TAB)

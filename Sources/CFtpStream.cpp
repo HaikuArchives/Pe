@@ -179,8 +179,9 @@ void URLData::PrintToStream()
 
 #pragma mark -
 
-CFtpStream::CFtpStream(URLData& data, bool retrieve)
+CFtpStream::CFtpStream(URLData& data, bool retrieve, bool passive)
 	: fURL(data)
+	, fPassive(passive)
 {
 	if (retrieve)
 		Retrieve();
@@ -270,6 +271,10 @@ void CFtpStream::Automaton(int action)
 		else
 			strcpy(password, "no.one@nowhere.na");
 		
+		struct sockaddr_in saData;
+		memset(&saData, 0, sizeof(saData));
+		saData.sin_family = AF_INET;
+
 		int state = 1;
 		while (state)
 		{
@@ -331,35 +336,56 @@ void CFtpStream::Automaton(int action)
 					if (state == 4 && (r / 100) != 2)
 						THROW(("Failed to change directory: %s", msg));
 					
-					struct sockaddr_in saData;
-					memset(&saData, 0, sizeof(saData));
-					saData.sin_family = AF_INET;
-					FailSockErr(bind(data, (struct sockaddr *)&saData, sizeof(saData)));
-					FailSockErr(listen(data, 5));
-					
-					// [zooey]: calling getsockname() on a socket that has been bound to 
-					// IN_ADDR_ANY (the wildcard-address) will *not* return any IP-address,
-					// as this will only be setup by the system during connect or accept.
-					// 		[refer to W.R. Stevens - Unix Network Programming, Vol 1, p. 92]
-					// BeOS R5 however, *does* fill in the IP-address at this stage (that's
-					// why this code worked for R5 but didn't work for BONE).
-					// In order to fix this problem, we simply use the IP-address of the
-					// command-socket for the PORT-command:
-					int size = sizeof(saData);
-					// fetch port from data-socket:
-					FailSockErr(getsockname(data, (struct sockaddr *)&saData, &size));
-					unsigned char *pap = (unsigned char *)&saData.sin_port;
-					// fetch ip-address from cmd-socket:
-					FailSockErr(getsockname(csSock->sSocket, (struct sockaddr *)&sa, &size));
-					unsigned char *sap = (unsigned char *)&sa.sin_addr.s_addr;
-		
-					s_printf(csSock, "port %d,%d,%d,%d,%d,%d\r\n", sap[0], sap[1], sap[2], sap[3], pap[0], pap[1]);
+					if (fPassive) {
+						// switch to passive mode
+						s_printf(csSock, "pasv\r\n");
+					} else {
+						FailSockErr(bind(data, (struct sockaddr *)&saData, sizeof(saData)));
+						FailSockErr(listen(data, 5));
+						// [zooey]: calling getsockname() on a socket that has been bound to 
+						// IN_ADDR_ANY (the wildcard-address) will *not* return any IP-address,
+						// as this will only be setup by the system during connect or accept.
+						// 		[refer to W.R. Stevens - Unix Network Programming, Vol 1, p. 92]
+						// BeOS R5 however, *does* fill in the IP-address at this stage (that's
+						// why this code worked for R5 but didn't work for BONE).
+						// In order to fix this problem, we simply use the IP-address of the
+						// command-socket for the PORT-command:
+						int size = sizeof(saData);
+						// fetch port from data-socket:
+						FailSockErr(getsockname(data, (struct sockaddr *)&saData, &size));
+						unsigned char *pap = (unsigned char *)&saData.sin_port;
+						// fetch ip-address from cmd-socket:
+						FailSockErr(getsockname(csSock->sSocket, (struct sockaddr *)&sa, &size));
+						unsigned char *sap = (unsigned char *)&sa.sin_addr.s_addr;
+						s_printf(csSock, "port %d,%d,%d,%d,%d,%d\r\n", sap[0], sap[1], sap[2], sap[3], pap[0], pap[1]);
+					}
 					state = 5;
 					break;
 				}
 				case 5:
-					if ((r / 100) != 2)
-						THROW(("Port command failed: %s", msg));
+					if (fPassive) {
+						unsigned int sap[4];
+						unsigned int pap[2];
+						if ((r / 100) != 2)
+							THROW(("Pasv command failed: %s", msg));
+						char* pos = strchr(msg,'(');
+						if (!pos)
+							THROW(("Answer to Pasv has unknown format: %s", msg));
+						int cnt = sscanf(pos+1, "%u,%u,%u,%u,%u,%u", 
+											  &sap[0], &sap[1], &sap[2], &sap[3], 
+											  &pap[0], &pap[1]);
+						if (cnt != 6)
+							THROW(("Could not parse answer to Pasv (%d of 6): %s", 
+									 cnt, msg));
+						char ipAddr[20];
+						sprintf(ipAddr, "%d.%d.%d.%d", sap[0], sap[1], sap[2], sap[3]);
+						saData.sin_port = htons(pap[0]*256+pap[1]);
+						saData.sin_addr.s_addr = inet_addr(ipAddr);
+						FailOSErr(connect(data, (struct sockaddr *)&saData, sizeof(saData)));
+					} else {
+						if ((r / 100) != 2)
+							THROW(("Port command failed: %s", msg));
+					}
 					if (action == 1)
 					{
 						s_printf(csSock, "retr %s\r\n", fURL.File());
@@ -377,8 +403,10 @@ void CFtpStream::Automaton(int action)
 					{
 						int ds;
 						int size = sizeof(sa);
-
-						FailSockErr(ds = accept(data, (struct sockaddr *)&sa, &size));
+						if (fPassive)
+							ds = data;
+						else
+							FailSockErr(ds = accept(data, (struct sockaddr *)&sa, &size));
 						
 						try
 						{
@@ -389,7 +417,7 @@ void CFtpStream::Automaton(int action)
 									fData.Write(msg, r);
 							}
 							while (r);
-						
+
 							closesocket(ds);
 						}
 						catch (HErr& e)
@@ -409,8 +437,10 @@ void CFtpStream::Automaton(int action)
 					{
 						int ds;
 						int size = sizeof(sa);
-
-						FailSockErr(ds = accept(data, (struct sockaddr *)&sa, &size));
+						if (fPassive)
+							ds = data;
+						else
+							FailSockErr(ds = accept(data, (struct sockaddr *)&sa, &size));
 						
 						try
 						{
@@ -440,7 +470,8 @@ void CFtpStream::Automaton(int action)
 		}
 		
 		s_close(csSock);
-		closesocket(data);
+		if (!fPassive)
+			closesocket(data);
 		closesocket(ctrl);
 	}
 	catch (HErr& e)

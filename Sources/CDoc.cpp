@@ -164,7 +164,7 @@ void CDoc::Read()
 	}
 	else
 	{
-		CFtpStream ftp(*fURL, true);
+		CFtpStream ftp(*fURL, true, gPrefs->GetPrefInt("passive ftp", 1));
 		ReadData(ftp);
 	}
 } /* CDoc::Read */
@@ -199,7 +199,7 @@ void CDoc::Save()
 	{
 		try
 		{
-			CFtpStream ftp(*fURL, false);
+			CFtpStream ftp(*fURL, false, gPrefs->GetPrefInt("passive ftp", 1));
 			WriteData(ftp);
 			ftp.Flush();
 			

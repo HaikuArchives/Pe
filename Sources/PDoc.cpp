@@ -628,7 +628,7 @@ void PDoc::Revert()
 		}
 		else if (fURL)
 		{
-			CFtpStream ftp(*fURL, true);
+			CFtpStream ftp(*fURL, true, gPrefs->GetPrefInt("passive ftp", 1));
 			ReadData(ftp);
 		}
 		else

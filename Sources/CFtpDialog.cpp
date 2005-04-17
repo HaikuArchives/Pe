@@ -129,63 +129,64 @@ CFtpDialog::CFtpDialog(BRect frame, const char *name, window_type type, int flag
 	static_cast<BControl*>(FindView("dotf"))->SetMessage(new BMessage(msg_ToggleDot));
 	
 	FindView("name")->Hide();
+	SetOn("pssv", gPrefs->GetPrefInt("passive ftp", 1));
 
+#if 0
 	// Build Extension->Mimetype list // Takes looong
 	typedef pair<string,string> entry;
-	if (0) {
-		BMessage mimDat;
-		BMessage extDat;
-		BMimeType mimTyp;
-		int32 mimIdx = -1;
-		int32 extIdx = 0;
-		const char* mimCStr;
-		const char* extCStr;
-		if (BMimeType::GetInstalledTypes(&mimDat) == B_OK) {
-			while (mimDat.FindString("types", ++mimIdx, &mimCStr) == B_OK) {
-				if ((mimTyp.SetTo(mimCStr) == B_OK) && (mimTyp.GetFileExtensions(&extDat) == B_OK)) {
-					extIdx = -1;
-					while (extDat.FindString("extensions", ++extIdx, &extCStr) == B_OK) {
-						BString extStr(extCStr);
-						extStr.ToLower();
-						if (extStr.ByteAt(0) == '.')  extStr.Remove(0, 1);
-						fExtMime[extCStr] = mimCStr;
-					}
+	BMessage mimDat;
+	BMessage extDat;
+	BMimeType mimTyp;
+	int32 mimIdx = -1;
+	int32 extIdx = 0;
+	const char* mimCStr;
+	const char* extCStr;
+	if (BMimeType::GetInstalledTypes(&mimDat) == B_OK) {
+		while (mimDat.FindString("types", ++mimIdx, &mimCStr) == B_OK) {
+			if ((mimTyp.SetTo(mimCStr) == B_OK) && (mimTyp.GetFileExtensions(&extDat) == B_OK)) {
+				extIdx = -1;
+				while (extDat.FindString("extensions", ++extIdx, &extCStr) == B_OK) {
+					BString extStr(extCStr);
+					extStr.ToLower();
+					if (extStr.ByteAt(0) == '.')  extStr.Remove(0, 1);
+					fExtMime[extCStr] = mimCStr;
 				}
 			}
 		}
-	// perhaps it's better to go with some predefiend types
-	} else {
-		fExtMime["aiff"] = "audio/x-aiff";
-		fExtMime["bz2"] = "application/x-bzip2";
-		fExtMime["cc"] = "text/x-source-code";
-		fExtMime["cpp"] = "text/x-source-code";
-		fExtMime["css"] = "text/css";
-		fExtMime["gif"] = "image/gif";
-		fExtMime["gz"] = "application/x-gzip";
-		fExtMime["h"] = "text/x-source-code";
-		fExtMime["htm"] = "text/html";
-		fExtMime["html"] = "text/html";
-		fExtMime["jpeg"] = "image/jpeg";
-		fExtMime["jpg"] = "image/jpeg";
-		fExtMime["mod"] = "audio/x-mod";
-		fExtMime["mov"] = "video/quicktime";
-		fExtMime["mp3"] = "audio/x-mpeg";
-		fExtMime["ogg"] = "audio/ogg.vorbis";
-		fExtMime["pdf"] = "application/pdf";
-		fExtMime["php"] = "text/x-php";
-		fExtMime["pl"] = "text/x-perl";
-		fExtMime["pkg"] = "application/x-scode-UPkg";
-		fExtMime["png"] = "image/png";
-		fExtMime["py"] = "text/x-source-code";
-		fExtMime["rar"] = "application/x-rar";
-		fExtMime["swf"] = "application/x-shockwave-flash";
-		fExtMime["tar"] = "application/x-tar";
-		fExtMime["tga"] = "image/x-targa";
-		fExtMime["tgz"] = "application/x-gzip";
-		fExtMime["txt"] = "text/plain";
-		fExtMime["xml"] = "text/xml";
-		fExtMime["zip"] = "application/zip";
 	}
+#else
+	// perhaps it's better to go with some predefiend types:
+	fExtMime["aiff"] = "audio/x-aiff";
+	fExtMime["bz2"] = "application/x-bzip2";
+	fExtMime["cc"] = "text/x-source-code";
+	fExtMime["cpp"] = "text/x-source-code";
+	fExtMime["css"] = "text/css";
+	fExtMime["gif"] = "image/gif";
+	fExtMime["gz"] = "application/x-gzip";
+	fExtMime["h"] = "text/x-source-code";
+	fExtMime["htm"] = "text/html";
+	fExtMime["html"] = "text/html";
+	fExtMime["jpeg"] = "image/jpeg";
+	fExtMime["jpg"] = "image/jpeg";
+	fExtMime["mod"] = "audio/x-mod";
+	fExtMime["mov"] = "video/quicktime";
+	fExtMime["mp3"] = "audio/x-mpeg";
+	fExtMime["ogg"] = "audio/ogg.vorbis";
+	fExtMime["pdf"] = "application/pdf";
+	fExtMime["php"] = "text/x-php";
+	fExtMime["pl"] = "text/x-perl";
+	fExtMime["pkg"] = "application/x-scode-UPkg";
+	fExtMime["png"] = "image/png";
+	fExtMime["py"] = "text/x-source-code";
+	fExtMime["rar"] = "application/x-rar";
+	fExtMime["swf"] = "application/x-shockwave-flash";
+	fExtMime["tar"] = "application/x-tar";
+	fExtMime["tga"] = "image/x-targa";
+	fExtMime["tgz"] = "application/x-gzip";
+	fExtMime["txt"] = "text/plain";
+	fExtMime["xml"] = "text/xml";
+	fExtMime["zip"] = "application/zip";
+#endif
 
 } // CFtpDialog::CFtpDialog
 
@@ -520,29 +521,38 @@ void CFtpDialog::ListDirectory()
 
 		memset(&saData, 0, sizeof(saData));
 		saData.sin_family = AF_INET;
-		FailSockErr(bind(data, (struct sockaddr *)&saData, sizeof(saData)));
-		FailSockErr(listen(data, 5));
-		
-		// [zooey]: calling getsockname() on a socket that has been bound to 
-		// IN_ADDR_ANY (the wildcard-address) will *not* return any IP-address,
-		// as this will only be setup by the system during connect or accept.
-		// 		[refer to W.R. Stevens - Unix Network Programming, Vol 1, p. 92]
-		// BeOS R5 however, *does* fill in the IP-address at this stage (that's
-		// why this code worked for R5 but didn't work for BONE).
-		// In order to fix this problem, we simply use the IP-address of the
-		// command-socket for the PORT-command:
 		int size = sizeof(saData);
-		// fetch port from data-socket:
-		FailSockErr(getsockname(data, (struct sockaddr *)&saData, &size));
-		unsigned char *pap = (unsigned char *)&saData.sin_port;
-		// fetch ip-address from cmd-socket:
-		FailSockErr(getsockname(fSocketFD->sSocket, (struct sockaddr *)&saCmd, &size));
-		unsigned char *sap = (unsigned char *)&saCmd.sin_addr.s_addr;
-		
-		// combine both into the PORT-command:
-		s_printf(fSocketFD, "port %d,%d,%d,%d,%d,%d\r\n", sap[0], sap[1], sap[2], sap[3], pap[0], pap[1]);
+
+		bool passive = IsOn("pssv");
+		if (passive) {
+			// switch to passive mode
+			s_printf(fSocketFD, "pasv\r\n");
+		} else {
+			FailSockErr(bind(data, (struct sockaddr *)&saData, sizeof(saData)));
+			FailSockErr(listen(data, 5));
+			// [zooey]: calling getsockname() on a socket that has been bound to 
+			// IN_ADDR_ANY (the wildcard-address) will *not* return any IP-address,
+			// as this will only be setup by the system during connect or accept.
+			// 	[refer to W.R. Stevens - Unix Network Programming, Vol 1, p. 92]
+			// BeOS R5 however, *does* fill in the IP-address at this stage (that's
+			// why this code worked for R5 but didn't work for BONE).
+			// In order to fix this problem, we simply use the IP-address of the
+			// command-socket for the PORT-command:
+			//
+			// fetch port from data-socket:
+			FailSockErr(getsockname(data, (struct sockaddr *)&saData, &size));
+			unsigned char *pap = (unsigned char *)&saData.sin_port;
+			// fetch ip-address from cmd-socket:
+			FailSockErr(getsockname(fSocketFD->sSocket, (struct sockaddr *)&saCmd, 
+											&size));
+			unsigned char *sap = (unsigned char *)&saCmd.sin_addr.s_addr;
+			// combine both into the PORT-command:
+			s_printf(fSocketFD, "port %d,%d,%d,%d,%d,%d\r\n", sap[0], sap[1], 
+						sap[2], sap[3], pap[0], pap[1]);
+		}
 	
 		int state = 1;
+		SOCK* dsf = NULL;
 
 		while (state)
 		{
@@ -551,8 +561,30 @@ void CFtpDialog::ListDirectory()
 			switch (state)
 			{
 				case 1:
-					if (*fReply != '2')
-						THROW(("Port command failed: %s", fReply));
+					if (passive) {
+						unsigned int sap[4];
+						unsigned int pap[2];
+						if (*fReply != '2')
+							THROW(("Pasv command failed: %s", fReply));
+						char* pos = strchr(fReply,'(');
+						if (!pos)
+							THROW(("Answer to Pasv has unknown format: %s", fReply));
+						int cnt = sscanf(pos+1, "%u,%u,%u,%u,%u,%u", 
+											  &sap[0], &sap[1], &sap[2], &sap[3], 
+											  &pap[0], &pap[1]);
+						if (cnt != 6)
+							THROW(("Could not parse answer to Pasv (%d of 6): %s", 
+									 cnt, fReply));
+						char ipAddr[20];
+						sprintf(ipAddr, "%d.%d.%d.%d", sap[0], sap[1], sap[2], sap[3]);
+						saData.sin_port = htons(pap[0]*256+pap[1]);
+						saData.sin_addr.s_addr = inet_addr(ipAddr);
+						FailOSErr(connect(data, (struct sockaddr *)&saData, sizeof(saData)));
+						dsf = s_open(data, "r+");
+					} else {
+						if (*fReply != '2')
+							THROW(("Port command failed: %s", fReply));
+					}
 					s_printf(fSocketFD, "list\r\n");
 					state = 2;
 					break;
@@ -560,9 +592,11 @@ void CFtpDialog::ListDirectory()
 				case 2:
 					if (*fReply == '1')
 					{
-						int ds;
-						FailSockErr(ds = accept(data, (struct sockaddr *)&saData, &size));
-						SOCK* dsf = s_open(ds, "r+");
+						int ds = 0;
+						if (!passive) {
+							FailSockErr(ds = accept(data, (struct sockaddr *)&saData, &size));
+							dsf = s_open(ds, "r+");
+						}
 						
 						try
 						{
@@ -588,7 +622,8 @@ void CFtpDialog::ListDirectory()
 							fList->Invalidate();
 							UpdateIfNeeded();
 							s_close(dsf);
-							closesocket(ds);
+							if (!passive)
+								closesocket(ds);
 						}
 						catch (HErr& e)
 						{

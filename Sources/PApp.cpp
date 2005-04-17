@@ -448,9 +448,18 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 		BNode n(&doc);
 		char mime[256];
 		
-		if (BNodeInfo(&n).GetType(mime))
+		BNodeInfo ni(&n);
+		if (ni.GetType(mime) != B_OK)
 			mime[0] = 0;
 
+		if (gPrefs->GetPrefInt("autodetect projects", 1)) {
+			if (!strcmp(doc.name, "Jamfile"))
+				ni.SetType("text/x-jamfile");
+			else if (!strcasecmp(doc.name, "Makefile"))
+				ni.SetType("text/x-makefile");
+			ni.GetType(mime);
+		}
+		
 		if (strcmp(mime, "text/x-vnd.Hekkel-Pe-Group") == 0 ||
 			strcmp(mime, "text/x-pe-group") == 0)
 		{
@@ -494,7 +503,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 				return CDoc::FindDoc(doc);
 			}
 			else
-				return new PProjectWindow(&doc, "text/x-jamfile");
+				return PProjectWindow::Create(&doc, "text/x-jamfile");
 		}
 		else
 		{

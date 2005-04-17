@@ -421,6 +421,8 @@ bool CPrefsDialog::OKClicked()
 	
 	gPrefs->SetPrefInt("ide menu", IsOn("idmn"));
 	gPrefs->SetPrefInt("mw plugins", IsOn("mwpl"));
+
+	gPrefs->SetPrefInt("passive ftp", IsOn("pftp"));
 	
 	gPrefs->SetPrefInt("showglossary", IsOn("shgl"));
 	gPrefs->SetPrefInt("singleclickglossary", IsOn("sigl"));
@@ -434,6 +436,7 @@ bool CPrefsDialog::OKClicked()
 	gPrefs->SetPrefInt("sortgroup", IsOn("sogr"));
 
 	gPrefs->SetPrefInt("sortproject", IsOn("prso"));
+	gPrefs->SetPrefInt("autodetect projects", IsOn("prad"));
 	
 	fSearchPaths->DoOK();
 	fIncludePaths->DoOK();
@@ -656,6 +659,8 @@ bool CPrefsDialog::CancelClicked()
 	SetOn("idmn", gPrefs->GetPrefInt("ide menu", 1));
 	SetOn("mwpl", gPrefs->GetPrefInt("mw plugins", 1));
 	
+	SetOn("pftp", gPrefs->GetPrefInt("passive ftp", 1));
+
 	SetOn("shgl", gPrefs->GetPrefInt("showglossary", 0));
 	SetOn("sigl", gPrefs->GetPrefInt("singleclickglossary", 0));
 
@@ -668,6 +673,7 @@ bool CPrefsDialog::CancelClicked()
 	SetOn("rlgp", gPrefs->GetPrefInt("relative group paths", 0));
 
 	SetOn("prso", gPrefs->GetPrefInt("sortproject", 1));
+	SetOn("prad", gPrefs->GetPrefInt("autodetect projects", 1));
 
 	fSearchPaths->DoCancel();
 	fIncludePaths->DoCancel();

@@ -67,7 +67,7 @@ private:
 
 class CFtpStream : public BPositionIO {
 public:
-			CFtpStream(URLData& spec, bool retrieve = true);
+			CFtpStream(URLData& spec, bool retrieve, bool passive);
 virtual	~CFtpStream();
 		
 virtual	ssize_t ReadAt(off_t pos, void *buffer, size_t size);
@@ -86,6 +86,7 @@ protected:
 
 			URLData fURL;
 			BMallocIO fData;
+			bool fPassive;
 };
 
 inline bool URLData::IsValid() const

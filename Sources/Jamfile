@@ -14,7 +14,7 @@ if $(OSPLAT) = X86 {
 	SubDirSysHdrs $(TOP) regex ;
 }
 
-# @src->@
+# <pe-src>
 Library libhekkel.a : 
 	HAppResFile.cpp
 	HBox.cpp
@@ -34,9 +34,9 @@ Library libhekkel.a :
 	MTextAddOn.cpp
 	MThread.cpp
 	;
-# @<-src@
+# </pe-src>
 
-# @src->@
+# <pe-src>
 Application pe : 
 	Benaphore.cpp
 	CCharObject.cpp
@@ -100,13 +100,13 @@ Application pe :
 	utf-support.cpp
 	:	libhekkel.a $(RX_LIB) be net $(STDC++LIB) tracker mail textencoding 
 	;
-# @<-src@
+# </pe-src>
 if $(OSPLAT) = X86 {
 	# avoid warning about strftime("%x") in CGlossary:
 	ObjectC++Flags CGlossary.cpp : -Wno-format ;
 }
 
-# @src->@
+# <pe-src>
 XRes pe : 
 	menus.rsrc
 	fonttabs.rsrc
@@ -134,7 +134,7 @@ XRes pe :
 	RProject.rsrc
 	RMimeinfo.rsrc
 	;
-# @<-src@
+# </pe-src>
 
 Rez pe : [ FDirName $(TOP) Resources Now.r ] ;
 
