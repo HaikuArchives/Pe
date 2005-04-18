@@ -10,6 +10,7 @@ if $(OSPLAT) = X86 {
 REZ = [ FDirName $(TOP) rez rez ] ;
 Depends $(REZ) : rez ;
 
+# <pe-src>
 Application rez 
 	:	rez_parser.y
 		rez_scanner.l
@@ -20,6 +21,7 @@ Application rez
 		RElem.cpp
 	:	be $(STDC++LIB) 
 	;
+# </pe-src>
 
 MakeLocate rez : [ FDirName $(TOP) rez ] ;
 

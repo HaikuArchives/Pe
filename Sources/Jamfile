@@ -106,7 +106,6 @@ if $(OSPLAT) = X86 {
 	ObjectC++Flags CGlossary.cpp : -Wno-format ;
 }
 
-# <pe-src>
 XRes pe : 
 	menus.rsrc
 	fonttabs.rsrc
@@ -134,7 +133,6 @@ XRes pe :
 	RProject.rsrc
 	RMimeinfo.rsrc
 	;
-# </pe-src>
 
 Rez pe : [ FDirName $(TOP) Resources Now.r ] ;
 

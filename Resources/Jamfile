@@ -2,6 +2,7 @@ SubDir TOP Resources ;
 
 SubDirHdrs $(TOP) Sources ;
 
+# <pe-src>
 RezObjects
 	menus.r
 	fonttabs.r
@@ -29,6 +30,7 @@ RezObjects
 	RProject.r
 	RMimeinfo.r
 	;
+# </pe-src>
 
 Includes RMimeinfo.r : pe.types.rsrc ;
 SEARCH on pe.types.rsrc = $(SUBDIR) ;

@@ -1,7 +1,9 @@
 
 SubDir TOP lpe ;
 
+# <pe-src>
 Application lpe 
 	: lpe.cpp
 	: be $(STDC++LIB)
 	;
+# </pe-src>

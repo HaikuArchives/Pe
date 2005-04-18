@@ -1,5 +1,6 @@
 SubDir TOP Languages Resources ;
 
+# <pe-src>
 RezObjects
 	keywords.asm.r
 	keywords.cpp.r
@@ -20,3 +21,4 @@ RezObjects
 	keywords.tex.r
 	keywords.diff.r
 	;
+# </pe-src>
