@@ -7,66 +7,88 @@ if $(OSPLAT) = PPC {
 	SubDirSysHdrs $(TOP) regex ;
 }
 
+# <pe-src>
 PeExtension PrefixLines 
 	: PrefixLines.cpp 
 	: libhekkel.a be $(STDC++LIB) 
 	: prefix.r
 	;
+# </pe-src>
 
+# <pe-src>
 PeExtension BeBookFetch 
 	: BeBookFetch.cpp 
 	: be $(STDC++LIB) 
 	;
+# </pe-src>
 
+# <pe-src>
 PeExtension Copy\ Lines\ Containing 
 	: CopyContaining.cpp 
 	: libhekkel.a $(RX_LIB) be $(STDC++LIB) 
 	: copycon.r
 	;
+# </pe-src>
 
+# <pe-src>
 PeExtension Cut\ Lines\ Containing 
 	: CutContaining.cpp 
 	: libhekkel.a $(RX_LIB) be $(STDC++LIB) 
 	;
+# </pe-src>
 
+# <pe-src>
 PeExtension HeaderGuard
 	: HeaderGuard.cpp 
 	: be
 	;
+# </pe-src>
 
+# <pe-src>
 PeExtension Pipe
 	: Pipe.cpp 
 	: libhekkel.a be $(STDC++LIB) 
 	: Pipe.dlog.r
 	;
+# </pe-src>
 
+# <pe-src>
 PeExtension HTMLImage
 	: HTMLImage.cpp 
 	: libhekkel.a be $(STDC++LIB) 
 	: HTMLImage.dlog.r
 	;
+# </pe-src>
 
+# <pe-src>
 PeExtension HTMLAnchor
 	: HTMLAnchor.cpp 
 	: libhekkel.a be $(STDC++LIB) 
 	: HTMLAnchor.dlog.r
 	;
+# </pe-src>
 
+# <pe-src>
 PeExtension HTMLUpdate
 	: HTMLUpdate.cpp 
 	: libhekkel.a be $(STDC++LIB) mail 
 	;
+# </pe-src>
 if $(OSPLAT) = X86 {
 	# avoid warning about strftime() with %x:
 	ObjectC++Flags HTMLUpdate.cpp : -Wno-format ;
 }
 
+# <pe-src>
 PeExtension ROT13
 	: ROT13.cpp 
 	: libhekkel.a be $(STDC++LIB) 
 	;
+# </pe-src>
 
+# <pe-src>
 PeExtension drieuxCaps
 	: drieuxCaps.cpp JRandom.cpp 
 	: libhekkel.a be $(STDC++LIB) 
 	;
+# </pe-src>
