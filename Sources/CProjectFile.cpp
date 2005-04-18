@@ -113,6 +113,9 @@ CProjectGroupItem::CProjectGroupItem(const char* path, const char* leafName,
 	,	fGroupName(groupName)
 	,	fIsDirty(false)
 {
+	if (fGroupName.Length())
+		// build display-name for a group that has a name specified:
+		fDisplayName << fLeafName << ' ' << fGroupName;
 }
 
 /*
