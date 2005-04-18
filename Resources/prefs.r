@@ -62,12 +62,12 @@ resource 'MENU' (93, "Language menu") {
 };
 
 resource 'DLOG' (132, "Preferences") {
-	{0, 0, 415, 270},
+	{0, 0, 415, 266},
 	"Preferences",
 	B_TITLED_WINDOW,
 	NORMAL,
 	{
-		TabbedBook					{{   0,   0, 415, 260 }, "tabB" },
+		TabbedBook					{{   0,   0, 415, 266 }, "tabB" },
 			TabSheet				{ "Colours", "The colours used for syntax colouring and window layout" },
 				ColorControl		{{   0,   0, 145,  16 }, "lowc", "Background" },
 				ColorControl		{{ 155,   0, 290,  16 }, "txtc", "Normal Text" },
