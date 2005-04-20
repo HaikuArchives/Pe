@@ -1168,7 +1168,26 @@ void PDoc::SetError(const char *err, rgb_color c)
 
 static vector<perform_edit_func> sExtensions;
 static vector<char*> sExtensionNames;
+static vector<int16> sExtensionHashes;
 static int sExtensionCount = 0;
+
+static int GetExtensionMenuIndexByHash(uint16 hash)
+{
+printf("GetExtensionIbH(%u) = ",hash);
+	int idx = -1;
+	int skipped = 0;
+	for (int i = 0; i < sExtensionCount; i++) {
+		if (gPrefs->GetPrefInt("skiphtmlext", 1) 
+		&& strncasecmp(sExtensionNames[i], "HTML", 4) == 0) {
+			skipped++;
+		} else if (sExtensionHashes[i] == hash) {
+			idx = i;
+			break;
+		}
+	}
+printf("%d\n",idx-skipped);
+	return idx - skipped;
+}
 
 static void LoadAddOnsFromPath(const char *path)
 {
@@ -1198,17 +1217,20 @@ static void LoadAddOnsFromPath(const char *path)
 			{
 				char *n = strdup(dent->d_name);
 
+printf("ext %d. -> %s\n", sExtensionCount, n);
 				sExtensionCount++;
 				sExtensions.push_back(f);
 				sExtensionNames.push_back(n);
+				sExtensionHashes.push_back(HashString16(n));
 			}
 			else if (stbuf.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 			{
-				// an executable shell scrip perhaps...
-				
+				// an executable shell script perhaps...
+printf("ext %d. -> %s\n", sExtensionCount, dent->d_name);
 				sExtensionCount++;
 				sExtensions.push_back(NULL);
 				sExtensionNames.push_back(strdup(dent->d_name));
+				sExtensionHashes.push_back(HashString16(dent->d_name));
 			}
 		}
 	}
@@ -1656,10 +1678,13 @@ void PDoc::MessageReceived(BMessage *msg)
 
 			default:
 			{
-				if ((msg->what & 0xffffff00) == 0x65787400)
+				if ((msg->what & 0xffff0000) == 0x65780000)	// that's 'ex..'
 				{
-					int nr = msg->what - 'ext0';
-					BMenuItem *item = fMBar->SubmenuAt(4)->ItemAt(nr);
+					uint16 extHash = msg->what & 0xffff;
+					int nr = GetExtensionMenuIndexByHash(extHash);
+					BMenuItem *item = NULL;
+					if (nr>=0)
+						item = fMBar->SubmenuAt(4)->ItemAt(nr);
 					
 					if (item)
 						PerformExtension(item->Label());
@@ -1819,12 +1844,14 @@ void PDoc::ResetMenuShortcuts()
 	{
 		if ((*ki).first.prefix == 0)
 		{
-			BMenuItem *item;
+			BMenuItem *item = NULL;
 			
-			if (((*ki).second & 0xffffff00) == 0x65787400)
+			if (((*ki).second & 0xffff0000) == 0x65780000)	// that's 'ex..'
 			{
-				int nr = (*ki).second - 'ext0';
-				item = fMBar->SubmenuAt(4)->ItemAt(nr);
+				uint16 extHash = (*ki).second & 0xffff;
+				int nr = GetExtensionMenuIndexByHash(extHash);
+				if (nr >= 0)
+					item = fMBar->SubmenuAt(4)->ItemAt(nr);
 			}
 			else
 				item = fMBar->FindItem((*ki).second);
