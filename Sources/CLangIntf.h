@@ -36,6 +36,9 @@
 #ifndef CLANGINTF_H
 #define CLANGINTF_H
 
+#include <map>
+#include <String.h>
+
 class CFunctionScanHandler;
 class CLanguageProxy;
 
@@ -75,21 +78,21 @@ static int GetIndex(const CLangIntf* intf);
 		const char* LineCommentStart() const;
 		const char* LineCommentEnd() const;
 		
+		int LookupKeyWord(const BString& word) const;
+
 protected:
 		CLangIntf();
-#if __dest_os  == __be_os
 		CLangIntf(const char *path, image_id image);
-#else
-		CLangIntf(FSSpec& inRef, CFragConnectionID image);
-#endif
 		
 		void InitTables(const char *kwFile);
 		void RegisterExtension(const char *ext);
 
 static	unsigned char *sfWordBreakTable;
 		
-		unsigned char ec[128];
-		unsigned short *accept, *base, *nxt, *chk;
+		typedef map<BString, int> KeyWordMap;
+		mutable bool fHaveParsedKeyWords;
+		mutable KeyWordMap fKeyWordMap;
+		
 		const char *fLanguage, *fExtensions, *fKeywordFile;		
 		const char *fLineCommentStart, *fLineCommentEnd;
 		bool (*fBalance)(CLanguageProxy& proxy, int& start, int& end);

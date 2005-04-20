@@ -36,9 +36,7 @@
 #ifndef CKEYWORDS_H
 #define CKEYWORDS_H
 
-void GenerateKWTables(const char *file, const char *ext,
-	unsigned char ec[],
-	unsigned short *& accept, unsigned short *& base,
-	unsigned short *& nxt, unsigned short *& chk);
+void GenerateKWMap(const char *file, const char *ext,
+						 map<BString,int>& kwMap);
 
 #endif // CKEYWORDS_H

@@ -78,20 +78,19 @@ CLanguageProxy::CLanguageProxy(CLangIntf& intf, PText& text,
 
 int CLanguageProxy::Move(int ch, int state)
 {
-	int c = fInterface.ec[ch];
-	
-	if (c && fInterface.chk[fInterface.base[state] + c] == state)
-		return fInterface.nxt[fInterface.base[state] + c];
-	else
-		return 0;
+	if (state > 0 && state <= kKeyWordBufSize) {
+		fKeyWordBuf[state-1] = ch;
+		return ++state;
+	}
+	return 0;
 } /* CLanguageProxy::Move */
 
 int CLanguageProxy::IsKeyWord(int state)
 {
-	if (state)
-		return fInterface.accept[state];
-	else
+	if (state < 2)
 		return 0;
+	BString word(fKeyWordBuf, state-1);
+	return fInterface.LookupKeyWord(word);
 } /* CLanguageProxy::IsKeyWord */
 
 const char *CLanguageProxy::Text() const

@@ -68,6 +68,16 @@ enum {
 	kLEndColor // just a marker, same as kLTextColor if you care
 };
 
+// these constants define the different keyword-types that are returned
+// by IsKeyWord() (see below):
+enum {
+	kKeywordLanguage = 1,
+	kKeywordUser1,
+	kKeywordUser2,
+	kKeywordUser3,
+	kKeywordUser4
+};
+
 class CFunctionScanHandler;
 class CLangIntf;
 class PText;
@@ -161,6 +171,9 @@ private:
 		rgb_color *fColors;
 		CFunctionScanHandler* fFunctionScanHandler;
 		uint32 fNestLevel;
+		//
+		static const int kKeyWordBufSize = 128;
+		char fKeyWordBuf[kKeyWordBufSize+1];
 };
 
 /*

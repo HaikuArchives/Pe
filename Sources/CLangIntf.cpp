@@ -89,6 +89,7 @@ bool ext::operator==(const ext& e) const
 #pragma mark -
 
 CLangIntf::CLangIntf()
+	:	fHaveParsedKeyWords(false)
 {
 	if (sfWordBreakTable == NULL)
 	{
@@ -109,6 +110,7 @@ CLangIntf::CLangIntf()
 } /* CLangIntf::CLangIntf */
 
 CLangIntf::CLangIntf(const char *path, image_id image)
+	:	fHaveParsedKeyWords(false)
 {
 	if (sfWordBreakTable == NULL)
 	{
@@ -132,17 +134,10 @@ CLangIntf::CLangIntf(const char *path, image_id image)
 	FailOSErr(get_image_symbol(fImage, "kLanguageCommentStart", B_SYMBOL_TYPE_DATA, (void**)&fLineCommentStart));
 	FailOSErr(get_image_symbol(fImage, "kLanguageCommentEnd", B_SYMBOL_TYPE_DATA, (void**)&fLineCommentEnd));
 	FailOSErr(get_image_symbol(fImage, "kLanguageKeywordFile", B_SYMBOL_TYPE_DATA, (void**)&fKeywordFile));
-
-	if (strlen(fKeywordFile))
-		GenerateKWTables(fKeywordFile, path, ec, accept, base, nxt, chk);
 } /* CLangIntf::CLangIntf */
 
 CLangIntf::~CLangIntf()
 {
-	delete accept;
-	delete base;
-	delete nxt;
-	delete chk;
 } /* CLangIntf::~CLangIntf */
 
 template <class T>
@@ -199,7 +194,6 @@ void CLangIntf::SetupLanguageInterfaces()
 				(err = get_image_symbol(next, "kLanguageName", B_SYMBOL_TYPE_DATA, (void**)&l)) == B_OK)
 			{
 				if (strlen(l) > 28) THROW(("Language name too long"));
-
 				CLangIntf *intf = new CLangIntf(plug, next);
 				fInterfaces.push_back(intf);
 				
@@ -618,6 +612,21 @@ CLangIntf* CLangIntf::FindByName(const char *language)
 	
 	return sDefault;
 } // CLangIntf::FindByName
+
+int CLangIntf::LookupKeyWord(const BString& word) const
+{
+	if (!fHaveParsedKeyWords) {
+		// do lazy loading of keywords-info:
+		image_info imageInfo;
+		if (get_image_info(fImage, &imageInfo) == B_OK && strlen(fKeywordFile))
+			GenerateKWMap(fKeywordFile, imageInfo.name, fKeyWordMap);
+		fHaveParsedKeyWords = true;
+	}
+	KeyWordMap::const_iterator iter = fKeyWordMap.find(word);
+	return iter == fKeyWordMap.end() ? 0 : iter->second;
+}
+
+
 
 
 // #pragma mark -
