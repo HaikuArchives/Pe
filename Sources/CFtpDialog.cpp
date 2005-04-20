@@ -45,6 +45,7 @@
 #include "HPreferences.h"
 #ifdef BONE_BUILD
 	#define closesocket(X)	close(X)
+	#include <arpa/inet.h>
 #endif
 #include <socket.h>
 #include <netdb.h>
