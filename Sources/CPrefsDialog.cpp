@@ -923,7 +923,6 @@ void CPrefsDialog::InitKeybindingPage()
 		
 			for (int i = 0; i < menu.CountItems(); i++) {
 				uint16 extHash = HashString16(menu.ItemAt(i)->Label());
-printf("hash for %s = %u\n", menu.ItemAt(i)->Label(), extHash);
 				fKBCommands->AddUnder(new MyItem(menu.ItemAt(i)->Label(), cmd|extHash), mom);
 			}
 		}

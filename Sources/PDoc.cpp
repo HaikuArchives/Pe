@@ -1173,7 +1173,6 @@ static int sExtensionCount = 0;
 
 static int GetExtensionMenuIndexByHash(uint16 hash)
 {
-printf("GetExtensionIbH(%u) = ",hash);
 	int idx = -1;
 	int skipped = 0;
 	for (int i = 0; i < sExtensionCount; i++) {
@@ -1185,7 +1184,6 @@ printf("GetExtensionIbH(%u) = ",hash);
 			break;
 		}
 	}
-printf("%d\n",idx-skipped);
 	return idx - skipped;
 }
 
@@ -1217,7 +1215,6 @@ static void LoadAddOnsFromPath(const char *path)
 			{
 				char *n = strdup(dent->d_name);
 
-printf("ext %d. -> %s\n", sExtensionCount, n);
 				sExtensionCount++;
 				sExtensions.push_back(f);
 				sExtensionNames.push_back(n);
@@ -1226,7 +1223,6 @@ printf("ext %d. -> %s\n", sExtensionCount, n);
 			else if (stbuf.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 			{
 				// an executable shell script perhaps...
-printf("ext %d. -> %s\n", sExtensionCount, dent->d_name);
 				sExtensionCount++;
 				sExtensions.push_back(NULL);
 				sExtensionNames.push_back(strdup(dent->d_name));
