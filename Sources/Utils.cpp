@@ -285,3 +285,18 @@ void p2cstrcpy(char *p, const unsigned char *s)
 //}
 //
 
+uint16 HashString16(const char *string)
+{	// [zooey]: this is a rough assimilation of Tracker's HashString() to 
+	//          16-bit, if anyone knows a better way, please enlighten me!
+	char ch;
+	uint32 result = 0;
+	
+	while((ch = *string++) != 0) {
+		result = (result << 7) ^ (result >> 24);
+		result ^= ch;
+	}
+
+	result ^= result << 12;
+	return result & 0xffff;
+}
+

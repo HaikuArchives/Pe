@@ -55,5 +55,6 @@ void SendToIDE(const BMessage& msg, BMessage *reply = NULL);
 void RelativePath(const entry_ref& a, const entry_ref& b, char* path);
 void RelativePath(const BPath& pa, const BPath& pb, char* path);
 void TruncPathString(char *path, int textTraitsID, int width);
+uint16 HashString16(const char *string);
 
 #endif // UTILS_H
