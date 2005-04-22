@@ -167,6 +167,7 @@
 #define msg_HTMLNew						'HNew'
 
 #define msg_ShowHTMLPalette			'HTMP'
+#define msg_HideHTMLPalette			'HTMp'
 	
 #define msg_IDE_SetTarget				'IdST'
 #define msg_IDE_Add						'IdAd'

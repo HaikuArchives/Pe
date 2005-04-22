@@ -283,7 +283,8 @@ PApp::PApp()
 		CPrefOpener *prefOpener = new CPrefOpener;
 		fPrefOpener = prefOpener->Thread();
 		
-		if (gPrefs->GetPrefInt("show htmlpalette", 1))
+		if (gPrefs->GetPrefInt("show htmlpalette", 1)
+		&& !gPrefs->GetPrefInt("show htmlpalette for html", 1))
 			CHTMLBar::Instance()->Show();
 		
 		try
@@ -997,6 +998,16 @@ void PApp::MessageReceived(BMessage *msg)
 				break;
 			}
 			
+			case msg_HideHTMLPalette:
+			{
+				BWindow *w = CHTMLBar::Instance();
+				BAutolock lock(w);
+
+				if (!w->IsHidden())
+					w->Hide();
+				break;
+			}
+
 			default:
 				BApplication::MessageReceived(msg);
 		}

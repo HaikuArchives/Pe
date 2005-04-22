@@ -671,6 +671,13 @@ void PDoc::WindowActivated(bool active)
 				fLastSaved = t;
 			}
 		}
+		if (active && gPrefs->GetPrefInt("show htmlpalette", 1)
+		&& gPrefs->GetPrefInt("show htmlpalette for html", 1)) {
+			BMessage msg(fMimeType == "text/html" 
+								? msg_ShowHTMLPalette 
+								: msg_HideHTMLPalette);
+			be_app->PostMessage(&msg);
+		}
 	}
 	catch (HErr& e)
 	{

@@ -428,6 +428,7 @@ bool CPrefsDialog::OKClicked()
 	gPrefs->SetPrefInt("singleclickglossary", IsOn("sigl"));
 
 	gPrefs->SetPrefInt("show htmlpalette", IsOn("shtp"));
+	gPrefs->SetPrefInt("show htmlpalette for html", IsOn("shtP"));
 	
 	gPrefs->SetPrefInt("isearch_igncase", IsOn("isic"));
 	gPrefs->SetPrefInt("centerfound", IsOn("cesf"));
@@ -665,7 +666,10 @@ bool CPrefsDialog::CancelClicked()
 	SetOn("sigl", gPrefs->GetPrefInt("singleclickglossary", 0));
 
 	SetOn("shtp", gPrefs->GetPrefInt("show htmlpalette", 1));
+	SetOn("shtP", gPrefs->GetPrefInt("show htmlpalette for html", 1));
 	
+	SetEnabled("shtP", IsOn("shtp"));
+
 	SetOn("isic", gPrefs->GetPrefInt("isearch_igncase", 1));
 	SetOn("cesf", gPrefs->GetPrefInt("centerfound", 0));
 	
@@ -742,6 +746,8 @@ void CPrefsDialog::UpdateFields()
 	SetEnabled("restore cwd", statePe);
 	
 	SetEnabled("wrft", IsOn("wrfi"));
+
+	SetEnabled("shtP", IsOn("shtp"));
 
 	UpdateKBPage();
 	

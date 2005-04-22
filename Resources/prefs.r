@@ -267,7 +267,8 @@ resource 'DLOG' (132, "Preferences") {
 				
 				Line				{{   0,  79, 290,  80 }},
 
-				CheckBox			{{   0,  87, 290, 103 }, "shtp", "Show HTML Palette at startup" },
+				CheckBox			{{   0,  87, 290, 103 }, "shtp", "Show HTML Palette" },
+				CheckBox			{{  20, 107, 290, 123 }, "shtP", "Only when editing HTML files" },
 			TabSheetEnd				{},
 
 			TabSheet				{ "State", "What to do with state information in saved documents" },
