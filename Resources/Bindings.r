@@ -361,8 +361,8 @@ Resource 'Bind' (2, "Bindings for Edit Menu") {
 		Cmd | Shift, 0x4e,		0, 0,		msg_CopyAppend,
 		Cmd, 0x4d,				0, 0,		'CCUT',
 		Cmd | Shift, 0x4d,		0, 0,		msg_CutAppend,
-		Cmd | Shift, 0x4c,		0, 0,		msg_Redo,
-		Cmd, 0x4c,				0, 0,		msg_Undo
+		Cmd | Shift, 0x2c,		0, 0,		msg_Redo,
+		Cmd, 0x2c,				0, 0,		msg_Undo
 	}
 };
 
@@ -462,7 +462,7 @@ Resource 'Bind' (9, "Emacs Bindings") {
 		Ctrl, 0x34,			0, 0,			kmsg_Cut_Word_Backward,
 		0, 0x3e,				0, 0x01,		kmsg_Cut_Word,
 		Ctrl, 0x43,			0, 0,			kmsg_Cut_to_End_of_Line,
-		Ctrl, 0x2c,			0, 0, 			'PSTE',
+		Ctrl, 0x4c,			0, 0, 			'PSTE',
 		0, 0x13,				Ctrl, 0x4d,	kmsg_SplitWindow,
 		0, 0x12,				Ctrl, 0x4d,	kmsg_UnsplitWindow,
 		0, 0x2f,				Ctrl, 0x4d,	kmsg_SwitchActivePart
