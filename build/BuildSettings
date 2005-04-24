@@ -83,7 +83,7 @@ rule SetUpSubDirBuildSettings {
 	
 	# debugging settings
 	if $(DEBUG) > 0 {
-		OPTIMIZE = 1 ;
+		OPTIMIZE = 0 ;
 		STRIP_APPS = 0 ;
 		DEFINES += DEBUG=$(DEBUG) ;
 		CCFLAGS += -g ;
