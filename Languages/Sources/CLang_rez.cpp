@@ -40,6 +40,7 @@ _EXPORT const char kLanguageExtensions[] = "r;rez";
 _EXPORT const char kLanguageCommentStart[] = "//";
 _EXPORT const char kLanguageCommentEnd[] = "";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.rez";
+_EXPORT const int16 kInterfaceVersion = 2;
 
 enum {
 	START, IDENT, OTHER, COMMENT, LCOMMENT, STRING,

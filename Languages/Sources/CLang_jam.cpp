@@ -37,6 +37,7 @@ _EXPORT const char kLanguageExtensions[] = "Jamfile;Jamrules;Jambase";
 _EXPORT const char kLanguageCommentStart[] = "#";
 _EXPORT const char kLanguageCommentEnd[] = "";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.jam";
+_EXPORT const int16 kInterfaceVersion = 2;
 
 // #pragma mark ----- tokens -----
 

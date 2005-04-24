@@ -13,6 +13,7 @@ _EXPORT const char kLanguageExtensions[] = "as;asm;ASM;nas;s;S";
 _EXPORT const char kLanguageCommentStart[] = ";";
 _EXPORT const char kLanguageCommentEnd[] = "";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.asm";
+_EXPORT const int16 kInterfaceVersion = 2;
 }
 
 enum {

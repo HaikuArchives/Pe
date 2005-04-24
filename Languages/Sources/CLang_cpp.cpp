@@ -48,6 +48,7 @@ _EXPORT const char kLanguageExtensions[] = "c;h;C;H;cc;hh;cpp;hpp;cxx;hxx;cp;hp"
 _EXPORT const char kLanguageCommentStart[] = "//";
 _EXPORT const char kLanguageCommentEnd[] = "";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.cpp";
+_EXPORT const int16 kInterfaceVersion = 2;
 }
 
 enum {

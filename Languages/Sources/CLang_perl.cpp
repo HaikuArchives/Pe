@@ -40,6 +40,7 @@ _EXPORT const char kLanguageExtensions[] = "pl";
 _EXPORT const char kLanguageCommentStart[] = "#";
 _EXPORT const char kLanguageCommentEnd[] = "";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.pl";
+_EXPORT const int16 kInterfaceVersion = 2;
 
 enum {
 	START, IDENT, OTHER, COMMENT, LCOMMENT, STRING1, STRING2,

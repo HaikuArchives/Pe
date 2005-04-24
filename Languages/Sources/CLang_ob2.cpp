@@ -40,6 +40,7 @@ _EXPORT const char kLanguageExtensions[] = "ob2;Mod";
 _EXPORT const char kLanguageCommentStart[] = "(*";
 _EXPORT const char kLanguageCommentEnd[] = "*)";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.ob2";
+_EXPORT const int16 kInterfaceVersion = 2;
 
 _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 {
