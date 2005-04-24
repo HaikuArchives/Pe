@@ -46,8 +46,6 @@
 #include "HError.h"
 #include "HColorUtils.h"
 
-const int kMaxNameSize = 256;
-
 CLanguageProxy::CLanguageProxy(CLangIntf& intf, const char *text, int size,
 	int encoding, int *starts, rgb_color *colors)
 	: fInterface(intf)
@@ -78,19 +76,12 @@ CLanguageProxy::CLanguageProxy(CLangIntf& intf, PText& text,
 
 int CLanguageProxy::Move(int ch, int state)
 {
-	if (state > 0 && state <= kKeyWordBufSize) {
-		fKeyWordBuf[state-1] = ch;
-		return ++state;
-	}
-	return 0;
+	return fInterface.AddToCurrentKeyWord(ch, state);
 } /* CLanguageProxy::Move */
 
 int CLanguageProxy::IsKeyWord(int state)
 {
-	if (state < 2)
-		return 0;
-	BString word(fKeyWordBuf, state-1);
-	return fInterface.LookupKeyWord(word);
+	return fInterface.LookupCurrentKeyWord(state);
 } /* CLanguageProxy::IsKeyWord */
 
 const char *CLanguageProxy::Text() const

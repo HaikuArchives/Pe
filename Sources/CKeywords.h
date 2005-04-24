@@ -39,4 +39,9 @@
 void GenerateKWMap(const char *file, const char *ext,
 						 map<BString,int>& kwMap);
 
+void GenerateKWTables(const char *file, const char *ext,
+							 unsigned char ec[],
+							 unsigned short *& accept, unsigned short *& base,
+							 unsigned short *& nxt, unsigned short *& chk);
+
 #endif // CKEYWORDS_H

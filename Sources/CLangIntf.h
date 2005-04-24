@@ -78,8 +78,6 @@ static int GetIndex(const CLangIntf* intf);
 		const char* LineCommentStart() const;
 		const char* LineCommentEnd() const;
 		
-		int LookupKeyWord(const BString& word) const;
-
 protected:
 		CLangIntf();
 		CLangIntf(const char *path, image_id image);
@@ -89,10 +87,12 @@ protected:
 
 static	unsigned char *sfWordBreakTable;
 		
-		typedef map<BString, int> KeyWordMap;
-		mutable bool fHaveParsedKeyWords;
-		mutable KeyWordMap fKeyWordMap;
-		
+		// data members for old (DFA-based) keyword implementation, needed to 
+		// support binary-only language-addons that use this implementation
+		// (like phpext):
+		unsigned char ec[128];
+		unsigned short *accept, *base, *nxt, *chk;
+
 		const char *fLanguage, *fExtensions, *fKeywordFile;		
 		const char *fLineCommentStart, *fLineCommentEnd;
 		bool (*fBalance)(CLanguageProxy& proxy, int& start, int& end);
@@ -101,6 +101,21 @@ static	unsigned char *sfWordBreakTable;
 		int (*fFindNextWord)(const CLanguageProxy& proxy);
 		image_id fImage;
 
+		// member introduced for proper interface version detection:
+		int16 fInterfaceVersion;
+		
+		// members for new (map-based) keyword implementation:
+public:
+		int AddToCurrentKeyWord(int ch, int state);
+		int LookupCurrentKeyWord(int state) const;
+		int LookupKeyWord(const BString& word) const;
+protected:
+		static const int kKeyWordBufSize = 128;
+		char fKeyWordBuf[kKeyWordBufSize+1];
+		typedef map<BString, int> KeyWordMap;
+		mutable bool fHaveParsedKeyWords;
+		mutable KeyWordMap fKeyWordMap;
+		
 static	vector<CLangIntf*>	fInterfaces;
 };
 

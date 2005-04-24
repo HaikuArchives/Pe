@@ -171,9 +171,6 @@ private:
 		rgb_color *fColors;
 		CFunctionScanHandler* fFunctionScanHandler;
 		uint32 fNestLevel;
-		//
-		static const int kKeyWordBufSize = 128;
-		char fKeyWordBuf[kKeyWordBufSize+1];
 };
 
 /*
@@ -201,6 +198,7 @@ extern const char kLanguageExtensions[];
 extern const char kLanguageCommentStart[];
 extern const char kLanguageCommentEnd[];
 extern const char kLanguageKeywordFile[];
+extern const int16 kInterfaceVersion;
 
 /*
 	These are the prototypes for the three functions you should implement.

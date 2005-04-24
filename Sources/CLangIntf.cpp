@@ -107,6 +107,7 @@ CLangIntf::CLangIntf()
 	fExtensions = "";
 	fKeywordFile = NULL;
 	fLineCommentStart = fLineCommentEnd = "";
+	fInterfaceVersion = 1;
 } /* CLangIntf::CLangIntf */
 
 CLangIntf::CLangIntf(const char *path, image_id image)
@@ -134,6 +135,13 @@ CLangIntf::CLangIntf(const char *path, image_id image)
 	FailOSErr(get_image_symbol(fImage, "kLanguageCommentStart", B_SYMBOL_TYPE_DATA, (void**)&fLineCommentStart));
 	FailOSErr(get_image_symbol(fImage, "kLanguageCommentEnd", B_SYMBOL_TYPE_DATA, (void**)&fLineCommentEnd));
 	FailOSErr(get_image_symbol(fImage, "kLanguageKeywordFile", B_SYMBOL_TYPE_DATA, (void**)&fKeywordFile));
+	int16* versionPtr = NULL;
+	get_image_symbol(fImage, "kInterfaceVersion", B_SYMBOL_TYPE_DATA, (void**)&versionPtr);
+	fInterfaceVersion = versionPtr ? *versionPtr : 1;
+	if (fInterfaceVersion == 1) {
+		if (strlen(fKeywordFile))
+			GenerateKWTables(fKeywordFile, path, ec, accept, base, nxt, chk);
+	}
 } /* CLangIntf::CLangIntf */
 
 CLangIntf::~CLangIntf()
@@ -612,6 +620,23 @@ CLangIntf* CLangIntf::FindByName(const char *language)
 	
 	return sDefault;
 } // CLangIntf::FindByName
+
+int CLangIntf::AddToCurrentKeyWord(int ch, int state)
+{
+	if (state > 0 && state <= kKeyWordBufSize) {
+		fKeyWordBuf[state-1] = ch;
+		return ++state;
+	}
+	return 0;
+}
+
+int CLangIntf::LookupCurrentKeyWord(int state) const
+{
+	if (state < 2)
+		return 0;
+	BString word(fKeyWordBuf, state-1);
+	return LookupKeyWord(word);
+}
 
 int CLangIntf::LookupKeyWord(const BString& word) const
 {
