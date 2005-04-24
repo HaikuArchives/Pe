@@ -46,19 +46,53 @@ void GenerateKWMap(const char *file, const char *ext, map<BString,int>& kwMap)
 {
 	try
 	{
-		BFile rf;
-		FailOSErr(rf.SetTo(ext, B_READ_ONLY));
-		BResources res;
-		FailOSErr(res.SetTo(&rf));
+		BPath settings;
+		bool isNew = false;
 		
-		size_t s;
-		const char *r = (const char*)res.LoadResource('KeyW', file, &s);
-		
-		if (!r) THROW(("Missing resource"));
-		
-bigtime_t st = system_time();
+		FailOSErr(find_directory(B_USER_SETTINGS_DIRECTORY, &settings, true));
+	
+		BString p;
+		p << settings.Path() << "/pe/" << file;
+	
+		BEntry e;
+		FailOSErrMsg(e.SetTo(p.String(), B_FILE_NODE), 
+						 "Settings directory was not found?");
+
+		BString keywords;
+		if (!e.Exists())
+		{
+			// copy resources into separate file in settings-folder, such that
+			// the user can edit that in order to modify the keywords for that
+			// specific language:
+			isNew = true;
+			
+			BFile rf;
+			FailOSErr(rf.SetTo(ext, B_READ_ONLY));
+			BResources res;
+			FailOSErr(res.SetTo(&rf));
+			
+			size_t s;
+			const char *r = (const char*)res.LoadResource('KeyW', file, &s);
+			
+			if (!r) THROW(("Missing resource"));
+			
+			BFile txtfile(p.String(), B_CREATE_FILE | B_READ_WRITE);
+			CheckedWrite(txtfile, r, s);
+			keywords.SetTo(r, s);
+		} else {
+			BFile txtfile(p.String(), B_READ_ONLY);
+			off_t size;
+			FailOSErr(txtfile.GetSize(&size));
+			char* kw = keywords.LockBuffer(size+1);
+			if (kw) {
+				CheckedRead(txtfile, kw, size);
+				keywords.UnlockBuffer(size);
+			}
+		}
+
+		const char* kw = keywords.String();
 		const char* white = " \n\r\t";
-		const char* start = r + strspn(r, white);
+		const char* start = kw + strspn(kw, white);
 		const char* end = start + strcspn(start, white);
 		BString word;
 		int currType = kKeywordLanguage;
@@ -98,8 +132,6 @@ bigtime_t st = system_time();
 				end = start + strcspn(start, white);
 			}
 		}
-bigtime_t et = system_time();
-printf("parsed keywords in %u ms\n", (unsigned int)(et-st)/1000);
 	}
 	catch (HErr& err)
 	{
