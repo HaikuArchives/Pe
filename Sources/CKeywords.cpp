@@ -43,6 +43,13 @@
 
 /*
  * New implementation of keyword lookup, a straightforward, map-based lookup:
+ * [zooey]: 
+ *     I know that using a hashmap should be faster, but since we do not know
+ *     the amount of words contained in the map beforehand, the memory footprint
+ *     of the hashmap would be (much) worse than that of a map.
+ *     Benchmarks have indicated that lookup speed is good enough with maps
+ *		 anyway (it performs at least s well as the older DFA-approach), 
+ *		 so I have decided to use a map for now.
  */
 void GenerateKWMap(const char *file, const char *ext, map<BString,int>& kwMap)
 {
@@ -97,9 +104,19 @@ void GenerateKWMap(const char *file, const char *ext, map<BString,int>& kwMap)
 		const char* start = kw + strspn(kw, white);
 		const char* end = start + strcspn(start, white);
 		BString word;
+		char* buf;
 		int currType = kKeywordLanguage;
 		while(start < end) {
-			word.SetTo(start, end-start);
+			// ideally, we'd like to use this:
+			//			word.SetTo(start, end-start);
+			// but the implementation of SetTo() seems to do a strlen() without
+			// clamping it to the given length, which (as we give it a pretty
+			// long string) results in pathetic performance.
+			// So we roll our own SetTo():
+			FailNil(buf = word.LockBuffer(end-start+1));
+			memcpy(buf, start, end-start);
+			buf[end-start] = '\0';
+			word.UnlockBuffer(end-start);
 			if (!word.Compare("//", 2)) {
 				// a comment, so we skip to end of line:
 				start += strcspn(start, "\n");
