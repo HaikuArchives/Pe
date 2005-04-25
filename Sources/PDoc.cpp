@@ -1173,20 +1173,25 @@ void PDoc::SetError(const char *err, rgb_color c)
 
 #pragma mark - Addons
 
-static vector<perform_edit_func> sExtensions;
-static vector<char*> sExtensionNames;
-static vector<int16> sExtensionHashes;
-static int sExtensionCount = 0;
+struct ExtensionInfo {
+	perform_edit_func extension;
+	char* name;
+	uint16 hash;
+	bool operator< (const ExtensionInfo& other) const {
+		return strcasecmp(name, other.name) < 0;
+	}
+};
+static vector<ExtensionInfo> sExtensions;
 
 static int GetExtensionMenuIndexByHash(uint16 hash)
 {
 	int idx = -1;
 	int skipped = 0;
-	for (int i = 0; i < sExtensionCount; i++) {
+	for (uint16 i = 0; i < sExtensions.size(); i++) {
 		if (gPrefs->GetPrefInt("skiphtmlext", 1) 
-		&& strncasecmp(sExtensionNames[i], "HTML", 4) == 0) {
+		&& strncasecmp(sExtensions[i].name, "HTML", 4) == 0) {
 			skipped++;
-		} else if (sExtensionHashes[i] == hash) {
+		} else if (sExtensions[i].hash == hash) {
 			idx = i;
 			break;
 		}
@@ -1215,6 +1220,7 @@ static void LoadAddOnsFromPath(const char *path)
 		{
 			image_id next;
 			perform_edit_func f;
+			struct ExtensionInfo extInfo;
 
 			next = load_add_on(plug);
 			if (next > B_ERROR &&
@@ -1222,18 +1228,18 @@ static void LoadAddOnsFromPath(const char *path)
 			{
 				char *n = strdup(dent->d_name);
 
-				sExtensionCount++;
-				sExtensions.push_back(f);
-				sExtensionNames.push_back(n);
-				sExtensionHashes.push_back(HashString16(n));
+				extInfo.extension = f;
+				extInfo.name = n;
+				extInfo.hash = HashString16(n);
+				sExtensions.push_back(extInfo);
 			}
 			else if (stbuf.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 			{
 				// an executable shell script perhaps...
-				sExtensionCount++;
-				sExtensions.push_back(NULL);
-				sExtensionNames.push_back(strdup(dent->d_name));
-				sExtensionHashes.push_back(HashString16(dent->d_name));
+				extInfo.extension = NULL;
+				extInfo.name = strdup(dent->d_name);
+				extInfo.hash = HashString16(dent->d_name);
+				sExtensions.push_back(extInfo);
 			}
 		}
 	}
@@ -1264,26 +1270,29 @@ void PDoc::LoadAddOns()
 			LoadAddOnsFromPath(path);
 		}
 	}
+	sort(sExtensions.begin(), sExtensions.end());
 } /* PDoc::LoadAddOns */
 
 void PDoc::BuildExtensionsMenu(BMenu *addOnMenu)
 {
-	for (int i = 0; i < sExtensionCount; i++)
+	for (uint16 i = 0; i < sExtensions.size(); i++)
 	{
-		if (! (gPrefs->GetPrefInt("skiphtmlext", 1) && strncasecmp(sExtensionNames[i], "HTML", 4) == 0))
-			addOnMenu->AddItem(new BMenuItem(sExtensionNames[i], new BMessage(msg_PerformExtension)));
+		if (!(gPrefs->GetPrefInt("skiphtmlext", 1) 
+			&& strncasecmp(sExtensions[i].name, "HTML", 4) == 0))
+			addOnMenu->AddItem(new BMenuItem(sExtensions[i].name, 
+														new BMessage(msg_PerformExtension)));
 	}
 } /* PDoc::BuildExtensionsMenu */
 
 void PDoc::PerformExtension(int nr)
 {
-	if (sExtensions[nr] != NULL)
+	if (sExtensions[nr].extension != NULL)
 	{
-		MTextAddOn intf(*fText, sExtensionNames[nr]);
+		MTextAddOn intf(*fText, sExtensions[nr].name);
 
 		UpdateIfNeeded();
 
-		(*sExtensions[nr])(&intf);
+		(*sExtensions[nr].extension)(&intf);
 	}
 	else if (modifiers() & B_OPTION_KEY)
 	{
@@ -1296,21 +1305,21 @@ void PDoc::PerformExtension(int nr)
 		strcpy(path, p.Path());
 	
 		strcat(path, "/Extensions/");
-		strcat(path, sExtensionNames[nr]);
+		strcat(path, sExtensions[nr].name);
 		
 		entry_ref ref;
 		if (get_ref_for_path(path, &ref) == B_OK)
 			gApp->OpenWindow(ref);
 	}
 	else
-		fText->RegisterCommand(new PScriptCmd(fText, sExtensionNames[nr]));
+		fText->RegisterCommand(new PScriptCmd(fText, sExtensions[nr].name));
 } /* PDoc::PerformExtension */
 
 void PDoc::PerformExtension(const char *ext)
 {
-	for (int i = 0; i < sExtensionCount; i++)
+	for (uint16 i = 0; i < sExtensions.size(); i++)
 	{
-		if (strcmp(sExtensionNames[i], ext) == 0)
+		if (strcmp(sExtensions[i].name, ext) == 0)
 		{
 			PerformExtension(i);
 			return;
