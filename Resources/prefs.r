@@ -216,15 +216,15 @@ resource 'DLOG' (132, "Preferences") {
 			TabSheet				{ "Keybindings", "The bindings between key shortcuts and actions" },
 
 				Caption				{{   0,   0,  40,  16 }, "actcap", "Action:" },
-				OutlineList			{{  42,   2, 288, 118 }, "kact" },
+				OutlineList			{{  42,   2, 288, 131 }, "kact" },
 				
-				Caption				{{   0, 126,  40, 142 }, "keycap", "Keys:" },
-				List				{{  42, 128, 168, 166 }, "keys" },
+				Caption				{{   0, 139,  40, 155 }, "keycap", "Keys:" },
+				List				{{  42, 141, 168, 179 }, "keys" },
 
-				KeyCapture			{{ 180, 126, 290, 142 }, "kebi" },
+				KeyCapture			{{ 180, 139, 290, 155 }, "kebi" },
 
-				Button				{{ 180, 146, 230, 166 }, "adke", "Add", 'AddK' },
-				Button				{{ 240, 146, 290, 166 }, "deke", "Delete", 'DelK' },
+				Button				{{ 180, 159, 230, 179 }, "adke", "Add", 'AddK' },
+				Button				{{ 240, 159, 290, 179 }, "deke", "Delete", 'DelK' },
 			TabSheetEnd				{},
 			
 			TabSheet				{ "Languages", "Options for Syntax Colouring and the Function Popup" },
@@ -300,8 +300,8 @@ resource 'DLOG' (132, "Preferences") {
 				
 			TabSheetEnd				{},
 			
-			Button					{{ 335, 224, 390, 244 }, "ok  ", "Apply", 'ok  ' },
-			Button					{{ 265, 224, 320, 244 }, "cncl", "Revert", 'cncl' },
+			Button					{{ 335, 235, 390, 255 }, "ok  ", "Apply", 'ok  ' },
+			Button					{{ 265, 235, 320, 255 }, "cncl", "Revert", 'cncl' },
 		TabbedBookEnd				{}
 	}
 };
