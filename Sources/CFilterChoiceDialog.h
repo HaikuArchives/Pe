@@ -68,7 +68,7 @@ public:
 	virtual void DispatchMessage(BMessage *message, BHandler *handler);
 	virtual void Quit();
 	virtual void WindowActivated(bool state);
-	virtual void WorkspacesChanged(uint32 oldWorkspace, uint32 newWorkspace);
+	virtual void WorkspacesActivated(int32 workspace, bool active);
 
 	CFilterChoiceModel *Model() const;
 

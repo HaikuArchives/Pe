@@ -14,6 +14,7 @@
 #include <TextControl.h>
 
 #include "CFilterChoiceDialog.h"
+#include "HColorUtils.h"
 #include "HError.h"
 
 // internal messages
@@ -217,7 +218,6 @@ public:
 	int GroupIndex() const				{ return fGroupIndex; }
 	int Index() const					{ return fIndex; }
 	ChoiceItemInfo *ItemInfo() const	{ return fItemInfo; }
-//	const char *Name() const			{ return Text(); }
 
 private:
 	int				fGroupIndex;
@@ -250,14 +250,44 @@ CFilterChoiceDialog::SeparatorListItem::DrawItem(BView *owner, BRect frame,
 		ym++;
 		owner->StrokeLine(BPoint(frame.left, ym), BPoint(frame.right, ym));
 	}
+	const char* name = fItemInfo && fItemInfo->choiceItem 
+									? fItemInfo->choiceItem->Name()
+									: NULL;
+	if (name && *name) {
+		float labelWidth = owner->StringWidth(name);
+		const int rightOffset = 5;
+		const int lineDist = 2;
+		BPoint labelPT(frame.right - rightOffset - labelWidth - 2*lineDist, 
+							frame.top);
+		BFont font;
+		font_height fontHeight;
+		owner->GetFont(&font);
+		font.GetHeight(&fontHeight);
+		float labelHeight = fontHeight.ascent + fontHeight.descent;
+		owner->FillRect(BRect(labelPT.x, labelPT.y, 
+									 labelPT.x+labelWidth+2*lineDist, 
+								 	 labelPT.y+labelHeight-1),
+							 B_SOLID_LOW);
+		owner->MovePenTo(labelPT.x+lineDist, labelPT.y+fontHeight.ascent);
+		owner->SetHighColor(gColor[kCommentColor]);
+		owner->DrawString(name);
+		owner->SetHighColor(oldHighColor);
+	}
 }
 
 // Update
 void
 CFilterChoiceDialog::SeparatorListItem::Update(BView *owner, const BFont *font)
 {
-	SetWidth(owner->Frame().Width());
-	SetHeight(6 + (fItemInfo->IsGroupSeparator() ? 0 : 1));
+	const char* name = fItemInfo && fItemInfo->choiceItem 
+									? fItemInfo->choiceItem->Name()
+									: NULL;
+	if (name && *name)
+		BListItem::Update(owner, font);
+	else {
+		SetWidth(owner->Frame().Width());
+		SetHeight(6 + (fItemInfo->IsGroupSeparator() ? 0 : 1));
+	}
 }
 
 
@@ -338,7 +368,7 @@ CFilterChoiceDialog::Filter::Accept(const ChoiceItemInfo* info, bool& matched)
 CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 	CFilterChoiceModel *model, BRect centerOver, int defaultSelectGroup)
 	: BWindow(BRect(0, 0, kDefaultDialogWidth, kDefaultDialogHeight), title,
-			  B_MODAL_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
+			  B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 			  B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
 	  fModel(model),
 	  fListener(NULL),
@@ -529,24 +559,18 @@ CFilterChoiceDialog::Quit()
 void
 CFilterChoiceDialog::WindowActivated(bool state)
 {
-	// Oh boy, that's scary. Since we get WorkspaceChanged() notifications
-	// with bollocks values for oldWorkspace when we're going to be shown
-	// initially, we need to ignore them when the window is not yet active.
-	// Unfortunately IsActive() returns nonsense at this point too. So we
-	// track the active state of the window ourselves.
-	fWindowActive = state;
 	BWindow::WindowActivated(state);
+	// quit whenever the window loses focus:
 	if (!state)
 		Quit();
 }
 
-// WorkspacesChanged
+// WorkspacesActivated
 void
-CFilterChoiceDialog::WorkspacesChanged(uint32 oldWorkspace, uint32 newWorkspace)
+CFilterChoiceDialog::WorkspacesActivated(int32 workspace, bool active)
 {
-	// Ignore as long as the window is not active. We get nonsense notification
-	// when we're initially shown.
-	if (fWindowActive)
+	// quit when the user changes to another workspace:
+	if (!active)
 		Quit();
 }
 
@@ -829,7 +853,7 @@ void
 CFilterChoiceDialog::_CoalesceSeparators()
 {
 	// drop all but the last separator of a sequence of separators
-	// we also don't won't separators at the end
+	// we also don't want separators at the end
 	bool wasSeparator = true;
 	bool wasGroupSeparator = true;
 	int count = fChoicesList->CountItems();
