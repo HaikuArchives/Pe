@@ -2082,14 +2082,49 @@ bool PText::WaitMouseMoved(BPoint where)
 	return true;
 } /* PText::WaitMouseMoved */
 
-class CSortMenuInfo
+class CSeparatorItem : public BSeparatorItem
 {
-  public:
-	bool operator() (void * const& a, void * const& b)
-	{
-		return strcasecmp(((const BMenuItem*)a)->Label(), ((const BMenuItem*)b)->Label()) < 0;
-	}
+public:
+	CSeparatorItem(const char* label) 
+		: fLabel(label) 						{}
+	bool IsUnnamed() const 					{ return fLabel.Length()==0; }
+protected:
+	virtual void Draw();
+	virtual void DrawContent();
+	BString fLabel;
 };
+
+void CSeparatorItem::Draw()
+{
+	BSeparatorItem::Draw();
+	DrawContent();
+}
+
+void CSeparatorItem::DrawContent()
+{
+	if (!fLabel.Length())
+		return;
+	BRect frame = Menu()->Frame();
+	float labelWidth = Menu()->StringWidth(fLabel.String());
+	const int rightOffset = 15;
+	const int lineDist = 2;
+	BPoint labelPT(frame.right - rightOffset - labelWidth - 2*lineDist, 
+						ContentLocation().y);
+	BFont font;
+	font_height fontHeight;
+	Menu()->GetFont(&font);
+	font.GetHeight(&fontHeight);
+	float labelHeight = fontHeight.ascent + fontHeight.descent;
+	Menu()->FillRect(BRect(labelPT.x, labelPT.y, 
+								  labelPT.x+labelWidth+2*lineDist, 
+								  labelPT.y+labelHeight-1),
+						  B_SOLID_LOW);
+	Menu()->MovePenTo(labelPT.x+lineDist, labelPT.y+fontHeight.ascent-3);
+	rgb_color highCol = Menu()->HighColor();
+	Menu()->SetHighColor(gColor[kCommentColor]);
+	Menu()->DrawString(fLabel.String());
+	Menu()->SetHighColor(highCol);
+}
 
 struct MenuFunctionScanHandler : public CFunctionScanHandler {
 	MenuFunctionScanHandler(bool sorted)
@@ -2112,9 +2147,9 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 		}
 
 		if (italic)
-			functions.push_back(new PItalicMenuItem(indName.String(), msg));
+			functions.AddItem(new PItalicMenuItem(indName.String(), msg));
 		else
-			functions.push_back(new BMenuItem(indName.String(), msg));
+			functions.AddItem(new BMenuItem(indName.String(), msg));
 	}
 	
 	void AddInclude(const char *name, const char *open, bool italic)
@@ -2123,18 +2158,32 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 		msg->AddString("include", open);
 		
 		if (italic)
-			includes.push_back(new PItalicMenuItem(name, msg));
+			includes.AddItem(new PItalicMenuItem(name, msg));
 		else
-			includes.push_back(new BMenuItem(name, msg));
+			includes.AddItem(new BMenuItem(name, msg));
 	}
 	
-	void AddSeparator()
+	void AddSeparator(const char* name)
 	{
-		if (!sorted)
-			functions.push_back(new BSeparatorItem);
+		if (!sorted) {
+			// strip unnamed separators if followed by other separators:
+			BMenuItem* lastItem = static_cast<BMenuItem*>(functions.LastItem());
+			CSeparatorItem* sepItem = dynamic_cast<CSeparatorItem*>(lastItem);
+			if (sepItem && sepItem->IsUnnamed()) {
+				if (functions.RemoveItem(lastItem))
+					delete lastItem;
+			}
+			functions.AddItem(new CSeparatorItem(name));
+		}
 	}
 
-	vector<void*> includes, functions;
+	static int CompareFunc(const void *a, const void* b)
+	{
+		return strcasecmp((*(const BMenuItem**)a)->Label(), 
+								(*(const BMenuItem**)b)->Label());
+	}
+
+	BList includes, functions;
 	bool sorted;
 };
 
@@ -2149,15 +2198,15 @@ void PText::ShowFunctionMenu(BPoint where)
 
 	MenuFunctionScanHandler handler(sorted);
 
-	vector<void*>& includes = handler.includes;
-	vector<void*>& functions = handler.functions;
+	BList& includes = handler.includes;
+	BList& functions = handler.functions;
 
 	ScanForFunctions(handler);
 	
 	if (sorted)
 	{
-		sort(includes.begin(), includes.end(), CSortMenuInfo());
-		sort(functions.begin(), functions.end(), CSortMenuInfo());
+		includes.SortItems(MenuFunctionScanHandler::CompareFunc);
+		functions.SortItems(MenuFunctionScanHandler::CompareFunc);
 	}
 	
 #if (B_BEOS_VERSION <= B_BEOS_VERSION_4)
@@ -2172,25 +2221,26 @@ void PText::ShowFunctionMenu(BPoint where)
 #endif
 	popup->SetFont(be_plain_font);
 	
-	if (includes.size() == 0 && functions.size() == 0)
+	if (includes.IsEmpty() && functions.IsEmpty())
 	{
 		popup->AddItem(new BMenuItem("Nothing Found", NULL));
 	}
 	else
 	{
-		vector<void*>::iterator i;
-		for (i = includes.begin(); i != includes.end(); i++)
-		{
-			popup->AddItem((BMenuItem *)*i);
+		for (int32 i=0; i<includes.CountItems(); ++i)
+			popup->AddItem((BMenuItem *)includes.ItemAt(i));
+		
+		if (!includes.IsEmpty() && !functions.IsEmpty()) {
+			// add unnamed separator only if functions do not start with
+			// another separator:
+			BMenuItem* firstItem = static_cast<BMenuItem*>(functions.FirstItem());
+			CSeparatorItem* sepItem = dynamic_cast<CSeparatorItem*>(firstItem);
+			if (!sepItem)
+				popup->AddSeparatorItem();
 		}
 		
-		if (i && functions.size())
-			popup->AddSeparatorItem();
-		
-		for (i = functions.begin(); i != functions.end(); i++)
-		{
-			popup->AddItem((BMenuItem *)*i);
-		}
+		for (int32 i=0; i<functions.CountItems(); ++i)
+			popup->AddItem((BMenuItem *)functions.ItemAt(i));
 	}
 
 	BRect r(where.x - 4, where.y - 20, where.x + 24, where.y + 4);
