@@ -194,9 +194,9 @@ PFindFunctionDialogController::AddInclude(const char *name, const char *open,
 
 // AddSeparator
 void
-PFindFunctionDialogController::AddSeparator()
+PFindFunctionDialogController::AddSeparator(const char* name)
 {
-	Choice *choice = new(nothrow) Choice(NULL, 0, true, false);
+	Choice *choice = new(nothrow) Choice(name, 0, true, false);
 	FailNil(choice);
 	fChoiceModel->AddFunctionChoice(choice);
 }
