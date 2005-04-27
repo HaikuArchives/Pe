@@ -249,8 +249,8 @@ const char *preprocessor(const char *text, CLanguageProxy& proxy)
 
 			*name = 0;
 			
-			if (strcmp(nameBuf, "-") == 0)
-				proxy.AddSeparator();
+			if (nameBuf[0] == '-')
+				proxy.AddSeparator(nameBuf+1);
 			else
 				proxy.AddFunction(nameBuf, nameBuf, offset);
 		}

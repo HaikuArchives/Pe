@@ -240,10 +240,7 @@ void pragma(const char *&text, int offset, CLanguageProxy& proxy)
 
 		*name = 0;
 
-		if (strcmp(nameBuf, "-") == 0)
-			proxy.AddSeparator();
-		else
-			proxy.AddFunction(nameBuf, nameBuf, offset);
+		proxy.AddSeparator(nameBuf);
 	}
 } /* pragma */
 

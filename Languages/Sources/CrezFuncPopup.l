@@ -53,6 +53,7 @@ static void AddResource(CLanguageProxy& proxy);
 static void AddResType(CLanguageProxy& proxy);
 static void AddMarker(CLanguageProxy& proxy);
 static void AddInclude(CLanguageProxy& proxy, char openingquote, char closingquote);
+static void AddSeparator(CLanguageProxy& proxy);
 %}
 
 ws			[ \n\t]*
@@ -66,7 +67,6 @@ ident		[a-zA-Z_][a-zA-Z0-9_]*{ws}
 												int BLOCKlevel = 0, CC_caller = 0, STR_caller = 0, CC_cnt = 0;
 \#{ws}include{ws}\<[^\n>]+\>		AddInclude(proxy, '<', '>');
 \#{ws}include{ws}\"[^\n"]+\"		AddInclude(proxy, '"', '"');
-\#{ws}pragma\ mark\ -\n				proxy.AddSeparator();
 \#pragma\ mark\ [^\n]+				AddMarker(proxy);
 type{ws}\'[^\']{4}\'						AddResType(proxy);
 resource{ws}\'[^\']{4}\'				AddResource(proxy);
@@ -186,7 +186,7 @@ static void AddMarker(CLanguageProxy& proxy)
 	{
 		m += 5;
 		
-		proxy.AddFunction(m, m, gIndx - yy_n_chars - 1);
+		proxy.AddSeparator(m);
 	}
 } /* AddMarker */
 

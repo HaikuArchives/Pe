@@ -640,13 +640,8 @@ FunctionScanParseAction::TokenParsed(ParseContext& context, const Token& token)
 				&& commentToken.length > 0) {
 				int nameLength = token.offset + token.length
 					- commentToken.offset;
-				if (nameLength == 1 && commentToken.string[0] == '-') {
-					context.proxy.AddSeparator();
-				} else {
-					BString buffer(commentToken.string, nameLength);
-					context.proxy.AddFunction(buffer.String(),
-						buffer.String(), commentToken.offset);
-				}
+				BString buffer(commentToken.string, nameLength);
+				context.proxy.AddSeparator(buffer.String());
 			}
 		}
 	} else if (fOffset < 0) {
