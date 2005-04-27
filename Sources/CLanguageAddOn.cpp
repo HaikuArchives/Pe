@@ -126,10 +126,22 @@ void CLanguageProxy::AddInclude(const char *name, const char *open, bool italic)
 	fFunctionScanHandler->AddInclude(name, open, italic);
 } /* CLanguageProxy::AddFunction */
 
-void CLanguageProxy::AddSeparator()
+void CLanguageProxy::AddSeparator(const char* nm)
 {
 	FailNilMsg(fFunctionScanHandler, "Not a valid call in this context");
-	fFunctionScanHandler->AddSeparator();
+	BString name;
+	if (nm) {
+		while(isspace(*nm) || *nm=='-')
+			nm++;
+		const char* nme = nm+strlen(nm);
+		while(nme > nm) {
+			nme--;
+			if (!isspace(*nme) && *nme!='-')
+				break;
+		}
+		name.SetTo(nm, 1+nme-nm);
+	}
+	fFunctionScanHandler->AddSeparator(name.String());
 } /* CLanguageProxy::AddSeparator */
 
 bool CLanguageProxy::Includes() const

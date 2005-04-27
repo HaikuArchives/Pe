@@ -674,7 +674,7 @@ void CFunctionScanHandler::AddInclude(const char *name, const char *open,
 {
 } // CFunctionScanHandler::AddInclude
 
-void CFunctionScanHandler::AddSeparator()
+void CFunctionScanHandler::AddSeparator(const char* name)
 {
 }
 
