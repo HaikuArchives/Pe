@@ -155,24 +155,7 @@ bool PProjectWindow::QuitRequested()
 		Save();
 	}
 	else
-	{
-		try
-		{
-			BFile file;
-			
-			FailOSErr(file.SetTo(fFile, B_READ_WRITE));
-			
-			BMessage msg;
-			msg.AddRect("windowposition", Frame());
-	
-			ssize_t s = msg.FlattenedSize();
-			char *fm = (char *)malloc(s);
-			FailNil(fm);
-			FailOSErr(msg.Flatten(fm, s));
-			FailIOErr(file.WriteAttr("pe-info", 'info', 0, fm, s));
-		}
-		catch (HErr& e) {}
-	}
+		WriteState();
 	
 	return !fWaitForSave;
 } /* PProjectWindow::QuitRequested */

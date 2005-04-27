@@ -56,7 +56,7 @@ virtual			~CDoc();
 virtual	void ReadData(BPositionIO& file) = 0;
 virtual	void ReadAttr(BFile& file) = 0;
 
-			void Write();
+status_t		  WriteState();
 virtual	void WriteData(BPositionIO& file) = 0;
 virtual	void WriteAttr(BFile& file) = 0;
 

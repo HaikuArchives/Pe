@@ -169,6 +169,8 @@ bool PDoc::QuitRequested()
 		SetDirty(true);
 		result = CDoc::QuitRequested();
 	}
+	else
+		WriteState();
 
 	return result;
 } /* PDoc::QuitRequested */

@@ -173,21 +173,20 @@ void CDoc::Read()
 //{
 //} /* CDoc::ReadAttr */
 
-void CDoc::Write()
+status_t CDoc::WriteState()
 {
 	if (fFile)
 	{
 		BFile file;
-		FailOSErr(file.SetTo(fFile, B_READ_WRITE));
-		
-		WriteData(file);
-		FailOSErr(file.Sync());
+		status_t res = file.SetTo(fFile, B_READ_WRITE);
+		if (res != B_OK)
+			return res;
 		WriteAttr(file);
-		FailOSErr(file.Sync());
+		return file.Sync();
 	}
 	else
-		THROW(("No file available"));
-} /* CDoc::Write */
+		return B_NO_INIT;
+} /* CDoc::WriteState */
 
 //void CDoc::WriteAttr(BFile& file)
 //{
