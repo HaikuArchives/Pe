@@ -51,7 +51,9 @@ resource 'BtnB' (0) {
 		0, 0, space, "",
 		15, msg_ReadOnly, dual, "Read Only",
 		12, msg_Info, 0, "File Options…",
-		18, msg_SoftWrap, dual, "Softwrap"
+		18, msg_SoftWrap, dual, "Softwrap",
+		0, 0, space, "",
+		31, msg_EditAsPrj, 0, "Edit As Project"
 	}
 };
 
@@ -248,4 +250,23 @@ Resource 'MICN' (18) {
 	$"ff0000000000ff00009a9a0000ffffff"
 	$"ffffffffffffffffff9a9affffffffff"
 	$"ffffffffffffffffffffffffffffffff"  
+};
+
+Resource 'MICN' (31) {
+	$"fffffafafafafafafafaffffffffffff"
+	$"fffffafafafafafafafaffffffffffff" 
+	$"ffff090909090909090909090909ffff" 
+	$"ffff091919191919191919191909ffff" 
+	$"ffff09193f3f3f3f3f3f3f3f1909ffff" 
+	$"ffff09193f0000000000003f1909ffff" 
+	$"ffff09193f3f3f3f3f3f3f3f1909ffff" 
+	$"ffff09193f3f3f3f3f3f3f3f1909ffff" 
+	$"ffff09193f0000000000003f1909ffff" 
+	$"ffff09193f3f3f3f3f3f3f3f1909ffff" 
+	$"ffff09193f3f3f3f3f3f3f3f1909ffff" 
+	$"ffff09193f0000000000003f1909ffff" 
+	$"ffff09193f3f3f3f3f3f3f3f1909ffff" 
+	$"ffff09193f3f3f3f3f3f3f3f1909ffff" 
+	$"ffff091919191919191919191909ffff" 
+	$"ffff090909090909090909090909ffff"
 };
