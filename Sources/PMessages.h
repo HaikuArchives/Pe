@@ -210,6 +210,7 @@
 #define msg_Nothing							0
 #define msg_EditAsText					'EdTx'
 #define msg_NewGroup						'NewG'
+#define msg_EditAsPrj					'EdPr'
 
 
 #endif // PMESSAGES_H

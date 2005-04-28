@@ -112,6 +112,10 @@ PDoc::PDoc(const entry_ref *doc, bool show)
 	
 	fButtonBar->SetEnabled(msg_Save, false);
 	
+	if (strcasecmp(MimeType(), "text/x-jamfile")
+	&& strcasecmp(MimeType(), "text/x-makefile"))
+		fButtonBar->SetVisible(msg_EditAsPrj, false);
+
 	if (show)
 		Show();
 } /* PDoc::PDoc */
@@ -1690,6 +1694,17 @@ void PDoc::MessageReceived(BMessage *msg)
 				break;
 			}
 
+			case msg_EditAsPrj:
+			{	
+				if (!QuitRequested())
+					break;
+				BMessage msg(msg_CommandLineOpen);
+				msg.AddRef("refs", fFile);
+				be_app->PostMessage(&msg);
+				Quit();
+				break;
+			}
+			
 			default:
 			{
 				if ((msg->what & 0xffff0000) == 0x65780000)	// that's 'ex..'
