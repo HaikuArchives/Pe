@@ -291,12 +291,12 @@ void PProjectWindow::ReadAttr(BFile& file)
 	try
 	{
 		attr_info ai;
-		if (file.GetAttrInfo("pe-info", &ai) == B_NO_ERROR)
+		if (file.GetAttrInfo("pe-prj-info", &ai) == B_NO_ERROR)
 		{
 			fm = (char *)malloc(ai.size);
 			FailNil(fm);
 			
-			FailIOErr(file.ReadAttr("pe-info", ai.type, 0, fm, ai.size));
+			FailIOErr(file.ReadAttr("pe-prj-info", ai.type, 0, fm, ai.size));
 			
 			BMessage msg;
 			FailOSErr(msg.Unflatten(fm));
@@ -355,7 +355,7 @@ void PProjectWindow::WriteAttr(BFile& file)
 		fm = (char *)malloc(s);
 		FailNil(fm);
 		FailOSErr(msg.Flatten(fm, s));
-		FailIOErr(file.WriteAttr("pe-info", 'info', 0, fm, s));
+		FailIOErr(file.WriteAttr("pe-prj-info", 'info', 0, fm, s));
 	}
 	catch (HErr& e) {}
 	if (fm) free(fm);
