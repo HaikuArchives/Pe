@@ -55,7 +55,6 @@ Resource 'MENU' (201)
 {
 	"Edit",
 	{
-		Item		{ "New Group", msg_NewGroup, none, noKey },
 		Item		{ "Edit as Text", msg_EditAsText, none, noKey }
 	}
 };
