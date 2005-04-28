@@ -51,6 +51,7 @@ HButton::HButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const 
 	fDown = false;
 	fOn = false;
 	fEnabled = true;
+	fVisible = true;
 	fHelp = strdup(help);
 	
 	if (resID >= 0)
@@ -132,33 +133,35 @@ void HButton::Draw(bool pushed)
 	fBar->SetHighColor(kViewColor);
 	fBar->FillRect(fFrame);
 
-	fBar->SetHighColor(0, 0, 0);
-	fBar->SetDrawingMode(B_OP_OVER);
-	fBar->DrawBitmap(&icon, fFrame.LeftTop());
-	fBar->SetDrawingMode(B_OP_COPY);
-	
-	if (fMenu)
-	{
-		BRect r(fFrame);
-		r.left = r.right - 6;
+	if (fVisible) {
+		fBar->SetHighColor(0, 0, 0);
+		fBar->SetDrawingMode(B_OP_OVER);
+		fBar->DrawBitmap(&icon, fFrame.LeftTop());
+		fBar->SetDrawingMode(B_OP_COPY);
 		
-		if (pushed)
-			fBar->SetLowColor(BScreen().ColorForIndex(gSelectedMap[0x1b]));
-		else
+		if (fMenu)
+		{
+			BRect r(fFrame);
+			r.left = r.right - 6;
+			
+			if (pushed)
+				fBar->SetLowColor(BScreen().ColorForIndex(gSelectedMap[0x1b]));
+			else
+				fBar->SetLowColor(kViewColor);
+			fBar->FillRect(r, B_SOLID_LOW);
 			fBar->SetLowColor(kViewColor);
-		fBar->FillRect(r, B_SOLID_LOW);
-		fBar->SetLowColor(kViewColor);
-		
-		float x = fFrame.left + 18;
-		float y = fFrame.top + 7;
-		
-		fBar->BeginLineArray(3);
-		fBar->AddLine(BPoint(x, y), BPoint(x + 4, y), kBlack);
-		y += 1; x += 1;
-		fBar->AddLine(BPoint(x, y), BPoint(x + 2, y), kBlack);
-		y += 1; x += 1;
-		fBar->AddLine(BPoint(x, y), BPoint(x, y), kBlack);
-		fBar->EndLineArray();
+			
+			float x = fFrame.left + 18;
+			float y = fFrame.top + 7;
+			
+			fBar->BeginLineArray(3);
+			fBar->AddLine(BPoint(x, y), BPoint(x + 4, y), kBlack);
+			y += 1; x += 1;
+			fBar->AddLine(BPoint(x, y), BPoint(x + 2, y), kBlack);
+			y += 1; x += 1;
+			fBar->AddLine(BPoint(x, y), BPoint(x, y), kBlack);
+			fBar->EndLineArray();
+		}
 	}
 } /* HButton::Draw */
 
@@ -188,9 +191,15 @@ void HButton::SetEnabled(bool enabled)
 	Draw();
 } /* HButton::SetEnabled */
 
+void HButton::SetVisible(bool visible)
+{
+	fVisible = visible;
+	Draw();
+} /* HButton::SetVisible */
+
 void HButton::MouseEnter(bool pushed)
 {
-	if (fEnabled)
+	if (fVisible && fEnabled)
 	{
 		BRect r(fFrame);
 		
@@ -228,7 +237,7 @@ void HButton::MouseEnter(bool pushed)
 
 void HButton::MouseLeave()
 {
-	if (fEnabled)
+	if (fVisible && fEnabled)
 	{
 		BRect r(fFrame);
 		
@@ -445,7 +454,7 @@ void HButtonBar::MouseDown(BPoint where)
 	if (fHelp)
 		HideHelp();
 
-	if (btn && fTarget && btn->IsEnabled())
+	if (btn && fTarget && btn->IsVisible() && btn->IsEnabled())
 	{
 		if (btn->IsMenu())
 		{
@@ -545,7 +554,7 @@ void HButtonBar::SetOn(int cmd, bool on)
 	
 	if (btn && btn->IsToggle())
 		btn->SetOn(on);
-} /* HButtonBar::SetDown */
+} /* HButtonBar::SetOn */
 
 void HButtonBar::SetEnabled(int cmd, bool enabled)
 {
@@ -560,6 +569,20 @@ void HButtonBar::SetEnabled(int cmd, bool enabled)
 	if (btn)
 		btn->SetEnabled(enabled);
 } /* HButtonBar::SetEnabled */
+
+void HButtonBar::SetVisible(int cmd, bool visible)
+{
+	HButton *btn = NULL;
+	
+	for (vector<HButton*>::iterator i = fButtons.begin(); i != fButtons.end() && btn == NULL; i++)
+	{
+		if ((*i)->Cmd() == cmd)
+			btn = *i;
+	}
+	
+	if (btn)
+		btn->SetVisible(visible);
+} /* HButtonBar::SetVisible */
 
 void HButtonBar::SetTarget(BHandler *target)
 {
@@ -588,6 +611,8 @@ void HButtonBar::ShowHelp()
 	if (fLastButtonOver >= 0)
 	{
 		HButton *btn = fButtons[fLastButtonOver];
+		if (!btn || !btn->IsVisible())
+			return;
 		BRect r(btn->Frame());
 		
 		r.OffsetBy(30, 30);

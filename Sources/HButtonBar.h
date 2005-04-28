@@ -70,6 +70,7 @@ virtual	void MouseLeave();
 	void SetOn(bool on);
 	void SetDown(bool pushed);
 	void SetEnabled(bool enabled = true);
+	void SetVisible(bool visible);
 	
 	BRect Frame() const;
 	int Cmd() const;
@@ -78,13 +79,14 @@ virtual	void MouseLeave();
 	bool IsDown() const;
 	bool IsMenu() const;
 	bool IsEnabled() const;
+	bool IsVisible() const;
 	
 	const char* Help() const;
 
 protected:
 	HButtonBar *fBar;
 	char *fHelp;
-	bool fMenu, fToggle, fDown, fEnabled, fOn;
+	bool fMenu, fToggle, fDown, fEnabled, fOn, fVisible;
 	int fCmd;
 	unsigned char *fIcon;
 	BRect fFrame;
@@ -119,6 +121,7 @@ virtual	void WindowActivated(bool active);
 			void SetDown(int cmd, bool down);
 			void SetOn(int cmd, bool on);
 			void SetEnabled(int cmd, bool enabled = true);
+			void SetVisible(int cmd, bool visible);
 			
 			bool IsActive() 		{ return Window()->IsActive(); }
 
@@ -171,6 +174,11 @@ inline bool HButton::IsEnabled() const
 {
 	return fEnabled;
 } /* HButton::IsEnabled */
+
+inline bool HButton::IsVisible() const
+{
+	return fVisible;
+} /* HButton::IsVisible */
 
 inline const char* HButton::Help() const
 {
