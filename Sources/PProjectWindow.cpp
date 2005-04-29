@@ -54,25 +54,21 @@
 
 const unsigned long msg_Done = 'done';
 
-CDoc* PProjectWindow::Create(const entry_ref *doc, const char* mimetype)
+CDoc* PProjectWindow::Create(const entry_ref *doc, const char* mimetype,
+									  CProjectFile* prjFile)
 {
-	PProjectWindow* pwin = new PProjectWindow(doc, mimetype);
-	if (!pwin->fPrjFile || !pwin->fPrjFile->HaveProjectInfo()) {
-		CDoc* doc = gApp->NewWindow(pwin->fFile);
-		pwin->Close();
-		return doc;
-	} else {
-		pwin->fList->AddFilter(new PKeyDownFilter());
-		pwin->fList->MakeFocus();
-		pwin->Show();
-		return pwin;
-	}
+	PProjectWindow* pwin = new PProjectWindow(doc, mimetype, prjFile);
+	pwin->fList->AddFilter(new PKeyDownFilter());
+	pwin->fList->MakeFocus();
+	pwin->Show();
+	return pwin;
 }
 
-PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
+PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype,
+										 CProjectFile* prjFile)
 	: BWindow(PDoc::NextPosition(), "", B_DOCUMENT_WINDOW, 0)
 	, CDoc(mimetype, this, doc)
-	, fPrjFile(NULL)
+	, fPrjFile(prjFile)
 {
 	fPanel = NULL;
 	fToolBar = NULL;
@@ -220,25 +216,12 @@ void PProjectWindow::MessageReceived(BMessage *msg)
 void PProjectWindow::ReadData(BPositionIO&)
 {
 	if (!fFile)
-		THROW(("Can only read local makefiles"));
+		THROW(("Can only read local projectfiles"));
 
 	try
 	{
-		BPath path;
-		
 		fList->MakeEmpty();
-
-		FailOSErr(BEntry(fFile, true).GetPath(&path));
-		
-		delete fPrjFile;
-		if (!strcmp(MimeType(),"text/x-makefile"))
-			fPrjFile = new CProjectMakeFile(path.Path());
-		else if (!strcmp(MimeType(),"text/x-jamfile"))
-			fPrjFile = new CProjectJamFile(path.Path());
-		else
-			fPrjFile = NULL;
 		if (fPrjFile) {
-			FailOSErr(fPrjFile->Parse());
 			list<CProjectItem*>::const_iterator iter;
 			for( iter = fPrjFile->begin(); iter != fPrjFile->end(); ++iter)
 				AddItemsToList( *iter, NULL);

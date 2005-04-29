@@ -61,7 +61,7 @@ static char *rcsid = "$Id$";
 #include "PProjectWindow.h"
 #include <be_apps/NetPositive/NetPositive.h>
 #include "HPreferences.h"
-#include "CProjectFile.h"
+#include "CProjectRoster.h"
 
 BDirectory gAppDir, gCWD, gPrefsDir;
 BFile gAppFile;
@@ -476,10 +476,9 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 			else
 				return new PGroupWindow(&doc);
 		}
-		else if (strcmp(mime, "text/x-makefile") == 0)
+		else if (ProjectRoster->IsProjectType(mime))
 		{
-			PProjectWindow *w 
-				= dynamic_cast<PProjectWindow*>(CDoc::FindDoc(doc));
+			BWindow *w = dynamic_cast<BWindow*>(CDoc::FindDoc(doc));
 			if (w)
 			{
 				if (gPrefs->GetPrefInt("window to workspace", 1))
@@ -489,22 +488,13 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 				return CDoc::FindDoc(doc);
 			}
 			else
-				return new PProjectWindow(&doc, "text/x-makefile");
-		}
-		else if (strcmp(mime, "text/x-jamfile") == 0)
-		{
-			PProjectWindow *w 
-				= dynamic_cast<PProjectWindow*>(CDoc::FindDoc(doc));
-			if (w)
 			{
-				if (gPrefs->GetPrefInt("window to workspace", 1))
-					w->SetWorkspaces(1 << current_workspace());
-				if (show)
-					w->Activate(true);
-				return CDoc::FindDoc(doc);
+				CProjectFile* prjFile = ProjectRoster->ParseProjectFile(&doc, mime);
+				if (prjFile && prjFile->HaveProjectInfo())
+					return PProjectWindow::Create(&doc, mime, prjFile);
+				else
+					return gApp->NewWindow(&doc);
 			}
-			else
-				return PProjectWindow::Create(&doc, "text/x-jamfile");
 		}
 		else
 		{

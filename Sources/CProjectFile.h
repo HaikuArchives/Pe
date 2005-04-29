@@ -11,7 +11,6 @@
 #include <list>
 #include <vector>
 
-#include <Locker.h>
 #include <Path.h>
 #include <String.h>
 
@@ -41,8 +40,8 @@ public:
 	//
 	const BString& ParentPath() const	{ return fParentPath; }
 	const BString& LeafName() const		{ return fLeafName; }
-	const BString& DisplayName() const;
-	void DisplayName(const BString& dn)	{ fDisplayName = dn; }
+	const BString& DisplayName() const	{ return fDisplayName; }
+	void DisplayName(const BString& dn);
 
 protected:
 	BString fParentPath;
@@ -89,7 +88,7 @@ public:
 	void GroupFooter( const BString& gf)
 													{ fGroupFooter = gf; }
 	//
-	bool ContainsFile(entry_ref* fileRef) const;
+	bool ContainsFile(const entry_ref* fileRef) const;
 
 protected:
 	list<CProjectItem*> fItems;
@@ -132,10 +131,14 @@ public:
 	time_t ActivationTime() const			{ return fActivationTime; }
 	void ActivationTime(time_t at)		{ fActivationTime = at; }
 	//
+	bool HadError() const					{ return fErrorMsg.Length() > 0; }
+	const BString& ErrorMsg() const		{ return fErrorMsg; }
+	//
 	void GetIncludePaths(vector<BString>& inclPathVect) const;
 protected:
 	void _AddIncludePath(const BString& inclPath)
 													{ fIncludePaths.push_back(inclPath); }
+	BString fErrorMsg;
 private:
 	vector<BString> fIncludePaths;
 	time_t fActivationTime;
@@ -154,31 +157,6 @@ struct CProjectSerializer
 	virtual void SerializeGroupItem(const CProjectGroupItem* item) = 0;
 	virtual void SerializeFile(const CProjectFile* item) = 0;
 };
-
-
-
-/*
- * CProjectRoster
- *		allows easy retrieval of currently open projects
- */
-class CProjectRoster
-{
-public:
-	CProjectRoster();
-	//
-	void AddProject(CProjectFile* pf);
-	void RemoveProject(CProjectFile* pf);
-	//
-	bool GetIncludePathsForFile(entry_ref* fileRef, 
-										 vector<BString>& inclPathVect) const;
-	bool GetAllIncludePaths(vector<BString>& inclPathVect);
-
-private:
-	list<CProjectFile*> fProjects;
-	mutable BLocker fLocker;
-};
-
-extern CProjectRoster* ProjectRoster;
 
 
 #endif

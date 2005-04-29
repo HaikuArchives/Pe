@@ -59,8 +59,8 @@ class PProjectWindow
 	, public CDoc
 {
   public:
-	static CDoc* Create(const entry_ref *doc, const char* mimetype);
-	PProjectWindow(const entry_ref *doc, const char* mimetype);
+	static CDoc* Create(const entry_ref *doc, const char* mimetype,
+							  CProjectFile* prjFile);
 	~PProjectWindow();
 
 	virtual bool QuitRequested();
@@ -70,6 +70,8 @@ class PProjectWindow
 	virtual void WindowActivated(bool active);
 	
 private:
+	PProjectWindow(const entry_ref *doc, const char* mimetype, 
+						CProjectFile* prjFile);
 	virtual void ReadData(BPositionIO& file);
 	virtual void ReadAttr(BFile& file);
 	virtual void WriteData(BPositionIO& file);

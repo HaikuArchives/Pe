@@ -36,7 +36,7 @@ Library libhekkel.a :
 	;
 # </pe-src>
 
-# <pe-src>
+#<pe-src>
 Application pe : 
 	Benaphore.cpp
 	CCharObject.cpp
@@ -71,6 +71,7 @@ Application pe :
 	CProjectFile.cpp
 	CProjectJamFile.cpp
 	CProjectMakeFile.cpp
+	CProjectRoster.cpp
 	CStdErrBox.cpp
 	CStdErrParser.cpp
 	CUrlOpener.cpp
@@ -96,11 +97,11 @@ Application pe :
 	PToolBar.cpp
 	PTypeAHeadList.cpp
 	Sstdio.cpp
-	Utils.cpp
 	utf-support.cpp
+	Utils.cpp
 	:	libhekkel.a $(RX_LIB) be net $(STDC++LIB) tracker mail textencoding 
 	;
-# </pe-src>
+#	</pe-src>
 if $(OSPLAT) = X86 {
 	# avoid warning about strftime("%x") in CGlossary:
 	ObjectC++Flags CGlossary.cpp : -Wno-format ;

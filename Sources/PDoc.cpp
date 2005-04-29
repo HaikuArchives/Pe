@@ -68,7 +68,8 @@
 #include "HDefines.h"
 #include "MAlert.h"
 #include "PFindFunctionDialog.h"
-#include "CProjectFile.h"
+#include "CProjectRoster.h"
+#include "PProjectWindow.h"
 
 static long sDocCount = 0;
 
@@ -112,8 +113,7 @@ PDoc::PDoc(const entry_ref *doc, bool show)
 	
 	fButtonBar->SetEnabled(msg_Save, false);
 	
-	if (strcasecmp(MimeType(), "text/x-jamfile")
-	&& strcasecmp(MimeType(), "text/x-makefile"))
+	if (!ProjectRoster->IsProjectType(MimeType()))
 		fButtonBar->SetVisible(msg_EditAsPrj, false);
 
 	if (show)
@@ -1696,12 +1696,19 @@ void PDoc::MessageReceived(BMessage *msg)
 
 			case msg_EditAsPrj:
 			{	
-				if (!QuitRequested())
-					break;
-				BMessage msg(msg_CommandLineOpen);
-				msg.AddRef("refs", fFile);
-				be_app->PostMessage(&msg);
-				Quit();
+				if (IsDirty() || fText->IsDirty())
+					Save();
+				CProjectFile* prjFile
+					= ProjectRoster->ParseProjectFile(fFile, MimeType());
+				if (prjFile) {
+					if (prjFile->HadError()) {
+						MInfoAlert a(prjFile->ErrorMsg().String(), "Hmmm...");
+						a.Go();
+					} else {
+						PProjectWindow::Create(fFile, MimeType(), prjFile);
+						Quit();
+					}
+				}
 				break;
 			}
 			

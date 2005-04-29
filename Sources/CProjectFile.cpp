@@ -27,6 +27,7 @@
 #include <Autolock.h>
 
 #include "CProjectFile.h"
+#include "CProjectRoster.h"
 
 /*
  * CProjectItem()
@@ -39,9 +40,8 @@ CProjectItem::CProjectItem()
  * 
  */
 CProjectItem::CProjectItem(const char* path, const char* leafName)
-	:	fParentPath(path)
-	,	fLeafName(leafName)
 {
+	SetTo(path, leafName);
 }
 
 /*
@@ -58,6 +58,7 @@ status_t CProjectItem::SetTo(const char* path, const char* leafName)
 {
 	fParentPath.SetTo(path);
 	fLeafName.SetTo(leafName);
+	DisplayName(leafName);
 	return B_OK;
 }
 
@@ -76,23 +77,19 @@ status_t CProjectItem::SetTo(const char* path)
 	return SetTo(parentPath.String(), fullPath.String()+slashPos+1);
 }
 
+void CProjectItem::DisplayName(const BString& dn)
+{
+	fDisplayName = dn;
+	fDisplayName.RemoveSet("\\");
+		// remove escaping characters for improved readability
+}
+
 /*
  * 
  */
 void CProjectItem::SerializeTo( CProjectSerializer* serializer) const
 {
 	serializer->SerializeItem(this); 
-}
-
-/*
- * 
- */
-const BString& CProjectItem::DisplayName() const
-{
-	if (fDisplayName.Length())
-		return fDisplayName;
-	else
-		return fLeafName;
 }
 
 
@@ -115,7 +112,7 @@ CProjectGroupItem::CProjectGroupItem(const char* path, const char* leafName,
 {
 	if (fGroupName.Length())
 		// build display-name for a group that has a name specified:
-		fDisplayName << fLeafName << ' ' << fGroupName;
+		DisplayName(fDisplayName << ' ' << fGroupName);
 }
 
 /*
@@ -132,7 +129,7 @@ CProjectGroupItem::~CProjectGroupItem()
 /*
  * 
  */
-bool CProjectGroupItem::ContainsFile(entry_ref* fileRef) const
+bool CProjectGroupItem::ContainsFile(const entry_ref* fileRef) const
 {
 	CProjectItem* child;
 	BString fullPath;
@@ -283,74 +280,3 @@ CProjectFile::WriteToFile(BPositionIO* file, const BString& contents,
 
 
 
-
-/*
- * 
- */
-static CProjectRoster gProjectRoster;
-CProjectRoster* ProjectRoster = &gProjectRoster;
-
-CProjectRoster::CProjectRoster()
-	:	fLocker("ProjectRosterLock")
-{
-}
-
-/*
- * 
- */
-void CProjectRoster::AddProject(CProjectFile* pf)
-{
-	BAutolock lock(&fLocker);
-	fProjects.push_back(pf); 
-}
-
-/*
- * 
- */
-void CProjectRoster::RemoveProject(CProjectFile* pf)
-{
-	BAutolock lock(&fLocker);
-	fProjects.remove(pf); 
-}
-
-/* GetIncludePathsForFile()
- * 	tries to determine the project that contains the given file and,
- *		if such a project is found, passes back these projects include-paths.
- */
-bool CProjectRoster::GetIncludePathsForFile(entry_ref* fileRef, 
-														  vector<BString>& inclPathVect) const
-{
-	inclPathVect.clear();
-	BAutolock lock(&fLocker);
-	list<CProjectFile*>::const_iterator iter;
-	for( iter=fProjects.begin(); iter != fProjects.end(); ++iter) {
-		if ((*iter)->ContainsFile(fileRef)) {
-			(*iter)->GetIncludePaths(inclPathVect);
-			return true;
-		}
-	}
-	return false;
-}
-
-/* GetAllIncludePaths()
- * 	returns the include-paths of all projects, sorted in descending
- *		order of the project-windows last activation time (i.e. projects
- *		have been used recently will be searched first).
- */
-struct ProjectActivationTimeSorter {
-	bool operator() (const CProjectFile* pfl, const CProjectFile* pfr) const {
-		return pfl->ActivationTime() >= pfr->ActivationTime();
-	}
-};
-bool CProjectRoster::GetAllIncludePaths(vector<BString>& inclPathVect)
-{
-	inclPathVect.clear();
-	BAutolock lock(&fLocker);
-	ProjectActivationTimeSorter compFunc;
-	fProjects.sort(compFunc);
-	list<CProjectFile*>::const_iterator iter;
-	for( iter=fProjects.begin(); iter != fProjects.end(); ++iter) {
-		(*iter)->GetIncludePaths(inclPathVect);
-	}
-	return true;
-}

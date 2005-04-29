@@ -119,6 +119,18 @@ static const char *skip_white(const char *t, bool multiline=true)
 	return t;
 } // skip_white
 
+static const char* skipback_over(const char* ptr, const char* start, 
+											const char* skipChars)
+{
+	if (!ptr)
+		return ptr;
+	do {
+		ptr--;
+	} while(ptr>=start && strchr(skipChars, *ptr));
+	ptr++;
+	return ptr;
+}
+
 static const char *next_path(const char *t, const char *& p, int& pl)
 {
 	if (*t == '"')
@@ -147,9 +159,12 @@ static const char *next_path(const char *t, const char *& p, int& pl)
 	}
 	else if (*t)
 	{
+		bool escapeNextChar = false;
 		p = t;
-		while (*t && ! isspace(*t))
+		while (*t && (!isspace(*t) || escapeNextChar)) {
+			escapeNextChar = (*t == '\\' ? !escapeNextChar : false);
 			t++;
+		}
 		pl = t - p;
 	}
 	else
@@ -304,8 +319,10 @@ void CProjectJamFile::_ParseSources(const BString& contents)
 	// other domain-declarations, too (like e.g. <pe-inc> for include-paths):
 	while (1)
 	{
-		groupStart = strstr(t, "# <pe-src>");
-		groupEnd = groupStart ? strstr(groupStart, "# </pe-src>") : NULL;
+		groupStart = strstr(t, "<pe-src>");
+		groupStart = skipback_over(groupStart, t, " \t#");
+		groupEnd = groupStart ? strstr(groupStart, "</pe-src>") : NULL;
+		groupEnd = skipback_over(groupEnd, t, " \t#");
 		if (!(groupStart < groupEnd))
 			break;
 
@@ -328,6 +345,11 @@ void CProjectJamFile::_ParseSources(const BString& contents)
 		// TODO:
 		// 	nothing found, maybe we should try to look out for some common
 		// 	rules here (Application, SharedLibrary and StaticLibrary)?
+		fErrorMsg 
+			<< "No project-items could be found in the jamfile\n\n"
+			<< "Maybe you have forgotten to add\n"
+			<< "   # <pe-src> and # </pe-src>\n"
+			<< "comments?";
 	}
 }
 
@@ -379,7 +401,9 @@ void CProjectJamFile::_ParseIncludes(const BString& contents)
 	while (1)
 	{
 		inclStart = strstr(t, "# <pe-inc>");
+		inclStart = skipback_over(inclStart, t, " \t#");
 		inclEnd = inclStart ? strstr(inclStart, "# </pe-inc>") : NULL;
+		inclEnd = skipback_over(inclEnd, t, " \t#");
 		if (!(inclStart < inclEnd))
 			break;
 
@@ -433,13 +457,22 @@ void CProjectJamFile::_ParseSubJamfiles(const BString& contents)
 	}
 }
 
+#define RET_FAIL(c,s) \
+	do { \
+		fErrorMsg \
+			<< "No project-info could be extracted from the jamfile\n\n" \
+			<< "Error: " << s; \
+		return c; \
+} while(0)
+
 status_t CProjectJamFile::Parse()
 {
+	fErrorMsg.Truncate(0);
 	BPath path( fParentPath.String(), fLeafName.String());
 	BFile prjFile;
 	status_t res = prjFile.SetTo(path.Path(), B_READ_ONLY);
 	if (res != B_OK)
-		return res;
+		RET_FAIL(res, "unable to open file");
 	
 	off_t size;
 	res = prjFile.GetSize(&size);
@@ -452,14 +485,14 @@ status_t CProjectJamFile::Parse()
 		return B_NO_MEMORY;
 	
 	if (prjFile.Read(buf, size) != size)
-		return B_IO_ERROR;
+		RET_FAIL(B_IO_ERROR, strerror(B_IO_ERROR));
 
 	contents.UnlockBuffer(size);
 	
 	const char* t = contents.String();
 	const char* topStart = strstr(t, "SubDir ");
 	if (!topStart)
-		return B_NO_INIT;
+		RET_FAIL(B_NO_INIT, "no SubDir statement found");
 	t = skip_to(topStart, ' ');
 	t = skip_white(t);
 
@@ -475,7 +508,7 @@ status_t CProjectJamFile::Parse()
 	t = _ParseJamPath(t, localJamPath);
 	int32 pos = fParentPath.FindLast(localJamPath);
 	if (pos < B_OK)
-		return B_NO_INIT;
+		RET_FAIL(B_NO_INIT, "unable to extract local jam path (relative to jamtop)");
 	if (pos)
 		fJamTopPath.SetTo(fParentPath.String(), pos);
 	else
