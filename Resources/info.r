@@ -83,26 +83,24 @@ resource 'DLOG' (6, "Info") {
 		TabbedBook					{{   0,   0, 400, 250 }, "tabbook" },
 
 			TabSheet				{ "Editor", "Editor Options" },
-				CheckBox			{{   0,   0, 140,  16 }, "show tabs", "Show Tabstops" },
 				Edit				{{ 150,   0, 290,  16 }, "tabs", "Spaces per Tab:", "", "0123456789", 3, 90 },
-				CheckBox			{{   0,  20, 140,  36 }, "syntaxcol", "Syntax Colouring" },
-				CheckBox			{{ 150,  20, 290,  36 }, "show invisibles", "Show Invisibles" },
+				CheckBox			{{   0,   0, 140,  16 }, "syntaxcol", "Syntax Colouring" },
 				
-				Line				{{   0,  43, 290,  44 }},
+				Line				{{   0,  23, 290,  24 }},
 				
-				PopupMenu			{{ 	-1,  51, 140,  71 }, "font", "Font:", 400, 30 },
-				Edit				{{ 150,  51, 290,  71 }, "size", "Size:", "", "0123456789", 2, 90 },
+				PopupMenu		{{  -1,  31, 140,  51 }, "font", "Font:", 400, 30 },
+				Edit				{{ 150,  31, 290,  51 }, "size", "Size:", "", "0123456789", 2, 90 },
 				
-				Line				{{   0,  78, 290,  79 }},
+				Line				{{   0,  58, 290,  59 }},
 			
-				PopupMenu			{{  -1,  86, 290, 106 }, "encoding", "Encoding:", 401, 80 },
-				PopupMenu			{{  -1, 106, 290, 126 }, "linebreaks", "Linebreaks:", 402, 80 },
+				PopupMenu		{{  -1,  66, 290,  86 }, "encoding", "Encoding:", 401, 80 },
+				PopupMenu		{{  -1,  86, 290, 106 }, "linebreaks", "Linebreaks:", 402, 80 },
 				
-				Line				{{   0, 133, 290, 134 }},
+				Line				{{   0, 113, 290, 114 }},
 				
-				PopupMenu			{{  -1, 141, 290, 161 }, "language", "Language:", 93, 80 },
+				PopupMenu		{{  -1, 121, 290, 141 }, "language", "Language:", 93, 80 },
 			
-			TabSheetEnd				{},
+			TabSheetEnd			{},
 			
 			TabSheet				{ "Statistics", "Statistical and State Information" },
 				Caption				{{   0,   0,  75,  16 }, "cname", "Name:" },
