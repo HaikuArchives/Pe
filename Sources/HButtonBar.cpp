@@ -374,16 +374,7 @@ void HButtonBar::Draw(BRect update)
 {
 	BRect bounds(Bounds());
 	
-	SetHighColor(kShadow);
-	StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
-	StrokeLine(bounds.RightTop(), bounds.RightBottom());
-	
-	SetHighColor(kWhite);
-	StrokeLine(bounds.LeftTop(), bounds.RightTop());
-	StrokeLine(bounds.LeftTop(), bounds.LeftBottom());
-
 	SetHighColor(kViewColor);
-	bounds.InsetBy(1, 1);
 	FillRect(bounds);
 	
 	if (fDragger)
