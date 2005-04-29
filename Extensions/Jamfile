@@ -10,7 +10,7 @@ if $(OSPLAT) = PPC {
 # <pe-src>
 PeExtension PrefixLines 
 	: PrefixLines.cpp 
-	: libhekkel.a be $(STDC++LIB) 
+	: be $(STDC++LIB) $(DISTRO_DIR)/pe 
 	: prefix.r
 	;
 # </pe-src>
@@ -25,7 +25,7 @@ PeExtension BeBookFetch
 # <pe-src>
 PeExtension Copy\ Lines\ Containing 
 	: CopyContaining.cpp 
-	: libhekkel.a $(RX_LIB) be $(STDC++LIB) 
+	: $(RX_LIB) be $(STDC++LIB) $(DISTRO_DIR)/pe 
 	: copycon.r
 	;
 # </pe-src>
@@ -33,7 +33,7 @@ PeExtension Copy\ Lines\ Containing
 # <pe-src>
 PeExtension Cut\ Lines\ Containing 
 	: CutContaining.cpp 
-	: libhekkel.a $(RX_LIB) be $(STDC++LIB) 
+	: $(RX_LIB) be $(STDC++LIB) $(DISTRO_DIR)/pe 
 	;
 # </pe-src>
 
@@ -47,7 +47,7 @@ PeExtension HeaderGuard
 # <pe-src>
 PeExtension Pipe
 	: Pipe.cpp 
-	: libhekkel.a be $(STDC++LIB) 
+	: be $(STDC++LIB) $(DISTRO_DIR)/pe 
 	: Pipe.dlog.r
 	;
 # </pe-src>
@@ -55,7 +55,7 @@ PeExtension Pipe
 # <pe-src>
 PeExtension HTMLImage
 	: HTMLImage.cpp 
-	: libhekkel.a be $(STDC++LIB) 
+	: be $(STDC++LIB) $(DISTRO_DIR)/pe 
 	: HTMLImage.dlog.r
 	;
 # </pe-src>
@@ -63,7 +63,7 @@ PeExtension HTMLImage
 # <pe-src>
 PeExtension HTMLAnchor
 	: HTMLAnchor.cpp 
-	: libhekkel.a be $(STDC++LIB) 
+	: be $(STDC++LIB) $(DISTRO_DIR)/pe 
 	: HTMLAnchor.dlog.r
 	;
 # </pe-src>
@@ -71,7 +71,7 @@ PeExtension HTMLAnchor
 # <pe-src>
 PeExtension HTMLUpdate
 	: HTMLUpdate.cpp 
-	: libhekkel.a be $(STDC++LIB) mail 
+	: be $(STDC++LIB) mail $(DISTRO_DIR)/pe 
 	;
 # </pe-src>
 if $(OSPLAT) = X86 {
@@ -82,13 +82,13 @@ if $(OSPLAT) = X86 {
 # <pe-src>
 PeExtension ROT13
 	: ROT13.cpp 
-	: libhekkel.a be $(STDC++LIB) 
+	: be $(STDC++LIB) $(DISTRO_DIR)/pe 
 	;
 # </pe-src>
 
 # <pe-src>
 PeExtension drieuxCaps
 	: drieuxCaps.cpp JRandom.cpp 
-	: libhekkel.a be $(STDC++LIB) 
+	: be $(STDC++LIB) $(DISTRO_DIR)/pe 
 	;
 # </pe-src>
