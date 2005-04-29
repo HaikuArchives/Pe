@@ -367,7 +367,6 @@ void PText::SetSettings(BMessage& msg)
 	if (gRestoreFont)
 	{
 		if (msg.FindInt32("tabstop", &i) == B_OK)			fTabStops = i;
-//		if (msg.FindBool("show tabs", &b) == B_OK)			ShowTabStops(b);
 		if (msg.FindFloat("fontsize", &f) == B_OK)			fFont.SetSize(f);
 		if (msg.FindString("fontfamily", &s1) == B_OK && msg.FindString("fontstyle", &s2) == B_OK)
 																		fFont.SetFamilyAndStyle(s1, s2);
@@ -419,8 +418,6 @@ void PText::GetSettings(BMessage& msg)
 	
 	FailOSErr(msg.AddInt32("tabstop", fTabStops));
 	FailOSErr(msg.AddFloat("fontsize", fFont.Size()));
-	
-	FailOSErr(msg.AddBool("show tabs", Doc()->ToolBar()->ShowsTabs()));
 	
 	font_family ff;
 	font_style fs;
@@ -2268,17 +2265,23 @@ void PText::ShowContextualMenu(BPoint where)
 		fMainPopUp->FindItem(msg_SoftWrap)->SetMarked(fSoftWrap);
 	
 		BFont f;
-		f.SetFamilyAndStyle(gPrefs->GetPrefString("alt font family"), gPrefs->GetPrefString("alt font style"));
-		f.SetSize(gPrefs->GetPrefDouble("alt font size"));
+		f.SetFamilyAndStyle(gPrefs->GetPrefString("font family"), gPrefs->GetPrefString("font style"));
+		f.SetSize(gPrefs->GetPrefDouble("font size"));
 		
+		BFont af;
+		af.SetFamilyAndStyle(gPrefs->GetPrefString("alt font family"), gPrefs->GetPrefString("alt font style"));
+		af.SetSize(gPrefs->GetPrefDouble("alt font size"));
+
+		if (af == f)
+			fMainPopUp->FindItem(msg_ToggleFont)->SetEnabled(false);
+			
 		if (f == fFont)
 		{
-			f.SetFamilyAndStyle(gPrefs->GetPrefString("font family"), gPrefs->GetPrefString("font style"));
-			f.SetSize(gPrefs->GetPrefDouble("font size"));
-			fMainPopUp->FindItem(msg_ToggleFont)->SetMarked(true);
+			f = af;
+			fMainPopUp->FindItem(msg_ToggleFont)->SetMarked(false);
 		}
 		else
-			fMainPopUp->FindItem(msg_ToggleFont)->SetMarked(false);
+			fMainPopUp->FindItem(msg_ToggleFont)->SetMarked(true);
 
 		BMessage *msg = new BMessage(msg_ToggleFont);
 		font_family ff;
@@ -5867,8 +5870,10 @@ void PText::ChangedInfo(BMessage *msg)
 	
 	if (msg->FindString("mime", &s) == B_OK)
 	{
-		static_cast<PDoc*>(Window())->SetMimeType(s);
-		dirty = true;
+		if (strcmp(Doc()->MimeType(), s) != 0) {
+			static_cast<PDoc*>(Window())->SetMimeType(s);
+			dirty = true;
+		}
 	}
 	
 	if (msg->FindInt32("language", &i) == B_OK)
