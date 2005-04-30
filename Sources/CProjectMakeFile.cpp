@@ -144,6 +144,18 @@ static const char *skip_white(const char *t)
 	return t;
 } // skip_white
 
+static const char* skipback_over(const char* ptr, const char* start, 
+											const char* skipChars)
+{
+	if (!ptr)
+		return ptr;
+	do {
+		ptr--;
+	} while(ptr>=start && strchr(skipChars, *ptr));
+	ptr++;
+	return ptr;
+}
+
 static const char *next_path(const char *t, const char *& p, int& pl)
 {
 	if (*t == '"')
@@ -254,39 +266,51 @@ const char *CProjectMakeFile::_AddGroup(const char *t)
 	return t;
 }
 
+#define RET_FAIL(c,s) \
+	do { \
+		fErrorMsg \
+			<< "No project-info could be extracted from the jamfile\n\n" \
+			<< "Error: " << s; \
+		return c; \
+} while(0)
+
 status_t CProjectMakeFile::Parse()
 {
 	BPath path( fParentPath.String(), fLeafName.String());
 	BFile prjFile;
 	status_t res = prjFile.SetTo(path.Path(), B_READ_ONLY);
 	if (res != B_OK)
-		return res;
+		RET_FAIL(res, "unable to open file");
 	
 	off_t size;
 	res = prjFile.GetSize(&size);
 	if (res != B_OK)
-		return res;
+		RET_FAIL(res, "unable to get file size");
 
 	BString contents;
 	char* t = contents.LockBuffer(size+1);
 	if (!t)
-		return B_NO_MEMORY;
+		RET_FAIL(B_NO_MEMORY, strerror(B_NO_MEMORY));
 	
 	contents.UnlockBuffer(size);
 
 	if (prjFile.Read(t, size) != size)
-		return B_IO_ERROR;
+		RET_FAIL(B_IO_ERROR, strerror(B_IO_ERROR));
 
 	const char *s, *e;
 	
-	s = strstr(t, "#%{");
+	s = strstr(t, "%{");
 	if (s) {
+		s = skipback_over(s, t, " \t#");
 		// Pe format
-		e = s ? strstr(s, "#%}") : s;
+		e = s ? strstr(s, "%}") : s;
+		e = skipback_over(e, s, " \t#");
 	} else {
 		// Eddie format
-		s = strstr(t, "# @src->@");
-		e = s ? strstr(s, "# @<-src@") : s;
+		s = strstr(t, "@src->@");
+		s = skipback_over(s, t, " \t#");
+		e = s ? strstr(s, "@<-src@") : s;
+		e = skipback_over(e, t, " \t#");
 	}
 	
 	if (s < e)
@@ -307,7 +331,15 @@ status_t CProjectMakeFile::Parse()
 
 		fHaveProjectInfo = true;
 	}
-
+	if (fItems.empty()) {
+		fErrorMsg 
+			<< "No project-items could be found in the makefile\n\n"
+			<< "Maybe you have forgotten to add\n"
+			<< "   # @src->@ and # @src<-@\n"
+			<< "or\n"
+			<< "   # %{ and # %}\n"
+			<< "comments?";
+	}
 
 	return B_OK;
 }

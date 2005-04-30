@@ -477,12 +477,12 @@ status_t CProjectJamFile::Parse()
 	off_t size;
 	res = prjFile.GetSize(&size);
 	if (res != B_OK)
-		return res;
+		RET_FAIL(res, "unable to get file size");
 
 	BString contents;
 	char* buf = contents.LockBuffer(size+1);
 	if (!buf)
-		return B_NO_MEMORY;
+		RET_FAIL(B_NO_MEMORY, strerror(B_NO_MEMORY));
 	
 	if (prjFile.Read(buf, size) != size)
 		RET_FAIL(B_IO_ERROR, strerror(B_IO_ERROR));

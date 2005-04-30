@@ -131,7 +131,6 @@ public:
 	time_t ActivationTime() const			{ return fActivationTime; }
 	void ActivationTime(time_t at)		{ fActivationTime = at; }
 	//
-	bool HadError() const					{ return fErrorMsg.Length() > 0; }
 	const BString& ErrorMsg() const		{ return fErrorMsg; }
 	//
 	void GetIncludePaths(vector<BString>& inclPathVect) const;

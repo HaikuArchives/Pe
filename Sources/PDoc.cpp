@@ -1701,7 +1701,7 @@ void PDoc::MessageReceived(BMessage *msg)
 				CProjectFile* prjFile
 					= ProjectRoster->ParseProjectFile(fFile, MimeType());
 				if (prjFile) {
-					if (prjFile->HadError()) {
+					if (!prjFile->HaveProjectInfo()) {
 						MInfoAlert a(prjFile->ErrorMsg().String(), "Hmmm...");
 						a.Go();
 					} else {
