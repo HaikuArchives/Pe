@@ -5853,8 +5853,12 @@ void PText::ChangedInfo(BMessage *msg)
 	if (msg->FindInt32("encoding", &i) == B_OK)
 		SetEncoding(i);
 	
-	if (msg->FindInt32("line breaks", &i) == B_OK)
-		fLineEndType = i;
+	if (msg->FindInt32("line breaks", &i) == B_OK) {
+		if (fLineEndType != i) {
+			fLineEndType = i;
+			dirty = true;
+		}
+	}
 	
 	if (msg->FindBool("softwrap", &b) == B_OK)
 	{
@@ -5879,7 +5883,8 @@ void PText::ChangedInfo(BMessage *msg)
 	if (msg->FindInt32("language", &i) == B_OK)
 		SetLanguage(i);
 	
-	SetDirty(dirty);
+	if (dirty)
+		SetDirty(dirty);
 	ReInit();
 	Invalidate();
 } /* PText::ChangedInfo */
