@@ -136,7 +136,7 @@ static const char *skip_white(const char *t)
 		if (*t == ' ' || *t == '\t')
 			t++;
 		else if (*t == '#')
-			t = skip_to(t + 1, '\n');
+			t = skip_to(t + 1, '\n')+1;
 		else
 			break;
 	}
@@ -216,6 +216,8 @@ const char *CProjectMakeFile::_AddGroup(const char *t)
 		
 		t = skip_white(t);
 		
+		if (*t == ':')
+			t++;
 		if (*t != '=')
 			return skip_to(t, '\n');
 
@@ -230,13 +232,13 @@ const char *CProjectMakeFile::_AddGroup(const char *t)
 		
 		groupStart = NULL;
 
-		t = skip_white(t);
-		
 		while (true)
 		{
 			const char *p;
 			int pl;
 			
+			t = skip_white(t);
+
 			t = next_path(t, p, pl);
 			if (p == NULL)
 				break;
@@ -329,7 +331,6 @@ status_t CProjectMakeFile::Parse()
 		if (groupStart && s>groupStart)
 			fFooter.Prepend(groupStart, s-groupStart);
 
-		fHaveProjectInfo = true;
 	}
 	if (fItems.empty()) {
 		fErrorMsg 
@@ -339,7 +340,8 @@ status_t CProjectMakeFile::Parse()
 			<< "or\n"
 			<< "   # %{ and # %}\n"
 			<< "comments?";
-	}
+	} else
+		fHaveProjectInfo = true;
 
 	return B_OK;
 }
