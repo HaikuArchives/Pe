@@ -135,9 +135,11 @@ static const char *skip_white(const char *t)
 			t += 2;
 		if (*t == ' ' || *t == '\t')
 			t++;
-		else if (*t == '#')
-			t = skip_to(t + 1, '\n')+1;
-		else
+		else if (*t == '#') {
+			t = skip_to(t + 1, '\n');
+			if (*t == '\n')
+				t++;
+		} else
 			break;
 	}
 
