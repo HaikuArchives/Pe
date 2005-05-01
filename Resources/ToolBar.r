@@ -77,26 +77,26 @@ resource 'MICN' (14) {
 	$"ff000015153f3f000b00000e0effffff"
 	$"ffffff000015000b00000e0effffffff"
 	$"ffffffffff000000000e0effffffffff"
-	$"ffffffffffffff000e0effffffffffff "
+	$"ffffffffffffff000e0effffffffffff"
 };
 
 resource 'MICN' (10) {
-	$"1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b"
-	$"1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b"
-	$"1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b"
-	$"1b1b1b1800001b1b1b1b1b1b1b1b1b1b"
-	$"1b1b1b00141b1b1b1b1b1b1b1b1b1b1b"
-	$"1b1b18001b1b1b1b1b1b1b1b1b1b1b1b"
-	$"1b000000000d180a1b1b1b1b1b1b0a18"
-	$"1b1b18001b1b0a111b001818001b110a"
-	$"1b1b110a1b1b00181b180606181b1800"
-	$"1b1b0a111b1b001b1b1b0a0a1b1b1b00"
-	$"1b1800181b1b001b1b180606181b1b00"
-	$"1b1400181b1b00181b001818001b1800"
-	$"1b0d001b1b1b0a111b1b1b1b1b1b110a"
-	$"0000181b1b1b180a1b1b1b1b1b1b0a18"
-	$"1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b"
-	$"1b1b1b1b1b1b1b1b1b1b1b1b1b1b1bff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffff180000ffffffffffffffffffff"
+	$"ffffff0014ffffffffffffffffffffff"
+	$"ffff1800ffffffffffffffffffffffff"
+	$"ff000000000d180affffffffffff0a18"
+	$"ffff1800ffff0a11ff00181800ff110a"
+	$"ffff110affff0018ff18060618ff1800"
+	$"ffff0a11ffff00ffffff0a0affffff00"
+	$"ff180018ffff00ffff18060618ffff00"
+	$"ff140018ffff0018ff00181800ff1800"
+	$"ff0d00ffffff0a11ffffffffffff110a"
+	$"000018ffffff180affffffffffff0a18"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
 };
 
 resource 'MICN' (11) {
@@ -173,7 +173,7 @@ resource 'MICN' (15) {
 	$"ff005a5af9bd00ffffffffffffffffff"
 	$"ff005a5a0000ffffffffffffffffffff"
 	$"00000000ffffffffffffffffffffffff"
-	$"0000ffffffffffffffffffffffffffff "
+	$"0000ffffffffffffffffffffffffffff"
 };
 
 resource 'MICN' (16) {
@@ -192,7 +192,7 @@ resource 'MICN' (16) {
 	$"ff005a5af9bd00ffffffff2d2d2dffff"
 	$"ff005a5a0000ffffffffffff2d2d2dff"
 	$"00000000ffffffffffffffffff2d2d2d"
-	$"0000ffffffffffffffffffffffff2d2d "
+	$"0000ffffffffffffffffffffffff2d2d"
 };
 
 resource 'MICN' (17) {
@@ -230,7 +230,7 @@ Resource 'MICN' (19) {
 	$"ffffffffffffffffff9a9aff9a9a9aff"
 	$"ff0000000000ff00009a9affff9a9aff"
 	$"ffffffffffffffffff9a9affffff9aff"
-	$"ffffffffffffffffffffffffffffffff "
+	$"ffffffffffffffffffffffffffffffff"
 };
 
 Resource 'MICN' (18) {
