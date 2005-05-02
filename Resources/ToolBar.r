@@ -45,6 +45,7 @@ resource 'BtnB' (0) {
 		0, 0, space, "",
 		11, msg_Execute, toggle, "Execute Command",
 		10, msg_FuncPopup, menu, "Function Popupmenu",
+		32, msg_HeaderPopup, menu, "Header Popupmenu",
 		0, 0, space, "",
 		17, msg_FindCmd, 0, "Find",
 		13, msg_IncSearchBtn, toggle, "Incremental Search",
@@ -61,6 +62,7 @@ type 'MICN' {
 	hexstring;
 };
 
+/* Save Document */
 resource 'MICN' (14) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
@@ -80,6 +82,7 @@ resource 'MICN' (14) {
 	$"ffffffffffffff000e0effffffffffff"
 };
 
+/* Function Popupmenu */
 resource 'MICN' (10) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
@@ -99,6 +102,27 @@ resource 'MICN' (10) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
+/* Header Popupmenu */
+resource 'MICN' (32) {
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffff1400ffffffffffffffffff"
+	$"ffffffffff0000ffffffffffffffffff"
+	$"ffffffffffff00ffffffffffffffffff"
+	$"ffffffffffff00ff000014ffffffffff"
+	$"ffffffffffff000aff1400ffffffffff"
+	$"ffffffffffff00ffffff00ffffffffff"
+	$"ffffffffffff00ffffff01ffffffffff"
+	$"ffffffffffff00ffffff00ffffffffff"
+	$"ffffffffff180017ff180017ffffffff"
+	$"ffffff00ff000000ff000000ffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+};
+
+/* Execute Command */
 resource 'MICN' (11) {
 	$"ffffffffffffffffffffff0000ffffff"
 	$"ffffffffffffffffffff00d8d800ffff"
@@ -118,6 +142,87 @@ resource 'MICN' (11) {
 	$"ffffffff00000000ffffffffffffffff"
 };
 
+/* Find */
+resource 'MICN' (17) {
+	$"ffffffffffffff0000000000ffffffff"
+	$"ffffffffff00003f3f3f3f3f0000ffff"
+	$"ffffffff003f3f00000000003f3f00ff"
+	$"ffffff003f0e008787878787010f3f00"
+	$"ffffff003f00aeaeaeaeaeaeae003f00"
+	$"ffffff003f0eae8686868686ae101f00"
+	$"ffffff00003f0e00000000000f3f0000"
+	$"ffffff008700003f3f3f3f3f00008700"
+	$"ffffff00870017000000000087878700"
+	$"ffffffff00173f00603f8787870000ff"
+	$"ffffff00043f00000000000000ffffff"
+	$"ffff00000e00000fffffffffffffffff"
+	$"ff00000e00000fffffffffffffffffff"
+	$"00000e00000fffffffffffffffffffff"
+	$"000000000fffffffffffffffffffffff"
+	$"ff00000fffffffffffffffffffffffff"
+};
+
+/* Incremental Search */
+resource 'MICN' (13) {
+	$"ffffffffffffff0000000000ffffffff"
+	$"ffffffffff00003f3f3f3f3f0000ffff"
+	$"ffffffff003f3f00000000003f3f00ff"
+	$"ffffff003f0e008787878787010f3f00"
+	$"ffffff003f00aeaeaeaeaeaeae003f00"
+	$"ffffff003f0eae8686868686ae101f00"
+	$"ffffff00003f0e00000000000f3f0000"
+	$"ffffff008700003f3f3f3f3f00008700"
+	$"ffffff00870017000000000087878700"
+	$"ffffffff00173f00603f8787870000ff"
+	$"ffffff00043f00000000000000ffffff"
+	$"ffff00000e00000fffffffffffffffff"
+	$"ff00000e00000fffffffffffffffffff"
+	$"00000e00000fffffff00ffffff00ffff"
+	$"000000000fffffff000000ff000000ff"
+	$"ff00000fffffffffff00ffffff00ffff"
+};
+
+/* Read Only Off */
+resource 'MICN' (15) {
+	$"ffffffffffffffffffff0b0000ffffff"
+	$"ffffffffffffffffff000b3f5a00ffff"
+	$"ffffffffffffffff005c0b3f5a5a00ff"
+	$"ffffffffffffff005cfd0b3f5a5a00ff"
+	$"ffffffffffff005cfd113f085a5a00ff"
+	$"ffffffffff005cfd113ffd08080900ff"
+	$"ffffffff0a5cfd113ffd085c5c00ffff"
+	$"ffffff0a5cfd113ffa085c5c00ffffff"
+	$"ffff110afd113ffa085c5c00ffffffff"
+	$"ffff0a0b0a3ffa085c5c00ffffffffff"
+	$"ff170a3f0afa115c5c00ffffffffffff"
+	$"ff110b3f110a001100ffffffffffffff"
+	$"170a3f5a5b5b5b00ffffffffffffffff"
+	$"110a005b5b0000ffffffffffffffffff"
+	$"0a00000000ffffffffffffffffffffff"
+	$"0a000affffffffffffffffffffffffff"
+};
+
+/* Read Only On */
+resource 'MICN' (16) {
+	$"ff2dffffffffffffffff0b0000ffffff"
+	$"2d2d2dffffffffffff000b3f5a00ffff"
+	$"ff2d2d2dffffffff005c0b3f5a5a00ff"
+	$"ffff2d2d2dffff005cfd0b3f5a5a00ff"
+	$"ffffff2d2d2d005cfd113f085a5a00ff"
+	$"ffffffff2d2d2dfd113ffd08080900ff"
+	$"ffffffff0a2d2d2d3ffd085c5c00ffff"
+	$"ffffff0a5cfd2d2d2d085c5c00ffffff"
+	$"ffff110afd113f2d2d2d5c00ffffffff"
+	$"ffff0a0b0a3ffa082d2d2dffffffffff"
+	$"ff170a3f0afa115c5c2d2d2dffffffff"
+	$"ff110b3f110a001100ff2d2d2dffffff"
+	$"170a3f5a5b5b5b00ffffff2d2d2dffff"
+	$"110a005b5b0000ffffffffff2d2d2dff"
+	$"0a00000000ffffffffffffffff2d2d2d"
+	$"0a000affffffffffffffffffffff2dff"
+};
+
+/* File Options */
 resource 'MICN' (12) {
 	$"ffffffffff000000ffffffffffffffff"
 	$"ffffffff00f2232400ffffffffffffff"
@@ -137,83 +242,7 @@ resource 'MICN' (12) {
 	$"ffffffffffffffff001313ffffffffff"
 };
 
-
-resource 'MICN' (13) {
-	$"ffffff1814141418ff1000000010ffff"
-	$"ffff141467676714000d4646460d00ff"
-	$"ff181467676767100d403f3f46520d10"
-	$"ff1467676767670052403f3f46526c00"
-	$"ff146767676767004c46404046526c00"
-	$"ff146767676767006c6c4652526c6c00"
-	$"ff181467676767100d6c52526c6c0d10"
-	$"ffff141467676718000d6c6c6c0d00ff"
-	$"1414141814140000001000000010ffff"
-	$"838414ffff0098ab00ffffffffffffff"
-	$"848514ff0098abd100ffffffffffffff"
-	$"8514ff0098abd100ffffffffffffffff"
-	$"14ff0098abd100ffff00ffffff00ffff"
-	$"ff0098abd100ffff000000ff000000ff"
-	$"ff00abd100ffffffff00ffffff00ffff"
-	$"ffff0000ffffffffffffffffffffffff"
-};
-
-resource 'MICN' (15) {
-	$"ffffffffffffffffffffffff0000ffff"
-	$"ffffffffffffffffffffff002c5a00ff"
-	$"ffffffffffffffffffff00002c2c5a00"
-	$"ffffffffffffffffff00fae500ebeb00"
-	$"ffffffffffffffff00fae5e5f90000ff"
-	$"ffffffffffffff00fae5e5f9bd00ffff"
-	$"ffffffffffff00fae5e5f9bd00ffffff"
-	$"ffffffffff00fae5e5f9bd00ffffffff"
-	$"ffffffff00fae5e5f9bd00ffffffffff"
-	$"ffffff00fae5e5f9bd00ffffffffffff"
-	$"ffff00fae5e5f9bd00ffffffffffffff"
-	$"ffff00e5e5f9bd00ffffffffffffffff"
-	$"ff005a5af9bd00ffffffffffffffffff"
-	$"ff005a5a0000ffffffffffffffffffff"
-	$"00000000ffffffffffffffffffffffff"
-	$"0000ffffffffffffffffffffffffffff"
-};
-
-resource 'MICN' (16) {
-	$"2d2dffffffffffffffffffff0000ffff"
-	$"2d2d2dffffffffffffffff002c5a00ff"
-	$"ff2d2d2dffffffffffff00002c2c5a00"
-	$"ffff2d2d2dffffffff00fae500ebeb00"
-	$"ffffff2d2d2dffff00fae5e5f90000ff"
-	$"ffffffff2d2d2d00fae5e5f9bd00ffff"
-	$"ffffffffff2d2d2de5e5f9bd00ffffff"
-	$"ffffffffff002d2d2df9bd00ffffffff"
-	$"ffffffff00fae52d2d2d00ffffffffff"
-	$"ffffff00fae5e5f92d2d2dffffffffff"
-	$"ffff00fae5e5f9bd002d2d2dffffffff"
-	$"ffff00e5e5f9bd00ffff2d2d2dffffff"
-	$"ff005a5af9bd00ffffffff2d2d2dffff"
-	$"ff005a5a0000ffffffffffff2d2d2dff"
-	$"00000000ffffffffffffffffff2d2d2d"
-	$"0000ffffffffffffffffffffffff2d2d"
-};
-
-resource 'MICN' (17) {
-	$"ffffffffffffffffff1000000010ffff"
-	$"ffffffffffffffff000d4646460d00ff"
-	$"ffffffffffffff100d403f3f46520d10"
-	$"ffffffffffffff0052403f3f46526c00"
-	$"ffffffffffffff004c46404046526c00"
-	$"ffffffffffffff006c6c4652526c6c00"
-	$"ffffffffffffff100d6c52526c6c0d10"
-	$"ffffffffffffffff000d6c6c6c0d00ff"
-	$"ffffffffffff0000001000000010ffff"
-	$"ffffffffff0098ab00ffffffffffffff"
-	$"ffffffff0098abd100ffffffffffffff"
-	$"ffffff0098abd100ffffffffffffffff"
-	$"ffff0098abd100ffffffffffffffffff"
-	$"ff0098abd100ffffffffffffffffffff"
-	$"ff00abd100ffffffffffffffffffffff"
-	$"ffff0000ffffffffffffffffffffffff"
-};
-
+/* Softwrap On */
 Resource 'MICN' (19) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ff00000000000000ff9a9affffffffff"
@@ -233,6 +262,7 @@ Resource 'MICN' (19) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
+/* Softwrap Off */
 Resource 'MICN' (18) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ff00000000000000ff9a9a000000ffff"
@@ -252,6 +282,7 @@ Resource 'MICN' (18) {
 	$"ffffffffffffffffffffffffffffffff"  
 };
 
+/* Edit As Project */
 Resource 'MICN' (31) {
 	$"fffffafafafafafafafaffffffffffff"
 	$"fffffafafafafafafafaffffffffffff" 
