@@ -34,6 +34,7 @@
 */
 
 #include "pe.h"
+
 #include "HHelpWindow.h"
 #include "HButtonBar.h"
 #include "HAppResFile.h"
@@ -41,6 +42,29 @@
 #include "HColorUtils.h"
 #include "HDefines.h"
 #include "HStream.h"
+
+class HVSep : public BView
+{	// a HVSep is a vertical separator
+public:
+	HVSep(BRect frame)
+		:	BView(frame, "hvsep", B_FOLLOW_TOP | B_FOLLOW_LEFT, B_WILL_DRAW)	
+		{}
+	virtual void Draw(BRect update);
+};
+
+void HVSep::Draw(BRect /*update*/)
+{
+	BRect b = Bounds();
+	SetHighColor(kViewColor);
+	FillRect(b);
+	float x = b.Width()/2;
+	static const rgb_color DarkCol =  { 186, 186, 186, 255};
+	static const rgb_color LightCol = { 241, 241, 241, 255};
+	SetHighColor(DarkCol);
+	StrokeLine(BPoint(x, b.top), BPoint(x, b.bottom));
+	SetHighColor(LightCol);
+	StrokeLine(BPoint(x+1, b.top), BPoint(x+1, b.bottom));
+}
 
 HButton::HButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help)
 {
@@ -347,8 +371,10 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 			
 		buf >> bID >> cmd >> fl >> help;
 		
-		if (fl & (1 << bfSpace))
-			x += 10;
+		if (fl & (1 << bfSpace)) {
+			AddChild(new HVSep( BRect(x, 3, x+7, 18)));
+			x += 14;
+		}
 		else
 		{
 			if (fl & (1 << bfDualIcon))
