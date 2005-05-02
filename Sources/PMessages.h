@@ -185,6 +185,7 @@
 #define msg_SoftWrap						'SfWr'
 
 #define msg_FuncPopup						'PopF'
+#define msg_HeaderPopup					'PopH'
 #define msg_ReadOnly						'RdOn'
 
 #define msg_MergeTo1						'Mrg1'

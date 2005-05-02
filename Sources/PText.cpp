@@ -2123,19 +2123,28 @@ void CSeparatorItem::DrawContent()
 	Menu()->SetHighColor(highCol);
 }
 
+enum {
+	kFunctionsOnly = 1,
+	kHeadersOnly
+};
+
 struct MenuFunctionScanHandler : public CFunctionScanHandler {
-	MenuFunctionScanHandler(bool sorted)
+	MenuFunctionScanHandler(bool sorted, int whichVal)
 		: sorted(sorted)
+		, which(whichVal)
 	{
 	}
 
 	void AddFunction(const char *name, const char *match, int offset,
 		bool italic, uint32 nestLevel, const char *params)
 	{
+		if (which != kFunctionsOnly)
+			return;
+
 		BMessage *msg = new BMessage(msg_JumpToProcedure);
 		msg->AddInt32("offset", offset);
 		msg->AddString("function", match);
-		
+	
 		BString indName(name);
 		if (nestLevel)
 		{
@@ -2151,9 +2160,11 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 	
 	void AddInclude(const char *name, const char *open, bool italic)
 	{
+		if (which != kHeadersOnly)
+			return;
+
 		BMessage *msg = new BMessage(msg_OpenInclude);
 		msg->AddString("include", open);
-		
 		if (italic)
 			includes.AddItem(new PItalicMenuItem(name, msg));
 		else
@@ -2162,6 +2173,8 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 	
 	void AddSeparator(const char* name)
 	{
+		if (which != kFunctionsOnly)
+			return;
 		if (!sorted) {
 			// strip unnamed separators if followed by other separators:
 			BMenuItem* lastItem = static_cast<BMenuItem*>(functions.LastItem());
@@ -2182,9 +2195,10 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 
 	BList includes, functions;
 	bool sorted;
+	int which;
 };
 
-void PText::ShowFunctionMenu(BPoint where)
+void PText::ShowFunctionMenu(BPoint where, int which)
 {
 	key_info ki;
 	
@@ -2193,7 +2207,7 @@ void PText::ShowFunctionMenu(BPoint where)
 	bool optionDown = (ki.modifiers & (B_OPTION_KEY | B_SHIFT_KEY | B_COMMAND_KEY)) != 0;
 	bool sorted = (optionDown != gPrefs->GetPrefInt("sortpopup"));
 
-	MenuFunctionScanHandler handler(sorted);
+	MenuFunctionScanHandler handler(sorted, which);
 
 	BList& includes = handler.includes;
 	BList& functions = handler.functions;
@@ -2243,8 +2257,6 @@ void PText::ShowFunctionMenu(BPoint where)
 	BRect r(where.x - 4, where.y - 20, where.x + 24, where.y + 4);
 	popup->SetTargetForItems(this);
 	popup->Go(where, true, true, r, true);
-
-	Doc()->ButtonBar()->SetDown(msg_FuncPopup, false);
 } /* PText::ShowFunctionMenu */
  
 void PText::ShowContextualMenu(BPoint where)
@@ -2299,7 +2311,7 @@ void PText::ShowContextualMenu(BPoint where)
 		fMainPopUp->Go(ConvertToScreen(where), true, true, r, true);
 	}
 	else
-		ShowFunctionMenu(ConvertToScreen(where));
+		ShowFunctionMenu(ConvertToScreen(where), kFunctionsOnly);
 } /* PText::ShowContextualMenu */
 
 #pragma mark - Lines
@@ -5511,7 +5523,17 @@ void PText::MessageReceived(BMessage *msg)
 			{
 				BPoint p;
 				FailOSErr(msg->FindPoint("where", &p));
-				ShowFunctionMenu(p);
+				ShowFunctionMenu(p, kFunctionsOnly);
+				Doc()->ButtonBar()->SetDown(msg_FuncPopup, false);
+				break;
+			}
+			
+			case msg_HeaderPopup:
+			{
+				BPoint p;
+				FailOSErr(msg->FindPoint("where", &p));
+				ShowFunctionMenu(p, kHeadersOnly);
+				Doc()->ButtonBar()->SetDown(msg_HeaderPopup, false);
 				break;
 			}
 			

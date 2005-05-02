@@ -131,7 +131,7 @@ virtual	void FrameResized(float w, float h);
 
 			bool WaitMouseMoved(BPoint where);
 			void ShowContextualMenu(BPoint where);
-			void ShowFunctionMenu(BPoint where);
+			void ShowFunctionMenu(BPoint where, int which);
 			
 			void SetDirty(bool dirty);
 			bool IsDirty();
