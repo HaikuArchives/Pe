@@ -262,7 +262,8 @@ void PText::AttachedToWindow()
 	Window()->SetPulseRate(100000);
 	fMainPopUp->SetTargetForItems(this);
 	fBounds = Bounds();
-	Doc()->ButtonBar()->SetDown(msg_SoftWrap, fSoftWrap);
+	Doc()->ButtonBar()->SetOn(msg_SoftWrap, fSoftWrap);
+	ShowTabStops(gPrefs->GetPrefInt("show tabs", false));
 } /* PText::AttachedToWindow */
 
 const char* PText::Text()
@@ -367,14 +368,18 @@ void PText::SetSettings(BMessage& msg)
 	if (gRestoreFont)
 	{
 		if (msg.FindInt32("tabstop", &i) == B_OK)			fTabStops = i;
+		if (msg.FindBool("show tabs", &b) == B_OK)		ShowTabStops(b);
 		if (msg.FindFloat("fontsize", &f) == B_OK)			fFont.SetSize(f);
 		if (msg.FindString("fontfamily", &s1) == B_OK && msg.FindString("fontstyle", &s2) == B_OK)
 																		fFont.SetFamilyAndStyle(s1, s2);
 		if (msg.FindBool("syntaxcoloring", &b) == B_OK)	fSyntaxColoring = b;
 		if (msg.FindInt32("encoding", &i) == B_OK)			SetEncoding(i);
 
-		if (msg.FindBool("softwrap", &b) == B_OK)			fSoftWrap = b;
-		Doc()->ButtonBar()->SetDown(msg_SoftWrap, fSoftWrap);
+		if (msg.FindBool("softwrap", &b) == B_OK)
+			fSoftWrap = b;
+		else
+			fSoftWrap = gPrefs->GetPrefInt("softwrap", 0);
+		Doc()->ButtonBar()->SetOn(msg_SoftWrap, fSoftWrap);
 
 		if (msg.FindInt32("wraptype", &i) == B_OK)			fWrapType = i;
 		if (msg.FindInt32("wrapwidth", &i) == B_OK)		fWrapWidth = i;
@@ -417,6 +422,7 @@ void PText::GetSettings(BMessage& msg)
 	FailOSErr(msg.MakeEmpty());
 	
 	FailOSErr(msg.AddInt32("tabstop", fTabStops));
+	FailOSErr(msg.AddBool("show tabs", toolBar->ShowsTabs()));
 	FailOSErr(msg.AddFloat("fontsize", fFont.Size()));
 	
 	font_family ff;
