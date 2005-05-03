@@ -83,22 +83,22 @@ resource 'DLOG' (6, "Info") {
 		TabbedBook					{{   0,   0, 400, 250 }, "tabbook" },
 
 			TabSheet				{ "Editor", "Editor Options" },
-				Edit				{{ 150,   0, 290,  16 }, "tabs", "Spaces per Tab:", "", "0123456789", 3, 90 },
 				CheckBox			{{   0,   0, 140,  16 }, "syntaxcol", "Syntax Colouring" },
+				Edit				{{ 150,   0, 275,  16 }, "tabs", "Spaces per Tab:", "", "0123456789", 3, 120 },
 				
-				Line				{{   0,  23, 290,  24 }},
+				Line				{{   0,  23, 275,  24 }},
 				
 				PopupMenu		{{  -1,  31, 140,  51 }, "font", "Font:", 400, 30 },
-				Edit				{{ 150,  31, 290,  51 }, "size", "Size:", "", "0123456789", 2, 90 },
+				Edit				{{ 150,  31, 275,  51 }, "size", "Size:", "", "0123456789", 2, 90 },
 				
-				Line				{{   0,  58, 290,  59 }},
+				Line				{{   0,  58, 275,  59 }},
 			
-				PopupMenu		{{  -1,  66, 290,  86 }, "encoding", "Encoding:", 401, 80 },
-				PopupMenu		{{  -1,  86, 290, 106 }, "linebreaks", "Linebreaks:", 402, 80 },
+				PopupMenu		{{  -1,  66, 275,  86 }, "encoding", "Encoding:", 401, 80 },
+				PopupMenu		{{  -1,  86, 275, 106 }, "linebreaks", "Linebreaks:", 402, 80 },
 				
-				Line				{{   0, 113, 290, 114 }},
+				Line				{{   0, 113, 275, 114 }},
 				
-				PopupMenu		{{  -1, 121, 290, 141 }, "language", "Language:", 93, 80 },
+				PopupMenu		{{  -1, 121, 275, 141 }, "language", "Language:", 93, 80 },
 			
 			TabSheetEnd			{},
 			
