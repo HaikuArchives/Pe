@@ -45,7 +45,8 @@ type 'BtnB' {
 			menu = 1,
 			toggle = 2,
 			space = 4,
-			dual = 8;				// flags
+			separator = 8,
+			dual = 16;				// flags
 		cstring;					// help string
 	};
 };

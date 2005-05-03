@@ -41,9 +41,9 @@ resource 'BtnB' (2) {
 	{
 		28, msg_DiffFile1, menu | toggle, "File 1",
 		29, msg_DiffFile2, menu | toggle, "File 2",
-		0, 0, space, "",
+		0, 0, separator, "",
 		27, msg_RefreshDiffs, 0, "Refresh",
-		0, 0, space, "",
+		0, 0, separator, "",
 		25, msg_MergeTo1, 0, "Merge to File 1",
 		26, msg_MergeTo2, 0, "Merge to File 2",
 	}

@@ -42,18 +42,18 @@ resource 'BtnB' (0) {
 		new, msg_New, 0, "New Document",
 		open, msg_BtnOpen, menu, "Open Document",
 		14, msg_Save, 0, "Save Document",
-		0, 0, space, "",
+		0, 0, separator, "",
 		11, msg_Execute, toggle, "Execute Command",
 		10, msg_FuncPopup, menu, "Function Popupmenu",
 		32, msg_HeaderPopup, menu, "Header Popupmenu",
-		0, 0, space, "",
+		0, 0, separator, "",
 		17, msg_FindCmd, 0, "Find",
 		13, msg_IncSearchBtn, toggle, "Incremental Search",
-		0, 0, space, "",
+		0, 0, separator, "",
 		15, msg_ReadOnly, dual, "Read Only",
 		12, msg_Info, 0, "File Options…",
 		18, msg_SoftWrap, dual, "Softwrap",
-		0, 0, space, "",
+		0, 0, separator, "",
 		31, msg_EditAsPrj, 0, "Edit As Project"
 	}
 };
@@ -245,41 +245,41 @@ resource 'MICN' (12) {
 /* Softwrap On */
 Resource 'MICN' (19) {
 	$"ffffffffffffffffffffffffffffffff"
-	$"ff00000000000000ff9a9affffffffff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ff0000ff00000000009a9affffffffff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ff00000000000000ff9a9affffffffff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ff00000000000000009a9affffffffff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ff00000000ff0000009a9affffffffff"
-	$"ffffffffffffffffff9a9affffff9aff"
-	$"ff0000ff00000000ff9a9affff9a9aff"
-	$"ffffffffffffffffff9a9aff9a9a9aff"
-	$"ff0000000000ff00009a9affff9a9aff"
-	$"ffffffffffffffffff9a9affffff9aff"
-	$"ffffffffffffffffffffffffffffffff"
+	$"ff1212121212121212bb1212121212ff"
+	$"ff123f3f3f3f3f3f3fbb3f3f3f3f12ff"
+	$"ff123f003f0000003fbb3f3f3f3f12ff"
+	$"ff123f3f3f3f3f3f3fbb3f3f3f3f12ff"
+	$"ff123f00000000003fbb3f3f3f3f12ff"
+	$"ff123f3f3f3f3f3f3fbb3f3f3f3f12ff"
+	$"ff123f00000000003fbb3f3f3f3f12ff"
+	$"ff123f3f3f3f3f3f3fbb3f3f3f3f12ff"
+	$"ff123f00003f00003fbb3f3f3fbb12ff"
+	$"ff123f3f3f3f3f3f3fbb3f3fbbbb12ff"
+	$"ff123f003f0000003fbb3fbbbbbb12ff"
+	$"ff123f3f3f3f3f3f3fbb3f3fbbbb12ff"
+	$"ff123f0000003f003fbb3f3f3fbb12ff"
+	$"ff123f3f3f3f3f3f3fbb3f3f3f3f12ff"
+	$"ff1212121212121212bb1212121212ff"
 };
 
 /* Softwrap Off */
 Resource 'MICN' (18) {
 	$"ffffffffffffffffffffffffffffffff"
-	$"ff00000000000000ff9a9a000000ffff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ff0000ff00000000009a9a0000ffffff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ff00000000000000ff9a9a000000ffff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ff00000000000000009a9a000000ffff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ff00000000ff0000009a9aff000000ff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ff0000ff00000000ff9a9a000000ffff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ff0000000000ff00009a9a0000ffffff"
-	$"ffffffffffffffffff9a9affffffffff"
-	$"ffffffffffffffffffffffffffffffff"  
+	$"ff1212121212121212f21212121212ff"
+	$"ff123f3f3f3f3f3f3ff23f3f3f3f12ff"
+	$"ff123f003f0000001ef21e00003f12ff"
+	$"ff123f3f3f3f3f3f3ff23f3f3f3f12ff"
+	$"ff123f00000000001ef21e00003f12ff"
+	$"ff123f3f3f3f3f3f3ff23f3f3f3f12ff"
+	$"ff123f00000000001ef21e00003f12ff"
+	$"ff123f3f3f3f3f3f3ff23f3f3f3f12ff"
+	$"ff123f00003f00001ef21e00003f12ff"
+	$"ff123f3f3f3f3f3f3ff23f3f3f3f12ff"
+	$"ff123f003f0000001ef21e00003f12ff"
+	$"ff123f3f3f3f3f3f3ff23f3f3f3f12ff"
+	$"ff123f0000003f001ef21e00003f12ff"
+	$"ff123f3f3f3f3f3f3ff23f3f3f3f12ff"
+	$"ff1212121212121212f21212121212ff"
 };
 
 /* Edit As Project */
