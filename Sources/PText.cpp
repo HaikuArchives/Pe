@@ -422,7 +422,7 @@ void PText::GetSettings(BMessage& msg)
 	FailOSErr(msg.MakeEmpty());
 	
 	FailOSErr(msg.AddInt32("tabstop", fTabStops));
-	FailOSErr(msg.AddBool("show tabs", toolBar->ShowsTabs()));
+	FailOSErr(msg.AddBool("show tabs", Doc()->ToolBar()->ShowsTabs()));
 	FailOSErr(msg.AddFloat("fontsize", fFont.Size()));
 	
 	font_family ff;
