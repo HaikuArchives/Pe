@@ -48,6 +48,7 @@ enum BtnFlags {
 	bfMenu,
 	bfToggle,
 	bfSpace,
+	bfSeparator,
 	bfDualIcon
 };
 
@@ -102,6 +103,13 @@ virtual	void MouseLeave();
 
 private:
 			unsigned char *fAltIcon;
+};
+
+class HSeparator : public HButton {
+public:
+			HSeparator(HButtonBar *bar, float x);
+			
+virtual	void Draw(bool pushed = false);
 };
 
 class HButtonBar : public BView {

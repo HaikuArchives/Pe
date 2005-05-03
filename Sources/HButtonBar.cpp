@@ -34,7 +34,6 @@
 */
 
 #include "pe.h"
-
 #include "HHelpWindow.h"
 #include "HButtonBar.h"
 #include "HAppResFile.h"
@@ -42,29 +41,6 @@
 #include "HColorUtils.h"
 #include "HDefines.h"
 #include "HStream.h"
-
-class HVSep : public BView
-{	// a HVSep is a vertical separator
-public:
-	HVSep(BRect frame)
-		:	BView(frame, "hvsep", B_FOLLOW_TOP | B_FOLLOW_LEFT, B_WILL_DRAW)	
-		{}
-	virtual void Draw(BRect update);
-};
-
-void HVSep::Draw(BRect /*update*/)
-{
-	BRect b = Bounds();
-	SetHighColor(kViewColor);
-	FillRect(b);
-	float x = b.Width()/2;
-	static const rgb_color DarkCol =  { 186, 186, 186, 255};
-	static const rgb_color LightCol = { 241, 241, 241, 255};
-	SetHighColor(DarkCol);
-	StrokeLine(BPoint(x, b.top), BPoint(x, b.bottom));
-	SetHighColor(LightCol);
-	StrokeLine(BPoint(x+1, b.top), BPoint(x+1, b.bottom));
-}
 
 HButton::HButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help)
 {
@@ -83,7 +59,7 @@ HButton::HButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const 
 		fIcon = (unsigned char *)HResources::GetResource('MICN', resID);
 		FailNilRes(fIcon);
 	}
-	else
+	else if (resID != -999)
 	{
 		fIcon = (unsigned char *)malloc(256);
 		FailNil(fIcon);
@@ -201,7 +177,7 @@ void HButton::SetDown(bool pushed)
 	fDown = pushed;
 	Draw(fDown);
 	MouseLeave();
-} /* HButton::Push */
+} /* HButton::SetDown */
 
 void HButton::SetEnabled(bool enabled)
 {
@@ -340,6 +316,26 @@ void HDualIconButton::MouseLeave()
 
 #pragma mark -
 
+HSeparator::HSeparator(HButtonBar *bar, float x)
+	: HButton(bar, -999, 0, x, 0, "")
+{
+	fEnabled = false;
+	fMenu = false;
+	fFrame.right = fFrame.left + 5.0;
+} /* HSeparator::HSeparator */
+
+void HSeparator::Draw(bool pushed)
+{
+	float x = fFrame.left+2.0;
+	
+	fBar->BeginLineArray(2);
+	fBar->AddLine(BPoint(x, fFrame.top), BPoint(x, fFrame.bottom), kDarkShadow);
+	fBar->AddLine(BPoint(x+1.0, fFrame.top), BPoint(x+1.0, fFrame.bottom), kWhite);
+	fBar->EndLineArray();
+} /* HSeparator::Draw */
+
+#pragma mark -
+
 HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *target)
 	: BView(frame, name, B_FOLLOW_TOP | B_FOLLOW_LEFT, B_WILL_DRAW | B_PULSE_NEEDED)
 {
@@ -362,7 +358,8 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 	fDragger = (flags & (1 << bbDragger)) != 0;
 	fAcceptFirstClick = (flags & (1 << bbAcceptFirstClick)) != 0;
 	
-	float x = fDragger ? 12 : 4;
+	HButton* but;
+	float x = fDragger ? 12.0 : 6.0;
 	
 	while (bCnt--)
 	{
@@ -371,19 +368,19 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 			
 		buf >> bID >> cmd >> fl >> help;
 		
-		if (fl & (1 << bfSpace)) {
-			AddChild(new HVSep( BRect(x, 3, x+7, 18)));
-			x += 14;
-		}
+		if (fl & (1 << bfSpace))
+			x += 10.0;
 		else
 		{
-			if (fl & (1 << bfDualIcon))
-				fButtons.push_back(new HDualIconButton(this, bID, cmd, x, fl, help));
+			if (fl & (1 << bfSeparator))
+				but = new HSeparator(this, x);
+			else if (fl & (1 << bfDualIcon))
+				but = new HDualIconButton(this, bID, cmd, x, fl, help);
 			else
-				fButtons.push_back(new HButton(this, bID, cmd, x, fl, help));
-	
-			x += 20;
-			if (fl & (1 << bfMenu)) x += 10;
+				but = new HButton(this, bID, cmd, x, fl, help);
+
+			fButtons.push_back(but);
+			x = but->Frame().right+6.0;
 		}
 	}
 	
@@ -628,7 +625,7 @@ void HButtonBar::ShowHelp()
 	if (fLastButtonOver >= 0)
 	{
 		HButton *btn = fButtons[fLastButtonOver];
-		if (!btn || !btn->IsVisible())
+		if (!btn || !btn->IsVisible() || !btn->Help() || !strlen(btn->Help()))
 			return;
 		BRect r(btn->Frame());
 		
