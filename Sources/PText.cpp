@@ -1135,12 +1135,6 @@ void PText::BackspaceKeyDown()
 {
 	if (Doc()->IsReadOnly()) THROW(("Document is read-only"));
 
-	PTypingCmd *tc = dynamic_cast<PTypingCmd*>(fLastCommand);
-	if (!tc)
-		RegisterCommand(tc = new PTypingCmd(this));
-	
-	int cl = fText.PrevCharLen(fCaret);
-
 	if (fAnchor == fCaret)
 	{
 		if (fCaret == 0)
@@ -1148,26 +1142,34 @@ void PText::BackspaceKeyDown()
 			beep();
 			return;
 		}
-		fCaret -= cl;
-		
-// store info for undo
-		if (tc->fInsertedLen > 0)
-			tc->fInsertedLen -= cl;
-		else
-		{
-			tc->fDeleted = (char *)realloc(tc->fDeleted, tc->fDeletedLen + cl);
-			FailNil(tc->fDeleted);
-			memmove(tc->fDeleted + cl, tc->fDeleted, tc->fDeletedLen);
-			tc->fDeletedLen += cl;
-			tc->fDeletedIndx -= cl;
-			while (cl--)
-				tc->fDeleted[cl] = fText[fCaret + cl];
-		}
+		fCaret -= fText.PrevCharLen(fCaret);
 	}
-	
+
 	int from = min(fCaret, fAnchor);
 	int to = max(fCaret, fAnchor);
-	
+	int cutLength = to - from;
+
+	PTypingCmd *typingCmd = dynamic_cast<PTypingCmd*>(fLastCommand);
+	if (typingCmd)
+	{
+		// store info for undo (PTypingCmd::Do() does no merging)
+		if (typingCmd->fInsertedLen > 0)
+			typingCmd->fInsertedLen -= cutLength;
+		else
+		{
+			typingCmd->fDeleted = (char *)realloc(typingCmd->fDeleted,
+				typingCmd->fDeletedLen + cutLength);
+			FailNil(typingCmd->fDeleted);
+			memmove(typingCmd->fDeleted + cutLength, typingCmd->fDeleted, typingCmd->fDeletedLen);
+			typingCmd->fDeletedLen += cutLength;
+			typingCmd->fDeletedIndx -= cutLength;
+			while (cutLength--)
+				typingCmd->fDeleted[cutLength] = fText[from + cutLength];
+		}
+	}
+	else
+		RegisterCommand(new PTypingCmd(this));
+
 	fCaret = fAnchor = from;
 	Delete(from, to);
 
@@ -1179,12 +1181,6 @@ void PText::DeleteKeyDown()
 {
 	if (Doc()->IsReadOnly()) THROW(("Document is read-only"));
 
-	PTypingCmd *tc = dynamic_cast<PTypingCmd*>(fLastCommand);
-	if (!tc)
-		RegisterCommand(tc = new PTypingCmd(this));
-	
-	int cl = fText.CharLen(fCaret);
-
 	if (fAnchor == fCaret)
 	{
 		if (fCaret == fText.Size())
@@ -1192,19 +1188,27 @@ void PText::DeleteKeyDown()
 			beep();
 			return;
 		}
-		fCaret += cl;
-
-// store info for undo
-		tc->fDeleted = (char *)realloc(tc->fDeleted, tc->fDeletedLen + cl);
-		FailNil(tc->fDeleted);
-		for (int i = 0; i < cl; i++)
-			tc->fDeleted[tc->fDeletedLen + i] = fText[fAnchor + i];
-		tc->fDeletedLen += cl;
+		fCaret += fText.CharLen(fCaret);
 	}
-	
+
 	int from = min(fCaret, fAnchor);
 	int to = max(fCaret, fAnchor);
-	
+	int cutLength = to - from;
+
+	PTypingCmd *typingCmd = dynamic_cast<PTypingCmd*>(fLastCommand);
+	if (typingCmd)
+	{
+		// store info for undo (PTypingCmd::Do() does no merging)
+		typingCmd->fDeleted = (char *)realloc(typingCmd->fDeleted,
+			typingCmd->fDeletedLen + cutLength);
+		FailNil(typingCmd->fDeleted);
+		for (int i = 0; i < cutLength; i++)
+			typingCmd->fDeleted[typingCmd->fDeletedLen + i] = fText[from + i];
+		typingCmd->fDeletedLen += cutLength;
+	}
+	else
+		RegisterCommand(new PTypingCmd(this));
+
 	fCaret = fAnchor = from;
 	Delete(from, to);
 
@@ -3412,7 +3416,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 				else
 					fCaret = fText.Size();
 			}
-			DeleteKeyDown();	
+			DeleteKeyDown();
 			newAnchor = newCaret = fCaret;
 			break;
 		case kmsg_Delete_to_End_of_File:
