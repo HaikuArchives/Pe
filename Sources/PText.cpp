@@ -90,6 +90,85 @@ enum {
 	flSyntaxColoring
 };
 
+
+class WordState {
+	public:
+		WordState(int key, bool subWord = false, bool mouseSelect = false)
+			: fKey(key)
+			, fSubWord(subWord)
+			, fSkip(!mouseSelect)
+			, fUnicodeClass(-1)
+		{
+		}
+
+		bool BelongsToWord(uint32 unicode)
+		{
+			// If we start with !fSkip (in case of mouse select), we need to
+			// initialize the class of the first character here
+			if (!fSkip && fUnicodeClass == -1)
+				FirstChar(unicode);
+
+			// We skip everything until the first allowed character, then we only
+			// accept allowed characters of the same class as the first accepted
+			// character
+
+			if (!AllowedChar(unicode) == fSkip
+				&& (fSkip || fUnicodeClass == mclass(unicode)))
+			{
+				if (fSubWord && !fSkip && unicode < 128)
+				{
+					bool isUpperCase = isupper(unicode);
+					if ((fKey == B_RIGHT_ARROW && isUpperCase && !fLastIsUpperCase)
+						|| (fKey == B_LEFT_ARROW && !isUpperCase && fLastIsUpperCase))
+						return false;
+
+					fLastIsUpperCase = isUpperCase;
+				}
+
+				return true;
+			} 
+			else if (fSkip)
+			{
+				// the character we got here is the first one of our word
+				FirstChar(unicode);
+				fSkip = false;
+				return true;
+			}
+
+			return false;
+		}
+
+	private:
+		void FirstChar(uint32 unicode)
+		{
+			fUnicodeClass = mclass(unicode);
+
+			// ToDo: sub-word finding only works for single-byte words
+			if (unicode < 128)
+				fLastIsUpperCase = isupper(unicode);
+			else
+				fLastIsUpperCase = fKey == B_RIGHT_ARROW;
+		}
+
+		bool AllowedChar(uint32 unicode)
+		{
+			if (unicode == '_')
+				return !fSubWord;
+
+			return isalnum_uc(unicode);
+		}
+
+		int32	fKey;
+		bool	fSubWord;
+		bool	fSkip;
+		bool	fLastIsUpperCase;
+		int32	fUnicodeClass;
+};
+
+
+//	#pragma mark - class PText
+
+
 PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	: BView(frame, "text view", B_FOLLOW_ALL_SIDES, B_ASYNCHRONOUS_CONTROLS |
 		B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED | B_FRAME_EVENTS)
@@ -2901,52 +2980,39 @@ void PText::BlockOffsetsForLine(int lineNr, int& startOffset, int& endOffset)
 
 #pragma mark - Language
 
-int PText::FindWord(int key)
+int PText::FindWord(int key, bool subWord)
 {
-	return FindWord(fCaret, key);
+	return FindWord(fCaret, key, false, subWord);
 } /* PText::FindWord */
 
-int PText::FindWord(int i, int key, bool mouseSelect)
+int PText::FindWord(int i, int key, bool mouseSelect, bool subWord)
 {
-	int unicode, len, uClass = -1;
-	bool skip = ! mouseSelect;
-	
+	int unicode, len;
+	WordState state(key, subWord, mouseSelect);
+
 	if (key == B_RIGHT_ARROW)
 	{
 		while (i < fText.Size())
 		{
 			fText.CharInfo(i, unicode, len);
-			
-			if (uClass == -1)
-				uClass = mclass(unicode);
 
-			if ((fText[i] != '_' && !isalnum_uc(unicode)) == skip && (skip || uClass == mclass(unicode)))
-				i += len;
-			else if (skip)
-				skip = false;
-			else
+			if (!state.BelongsToWord(unicode))
 				break;
+
+			i += len;
 		}
 	}
 	else if (key == B_LEFT_ARROW)
 	{
 		while (i > 0)
 		{
-			i -= fText.PrevCharLen(i);
-			fText.CharInfo(i, unicode, len);
+			len = fText.PrevCharLen(i);
+			fText.CharInfo(i - len, unicode, len);
 
-			if (uClass == -1)
-				uClass = mclass(unicode);
-
-			if ((fText[i] != '_' && !isalnum_uc(unicode)) == skip && (skip || uClass == mclass(unicode)))
-				;
-			else if (skip)
-				skip = false;
-			else
-			{
-				i += len;
+			if (!state.BelongsToWord(unicode))
 				break;
-			}
+
+			i -= len;
 		}
 	}
 	
@@ -3242,6 +3308,12 @@ bool PText::DoKeyCommand(BMessage *msg)
 		case kmsg_Move_Word_Right:
 			newAnchor = newCaret = FindWord(B_RIGHT_ARROW);
 			break;
+		case kmsg_Move_SubWord_Left:
+			newAnchor = newCaret = FindWord(B_LEFT_ARROW, true);
+			break;
+		case kmsg_Move_SubWord_Right:
+			newAnchor = newCaret = FindWord(B_RIGHT_ARROW, true);
+			break;
 		case kmsg_Move_to_Beginning_of_Line:
 		case kmsg_Extend_Selection_to_Beginning_of_Line:
 		{
@@ -3327,6 +3399,11 @@ bool PText::DoKeyCommand(BMessage *msg)
 			DeleteKeyDown();
 			newAnchor = newCaret = fCaret;
 			break;
+		case kmsg_Delete_to_Beginning_of_Line:
+			fAnchor = LineStart(line);
+			BackspaceKeyDown();
+			newAnchor = newCaret = fCaret;
+			break;
 		case kmsg_Delete_to_End_of_Line:
 			if (fAnchor == fCaret)
 			{
@@ -3359,6 +3436,14 @@ bool PText::DoKeyCommand(BMessage *msg)
 		case kmsg_Extend_Selection_with_Next_Word:
 			extend = true;
 			newCaret = FindWord(B_RIGHT_ARROW);
+			break;
+		case kmsg_Extend_Selection_with_Previous_SubWord:
+			extend = true;
+			newCaret = FindWord(B_LEFT_ARROW, true);
+			break;
+		case kmsg_Extend_Selection_with_Next_SubWord:
+			extend = true;
+			newCaret = FindWord(B_RIGHT_ARROW, true);
 			break;
 		case kmsg_Extend_Selection_to_Current_Line:
 			ChangeSelection(LineStart(line), line < LineCount() - 1 ? LineStart(line + 1) - 1 : fText.Size());

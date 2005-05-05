@@ -153,8 +153,8 @@ virtual	void FrameResized(float w, float h);
 			void HideCaret();
 			void ShowCaret();
 			
-			int FindWord(int key);
-			int FindWord(int indx, int key, bool mouseSelect = false);
+			int FindWord(int key, bool subWord = false);
+			int FindWord(int indx, int key, bool mouseSelect = false, bool subWord = false);
 			int FindNextWord(int offset);
 			void RecalculateLineBreaks();
 			void InsertLinebreaks();
