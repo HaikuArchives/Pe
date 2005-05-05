@@ -42,73 +42,94 @@
 #include "HDefines.h"
 #include "HStream.h"
 
-HButton::HButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help)
+HTool::HTool(HButtonBar *bar, float x, float width, int cmd=-1, const char *help="")
+	: fBar(bar), fCmd(cmd)
+	, fMenu(false), fToggle(false), fEnabled(true), fVisible(true), fDown(false), fOn(false)
+	, fIconStd(NULL), fIconAlt(NULL)
 {
-	fBar = bar;
-	fCmd = cmd;
-	fMenu = (flags & (1 << bfMenu)) != 0;
-	fToggle = (flags & (1 << bfToggle)) != 0 || fMenu;
-	fDown = false;
-	fOn = false;
-	fEnabled = true;
-	fVisible = true;
 	fHelp = strdup(help);
-	
-	if (resID >= 0)
-	{
-		fIcon = (unsigned char *)HResources::GetResource('MICN', resID);
-		FailNilRes(fIcon);
-	}
-	else if (resID != -999)
-	{
-		fIcon = (unsigned char *)malloc(256);
-		FailNil(fIcon);
-		
-		BBitmap bm(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
-		BMimeType mt;
-		
-		try
-		{
-			switch (resID)
-			{
-				case -1:
-					FailOSErr(mt.SetTo("application/x-vnd.beunited.pe"));
-					FailOSErr(mt.GetIconForType("text/plain", &bm, B_MINI_ICON));
-					break;
-				case -2:
-				{
-					BNode n;
-					BPath p;
-					BNodeInfo ni;
-					
-					FailOSErr(find_directory(B_USER_CONFIG_DIRECTORY, &p));
-					FailOSErr(n.SetTo(p.Path()));
-					FailOSErr(ni.SetTo(&n));
-					FailOSErr(ni.GetTrackerIcon(&bm, B_MINI_ICON));
-					break;
-				}
-			}
-		}
-		catch (HErr& e)
-		{
-			e.DoError();
-			resID = 0;
-		}
-		
-		if (resID != -3)
-			memcpy(fIcon, bm.Bits(), 256);
-	}
-	
-	fFrame.Set(x, 3, x + 15, 18);
-	if (fMenu) fFrame.right += 7;
-} /* HButton::HButton */
+	fFrame.Set(x, 3, x + width - 1, 18);
+} /* HTool::HTool */
 
-HButton::~HButton()
+HTool::~HTool()
 {
 	free(fHelp);
-} /* HButton::~HButton */
+} /* HTool::~HTool */
 
-void HButton::Draw(bool pushed)
+void HTool::MouseEnter(bool pushed)
+{
+} /* HTool::MouseEnter */
+
+void HTool::MouseLeave()
+{
+} /* HTool::MouseLeave */
+
+void HTool::SetOn(bool on)
+{
+	fOn = on;
+	Draw(false);
+	MouseLeave();
+} /* HTool::SetOn */
+
+void HTool::SetDown(bool pushed)
+{
+	fDown = pushed;
+	Draw(fDown);
+	MouseLeave();
+} /* HTool::SetDown */
+
+void HTool::SetEnabled(bool enabled)
+{
+	bool down = fDown;
+
+	fDown = false;
+	MouseLeave();
+	fDown = down;
+	
+	fEnabled = enabled;
+	Draw();
+} /* HTool::SetEnabled */
+
+void HTool::SetVisible(bool visible)
+{
+	fVisible = visible;
+	Draw();
+} /* HTool::SetVisible */
+
+void HTool::DrawFrame(bool enter, bool active)
+{
+	rgb_color lt, rb, m1, m2;
+	BRect r(fFrame);
+
+	r.InsetBy(-1, -1);
+	if (enter)
+	{
+		lt = active ? kShadow : kWhite;
+		rb = active ? kWhite : kDarkShadow;
+		m1 = kDarkShadow;
+		m2 = kWhite;
+	}
+	else
+	{
+		lt = m2 = active ? kDarkShadow : kViewColor;
+		rb = m1 = active ? kWhite : kViewColor;
+	}
+
+	fBar->BeginLineArray(fMenu ? 6 : 4);
+	fBar->AddLine(r.LeftBottom(), r.RightBottom(), rb);
+	fBar->AddLine(r.RightTop(), r.RightBottom(), rb);
+	fBar->AddLine(r.LeftTop(), r.LeftBottom(), lt);
+	fBar->AddLine(r.LeftTop(), r.RightTop(), lt);
+	if (fMenu)
+	{
+		fBar->AddLine(BPoint(r.left + 17, r.top), BPoint(r.left + 17, r.bottom), m1);
+		fBar->AddLine(BPoint(r.left + 18, r.top), BPoint(r.left + 18, r.bottom), m2);
+		
+	}
+	fBar->EndLineArray();
+} /* HTool::DrawFrame */
+
+void HTool::DrawButton(unsigned char *icondat, bool pushed)
 {
 	BRect r(0, 0, 15, 15);
 	BBitmap icon(r, B_COLOR_8_BIT);
@@ -117,18 +138,18 @@ void HButton::Draw(bool pushed)
 	{
 		unsigned char ic[256];
 		for (int i = 0; i < 256; i++)
-			ic[i] = gSelectedMap[fIcon[i]];
+			ic[i] = gSelectedMap[icondat[i]];
 		icon.SetBits(ic, 256, 0, B_COLOR_8_BIT);
 	}
 	else if (! fEnabled)
 	{
 		unsigned char ic[256];
 		for (int i = 0; i < 256; i++)
-			ic[i] = gDisabledMap[fIcon[i]];
+			ic[i] = gDisabledMap[icondat[i]];
 		icon.SetBits(ic, 256, 0, B_COLOR_8_BIT);
 	}
 	else
-		icon.SetBits(fIcon, 256, 0, B_COLOR_8_BIT);
+		icon.SetBits(icondat, 256, 0, B_COLOR_8_BIT);
 
 	fBar->SetHighColor(kViewColor);
 	fBar->FillRect(fFrame);
@@ -163,168 +184,63 @@ void HButton::Draw(bool pushed)
 			fBar->EndLineArray();
 		}
 	}
-} /* HButton::Draw */
+} /* HTool::Draw */
 
-void HButton::SetOn(bool on)
+void HTool::ReadIcon(int resID)
 {
-	fOn = on;
-	Draw(false);
-	MouseLeave();
-} /* HButton::SetOn */
-
-void HButton::SetDown(bool pushed)
-{
-	fDown = pushed;
-	Draw(fDown);
-	MouseLeave();
-} /* HButton::SetDown */
-
-void HButton::SetEnabled(bool enabled)
-{
-	bool b = false;
-
-	swap(b, fDown);
-	MouseLeave();
-	swap(b, fDown);
-	
-	fEnabled = enabled;
-	Draw();
-} /* HButton::SetEnabled */
-
-void HButton::SetVisible(bool visible)
-{
-	fVisible = visible;
-	Draw();
-} /* HButton::SetVisible */
-
-void HButton::MouseEnter(bool pushed)
-{
-	if (fVisible && fEnabled)
+	if (resID >= 0)
 	{
-		BRect r(fFrame);
-		
-		r.InsetBy(-1, -1);
-	
-		pushed = pushed || fDown;
-	
-		if (fMenu)
-		{
-			fBar->BeginLineArray(6);
-			fBar->AddLine(r.LeftBottom(), r.RightBottom(), pushed ? kWhite : kDarkShadow);
-			fBar->AddLine(r.RightTop(), r.RightBottom(), pushed ? kWhite : kDarkShadow);
-			
-			fBar->AddLine(r.LeftTop(), r.LeftBottom(), pushed ? kShadow : kWhite);
-			fBar->AddLine(r.LeftTop(), r.RightTop(), pushed ? kShadow : kWhite);
-			
-			float x = r.left + 17;
-			fBar->AddLine(BPoint(x, r.top), BPoint(x, r.bottom), kDarkShadow);
-			x += 1;
-			fBar->AddLine(BPoint(x, r.top), BPoint(x, r.bottom), kWhite);
-			
-			fBar->EndLineArray();
-		}
-		else
-		{
-			fBar->BeginLineArray(4);
-			fBar->AddLine(r.LeftBottom(), r.RightBottom(), pushed ? kWhite : kDarkShadow);
-			fBar->AddLine(r.RightTop(), r.RightBottom(), pushed ? kWhite : kDarkShadow);
-			fBar->AddLine(r.LeftTop(), r.LeftBottom(), pushed ? kShadow : kWhite);
-			fBar->AddLine(r.LeftTop(), r.RightTop(), pushed ? kShadow : kWhite);
-			fBar->EndLineArray();
-		}
+		fIconStd = (unsigned char *)HResources::GetResource('MICN', resID);
+		FailNilRes(fIconStd);
 	}
-} /* HButton::MouseEnter */
-
-void HButton::MouseLeave()
-{
-	if (fVisible && fEnabled)
+	else
 	{
-		BRect r(fFrame);
+		fIconStd = (unsigned char *)malloc(256);
+		FailNil(fIconStd);
 		
-		r.InsetBy(-1, -1);
-	
-		if (fMenu)
+		BBitmap bm(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
+		BMimeType mt;
+		
+		try
 		{
-			fBar->BeginLineArray(6);
-			fBar->AddLine(r.LeftBottom(), r.RightBottom(), fDown ? kWhite : kViewColor);
-			fBar->AddLine(r.RightTop(), r.RightBottom(), fDown ? kWhite : kViewColor);
-			fBar->AddLine(r.LeftTop(), r.LeftBottom(), fDown ? kDarkShadow : kViewColor);
-			fBar->AddLine(r.LeftTop(), r.RightTop(), fDown ? kDarkShadow : kViewColor);
-			
-			float x = r.left + 17;
-			fBar->AddLine(BPoint(x, r.top), BPoint(x, r.bottom), fDown ? kWhite : kViewColor);
-			x += 1;
-			fBar->AddLine(BPoint(x, r.top), BPoint(x, r.bottom), fDown ? kDarkShadow : kViewColor);
-			
-			fBar->EndLineArray();
+			switch (resID)
+			{
+				case -1:
+					FailOSErr(mt.SetTo("application/x-vnd.beunited.pe"));
+					FailOSErr(mt.GetIconForType("text/plain", &bm, B_MINI_ICON));
+					break;
+				case -2:
+				{
+					BNode n;
+					BPath p;
+					BNodeInfo ni;
+					
+					FailOSErr(find_directory(B_USER_CONFIG_DIRECTORY, &p));
+					FailOSErr(n.SetTo(p.Path()));
+					FailOSErr(ni.SetTo(&n));
+					FailOSErr(ni.GetTrackerIcon(&bm, B_MINI_ICON));
+					break;
+				}
+			}
 		}
-		else
+		catch (HErr& e)
 		{
-			fBar->BeginLineArray(4);
-			fBar->AddLine(r.LeftBottom(), r.RightBottom(), fDown ? kWhite : kViewColor);
-			fBar->AddLine(r.RightTop(), r.RightBottom(), fDown ? kWhite : kViewColor);
-			fBar->AddLine(r.LeftTop(), r.LeftBottom(), fDown ? kDarkShadow : kViewColor);
-			fBar->AddLine(r.LeftTop(), r.RightTop(), fDown ? kDarkShadow : kViewColor);
-			fBar->EndLineArray();
+			e.DoError();
+			resID = 0;
 		}
+		
+		if (resID != -3)
+			memcpy(fIconStd, bm.Bits(), 256);
 	}
-} /* HButton::MouseLeave */
-
+} /* HTool::ReadIcon */
 #pragma mark -
 
-HDualIconButton::HDualIconButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help)
-	: HButton(bar, resID, cmd, x, flags, help)
+HToolSeparator::HToolSeparator(HButtonBar *bar, float x)
+	: HTool(bar, x, 5.0)
 {
-//	ASSERT(resID > 0);
+} /* HToolSeparator::HToolSeparator */
 
-	fAltIcon = (unsigned char *)HResources::GetResource('MICN', resID + 1);
-	FailNilRes(fAltIcon);
-	
-	fToggle = true;
-} /* HDualIconButton::HDualIconButton */
-
-void HDualIconButton::Draw(bool pushed)
-{
-	if (fOn)
-		swap(fIcon, fAltIcon);
-
-	HButton::Draw(pushed);
-
-	if (fOn)
-		swap(fIcon, fAltIcon);
-} /* HDualIconButton::Draw */
-
-void HDualIconButton::MouseEnter(bool pushed)
-{
-	bool b = fDown;
-	fDown = false;
-	
-	HButton::MouseEnter(pushed);
-	
-	fDown = b;
-} /* HDualIconButton::MouseEnter */
-
-void HDualIconButton::MouseLeave()
-{
-	bool b = fDown;
-	fDown = false;
-	
-	HButton::MouseLeave();
-	
-	fDown = b;
-} /* HDualIconButton::MouseLeave */
-
-#pragma mark -
-
-HSeparator::HSeparator(HButtonBar *bar, float x)
-	: HButton(bar, -999, 0, x, 0, "")
-{
-	fEnabled = false;
-	fMenu = false;
-	fFrame.right = fFrame.left + 5.0;
-} /* HSeparator::HSeparator */
-
-void HSeparator::Draw(bool pushed)
+void HToolSeparator::Draw(bool pushed)
 {
 	float x = fFrame.left+2.0;
 	
@@ -332,7 +248,72 @@ void HSeparator::Draw(bool pushed)
 	fBar->AddLine(BPoint(x, fFrame.top), BPoint(x, fFrame.bottom), kDarkShadow);
 	fBar->AddLine(BPoint(x+1.0, fFrame.top), BPoint(x+1.0, fFrame.bottom), kWhite);
 	fBar->EndLineArray();
-} /* HSeparator::Draw */
+} /* HToolSeparator::Draw */
+
+
+#pragma mark -
+
+HToolButton::HToolButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help)
+	: HTool(bar, x, 16.0, cmd, help)
+{
+	fMenu = (flags & (1 << bfMenu)) != 0;
+	fToggle = (flags & (1 << bfToggle)) != 0 || fMenu;
+
+	ReadIcon(resID);
+	
+	if (fMenu) fFrame.right += 7;
+} /* HToolButton::HToolButton */
+
+void HToolButton::Draw(bool pushed)
+{
+	DrawButton(fIconStd, pushed);
+} /* HToolButton::Draw */
+
+void HToolButton::MouseEnter(bool pushed)
+{
+	if (fVisible && fEnabled)
+		DrawFrame(true, pushed || fDown);
+} /* HToolButton::MouseEnter */
+
+void HToolButton::MouseLeave()
+{
+	if (fVisible && fEnabled)
+		DrawFrame(false, fDown);
+} /* HToolButton::MouseLeave */
+
+#pragma mark -
+
+HToolStateButton::HToolStateButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help)
+	: HTool(bar, x, 16.0, cmd, help)
+{
+	fMenu = (flags & (1 << bfMenu)) != 0;
+	fToggle = true;
+
+	ReadIcon(resID);
+	
+	if (fMenu) fFrame.right += 7;
+
+	fIconAlt = (unsigned char *)HResources::GetResource('MICN', resID + 1);
+	FailNilRes(fIconAlt);
+	
+} /* HToolStateButton::HToolStateButton */
+
+void HToolStateButton::Draw(bool pushed)
+{
+	DrawButton(fOn ? fIconAlt : fIconStd, pushed);
+} /* HToolStateButton::Draw */
+
+void HToolStateButton::MouseEnter(bool pushed)
+{
+	if (fVisible && fEnabled)
+		DrawFrame(true, pushed);
+} /* HToolStateButton::MouseEnter */
+
+void HToolStateButton::MouseLeave()
+{
+	if (fVisible && fEnabled)
+		DrawFrame(false, false);
+} /* HToolStateButton::MouseLeave */
 
 #pragma mark -
 
@@ -340,7 +321,7 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 	: BView(frame, name, B_FOLLOW_TOP | B_FOLLOW_LEFT, B_WILL_DRAW | B_PULSE_NEEDED)
 {
 	fTarget = target;
-	fLastButtonOver = -1;
+	fLastToolOver = -1;
 	fLastEnter = 0;
 	fLastDisplay = 0;
 	fHelp = NULL;
@@ -358,7 +339,7 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 	fDragger = (flags & (1 << bbDragger)) != 0;
 	fAcceptFirstClick = (flags & (1 << bbAcceptFirstClick)) != 0;
 	
-	HButton* but;
+	HTool* tool;
 	float x = fDragger ? 12.0 : 6.0;
 	
 	while (bCnt--)
@@ -373,14 +354,14 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 		else
 		{
 			if (fl & (1 << bfSeparator))
-				but = new HSeparator(this, x);
+				tool = new HToolSeparator(this, x);
 			else if (fl & (1 << bfDualIcon))
-				but = new HDualIconButton(this, bID, cmd, x, fl, help);
+				tool = new HToolStateButton(this, bID, cmd, x, fl, help);
 			else
-				but = new HButton(this, bID, cmd, x, fl, help);
+				tool = new HToolButton(this, bID, cmd, x, fl, help);
 
-			fButtons.push_back(but);
-			x = but->Frame().right+6.0;
+			fTools.push_back(tool);
+			x = tool->Frame().right+6.0;
 		}
 	}
 	
@@ -423,7 +404,7 @@ void HButtonBar::Draw(BRect update)
 		EndLineArray();
 	}
 	
-	for (vector<HButton*>::iterator i = fButtons.begin(); i != fButtons.end(); i++)
+	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end(); i++)
 	{
 		(*i)->Draw((*i)->IsDown());
 		(*i)->MouseLeave();
@@ -437,21 +418,21 @@ void HButtonBar::MouseMoved(BPoint where, uint32 code, const BMessage *a_message
 	
 	if (fAcceptFirstClick || IsActive())
 	{
-		int btn = FindButton(where);
+		int tool = FindTool(where);
 		
-		if (btn != fLastButtonOver)
+		if (tool != fLastToolOver)
 		{
 			if (fHelp)
 				HideHelp();
 
-			if (fLastButtonOver >= 0)
-				fButtons[fLastButtonOver]->MouseLeave();
+			if (fLastToolOver >= 0)
+				fTools[fLastToolOver]->MouseLeave();
 			
-			fLastButtonOver = btn;
+			fLastToolOver = tool;
 
-			if (fLastButtonOver >= 0)
+			if (fLastToolOver >= 0)
 			{
-				fButtons[fLastButtonOver]->MouseEnter();
+				fTools[fLastToolOver]->MouseEnter();
 				fLastEnter = system_time();
 			}
 			else
@@ -462,25 +443,25 @@ void HButtonBar::MouseMoved(BPoint where, uint32 code, const BMessage *a_message
 
 void HButtonBar::MouseDown(BPoint where)
 {
-	int btnID = FindButton(where);
-	HButton *btn = btnID != -1 ? fButtons[btnID] : NULL;
+	int toolID = FindTool(where);
+	HTool *tool = toolID != -1 ? fTools[toolID] : NULL;
 	
 	if (fHelp)
 		HideHelp();
 
-	if (btn && fTarget && btn->IsVisible() && btn->IsEnabled())
+	if (tool && fTarget && tool->IsVisible() && tool->IsEnabled())
 	{
-		if (btn->IsMenu())
+		if (tool->IsMenu())
 		{
-			BMessage msg(btn->Cmd());
+			BMessage msg(tool->Cmd());
 
-			BPoint p = btn->Frame().LeftBottom();
+			BPoint p = tool->Frame().LeftBottom();
 			p.y += 5;
 			
 			msg.AddPoint("where", ConvertToScreen(p));
-			msg.AddBool("showalways", where.x > btn->Frame().right - 7);
+			msg.AddBool("showalways", where.x > tool->Frame().right - 7);
 			
-			btn->SetDown(true);
+			tool->SetDown(true);
 
 			if (fTarget)
 				fTarget->Looper()->PostMessage(&msg, fTarget);
@@ -494,108 +475,106 @@ void HButtonBar::MouseDown(BPoint where)
 		{
 			GetMouse(&where, &btns);
 			
-			if (in != btn->Frame().Contains(where))
+			if (in != tool->Frame().Contains(where))
 			{
 				in = !in;
 				
-				btn->Draw(in);
-				btn->MouseEnter(in);
+				tool->Draw(in);
+				tool->MouseEnter(in);
 			}
 		}
 		while (btns);
 		
 		if (in)
 		{
-			if (btn->IsToggle())
-				btn->SetOn(!btn->IsOn());
+			if (tool->IsToggle())
+				tool->SetOn(!tool->IsOn());
 
 			if (fTarget)
-				fTarget->Looper()->PostMessage(btn->Cmd(), fTarget);
+				fTarget->Looper()->PostMessage(tool->Cmd(), fTarget);
 		}
 
-		btn->Draw();
+		tool->Draw();
 		if (in)
-			btn->MouseEnter();
+			tool->MouseEnter();
 		else
 		{
-			btn->MouseLeave();
-			fLastButtonOver = -1;
+			tool->MouseLeave();
+			fLastToolOver = -1;
 		}
 
 		fLastEnter = 0;
 	}
 } /* HButtonBar::MouseDown */
 
-int HButtonBar::FindButton(BPoint where)
+int HButtonBar::FindTool(BPoint where)
 {
-	int btn = -1;
+	int tool = -1;
 
-	for (vector<HButton*>::iterator i = fButtons.begin(); i != fButtons.end(); i++)
+	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end(); i++)
 	{
 		if ((*i)->Frame().Contains(where))
 		{
-			btn = i - fButtons.begin();
+			tool = i - fTools.begin();
 			break;
 		}
 	}
 	
-	return btn;
-} /* HButtonBar::FindButton */
+	return tool;
+} /* HButtonBar::FindTool */
 
 void HButtonBar::SetDown(int cmd, bool down)
 {
-	HButton *btn = NULL;
+	HTool *tool = NULL;
 	
-	for (vector<HButton*>::iterator i = fButtons.begin(); i != fButtons.end() && btn == NULL; i++)
+	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end() && tool == NULL; i++)
 	{
 		if ((*i)->Cmd() == cmd)
-			btn = *i;
+			tool = *i;
 	}
 	
-	if (btn && btn->IsDown() != down)
-		btn->SetDown(down);
+	if (tool && tool->IsDown() != down)
+		tool->SetDown(down);
 } /* HButtonBar::SetDown */
 
 void HButtonBar::SetOn(int cmd, bool on)
 {
-	HButton *btn = NULL;
+	HTool *tool = NULL;
 	
-	for (vector<HButton*>::iterator i = fButtons.begin(); i != fButtons.end() && btn == NULL; i++)
+	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end() && tool == NULL; i++)
 	{
 		if ((*i)->Cmd() == cmd)
-			btn = *i;
+			tool = *i;
 	}
 	
-	if (btn && btn->IsToggle())
-		btn->SetOn(on);
+	if (tool && tool->IsToggle())
+		tool->SetOn(on);
 } /* HButtonBar::SetOn */
 
 void HButtonBar::SetEnabled(int cmd, bool enabled)
 {
-	HButton *btn = NULL;
-	
-	for (vector<HButton*>::iterator i = fButtons.begin(); i != fButtons.end() && btn == NULL; i++)
+	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end(); i++)
 	{
 		if ((*i)->Cmd() == cmd)
-			btn = *i;
+		{
+			(*i)->SetEnabled(enabled);
+			break;
+		}
 	}
-	
-	if (btn)
-		btn->SetEnabled(enabled);
 } /* HButtonBar::SetEnabled */
 
 void HButtonBar::SetVisible(int cmd, bool visible)
 {
-	HButton *btn = NULL;
+	HTool *tool = NULL;
 	
-	for (vector<HButton*>::iterator i = fButtons.begin(); i != fButtons.end() && btn == NULL; i++)
+	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end() && tool == NULL; i++)
 	{
 		if ((*i)->Cmd() == cmd)
-			btn = *i;
+			tool = *i;
 	}
 	
-	if (btn)
-		btn->SetVisible(visible);
+	if (tool)
+		tool->SetVisible(visible);
 } /* HButtonBar::SetVisible */
 
 void HButtonBar::SetTarget(BHandler *target)
@@ -605,15 +584,15 @@ void HButtonBar::SetTarget(BHandler *target)
 
 void HButtonBar::WindowActivated(bool active)
 {
-	if (!active && fLastButtonOver >= 0)
+	if (!active && fLastToolOver >= 0)
 	{
-		fButtons[fLastButtonOver]->MouseLeave();
+		fTools[fLastToolOver]->MouseLeave();
 
 		if (fHelp)
 			HideHelp();
 	}
 
-	fLastButtonOver = -1;
+	fLastToolOver = -1;
 } /* HButtonBar::WindowActivated */
 
 void HButtonBar::ShowHelp()
@@ -622,20 +601,20 @@ void HButtonBar::ShowHelp()
 	
 	be_plain_font->GetHeight(&fh);
 	
-	if (fLastButtonOver >= 0)
+	if (fLastToolOver >= 0)
 	{
-		HButton *btn = fButtons[fLastButtonOver];
-		if (!btn || !btn->IsVisible() || !btn->Help() || !strlen(btn->Help()))
+		HTool *tool = fTools[fLastToolOver];
+		if (!tool || !tool->IsVisible() || !tool->Help() || !strlen(tool->Help()))
 			return;
-		BRect r(btn->Frame());
+		BRect r(tool->Frame());
 		
 		r.OffsetBy(30, 30);
-		r.right = r.left + be_plain_font->StringWidth(btn->Help()) + 2;
+		r.right = r.left + be_plain_font->StringWidth(tool->Help()) + 2;
 		r.bottom = r.top + fh.ascent + fh.descent;
 		
 		ConvertToScreen(&r);
 		
-		fHelp = new HHelpWindow(r, btn->Help());
+		fHelp = new HHelpWindow(r, tool->Help());
 		fLastEnter = 0;
 		fLastDisplay = system_time();
 	}

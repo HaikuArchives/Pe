@@ -59,12 +59,12 @@ enum BtnBarFlags {
 
 class HButtonBar;
 
-class HButton {
+class HTool {
 public:
-			HButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help);
-virtual	~HButton();
+			HTool(HButtonBar *bar, float x, float width, int cmd, const char *help);
+virtual	~HTool();
 			
-virtual	void Draw(bool pushed = false);
+virtual	void Draw(bool pushed = false) = 0;
 virtual	void MouseEnter(bool pushed = false);
 virtual	void MouseLeave();
 
@@ -72,42 +72,51 @@ virtual	void MouseLeave();
 	void SetDown(bool pushed);
 	void SetEnabled(bool enabled = true);
 	void SetVisible(bool visible);
-	
+
 	BRect Frame() const;
 	int Cmd() const;
 	bool IsToggle() const;
-	bool IsOn() const;
 	bool IsDown() const;
+	bool IsOn() const;
 	bool IsMenu() const;
 	bool IsEnabled() const;
 	bool IsVisible() const;
-	
 	const char* Help() const;
 
 protected:
+	void DrawFrame(bool enter, bool active);
+	void DrawButton(unsigned char *icondat, bool pushed = false);
+	void ReadIcon(int resID);
+
+	BRect fFrame;
 	HButtonBar *fBar;
 	char *fHelp;
-	bool fMenu, fToggle, fDown, fEnabled, fOn, fVisible;
 	int fCmd;
-	unsigned char *fIcon;
-	BRect fFrame;
+	bool fMenu, fToggle, fEnabled, fVisible, fDown, fOn;
+	unsigned char *fIconStd, *fIconAlt;
 };
 
-class HDualIconButton : public HButton {
+class HToolButton : public HTool {
 public:
-			HDualIconButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help);
+			HToolButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help);
 			
 virtual	void Draw(bool pushed = false);
 virtual	void MouseEnter(bool pushed = false);
 virtual	void MouseLeave();
-
-private:
-			unsigned char *fAltIcon;
 };
 
-class HSeparator : public HButton {
+class HToolStateButton : public HTool {
 public:
-			HSeparator(HButtonBar *bar, float x);
+			HToolStateButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help);
+			
+virtual	void Draw(bool pushed = false);
+virtual	void MouseEnter(bool pushed = false);
+virtual	void MouseLeave();
+};
+
+class HToolSeparator : public HTool {
+public:
+			HToolSeparator(HButtonBar *bar, float x);
 			
 virtual	void Draw(bool pushed = false);
 };
@@ -134,7 +143,7 @@ virtual	void WindowActivated(bool active);
 			bool IsActive() 		{ return Window()->IsActive(); }
 
 private:
-			int FindButton(BPoint where);
+			int FindTool(BPoint where);
 			
 			void ShowHelp();
 			void HideHelp();
@@ -142,55 +151,55 @@ virtual	void Pulse();
 
 			bool fDragger, fAcceptFirstClick;
 			BHandler *fTarget;
-			vector<HButton*> fButtons;
-			int fLastButtonOver;
+			vector<HTool*> fTools;
+			int fLastToolOver;
 			HHelpWindow *fHelp;
 			bigtime_t fLastEnter, fLastDisplay;
 };
 
-inline BRect HButton::Frame() const
+inline BRect HTool::Frame() const
 {
 	return fFrame;
-} /* HButton::Frame */
+} /* HTool::Frame */
 
-inline int HButton::Cmd() const
+inline int HTool::Cmd() const
 {
 	return fCmd;
-} /* HButton::Cmd */
+} /* HTool::Cmd */
 
-inline bool HButton::IsToggle() const
+inline bool HTool::IsToggle() const
 {
 	return fToggle;
-} /* HButton::Toggle */
+} /* HTool::Toggle */
 
-inline bool HButton::IsDown() const
+inline bool HTool::IsDown() const
 {
 	return fDown;
-} /* HButton::Down */
+} /* HTool::Down */
 
-inline bool HButton::IsOn() const
+inline bool HTool::IsOn() const
 {
 	return fOn;
-} /* HButton::Down */
+} /* HTool::Down */
 
-inline bool HButton::IsMenu() const
+inline bool HTool::IsMenu() const
 {
 	return fMenu;
-} /* HButton::Menu */
+} /* HTool::Menu */
 
-inline bool HButton::IsEnabled() const
+inline bool HTool::IsEnabled() const
 {
 	return fEnabled;
-} /* HButton::IsEnabled */
+} /* HTool::IsEnabled */
 
-inline bool HButton::IsVisible() const
+inline bool HTool::IsVisible() const
 {
 	return fVisible;
-} /* HButton::IsVisible */
+} /* HTool::IsVisible */
 
-inline const char* HButton::Help() const
+inline const char* HTool::Help() const
 {
 	return fHelp;
-} /* HButton::Help */
+} /* HTool::Help */
 
 #endif // HBUTTONBAR_H
