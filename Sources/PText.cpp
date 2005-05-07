@@ -1648,9 +1648,10 @@ void PText::ScrollBarChanged(BScrollBar *bar, g_unit_t dy)
 		fCaretVisible = false;
 		
 		SetDrawingMode(B_OP_INVERT);
-		BPoint p = Offset2Position(fCaret);
-		p.y += 1 + dy;
-		StrokeLine(p, BPoint(p.x, p.y + fLineHeight - 1));
+		BRect rect = CursorFrame(fCaret);
+		rect.OffsetBy(0, dy);
+
+		FillRect(rect);
 		SetDrawingMode(B_OP_COPY);
 	}
 	
@@ -5125,6 +5126,27 @@ void PText::Pulse()
 		ToggleCaret();
 } /* PText::Pulse */
 
+BRect PText::CursorFrame(int caret)
+{
+	BPoint p = Offset2Position(caret);
+
+	if (gBlockCursor)
+	{
+		float width;
+
+		if (caret >= fText.Size() - 1 || isspace(fText[caret]))
+			width = StringWidth(" ", 1);
+		else if (iscntrl(fText[caret]))
+			width = StringWidth("¿", strlen("¿"));
+		else
+			width = TextWidth(caret, fText.CharLen(caret));
+
+		return BRect(p.x + 1, p.y + 1, p.x + width, p.y + fLineHeight);
+	}
+
+	return BRect(p.x, p.y + 1, p.x, p.y + fLineHeight);
+} /* PText::CursorFrame */
+
 void PText::ToggleCaret()
 {
 	if (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible))
@@ -5135,8 +5157,6 @@ void PText::ToggleCaret()
 	Window()->UpdateIfNeeded();
 	Sync();
 	
-	BPoint p = Offset2Position(fCaret);
-
 	BRegion clip;
 	BRect r(fBounds);
 	if (fActivePart == 1)
@@ -5145,26 +5165,7 @@ void PText::ToggleCaret()
 		r.top = fSplitAt;
 	clip.Include(r);
 
-	if (gBlockCursor)
-	{
-		float w;
-
-		if (fCaret < fText.Size() - 1)
-		{
-			if (isspace(fText[fCaret]))
-				w = StringWidth(" ", 1);
-			else if (iscntrl(fText[fCaret]))
-				w = StringWidth("¿", strlen("¿"));
-			else
-				w = TextWidth(fCaret, fText.CharLen(fCaret));
-		}
-		else
-			w = StringWidth(" ", 1);
-			
-		r.Set(p.x, p.y + 1, p.x + w, p.y + fLineHeight);
-	}
-	else
-		r.Set(p.x, p.y + 1, p.x, p.y + fLineHeight);
+	r = CursorFrame(fCaret);
 
 	if (clip.Frame().IsValid())
 	{

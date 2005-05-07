@@ -269,8 +269,9 @@ virtual	void FrameResized(float w, float h);
 			int WrapType() const;
 			int WrapWidth() const;
 			PDoc* Doc() const;
-	
+
 private:
+			BRect CursorFrame(int caret);
 			void SetupBitmap();
 			
 			BBitmap *fLineMap;
