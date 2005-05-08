@@ -73,7 +73,7 @@ CProjectFile* CProjectRoster::ParseProjectFile(const entry_ref* eref,
 
 /* GetIncludePathsForFile()
  * 	tries to determine the project that contains the given file and,
- *		if such a project is found, passes back these projects include-paths.
+ *		if such a project is found, passes back this projects include-paths.
  */
 bool CProjectRoster::GetIncludePathsForFile(const entry_ref* fileRef, 
 														  vector<BString>& inclPathVect) const
