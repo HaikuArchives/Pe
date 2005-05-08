@@ -38,6 +38,10 @@ public:
 	virtual bool IsDirty() const			{ return false; }
 	virtual void SerializeTo( CProjectSerializer* serializer) const;
 	//
+	virtual bool ContainsFile(const entry_ref* fileRef) const
+													{ return false; }
+	virtual bool IsSubordinate() const	{ return true; }
+	//
 	const BString& ParentPath() const	{ return fParentPath; }
 	const BString& LeafName() const		{ return fLeafName; }
 	const BString& DisplayName() const	{ return fDisplayName; }
@@ -79,6 +83,8 @@ public:
 	virtual bool IsDirty() const			{ return fIsDirty; }
 	virtual void SerializeTo( CProjectSerializer* serializer) const;
 	//
+	virtual bool ContainsFile(const entry_ref* fileRef) const;
+	//
 	const BString& GroupHeader() const	{ return fGroupHeader; }
 	const BString& GroupFooter() const	{ return fGroupFooter; }
 	const BString& GroupName() const		{ return fGroupName; }
@@ -87,10 +93,9 @@ public:
 													{ fGroupHeader = gh; }
 	void GroupFooter( const BString& gf)
 													{ fGroupFooter = gf; }
-	//
-	bool ContainsFile(const entry_ref* fileRef) const;
 
 protected:
+
 	list<CProjectItem*> fItems;
 	BString fGroupHeader;
 	BString fGroupFooter;
@@ -134,6 +139,7 @@ public:
 	const BString& ErrorMsg() const		{ return fErrorMsg; }
 	//
 	void GetIncludePaths(vector<BString>& inclPathVect) const;
+	virtual bool IsSubordinate() const	{ return false; }
 protected:
 	void _AddIncludePath(const BString& inclPath)
 													{ fIncludePaths.push_back(inclPath); }

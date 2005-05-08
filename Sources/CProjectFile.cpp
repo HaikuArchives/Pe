@@ -143,9 +143,11 @@ bool CProjectGroupItem::ContainsFile(const entry_ref* fileRef) const
 		res = get_ref_for_path(fullPath.String(), &eref);
 		if (res == B_OK && eref == *fileRef)
 			return true;
-		CProjectGroupItem* groupChild = dynamic_cast<CProjectGroupItem*>(child);
-		if (groupChild && groupChild->ContainsFile(fileRef))
-			return true;
+		if (child->IsSubordinate()) {
+			// do not descend into other project-files (as these will be
+			// scanned separately):
+			return child->ContainsFile(fileRef);
+		}
 	}
 	return false;
 }
