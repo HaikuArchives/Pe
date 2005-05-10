@@ -3372,6 +3372,20 @@ bool PText::DoKeyCommand(BMessage *msg)
 				newAnchor = newCaret = fText.Size();
 			catchOffset = extend;
 			break;
+		case kmsg_Move_to_Previous_Page:
+			bar->SetValue(barValue - linesPerPage * fLineHeight);
+			line = max(0, line - linesPerPage);
+			newAnchor = newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
+			catchOffset = false;
+			scroll = false;
+			break;
+		case kmsg_Move_to_Next_Page:
+			bar->SetValue(barValue + linesPerPage * fLineHeight);
+			line = min(LineCount() - 1, line + linesPerPage);
+			newAnchor = newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
+			catchOffset = false;
+			scroll = false;
+			break;
 		case kmsg_Move_to_Top_of_Page:
 			if (line > topline + 1)
 				line = topline;

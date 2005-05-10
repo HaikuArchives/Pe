@@ -120,6 +120,8 @@ Resource 'Cmnd' (0, "Editing commands") {
 		kmsg_Move_to_Beginning_of_File,					"Move to Beginning of File",
 		kmsg_Move_to_Bottom_of_Page,					"Move to Bottom of Page",
 		kmsg_Move_to_Top_of_Page,							"Move to Top of Page",
+		kmsg_Move_to_Next_Page,								"Move to Next Page",
+		kmsg_Move_to_Previous_Page,							"Move to Previous Page",
 		kmsg_Move_to_Next_Line,								"Move to Next Line",
 		kmsg_Move_to_Previous_Line,							"Move to Previous Line",
 		kmsg_Move_to_End_of_Line,							"Move to End of Line",

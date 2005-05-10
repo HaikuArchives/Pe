@@ -48,6 +48,8 @@
 #define kmsg_Move_to_End_of_Line							'Meol'
 #define kmsg_Move_to_Previous_Line							'Mprl'
 #define kmsg_Move_to_Next_Line								'Mnxl'
+#define kmsg_Move_to_Previous_Page							'Mprp'
+#define kmsg_Move_to_Next_Page								'Mnxp'
 #define kmsg_Move_to_Top_of_Page							'Mbop'
 #define kmsg_Move_to_Bottom_of_Page							'Meop'
 #define kmsg_Move_to_Beginning_of_File						'Mbof'
