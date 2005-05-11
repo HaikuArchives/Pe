@@ -29,38 +29,10 @@
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
-	
-	Created: 02/20/98 19:12:29
 */
 
-#include "RButtonBar.r"
-#include "../Sources/PMessages.h"
+#include "Types.r"
 
-resource 'BtnB' (0) {
-	0,
-	{
-		new, msg_New, 0, "New Document",
-		open, msg_BtnOpen, menu, "Open Document",
-		14, msg_Save, 0, "Save Document",
-		0, 0, separator, "",
-		11, msg_Execute, toggle, "Execute Command",
-		10, msg_FuncPopup, menu, "Function Popupmenu",
-		32, msg_HeaderPopup, menu, "Header Popupmenu",
-		0, 0, separator, "",
-		17, msg_FindCmd, 0, "Find",
-		13, msg_IncSearchBtn, toggle, "Incremental Search",
-		0, 0, separator, "",
-		15, msg_ReadOnly, dual, "Read Only",
-		12, msg_Info, 0, "File Options…",
-		18, msg_SoftWrap, dual, "Softwrap",
-		0, 0, separator, "",
-		31, msg_EditAsPrj, 0, "Edit As Project"
-	}
-};
-
-type 'MICN' {
-	hexstring;
-};
 
 /* Save Document */
 resource 'MICN' (14) {
@@ -300,4 +272,164 @@ Resource 'MICN' (31) {
 	$"ffff09193f3f3f3f3f3f3f3f1909ffff" 
 	$"ffff091919191919191919191909ffff" 
 	$"ffff090909090909090909090909ffff"
+};
+
+/* ArrowRight */
+resource 'MICN' (26) {
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffff0000ffffffffff"
+	$"ffffffffffffffff00fafa00ffffffff"
+	$"ffffffffffffffff00fafafa00ffffff"
+	$"000000000000000000faf9fafa00ffff"
+	$"00fafafafafafafafafafaf9fafa00ff"
+	$"00faf9f9f9f9f9f9f9faf9f9f9f9fa00"
+	$"00faf9f9f9f9f9f9f9faf9f9f9f95d00"
+	$"00f95d5d5d5d5d5d5dfa5df9f95d00ff"
+	$"000000000000000000f9f95d5d00ffff"
+	$"ffffffffffffffff00f95d5d00ffffff"
+	$"ffffffffffffffff00f95d00ffffffff"
+	$"ffffffffffffffffff0000ffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+};
+
+/* ArrowLeft */
+resource 'MICN' (25) {
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffff0000ffffffffffffffffff"
+	$"ffffffff00fafa00ffffffffffffffff"
+	$"ffffff00fafafa00ffffffffffffffff"
+	$"ffff00fafaf9fa000000000000000000"
+	$"ff00faf9f9fafafafafafafafafaf900"
+	$"00faf9f9f9f9faf9f9f9f9f9f9f95d00"
+	$"005df9f9f9f9faf9f9f9f9f9f9f95d00"
+	$"ff005df9f95dfa5d5d5d5d5d5d5d5d00"
+	$"ffff005d5df9f9000000000000000000"
+	$"ffffff005d5df900ffffffffffffffff"
+	$"ffffffff005d5d00ffffffffffffffff"
+	$"ffffffffff0000ffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+};
+
+/* ArrowRound */
+resource 'MICN' (27) {
+	$"ffffffffff0000000000ffffffffffff"
+	$"ffffff0000fafafafafa0000ffffffff"
+	$"ffff00fafaf9f9f9f9f9f95d00ffffff"
+	$"ff00faf9f9f95d5d5df9f9f95d00ffff"
+	$"ff00faf9f95d0000005df9f95d00ffff"
+	$"00faf9f95d00ffffff00f9f9f95d00ff"
+	$"00faf95d00ffffffff0000faf90000ff"
+	$"00faf95d00ffffff00fafaf9f9f95d00"
+	$"00faf95d00ffffffff00faf9f95d00ff"
+	$"00faf9f9f900ffffffff00fa5d00ffff"
+	$"ff00f9f9f9f9000000ffff0000ffffff"
+	$"ff005df9f9f9fafaf900ffffffffffff"
+	$"ffff005df9f9f9f95d00ffffffffffff"
+	$"ffffff00005d5d5d5d00ffffffffffff"
+	$"ffffffffff00000000ffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+};
+
+/* Folder1 */
+resource 'MICN' (28) {
+	$"ffffffffff0000ffffffffffffffffff"
+	$"ffffff000000840100ffff090bffffff"
+	$"00001e00fd0c0d8484000084d80b00ff"
+	$"00d80000fdfdfd0c0d8484d85ad8d801"
+	$"ff001fd8af11fdfdfd0c0d84d884d801"
+	$"ff00d81fd81f0d0dfdfdfd0c0dd88400"
+	$"ff001fd81fd8d81f0d90fdfdfd0a00ff"
+	$"ff00d81fd81fd8d8d8d8890dfa0a00ff"
+	$"ffff00d8d8d8d81fd8d8d80bfa0800ff"
+	$"4d4d4d4d4d4dd8d8d8d8d80bfa00ffff"
+	$"4d4d6d004d4dd8d8d8d8d8d80b00ffff"
+	$"4d4d00004d4dd8d8d8d8d8d803000e11"
+	$"4d4d4d004d4d84d8d8d8d8d800000f0f"
+	$"4d4d4d004d4d000084d8d8d800050fff"
+	$"4d4d8e008e4dffff000084d80011ffff"
+	$"4d4d4d4d4d4dffffffff000000ffffff"
+};
+
+/* Folder2 */
+resource 'MICN' (29) {
+	$"ffffffffff0000ffffffffffffffffff"
+	$"ffffff000000840100ffff090bffffff"
+	$"00001e00fd0c0d8484000084d80b00ff"
+	$"00d80000fdfdfd0c0d8484d85ad8d801"
+	$"ff001fd8af11fdfdfd0c0d84d884d801"
+	$"ff00d81fd81f0d0dfdfdfd0c0dd88400"
+	$"ff001fd81fd8d81f0d90fdfdfd0a00ff"
+	$"ff00d81fd81fd8d8d8d8890dfa0a00ff"
+	$"ffff00d8d8d8d81fd8d8d80bfa0800ff"
+	$"4d4d4d4d4d4dd8d8d8d8d80bfa00ffff"
+	$"4d6d00006d4dd8d8d8d8d8d80b00ffff"
+	$"4d004d6dae4dd8d8d8d8d8d803000e11"
+	$"4d4d4dae4d4d84d8d8d8d8d800000f0f"
+	$"4d6dae4d4d4d000084d8d8d800050fff"
+	$"4d000000ae4dffff000084d80011ffff"
+	$"4d4d4d4d4d4dffffffff000000ffffff"
+};
+
+/* FilePlus */
+resource 'MICN' (20) {
+	$"ffffffffffffffff0000000000ffffff"
+	$"ffffffffffffffff00faf95d00ffffff"
+	$"ffffffffffffffff00faf95d00ffffff"
+	$"ffffffffff00000000faf95d00000000"
+	$"ffffffffff00fafafafaf9f9fafafa00"
+	$"ffffffff0000f9f9f9f9f9f9f9f9f900"
+	$"ffffff003f005d5d5df9f95d5d5d5d00"
+	$"ffff00414100000000faf95d00000000"
+	$"ff00414141b7b79000faf95d00ffffff"
+	$"004141424141b7b700faf95d00ffffff"
+	$"b7000042424242420000000000ffffff"
+	$"ffb7000000434343434343009000b7b7"
+	$"ffffb700900000454545000000b7ffff"
+	$"ffffffb7006890004500b7b7ffffffff"
+	$"ffffffffb700000000b7b7ffffffffff"
+	$"ffffffffffb700b7ffb7ffffffffffff"
+};
+
+/* FileMinus */
+resource 'MICN' (21) {
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffff0000000000000000000000"
+	$"ffffffffff00fafafafafafafafafa00"
+	$"ffffffff0000f9f9f9f9f9f9f9f9f900"
+	$"ffffff003f005d5d5d5d5d5d5d5d5d00"
+	$"ffff0041410000000000000000000000"
+	$"ff00414141b7b790b768689041410000"
+	$"004141424141b7b7b790b741410000b7"
+	$"b700004242424242b7b7424229900000"
+	$"ffb7000000434343434343009000b7b7"
+	$"ffffb700900000454545000000b7ffff"
+	$"ffffffb7006890004500b7b7ffffffff"
+	$"ffffffffb700000000b7b7ffffffffff"
+	$"ffffffffffb700b7ffb7ffffffffffff"
+};
+
+/* FilePencil */
+resource 'MICN' (22) {
+	$"ffffffffffffffffffffffff0a0b0aff"
+	$"ffffffffffffffffffffff0a24858500"
+	$"ffffffffffffffffffff0a2486858501"
+	$"ffffffffffff00ffff0a24863f200000"
+	$"ffffffffff003f000a24863f202000ff"
+	$"ffffffff003f400a24863f202000ffff"
+	$"ffffff003f40400a863f202000ffffff"
+	$"ffff004141410a640b202000400000ff"
+	$"ff00414141410a646400004141410000"
+	$"00414142410a290000919191910100b7"
+	$"b7000042420000b7b7b7b7b700910000"
+	$"ffb7000000434343434343009000b7b7"
+	$"ffffb700900000454545000000b7ffff"
+	$"ffffffb7006890004500b7b7ffffffff"
+	$"ffffffffb700000000b7b7ffffffffff"
+	$"ffffffffffb700b7ffb7ffffffffffff"
 };

@@ -31,6 +31,7 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
+
 type 'UMap' {
 	array {
 		integer;
@@ -406,4 +407,3 @@ resource 'UMap' (11) {
 		175, 728, 729, 730, 184, 733, 731, 711, 
 	}
 };
-

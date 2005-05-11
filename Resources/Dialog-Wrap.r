@@ -33,18 +33,14 @@
 
 #include "Types.r"
 
-resource 'DLOG' (11, "Open FTP") {
-	{ 0, 0, 260, 150 },
-	"FTP Open…",
-	B_TITLED_WINDOW,
-	NORMAL,
+
+resource 'DLOG' (2, "Wrap") {
+	{ 0, 0, 200, 110 }, "Wrap", B_TITLED_WINDOW, NORMAL,
 	{
-		Edit			{{  10,  10, 250,  26 }, "name", "Username:", "", "", 24, 40 },
-		Edit			{{  10,  30, 250,  46 }, "pass", "Password:", "", "", 24, 40 },
-		Edit			{{  10,  50, 250,  66 }, "server", "Server:", "", "", 128, 40 },
-		Edit			{{  10,  70, 250,  86 }, "file", "Path:", "", "", 255, 40 },
-		
-		Button			{{ 190, 120, 250, 140 }, "ok", "OK", 'ok  ' },
-		Button			{{ 120, 120, 180, 140 }, "cancel", "Cancel", 'cncl' }
+		Caption		{{  10,  10, 190,  26 }, "limit",	"Limit to:"										},
+		RadioButton	{{  10,  30, 120,  46 }, "width",	"Window Width"									},
+		RadioButton	{{  10,  50, 120,  66 }, "count",	"Character Width:"								},
+		Edit		{{ 130,  50, 160,  66 }, "chars",	"",					"70", "0123456789", 0, 0	},
+		Button		{{ 130,  80, 190,  90 }, "ok",		"Wrap",				'ok  '						}
 	}
 };

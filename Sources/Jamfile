@@ -108,31 +108,30 @@ if $(OSPLAT) = X86 {
 }
 
 XRes pe : 
-	menus.rsrc
-	fonttabs.rsrc
-	find.rsrc
-	prefs.rsrc
-	wrap.rsrc
-	icons.rsrc
-	colorpicker.rsrc
-	openfile.rsrc
-	gotoline.rsrc
-	changecase.rsrc
-	info.rsrc
-	convert.rsrc
 	Bindings.rsrc
-	UTF-Tables.rsrc
+	Cursor.rsrc
+	Dialog-ChangeCase.rsrc
+	Dialog-ChangeEncoding.rsrc
+	Dialog-Colorpicker.rsrc
+	Dialog-Find.rsrc
+	Dialog-FontTabs.rsrc
+	Dialog-Ftp.rsrc
+	Dialog-FtpOpen.rsrc
+	Dialog-GotoLine.rsrc
+	Dialog-Info.rsrc
+	Dialog-Login.rsrc
+	Dialog-Open.rsrc
+	Dialog-Preferences.rsrc
+	Dialog-Wrap.rsrc
+	HtmlPalette.rsrc
+	Icons.rsrc
+	Menus.rsrc
+	MimeInfo.rsrc
+	ToolBarIcons.rsrc
+	ToolBars.rsrc
 	UTF-Mappings.rsrc
-	ToolBar.rsrc
+	UTF-Tables.rsrc
 	WordBreakTable.rsrc
-	RHTMLBar.rsrc
-	RDiffToolbar.rsrc
-	ftp.rsrc
-	login.rsrc
-	RCursor.rsrc
-	RFtpOpenDialog.rsrc
-	RProject.rsrc
-	RMimeinfo.rsrc
 	;
 
 Rez pe : [ FDirName $(TOP) Resources Now.r ] ;

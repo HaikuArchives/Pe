@@ -33,6 +33,7 @@
 
 #include "Types.r"
 
+
 //resource 'MENU' (400, "Font Popup") {
 //	"Font",
 //	{
@@ -67,23 +68,20 @@
 //};
 
 resource 'DLOG' (10, "Window Options") {
-	{ 0, 0, 250, 140 },
-	"Window Options",
-	B_TITLED_WINDOW,
-	NORMAL,
+	{ 0, 0, 250, 140 }, "Window Options", B_TITLED_WINDOW, NORMAL,
 	{
-//		PopupMenu		{{ 	10,   8, 160,  28 }, "font", "Font:", 400, 30 },
-//		Edit			{{ 161,  10, 240,  26 }, "size", "Size:", "", "0123456789", 2, 0 },
+//		PopupMenu	{{ 	10,   8, 160,  28 }, "font",			"Font:",				400, 30					},
+//		Edit		{{ 161,  10, 240,  26 }, "size",			"Size:",				"", "0123456789", 2, 0	},
 //
-//		PopupMenu		{{  10,  33, 129,  53 }, "encoding", "Encoding:", 401, 50 },
-//		PopupMenu		{{ 130,  33, 240,  53 }, "linebreaks", "Linebreaks:", 402, 60 },
+//		PopupMenu	{{  10,  33, 129,  53 }, "encoding",		"Encoding:",			401, 50					},
+//		PopupMenu	{{ 130,  33, 240,  53 }, "linebreaks",		"Linebreaks:",			402, 60					},
 //
-//		CheckBox		{{  10,  60, 120,  76 }, "show tabs", "Show Tabstops" },
-//		Edit			{{ 130,  59, 240,  75 }, "tabs", "Spaces per Tab:", "", "0123456789", 3, 0 },
-//		CheckBox		{{  10,  80, 120,  96 }, "syntaxcol", "Syntax Colouring" },
-//		CheckBox		{{ 130,  80, 240,  96 }, "show invisibles", "Show Invisibles" },
+//		CheckBox	{{  10,  60, 120,  76 }, "show tabs",		"Show Tabstops"									},
+//		Edit		{{ 130,  59, 240,  75 }, "tabs",			"Spaces per Tab:",		"", "0123456789", 3, 0	},
+//		CheckBox	{{  10,  80, 120,  96 }, "syntaxcol",		"Syntax Colouring"								},
+//		CheckBox	{{ 130,  80, 240,  96 }, "show invisibles",	"Show Invisibles"								},
 
-		Button			{{ 180, 110, 240, 130 }, "ok", "Apply", 'ok  ' },
-		Button			{{ 110, 110, 170, 130 }, "cancel", "Revert", 'cncl' }
+		Button		{{ 180, 110, 240, 130 }, "ok",				"Apply",				'ok  '					},
+		Button		{{ 110, 110, 170, 130 }, "cancel",			"Revert",				'cncl'					}
 	}
 };

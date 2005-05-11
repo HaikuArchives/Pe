@@ -31,23 +31,89 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
-read 'MICN' (401, "error.micn")
-	"error.icon.raw";
+#include "Types.r"
 
-//read 'MICN' (404, "idea.micn")
-//	"ide a.icon.raw";
-
-read 'MICN' (403, "info.micn")
-	"info.icon.raw";
-
-read 'MICN' (402, "warning.micn")
-	"warning.icon.raw";
-
-type 'MICN' {
-	hexstring;
+resource 'MICN' (401, "error.micn")
+{
+	$"ffffffffffff0d14ffffffffffffffff"
+	$"ffffffffffd02b2dd014ffffffffffff"
+	$"ffffffffd02b2b2b2b2dd0ffffffffff"
+	$"ffffffffd09c2b2b2b2bf1ffffffffff"
+	$"ffffffff0b2b2b9c9c2e0dffffffffff"
+	$"ffffffff102d2b2bebf114ffffffffff"
+	$"ffffffffff302b2b2fd0ffffffffffff"
+	$"ffffffffff0b2b2d2f0dffffffffffff"
+	$"ffffffffff0b2beb32ffffffffffffff"
+	$"ffffffffffff302fd0ffffffffffffff"
+	$"ffffffffff100632d014ffffffffffff"
+	$"fffffffffff12b2b2e32ffffffffffff"
+	$"ffffffff0b2d9c2b2ceb0dffffffffff"
+	$"ffffffff0b2f2c2c2d2f0dffffffffff"
+	$"ffffffffff32ebeb2f32ffffffffffff"
+	$"ffffffffff10d032d014ffffffffffff"
 };
 
-Resource 'MICN' (500, "warning 2")
+resource 'MICN' (404, "idea.micn")
+{
+	$"ffffffffffff0b0b0d14ffffffffffff"
+	$"ffffffff108bfbfbfb65b0ffffffffff"
+	$"ffffff1064fcfdfdfdfcfab0ffffffff"
+	$"ffffff8bfd1f3f3ffefdfbf90dffffff"
+	$"ffff0bfbfd3f3f3f3ffdfdfaabffffff"
+	$"ffff0bfbfd3f3fd9d9fefcfbabffffff"
+	$"ffff0bfbfcfe3fd9e5fdfcfaabffffff"
+	$"ffff1065fcfdfee5fcfcfbf9b0ffffff"
+	$"ffffffb0fafcfde5fcfcfb8514ffffff"
+	$"ffffffffb0fafbe5fbfa8514ffffffff"
+	$"ffffffffffb0f9f8f9a514ffffffffff"
+	$"ffffffffff0bbdf8bdcbffffffffffff"
+	$"ffffffffff0bb0aaab02ffffffffffff"
+	$"ffffffffff0b0c0e0502ffffffffffff"
+	$"ffffffffff0b0c0e0502ffffffffffff"
+	$"ffffffffffff0c0e050a0e0e0e0e0e11"
+};
+
+resource 'MICN' (403, "info.micn")
+{
+	$"ffffffff100528d514ffffffffffffff"
+	$"ffffffff2622222428ffffffffffffff"
+	$"ffffff0b23b22122240dffffffffffff"
+	$"ffffff0b25222223250dffffffffffff"
+	$"ffffff10282424242814ffffffffffff"
+	$"ffffffdcbf26282826dcffffffffffff"
+	$"ffffffd5dc5ebf22bf28ffffffffffff"
+	$"ffffffff2621bebf2528ffffffffffff"
+	$"ffffffff262121232528ffffffffffff"
+	$"ffffffd526212123252817ffffffffff"
+	$"ffffb5be2621212325280a1117ffffff"
+	$"ffff26be2321212325bfbf030e1117ff"
+	$"ffffd52321212123bfbe24280e0e0e17"
+	$"ffffff10d52321be5e2425030e0e17ff"
+	$"ffffffffff10d5232125030e0e17ffff"
+	$"ffffffffffffff11d5030e0e17ffffff"
+};
+
+resource 'MICN' (402, "warning.micn")
+{
+	$"ffffffffffff0b13ffffffffffffffff"
+	$"ffffffffffb0fa65b014ffffffffffff"
+	$"ffffffffb0fafafafa65b0ffffffffff"
+	$"ffffffffaafdfbfafafbaaffffffffff"
+	$"ffffffffabf9e5fdfdbdcbffffffffff"
+	$"ffffffffabf9f9f9bd5dcbffffffffff"
+	$"ffffffffabf9f9f9bd5dcbffffffffff"
+	$"ffffffffabf9f9f9bd5dcbffffffffff"
+	$"ffffffffb085f9f9bd5dd7ffffffffff"
+	$"ffffffffd0cbd185bdd7ffffffffffff"
+	$"ffffffffd7d1cbcbd1cbd7ffffffffff"
+	$"ffffffffabf985d1d1a5cbffffffffff"
+	$"ffffffffabf9f9f9bd5dcb0e14ffffff"
+	$"ffffffffb085f9f9bd5dd10e0e11ffff"
+	$"ffffffffff10b085bdd10e0e11ffffff"
+	$"ffffffffffffff110d141414ffffffff"
+};
+
+resource 'MICN' (500, "warning 2")
 {
 	$"ffffffffffffffffffffffff"
 	$"fffffffff9f9f9ffffffffff"
@@ -63,7 +129,7 @@ Resource 'MICN' (500, "warning 2")
 	$"ffffffffffffffffffffffff"
 };
 
-Resource 'MICN' (501, "error 2")
+resource 'MICN' (501, "error 2")
 {
 	$"ffffffffffffffffffffffff"
 	$"ffffffff2d2d2dffffffffff"
@@ -79,7 +145,7 @@ Resource 'MICN' (501, "error 2")
 	$"ffffffffffffffffffffffff"
 };
 
-Resource 'MICN' (502, "info 2")
+resource 'MICN' (502, "info 2")
 {
 	$"ffffffffffffffffffffffff"
 	$"ffffffff222222ffffffffff"
@@ -95,7 +161,7 @@ Resource 'MICN' (502, "info 2")
 	$"ffffffffffffffffffffffff"
 };
 
-//Resource 'MICN' (500, "warning 2")
+//resource 'MICN' (500, "warning 2")
 //{
 //	$"ffffffff0000ffffffffffff"
 //	$"ffffff00fafa0000ffffffff"
@@ -111,7 +177,7 @@ Resource 'MICN' (502, "info 2")
 //	$"ffffffffff0000ffffffffff"
 //};
 //
-//Resource 'MICN' (501, "error 2")
+//resource 'MICN' (501, "error 2")
 //{
 //	$"ffffffff0000ffffffffffff"
 //	$"ffffff002a2a0000ffffffff"
@@ -127,7 +193,7 @@ Resource 'MICN' (502, "info 2")
 //	$"ffffffff000000ffffffffff"
 //};
 //
-//Resource 'MICN' (502, "info 2")
+//resource 'MICN' (502, "info 2")
 //{
 //	$"ffffffffff000000ffffffff"
 //	$"ffffffff0020242600ffffff"

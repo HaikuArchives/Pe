@@ -33,18 +33,36 @@
 
 #include "Types.r"
 
-resource 'DLOG' (5, "Change Case") {
-	{ 0, 0, 170, 150 },
-	"Change Case",
-	B_TITLED_WINDOW,
-	NORMAL,
+
+resource 'MENU' (111, "Conversion") {
+	"Conversion",
 	{
-		RadioButton		{{  10,  10, 160,  26 }, "lower", "Lower Case" },
-		RadioButton		{{  10,  30, 160,  46 }, "upper", "Upper Case" },
-		RadioButton		{{  10,  50, 160,  66 }, "capword", "Capitalize Words" },
-		RadioButton		{{  10,  70, 160,  86 }, "capsent", "Capitalize Sentences" },
-		RadioButton		{{  10,  90, 160, 106 }, "capline", "Capitalize Lines" },
-		Button			{{ 100, 120, 160, 140 }, "ok", "OK", 'ok  ' },
-		Button			{{  30, 120,  90, 140 }, "cancel", "Cancel", 'cncl' }
+		Item		{ "UTF-8",				'chng',	none,	noKey	},
+		Separator	{												},
+		Item		{ "ISO 8859 1",			'chng',	none,	noKey	},
+		Item		{ "ISO 8859 2",			'chng',	none,	noKey	},
+		Item		{ "ISO 8859 3",			'chng',	none,	noKey	},
+		Item		{ "ISO 8859 4",			'chng',	none,	noKey	},
+		Item		{ "ISO 8859 5",			'chng',	none,	noKey	},
+		Item		{ "ISO 8859 6",			'chng',	none,	noKey	},
+		Item		{ "ISO 8859 7",			'chng',	none,	noKey	},
+		Item		{ "ISO 8859 8",			'chng',	none,	noKey	},
+		Item		{ "ISO 8859 9",			'chng',	none,	noKey	},
+		Item		{ "ISO 8859 10",		'chng',	none,	noKey	},
+		Item		{ "Macintosh Roman",	'chng',	none,	noKey	},
+		Item		{ "Shift-JIS",			'chng',	none,	noKey	},
+		Item		{ "Extended UNIX Code",	'chng',	none,	noKey	}
+	}
+};
+
+resource 'DLOG' (7, "Convert") {
+	{ 0, 0, 210, 120 }, "Convert", B_TITLED_WINDOW, NORMAL,
+	{
+		Caption		{{  10,  10, 200,  26 }, "cap",		"Change the character encoding"	},
+		PopupMenu	{{   9,  29, 200,  59 }, "src",		"From:",			111, 40		},
+		PopupMenu	{{	 9,  49, 200,  79 }, "dest",	"To:",				111, 40		},
+
+		Button		{{ 140,  90, 200, 110 }, "ok",		"OK",				'ok  '		},
+		Button		{{  70,  90, 130, 110 }, "cancel",	"Cancel",			'cncl'		}
 	}
 };

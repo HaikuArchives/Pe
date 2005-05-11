@@ -32,8 +32,8 @@
 */
 
 read 'Utbl' (0, "letters")
-	"UTF-Tables";
+	"UTF-Table-Letters";
 
 read 'Utbl' (1, "numbers")
-	"UTF-Tables1";
+	"UTF-Table-Numbers";
 

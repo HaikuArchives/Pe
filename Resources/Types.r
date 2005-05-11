@@ -31,159 +31,246 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
+
+/* Menu */
 type 'MENU' {
-	cstring;						// name
+	cstring;										// Name
 	array {
 		switch {
 			case Item:
 				key byte = 1;
-				cstring;				 	// label
-				longint;					// command
-				integer none = 0,			// modifier keys
-						shift = 1,
-						control = 4;
-				byte noKey = 0;				// command key
+				cstring;				 			// Label
+				longint;							// Command
+				integer
+					none	= 0,
+					shift	= 1,
+					control	= 4;					// Modifier keys
+				byte noKey = 0;						// Command key
 			case ColorItem:
 				key byte = 2;
-				cstring;					// label
-				longint;					// command
-				integer none = 0;			// modifiers
-				byte noKey = 0;				// key
-				byte;						// color red
-				byte;						//		 green
-				byte;						//		 blue
+				cstring;							// Label
+				longint;							// Command
+				integer none = 0;					// Modifiers
+				byte noKey = 0;						// Key
+				byte; byte; byte;					// Color	red, green, blue
 			case Separator:
 				key byte = 3;
 			case Submenu:
 				key byte = 4;
-				longint;					// submenuid
+				longint;							// Submenu id
 		}
 	};
 	byte = 0;
 };
 
+
+/* MenuBar */
 type 'MBAR' {
 	array {
-		integer;		// menu id's
+		integer;									// Menu id's
 	};
 };
 
+
+/* Dialog */
 type 'DLOG' {
-	rect;										// bounds
-	cstring;									// name
-	longint B_TITLED_WINDOW = 1, B_MODAL_WINDOW = 3,
-		B_DOCUMENT_WINDOW = 11, B_BORDERED_WINDOW = 20;
-	longint NORMAL = 0x00004042,
-		B_WILL_ACCEPT_FIRST_CLICK = 0x00000010;
+	rect;											// Bounds
+	cstring;										// Name
+	longint
+		B_TITLED_WINDOW		= 1,
+		B_MODAL_WINDOW		= 3,
+		B_DOCUMENT_WINDOW	= 11,
+		B_BORDERED_WINDOW	= 20;
+	longint
+		NORMAL						= 0x00004042,
+		B_WILL_ACCEPT_FIRST_CLICK	= 0x00000010;
 	longint = $$countof(items);
 	array items {
 		switch {
 			case Button:
 				key longint = 'btn ';
-				rect;							// bounds
-				cstring;						// name
-				cstring;						// label
-				longint;						// command
+				rect;								// Bounds
+				cstring;							// Name
+				cstring;							// Label
+				longint;							// Command
 			case RadioButton:
 				key longint = 'radb';
-				rect;							// bounds
-				cstring;						// name
-				cstring;						// label
+				rect;								// Bounds
+				cstring;							// Name
+				cstring;							// Label
 			case CheckBox:
 				key longint = 'chkb';
-				rect;							// bounds
-				cstring;						// name
-				cstring;						// label
+				rect;								// Bounds
+				cstring;							// Name
+				cstring;							// Label
 			case Edit:
 				key longint = 'edit';
-				rect;							// bounds
-				cstring;						// name
-				cstring;						// label
-				cstring;						// Initial value
-				cstring;						// allowed chars
-				integer;						// max length
-				integer;						// label width
+				rect;								// Bounds
+				cstring;							// Name
+				cstring;							// Label
+				cstring;							// Initial value
+				cstring;							// Allowed chars
+				integer;							// Max length
+				integer;							// Label width
 			case Caption:
 				key longint = 'capt';
-				rect;							// bounds
-				cstring;						// name
-				cstring;						// label
+				rect;								// Bounds
+				cstring;							// Name
+				cstring;							// Label
 			case PopupMenu:
 				key longint = 'popu';
-				rect;							// bounds
-				cstring;						// name
-				cstring;						// label
-				integer;						// Menu ID
-				integer;						// divider
+				rect;								// Bounds
+				cstring;							// Name
+				cstring;							// Label
+				integer;							// Menu ID
+				integer;							// Divider
 			case List:
 				key longint = 'list';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case OutlineList:
 				key longint = 'olst';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case ColorControl:
 				key longint = 'clct';
-				rect;							// bounds
-				cstring;						// name
-				cstring;						// label
+				rect;								// Bounds
+				cstring;							// Name
+				cstring;							// Label
 			case ColorSquare:
 				key longint = 'csqr';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case ColorSlider:
 				key longint = 'csld';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case ColorDemo:
 				key longint = 'cdmo';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case ListBox:
 				key longint = 'lbox';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case GrepListBox:
 				key longint = 'gbox';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case StringListBox:
 				key longint = 'slbx';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case PathBox:
 				key longint = 'pbox';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
+			case StdErrBox:
+				key longint = 'ebox';
+				rect;								// Bounds
+				cstring;							// Name
 			case KeyCapture:
 				key longint = 'keyc';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case Line:
 				key longint = 'line';
-				rect;							// bounds
+				rect;								// Bounds
 			case TabbedBook:
 				key longint = 'tabb';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case TabbedBookEnd:
 				key longint = 'tabe';
 			case TabSheet:
 				key longint = 'shet';
-				cstring;						// name
-				cstring;						// description
+				cstring;							// Name
+				cstring;							// Description
 			case TabSheetEnd:
 				key longint = 'shte';
 			case Box:
 				key longint = 'box ';
-				rect;							// bounds
-				cstring;						// name
+				rect;								// Bounds
+				cstring;							// Name
 			case Line:
 				key longint = 'line';
-				rect;							// bounds van de lijn
+				rect;								// Bounds of the line
+			case Slider:
+				key longint = 'sldr';
+				rect;								// Bounds
+				cstring;							// Name
+				cstring;							// Label
+				longint;							// Msg
+				longint;							// Min
+				longint;							// Max
+				longint
+					block		= 0,
+					triangle	= 1;				// Thumb
 			case BoxEnd:
 				key longint = 'boxe';
 		};
+	};
+};
+
+
+/* MiniIcon */
+type 'MICN' {
+	hexstring;
+};
+
+
+/* Cursor */
+type 'CURS' {
+	byte;											// Size
+	byte;											// Depth
+	array {
+		byte;
+	};
+	array {
+		byte;										// Image
+	};
+	array {
+		byte;										// Mask
+	}
+};
+
+
+/* Command */
+type 'Cmnd' {
+	longint = $$CountOf(binding);
+	array binding {
+		longint;									// Command
+		cstring;									// Description
+	}
+};
+
+
+/* Bindings */
+type 'Bind' {
+	longint = $$CountOf(cmdbinding);				// Number of Bindings
+	array cmdbinding {
+
+		// The key combination
+		integer
+			Shift	= 0x0001,
+			Cmd		= 0x0002,
+			Ctrl	= 0x0004,
+			Opt		= 0x0040,
+			Menu	= 0x0080;						// Modifiers
+		char = 0;									// Raw Character
+		char;										// Keycode
+
+		// The Prefix for this combination
+		integer
+			Shift	= 0x0001,
+			Cmd		= 0x0002,
+			Ctrl	= 0x0004,
+			Opt		= 0x0040,
+			Menu	= 0x0080;						// Modifiers
+		char = 0;									// Raw Character
+		char;										// Keycode
+
+		// The command
+		longint;									// Command
 	};
 };

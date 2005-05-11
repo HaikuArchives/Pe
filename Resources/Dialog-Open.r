@@ -33,13 +33,12 @@
 
 #include "Types.r"
 
-resource 'DLOG' (11, "Add Pattern") {
-	{ 0, 0, 300, 100 },
-	"Add Pattern",
-	B_TITLED_WINDOW,
-	NORMAL,
+
+resource 'DLOG' (3, "Open Selection") {
+	{ 0, 0, 250, 70 }, "Open Selection", B_TITLED_WINDOW, NORMAL,
 	{
-		Edit			{{  10,  10, 280, 26 }, "file", "Pattern:", "/boot/home/*.c", "", 1024, 0 },
-		Button			{{ 230,  70, 290, 90 }, "ok", "OK", 'ok  ' }
+		Edit	{{  10,  10, 240,  26 }, "open",	"Open:",	"", "", 0, 30	},
+		Button	{{ 180,  40, 240,  60 }, "ok",		"OK",		'ok  '			},
+		Button	{{ 110,  40, 170,  60 }, "cancel",	"Cancel",	'cncl'			}
 	}
 };

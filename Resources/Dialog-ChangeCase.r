@@ -31,44 +31,19 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
-#include "RTypes.r"
+#include "Types.r"
 
-Resource 'MENU' (128)
-{
-	"pub",
-	{
-		Item			{ "/", 'dir ', none, noKey },
-		Item			{ "pub", 'dir ', none, noKey }
-	};
-};
 
-resource 'DLOG' (128, "Open from Server") {
-	{ 0, 0, 375, 200 },
-	"Open From Server",
-	B_TITLED_WINDOW,
-	NORMAL,
+resource 'DLOG' (5, "Change Case") {
+	{ 0, 0, 170, 150 }, "Change Case", B_TITLED_WINDOW, NORMAL,
 	{
-		Caption			{{  10,  10, 100,  26 }, "csrvr", "Server:" },
-		Edit			{{  10,  30, 100,  46 }, "srvr", "", "", "", 0, 0 },
-		CheckBox		{{  12,  48, 100,  64 }, "pssv", "Passive" },
-		Caption			{{  10,  70, 100,  86 }, "cuser", "User Name:" },
-		Edit			{{  10,  90, 100,  106 }, "user", "", "", "", 24, 0 },
-		Caption			{{  10,  110, 100, 126 }, "csrvr", "Password:" },
-		Edit			{{  10, 130, 100, 146 }, "pass", "", "", "", 128, 0 },
-		
-		Button			{{  25, 160,  85, 180 }, "cnct", "Connect", 'cnct' },
-		
-		Line			{{ 106,  10, 107, 160 }},
-		
-		PopupMenu		{{ 115,  10, 295,  30 }, "path", "", 128, 0 },
-		
-		List			{{ 115,  40, 365, 160 }, "list" },
-		
-		CheckBox		{{ 300,  10, 365,  26 }, "dotf", "Show All" },
-		
-		Edit			{{  10, 174, 210, 190 }, "name", "", "", "", 0, 0 },
-		
-		Button			{{ 305, 170, 365, 190 }, "ok  ", "Open", 'ok  ' },
-		Button			{{ 235, 170, 295, 190 }, "cncl", "Cancel", 'cncl' }
+		RadioButton	{{  10,  10, 160,  26 },	"lower",	"Lower Case"					},
+		RadioButton	{{  10,  30, 160,  46 },	"upper",	"Upper Case"					},
+		RadioButton	{{  10,  50, 160,  66 },	"capword",	"Capitalize Words"				},
+		RadioButton	{{  10,  70, 160,  86 },	"capsent",	"Capitalize Sentences"			},
+		RadioButton	{{  10,  90, 160, 106 },	"capline",	"Capitalize Lines"				},
+
+		Button		{{ 100, 120, 160, 140 },	"ok",		"OK",					'ok  '	},
+		Button		{{  30, 120,  90, 140 },	"cancel",	"Cancel",				'cncl'	}
 	}
 };

@@ -33,19 +33,12 @@
 
 #include "Types.r"
 
-resource 'DLOG' (11, "FTP Open") {
-	{ 0, 0, 300, 170 },
-	"FTP Open…",
-	B_TITLED_WINDOW,
-	NORMAL,
+
+resource 'DLOG' (4, "Go To Line") {
+	{ 0, 0, 160, 70 }, "Go To Line", B_TITLED_WINDOW, NORMAL,
 	{
-		Edit			{{  10,  10, 290,  26 }, "server", "Server:", "", "", 128, 60 },
-		Edit			{{  10,  30, 290,  46 }, "user", "Username:", "", "", 24, 60 },
-		Edit			{{  10,  50, 290,  66 }, "pass", "Password:", "", "", 24, 60 },
-		Edit			{{  10,  70, 290,  86 }, "path", "Directory:", "", "", 1024, 60 },
-		Edit			{{  10,  90, 290, 106 }, "file", "File:", "", "", 255, 60 },
-	
-		Button			{{ 230, 140, 290, 160 }, "ok", "OK", 'ok  ' },
-		Button			{{ 160, 140, 220, 160 }, "cancel", "Cancel", 'cncl' }
+		Edit	{{  10,  10,  80,  26 }, "line",	"Line:",	"", "", 0, 30	},
+		Button	{{  90,  40, 150,  60 }, "ok",		"OK",		'ok  '			},
+		Button	{{  20,  40,  80,  60 }, "cancel",	"Cancel",	'cncl'			}
 	}
 };

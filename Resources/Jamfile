@@ -4,31 +4,30 @@ SubDirHdrs $(TOP) Sources ;
 
 # <pe-src>
 RezObjects
-	menus.r
-	fonttabs.r
-	find.r
-	prefs.r
-	wrap.r
-	icons.r
-	colorpicker.r
-	openfile.r
-	gotoline.r
-	changecase.r
-	info.r
-	convert.r
 	Bindings.r
-	UTF-Tables.r
+	Cursor.r
+	Dialog-ChangeCase.r
+	Dialog-ChangeEncoding.r
+	Dialog-Colorpicker.r
+	Dialog-Find.r
+	Dialog-FontTabs.r
+	Dialog-Ftp.r
+	Dialog-FtpOpen.r
+	Dialog-GotoLine.r
+	Dialog-Info.r
+	Dialog-Login.r
+	Dialog-Open.r
+	Dialog-Preferences.r
+	Dialog-Wrap.r
+	HtmlPalette.r
+	Icons.r
+	Menus.r
+	MimeInfo.r
+	ToolBarIcons.r
+	ToolBars.r
 	UTF-Mappings.r
-	ToolBar.r
+	UTF-Tables.r
 	WordBreakTable.r
-	RHTMLBar.r
-	RDiffToolbar.r
-	ftp.r
-	login.r
-	RCursor.r
-	RFtpOpenDialog.r
-	RProject.r
-	RMimeinfo.r
 	;
 # </pe-src>
 

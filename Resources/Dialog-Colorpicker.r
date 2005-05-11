@@ -31,23 +31,16 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
-type 'BtnB' {
-	longint
-		dragger = 1,
-		acceptFirstClick = 2;	// flags
-	longint = $$CountOf(buttons);
-	array buttons {
-		longint
-			new = -1,
-			open = -2;			// resID for icon
-		longint;					// cmd
-		longint
-			menu = 1,
-			toggle = 2,
-			space = 4,
-			separator = 8,
-			dual = 16;				// flags
-		cstring;					// help string
-	};
-};
+#include "Types.r"
 
+
+resource 'DLOG' (100, "Color Picker") {
+	{ 0, 0, 230, 170 }, "ColorPicker", B_MODAL_WINDOW, NORMAL,
+	{
+		ColorSquare		{{  10,  10, 220, 110 }, "hs"							},
+		ColorSlider		{{  10, 120, 220, 132 }, "v"							},
+		ColorDemo		{{  10, 142,  80, 160 }, "demo"							},
+		Button			{{ 160, 140, 220, 160 }, "ok",		"OK",		'ok  '	},
+		Button			{{  90, 140, 150, 160 }, "cancel",	"Cancel",	'cncl'	}
+	}
+};
