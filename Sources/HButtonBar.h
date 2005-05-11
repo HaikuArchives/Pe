@@ -37,6 +37,7 @@
 #define HBUTTONBAR_H
 
 class HHelpWindow;
+class HButtonBar;
 
 struct BtnTemplate {
 	long resID;
@@ -57,7 +58,6 @@ enum BtnBarFlags {
 	bbAcceptFirstClick
 };
 
-class HButtonBar;
 
 class HTool {
 public:
@@ -73,15 +73,15 @@ virtual	void MouseLeave();
 	void SetEnabled(bool enabled = true);
 	void SetVisible(bool visible);
 
-	BRect Frame() const;
-	int Cmd() const;
-	bool IsToggle() const;
-	bool IsDown() const;
-	bool IsOn() const;
-	bool IsMenu() const;
-	bool IsEnabled() const;
-	bool IsVisible() const;
-	const char* Help() const;
+	BRect Frame() const			{ return fFrame; }
+	int Cmd() const				{ return fCmd; }
+	bool IsToggle() const		{ return fToggle; }
+	bool IsDown() const			{ return fDown; }
+	bool IsOn() const			{ return fOn; }
+	bool IsMenu() const			{ return fMenu; }
+	bool IsEnabled() const		{ return fEnabled; }
+	bool IsVisible() const		{ return fVisible; }
+	const char* Help() const	{ return fHelp; }
 
 protected:
 	void DrawFrame(bool enter, bool active);
@@ -157,49 +157,5 @@ virtual	void Pulse();
 			bigtime_t fLastEnter, fLastDisplay;
 };
 
-inline BRect HTool::Frame() const
-{
-	return fFrame;
-} /* HTool::Frame */
-
-inline int HTool::Cmd() const
-{
-	return fCmd;
-} /* HTool::Cmd */
-
-inline bool HTool::IsToggle() const
-{
-	return fToggle;
-} /* HTool::Toggle */
-
-inline bool HTool::IsDown() const
-{
-	return fDown;
-} /* HTool::Down */
-
-inline bool HTool::IsOn() const
-{
-	return fOn;
-} /* HTool::Down */
-
-inline bool HTool::IsMenu() const
-{
-	return fMenu;
-} /* HTool::Menu */
-
-inline bool HTool::IsEnabled() const
-{
-	return fEnabled;
-} /* HTool::IsEnabled */
-
-inline bool HTool::IsVisible() const
-{
-	return fVisible;
-} /* HTool::IsVisible */
-
-inline const char* HTool::Help() const
-{
-	return fHelp;
-} /* HTool::Help */
 
 #endif // HBUTTONBAR_H
