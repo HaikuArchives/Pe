@@ -128,12 +128,7 @@ CFindDialog::CFindDialog(BRect frame, const char *name,
 	fName->SetRadioMode(true);
 	fName->ItemAt(0)->SetMarked(true);
 
-	i = 0;
-	while ((p = gPrefs->GetIxPrefString("searchpath", i++)) != NULL)
-		AddPathToDirMenu(p, false);
-
-	item = fDirectory->ItemAt(gPrefs->GetPrefInt("Search Whichdir", 0));
-	(item ? item : fDirectory->ItemAt(0))->SetMarked(true);
+	UpdateSearchDirMenu();
 
 	static_cast<BTextControl*>(FindView("find"))->TextView()->SetWordWrap(true);
 	static_cast<BTextControl*>(FindView("repl"))->TextView()->SetWordWrap(true);
@@ -165,12 +160,6 @@ bool CFindDialog::QuitRequested()
 	gPrefs->SetPrefInt("Search Batch", IsOn("btch"));
 	gPrefs->SetPrefInt("Search Recursive", IsOn("recu"));
 	gPrefs->SetPrefInt("Search Multikind", fKind->IndexOf(fKind->FindMarked()));
-	gPrefs->SetPrefInt("Search Whichdir", fDirectory->IndexOf(fDirectory->FindMarked()));
-
-	gPrefs->RemovePref("searchpath");
-	
-	for (int i = 2; i < fDirectory->CountItems(); i++)
-		gPrefs->SetIxPrefString("searchpath", i - 2, fDirectory->ItemAt(i)->Label());
 
 	return CDoc::CountDocs() == 0;
 } /* CFindDialog::QuitRequested */
@@ -435,10 +424,11 @@ void CFindDialog::MessageReceived(BMessage *msg)
 			{
 				entry_ref ref;
 				if (msg->FindRef("refs", &ref) == B_NO_ERROR)
-					AddPathToDirMenu(ref, true);
+					AddPathToDirMenu(ref, true, true);
 				break;
 			}
 			case msg_YASD:
+				gPrefs->SetPrefInt("Search Whichdir", fDirectory->IndexOf(fDirectory->FindMarked()));
 			case msg_ChangedMFKind:
 				SetOn("mult", true);
 				UpdateFields();
@@ -455,11 +445,12 @@ void CFindDialog::MessageReceived(BMessage *msg)
 				SetOn("grep", true);
 				break;
 			}
-			
+
 			case msg_PrefsChanged:
 				FillGrepPopup();
+				UpdateSearchDirMenu();
 				break;
-			
+
 			case msg_AddGrepPattern:
 			{
 				int ix = fGrepPopup->CountItems() - 1;
@@ -486,7 +477,32 @@ void CFindDialog::MessageReceived(BMessage *msg)
 	}
 } /* CFindDialog::MessageReceived */
 
-void CFindDialog::AddPathToDirMenu(const char *path, bool select)
+void CFindDialog::UpdateSearchDirMenu()
+{
+	// remove old directory entries
+
+	for (int i = fDirectory->CountItems(); i-- > 1; )
+	{
+		delete fDirectory->RemoveItem(i);
+	}
+
+	// add new ones...
+
+	const char *path;
+	int i = 0;
+	while ((path = gPrefs->GetIxPrefString("searchpath", i++)) != NULL)
+		AddPathToDirMenu(path, false);
+
+	// ... and (re)select the current entry
+
+	BMenuItem *item = fDirectory->ItemAt(gPrefs->GetPrefInt("Search Whichdir", 0));
+	if (item == NULL)
+		item = fDirectory->ItemAt(0);
+
+	item->SetMarked(true);
+} /* CFindDialog::UpdateSearchDirMenu */
+
+void CFindDialog::AddPathToDirMenu(const char *path, bool select, bool addToPrefs)
 {
 	int i;
 
@@ -501,21 +517,26 @@ void CFindDialog::AddPathToDirMenu(const char *path, bool select)
 
 	if (fDirectory->CountItems() == 1)
 		fDirectory->AddSeparatorItem();
-	
+
 	fDirectory->AddItem(new BMenuItem(path, new BMessage(msg_YASD)));
 
+	i = fDirectory->CountItems() - 1;
+
 	if (select)
-		fDirectory->ItemAt(fDirectory->CountItems() - 1)->SetMarked(true);
+		fDirectory->ItemAt(i)->SetMarked(true);
+
+	if (addToPrefs && i >= 2)
+		gPrefs->SetIxPrefString("searchpath", i - 2, path);
 } /* CFindDialog::AddPathToDirMenu */
 
-void CFindDialog::AddPathToDirMenu(entry_ref& ref, bool select)
+void CFindDialog::AddPathToDirMenu(entry_ref& ref, bool select, bool addToPrefs)
 {
 	BEntry e;
 	FailOSErr(e.SetTo(&ref));
 	BPath p;
 	FailOSErr(e.GetPath(&p));
 	
-	AddPathToDirMenu(p.Path(), select);
+	AddPathToDirMenu(p.Path(), select, addToPrefs);
 } /* CFindDialog::AddPathToDirMenu */
 
 const char* CFindDialog::FindString()

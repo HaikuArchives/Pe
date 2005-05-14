@@ -59,7 +59,7 @@ class CFindDialog : public HDialog
 	virtual void DoFind(unsigned long cmd);
 	virtual void MessageReceived(BMessage *msg);
 	virtual void UpdateFields();
-		
+
 	const char* FindString();
 	const char* ReplaceString();
 	bool Backward();
@@ -77,8 +77,9 @@ class CFindDialog : public HDialog
 
 	enum MultiReplaceKind { mrNone, mrLeaveOpen, mrSaveToDisk };
 
-	void AddPathToDirMenu(const char *path, bool select = false);
-	void AddPathToDirMenu(entry_ref& ref, bool select = false);
+	void UpdateSearchDirMenu();
+	void AddPathToDirMenu(const char *path, bool select = false, bool addToPrefs = false);
+	void AddPathToDirMenu(entry_ref& ref, bool select = false, bool addToPrefs = false);
 
 	bool DoMultiFileFind(const char *dir, bool recursive, bool restart, MultiReplaceKind replace, PDoc **doc);
 	bool FindInFile(const entry_ref& ref, vector<PMessageItem*> *lst);
