@@ -89,7 +89,7 @@ resource 'DLOG' (8, "Find") {
 		CheckBox	{{  10, 144,  90, 160 }, "mult",	"Multi-File"								},
 		PopupMenu	{{  75, 142, 238, 162 }, "meth",	"Method:",				81, 45				},
 		CheckBox	{{ 270, 144, 340, 160 }, "recu",	"Recursive"									},
-		PopupMenu	{{  10, 164, 340, 184 }, "sdir",	"Starting Directory:",	2, 110				},
+		PopupMenu	{{  10, 164, 340, 184 }, "sdir",	"Starting Directory:",	82, 110				},
 		CheckBox	{{  10, 188, 115, 204 }, "text",	"Text Files Only"							},
 		PopupMenu	{{ 120, 186, 245, 206 }, "namp",	"",						83, 0				},
 		Edit		{{ 270, 186, 340, 206 }, "name",							"", "", "", 0, 0	},
