@@ -5332,7 +5332,16 @@ void PText::MessageReceived(BMessage *msg)
 			case msg_ReplaceAndFindBackward:
 				fLastCommand = NULL;
 				Find(what, NULL);
+				// supposed to fall through
+
+			case msg_QueryCanReplace:
+			{
+				BMessage reply(msg_ReplyCanReplace);
+				reply.AddBool("canreplace", CanReplace(msg->FindString("what"),
+					msg->FindBool("case"), msg->FindBool("grep")));
+				msg->SendReply(&reply);
 				break;
+			}
 
 			case msg_DlgFind:
 				Find(msg_Find, args);
@@ -5365,15 +5374,6 @@ void PText::MessageReceived(BMessage *msg)
 					gFindDialog->PostMessage(&nmsg);
 					free(s);
 				}
-				break;
-			}
-
-			case msg_QueryCanReplace:
-			{
-				BMessage reply(msg_ReplyCanReplace);
-				reply.AddBool("canreplace", CanReplace(msg->FindString("what"),
-					msg->FindBool("case"), msg->FindBool("grep")));
-				msg->SendReply(&reply);
 				break;
 			}
 

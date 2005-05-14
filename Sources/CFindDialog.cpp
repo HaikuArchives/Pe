@@ -246,11 +246,11 @@ void CFindDialog::DoFind(unsigned long cmd)
 		msg.AddBool("word", IsOn("word"));
 		msg.AddBool("back", IsOn("back"));
 		msg.AddBool("grep", IsOn("grep"));
-		
+
 		PDoc *w = PDoc::TopWindow();
-		
+
 		if (w)
-			w->PostMessage(&msg, w->TextView());
+			w->PostMessage(&msg, w->TextView(), this);
 	}
 } /* CFindDialog::DoFind */
 
