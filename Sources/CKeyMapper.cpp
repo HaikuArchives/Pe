@@ -43,6 +43,8 @@
 #include "KeyBindings.h"
 #include "PText.h"
 #include "HError.h"
+#include "ResourcesBindings.h"
+#include "ResourcesUtf.h"
 
 CKeyMapper* CKeyMapper::sfInstance = NULL;
 
@@ -164,7 +166,7 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 	{
 		FailOSErr(gPrefsDir.CreateFile("keybindings", &file));
 
-		long resID = 0, cnt = 0;
+		long resID = ri_BND_EDITING, cnt = 0;
 		BMallocIO b;
 		
 		b << cnt;
@@ -174,7 +176,7 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 			size_t size;
 			const void *p;
 			
-			if ((p = HResources::GetResource('Bind', resID++, size)) == NULL)
+			if ((p = HResources::GetResource(rt_BND, resID++, size)) == NULL)
 				break;
 			
 			BMemoryIO buf(p, size);

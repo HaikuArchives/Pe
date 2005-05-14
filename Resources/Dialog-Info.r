@@ -34,19 +34,19 @@
 #include "Types.r"
 
 
-resource 'MENU' (101, "Mimetype") {
+resource rt_POP (ri_POP_INF_MIMETYPES, "Mimetype") {
 	"Mimetype:",
 	{
 	}
 };
 
-resource 'MENU' (400, "Font Popup") {
+resource rt_POP (ri_POP_INF_FONT, "Font Popup") {
 	"Font",
 	{
 	}
 };
 
-resource 'MENU' (401, "Encoding Popup") {
+resource rt_POP (ri_POP_INF_ENCODING, "Encoding Popup") {
 	"Encoding",
 	{
 		Item	{ "UTF-8",				'chng', none, noKey },
@@ -64,12 +64,20 @@ resource 'MENU' (401, "Encoding Popup") {
 	}
 };
 
-resource 'MENU' (402, "Line Breaks") {
+resource rt_POP (ri_POP_INF_LINEBREAKS, "Line Breaks") {
 	"Line Breaks",
 	{
 		Item	{ "Be/Unix",			'chng', none, noKey },
 		Item	{ "Mac",				'chng', none, noKey },
 		Item	{ "DOS",				'chng', none, noKey }
+	}
+};
+
+resource rt_POP (ri_POP_INF_LANGUAGE, "Language menu") {
+	"Language",
+	{
+		Item		{ "None", 'chng', none, noKey	},
+		Separator	{								}
 	}
 };
 
@@ -86,17 +94,17 @@ resource 'DLOG' (6, "Info") {
 				
 				Line			{{   0,  43, 275,  44 }																				},
 				
-				PopupMenu		{{  -1,  51, 140,  71 },	"font",				"Font:",			400, 30							},
+				PopupMenu		{{  -1,  51, 140,  71 },	"font",				"Font:",			ri_POP_INF_FONT, 30			},
 				Edit			{{ 150,  51, 275,  71 },	"size",				"Size:",			"", "0123456789", 2, 90			},
 				
 				Line			{{   0,  78, 275,  79 }																				},
 			
-				PopupMenu		{{  -1,  86, 275, 106 },	"encoding",			"Encoding:",		401, 80							},
-				PopupMenu		{{  -1, 106, 275, 126 },	"linebreaks",		"Linebreaks:",		402, 80							},
+				PopupMenu		{{  -1,  86, 275, 106 },	"encoding",			"Encoding:",		ri_POP_INF_ENCODING, 80		},
+				PopupMenu		{{  -1, 106, 275, 126 },	"linebreaks",		"Linebreaks:",		ri_POP_INF_LINEBREAKS, 80		},
 				
 				Line			{{   0, 133, 275, 134 }},
 				
-				PopupMenu		{{  -1, 141, 275, 161 },	"language",			"Language:",		93, 80							},
+				PopupMenu		{{  -1, 141, 275, 161 },	"language",			"Language:",		ri_POP_INF_LANGUAGE, 80			},
 			
 			TabSheetEnd			{																									},
 			
@@ -105,7 +113,7 @@ resource 'DLOG' (6, "Info") {
 				Caption			{{  80,   0, 240,  16 },	"name",				"Not Saved"											},
 				Caption			{{   0,  20,  75,  36 },	"ctime",			"Last saved:"										},
 				Caption			{{  80,  20, 240,  36 },	"time",				""													},
-				PopupMenu		{{  -1,  38, 240,  58 },	"mime",				"Mimetype:",		101, 77							},
+				PopupMenu		{{  -1,  38, 240,  58 },	"mime",				"Mimetype:",		ri_POP_INF_MIMETYPES, 77		},
 				Caption			{{   0,  60,  75,  76 },	"csize",			"Size:"												},
 				Caption			{{  80,  60, 240,  76 },	"docsize",			""													},
 				Caption			{{   0,  80,  75,  96 },	"clines",			"Lines:"											},

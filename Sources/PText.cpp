@@ -63,6 +63,7 @@
 #include "MAlert.h"
 #include "HDefines.h"
 #include "HColorUtils.h"
+#include "ResourcesMenus.h"
 
 #if defined(__BEOS__) && defined(__INTEL__)
 	// [zooey]: BeOS' glibs is messing up iscntrl, as it reports all values>127 as
@@ -223,7 +224,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fLineMap = NULL;
 	fLineView = NULL;
 	
-	fMainPopUp = static_cast<BPopUpMenu*>(HResources::GetMenu(30, true));
+	fMainPopUp = static_cast<BPopUpMenu*>(HResources::GetMenu(ri_POP_CTX_TEXT, true));
 	FailNil(fMainPopUp);
 	fMainPopUp->SetFont(be_plain_font);
 	fMainPopUp->SetRadioMode(false);

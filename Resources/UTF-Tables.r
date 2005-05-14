@@ -31,9 +31,12 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
-read 'Utbl' (0, "letters")
+#include "ResourcesUtf.h"
+
+
+read rt_UTBL (ri_UTF_TABLE_LETTERS, "letters")
 	"UTF-Table-Letters";
 
-read 'Utbl' (1, "numbers")
+read rt_UTBL (ri_UTF_TABLE_NUMBERS, "numbers")
 	"UTF-Table-Numbers";
 

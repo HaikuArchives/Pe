@@ -41,6 +41,7 @@
 #include "HColorUtils.h"
 #include "HDefines.h"
 #include "HStream.h"
+#include "ResourcesToolbars.h"
 
 HTool::HTool(HButtonBar *bar, float x, float width, int cmd=-1, const char *help="")
 	: fBar(bar), fCmd(cmd)
@@ -329,7 +330,7 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 	long bCnt, flags;
 	const void *p;
 	size_t size;
-	p = HResources::GetResource('BtnB', resID, size);
+	p = HResources::GetResource(rt_TBR, resID, size);
 	FailNilRes(p);
 	
 	BMemoryIO buf(p, size);

@@ -51,6 +51,8 @@
 #include "HPreferences.h"
 #include "CProjectJamFile.h"
 #include "CProjectMakeFile.h"
+#include "ResourcesToolbars.h"
+#include "ResourcesMenus.h"
 
 const unsigned long msg_Done = 'done';
 
@@ -80,7 +82,7 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype,
 	BRect r(Bounds());
 
 	BMenuBar *mbar;
-	AddChild(mbar = HResources::GetMenuBar(r, 200));
+	AddChild(mbar = HResources::GetMenuBar(r, ri_MBR_PROJECT_WIN));
 	mbar->FindItem(msg_Quit)->SetTarget(be_app);
 
 	r.bottom = r.top + kToolBarHeight;
@@ -91,7 +93,7 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype,
 	r.bottom -= 2;
 	r.OffsetTo(0, 0);
 	
-	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "buttonbar", 1, this));
+	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "buttonbar", ri_TBR_PROJECT_WIN, this));
 	
 	r = Bounds();
 	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT + 1;

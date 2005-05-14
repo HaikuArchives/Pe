@@ -37,6 +37,7 @@
 #include "PAbout.h"
 #include "HAppResFile.h"
 #include "HError.h"
+#include "ResourcesMisc.h"
 #if STANDALONE
 #else
 #	include "PApp.h"
@@ -95,7 +96,7 @@ static const char *Now()
 #if STANDALONE
 	return "now";
 #else
-	static const char *now = (char *)HResources::GetResource('when', 0);
+	static const char *now = (char *)HResources::GetResource(rt_TIM, ri_TIM_COMPILED);
 	return now;
 #endif
 } /* Now */

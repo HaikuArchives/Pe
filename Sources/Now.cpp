@@ -36,10 +36,11 @@
 #include "pe.h"
 #include "Now.h"
 #include "HAppResFile.h"
+#include "ResourcesMisc.h"
 
 const char *Now()
 {
 	size_t l;
-	static const char *now = (char *)HResources::GetResource('when', 0);
+	static const char *now = (char *)HResources::GetResource(rt_TIM, ri_TIM_COMPILED);
 	return now;
 } /* Now */

@@ -32,10 +32,11 @@
 */
 
 #include "PMessages.h"
+#include "ResourcesToolbars.h"
 
 
 /* Type: ToolbarButton */
-type 'BtnB' {
+type rt_TBR {
 	longint
 		dragger				= 1,
 		acceptFirstClick	= 2;		// Flags
@@ -56,8 +57,8 @@ type 'BtnB' {
 };
 
 
-/* Text Edit Window */
-resource 'BtnB' (0) {
+/* Document Window */
+resource rt_TBR (ri_TBR_DOCUMENT_WIN) {
 	0,
 	{
 		new,	msg_New,			0,				"New Document",
@@ -79,8 +80,8 @@ resource 'BtnB' (0) {
 	}
 };
 
-/* Find Differences Window */
-resource 'BtnB' (2) {
+/* Differences Window */
+resource rt_TBR (ri_TBR_DIFFERENCES_WIN) {
 	0,
 	{
 		28,		msg_DiffFile1,		menu|toggle,	"File 1",
@@ -94,7 +95,7 @@ resource 'BtnB' (2) {
 };
 
 /* Group Window */
-resource 'BtnB' (1) {
+resource rt_TBR (ri_TBR_GROUP_WIN) {
 	acceptFirstClick,
 	{
 		20,		'Add ',				0,				"Add File",
@@ -105,7 +106,7 @@ resource 'BtnB' (1) {
 };
 
 /* Project Window */
-resource 'BtnB' (1) {
+resource rt_TBR (ri_TBR_PROJECT_WIN) {
 	0,
 	{
 		20,		'Add ',				0,				"Add File",

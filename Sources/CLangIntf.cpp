@@ -46,6 +46,7 @@
 #include "HPreferences.h"
 #include "HColorUtils.h"
 #include <algorithm>
+#include "ResourcesMisc.h"
 
 unsigned char *CLangIntf::sfWordBreakTable = NULL;
 
@@ -93,7 +94,7 @@ CLangIntf::CLangIntf()
 {
 	if (sfWordBreakTable == NULL)
 	{
-		sfWordBreakTable = (unsigned char *)HResources::GetResource('WBrT', 128);
+		sfWordBreakTable = (unsigned char *)HResources::GetResource(rt_WBT, ri_WBT_LWORDBREAKTABLE);
 		if (sfWordBreakTable == NULL) THROW(("Missing Resource!"));
 	}
 	
@@ -115,7 +116,7 @@ CLangIntf::CLangIntf(const char *path, image_id image)
 {
 	if (sfWordBreakTable == NULL)
 	{
-		sfWordBreakTable = (unsigned char *)HResources::GetResource('WBrT', 128);
+		sfWordBreakTable = (unsigned char *)HResources::GetResource(rt_WBT, ri_WBT_LWORDBREAKTABLE);
 		if (sfWordBreakTable == NULL) THROW(("Missing Resource!"));
 	}
 	

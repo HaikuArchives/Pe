@@ -34,7 +34,7 @@
 #include "Types.r"
 
 
-resource 'MENU' (128)
+resource rt_POP (ri_POP_FTP_PATH)
 {
 	"pub",
 	{
@@ -46,27 +46,27 @@ resource 'MENU' (128)
 resource 'DLOG' (128, "Open from Server") {
 	{ 0, 0, 375, 200 }, "Open From Server", B_TITLED_WINDOW, NORMAL,
 	{
-		Caption		{{  10,  10, 100,  26 }, "csrvr",		"Server:"						},
-		Edit		{{  10,  30, 100,  46 }, "srvr",		"",				"", "", 0, 0	},
-		CheckBox	{{  12,  48, 100,  64 }, "pssv",		"Passive"						},
-		Caption		{{  10,  70, 100,  86 }, "cuser",		"User Name:"					},
-		Edit		{{  10,  90, 100, 106 }, "user",		"",				"", "", 24, 0	},
-		Caption		{{  10, 110, 100, 126 }, "csrvr",		"Password:"						},
-		Edit		{{  10, 130, 100, 146 }, "pass",		"",				"", "", 128, 0	},
+		Caption		{{  10,  10, 100,  26 }, "csrvr",		"Server:"							},
+		Edit		{{  10,  30, 100,  46 }, "srvr",		"",				"", "", 0, 0		},
+		CheckBox	{{  12,  48, 100,  64 }, "pssv",		"Passive"							},
+		Caption		{{  10,  70, 100,  86 }, "cuser",		"User Name:"						},
+		Edit		{{  10,  90, 100, 106 }, "user",		"",				"", "", 24, 0		},
+		Caption		{{  10, 110, 100, 126 }, "csrvr",		"Password:"							},
+		Edit		{{  10, 130, 100, 146 }, "pass",		"",				"", "", 128, 0		},
 		
-		Button		{{  25, 160,  85, 180 }, "cnct",		"Connect",		'cnct'			},
+		Button		{{  25, 160,  85, 180 }, "cnct",		"Connect",		'cnct'				},
 		
-		Line		{{ 106,  10, 107, 160 }													},
+		Line		{{ 106,  10, 107, 160 }														},
 		
-		PopupMenu	{{ 115,  10, 295,  30 }, "path",		"",				128, 0			},
+		PopupMenu	{{ 115,  10, 295,  30 }, "path",		"",				ri_POP_FTP_PATH, 0	},
 		
-		List		{{ 115,  40, 365, 160 }, "list"											},
+		List		{{ 115,  40, 365, 160 }, "list"												},
 		
-		CheckBox	{{ 300,  10, 365,  26 }, "dotf",		"Show All"						},
+		CheckBox	{{ 300,  10, 365,  26 }, "dotf",		"Show All"							},
 		
-		Edit		{{  10, 174, 210, 190 }, "name",		"",				"", "", 0, 0	},
+		Edit		{{  10, 174, 210, 190 }, "name",		"",				"", "", 0, 0		},
 		
-		Button		{{ 305, 170, 365, 190 }, "ok  ",		"Open",			'ok  '			},
-		Button		{{ 235, 170, 295, 190 }, "cncl",		"Cancel",		'cncl'			}
+		Button		{{ 305, 170, 365, 190 }, "ok  ",		"Open",			'ok  '				},
+		Button		{{ 235, 170, 295, 190 }, "cncl",		"Cancel",		'cncl'				}
 	}
 };

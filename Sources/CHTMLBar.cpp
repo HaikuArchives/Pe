@@ -43,6 +43,7 @@
 #include "HAppResFile.h"
 #include "HStream.h"
 #include "HDefines.h"
+#include "ResourcesMisc.h"
 
 CHTMLBar *CHTMLBar::sfInstance;
 
@@ -74,7 +75,6 @@ CHTMLBar::CHTMLBar()
 {
 	const void *p;
 	size_t size;
-	int id = 0;
 	
 	if (gPrefsDir.Contains("HTML Palette"))
 	{
@@ -89,17 +89,17 @@ CHTMLBar::CHTMLBar()
 			FailOSErr(r.SetTo(&f));
 			
 			size_t size;
-			p = r.FindResource('HtmB', (int32)id, &size);
+			p = r.FindResource(rt_HTP, (int32)ri_HTP_HTML_PALETTE, &size);
 			if (p == NULL) THROW(("The custom HTML Palette file does not contain a valid palette resource"));
 		}
 		catch (HErr& e)
 		{
 			e.DoError();
-			p = HResources::GetResource('HtmB', id, size);
+			p = HResources::GetResource(rt_HTP, ri_HTP_HTML_PALETTE, size);
 		}
 	}
 	else
-		p = HResources::GetResource('HtmB', id, size);
+		p = HResources::GetResource(rt_HTP, ri_HTP_HTML_PALETTE, size);
 	
 	if (p == NULL) THROW(("Could not find a palette resource"));
 	

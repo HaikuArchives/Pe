@@ -48,11 +48,13 @@ mv "HTML Palette" $PE_SETTINGS_DIR
 */
 
 //#include "PMessages.h"
+#include "ResourcesMisc.h"
+
 #define msg_ShowInBrowser		'Brws'
 #define msg_HTMLNew				'HNew'
 
 
-type 'HtmB' {
+type rt_HTP {
 	cstring;									// Bar name
 	longint;									// Flags (unused for now)
 	longint;									// Width of the bar
@@ -83,7 +85,7 @@ type 'HtmB' {
 	};
 };
 
-resource 'HtmB' (0) {
+resource rt_HTP (ri_HTP_HTML_PALETTE) {
 	"Html Palette",
 	0,
 	85,

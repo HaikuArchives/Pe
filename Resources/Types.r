@@ -31,9 +31,12 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
+#include "ResourcesMenus.h"
+#include "ResourcesBindings.h"
+
 
 /* Menu */
-type 'MENU' {
+type rt_MEN {
 	cstring;										// Name
 	array {
 		switch {
@@ -65,7 +68,7 @@ type 'MENU' {
 
 
 /* MenuBar */
-type 'MBAR' {
+type rt_MBR {
 	array {
 		integer;									// Menu id's
 	};
@@ -236,7 +239,7 @@ type 'CURS' {
 
 
 /* Command */
-type 'Cmnd' {
+type rt_CMD {
 	longint = $$CountOf(binding);
 	array binding {
 		longint;									// Command
@@ -246,7 +249,7 @@ type 'Cmnd' {
 
 
 /* Bindings */
-type 'Bind' {
+type rt_BND {
 	longint = $$CountOf(cmdbinding);				// Number of Bindings
 	array cmdbinding {
 

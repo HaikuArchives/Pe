@@ -70,6 +70,8 @@
 #include "PFindFunctionDialog.h"
 #include "CProjectRoster.h"
 #include "PProjectWindow.h"
+#include "ResourcesToolbars.h"
+#include "ResourcesMenus.h"
 
 static long sDocCount = 0;
 
@@ -187,12 +189,12 @@ void PDoc::InitWindow(const char *name)
 	bool showIde = gPrefs->GetPrefInt("ide menu", 1);
 	
 	r = b;
-	fMBar = HResources::GetMenuBar(r, 0);
+	fMBar = HResources::GetMenuBar(r, ri_MBR_DOCUMENT_WIN);
 
 	// add the BeIDE menu, if desired
 	if (showIde)
 	{
-		BMenu *menu = HResources::GetMenu(7);
+		BMenu *menu = HResources::GetMenu(ri_MEN_DW_BEIDE);
 		BMenuItem *ideMenuItem = new CMenuItem(menu);
 		fMBar->AddItem(ideMenuItem);
 	}
@@ -219,7 +221,7 @@ void PDoc::InitWindow(const char *name)
 	
 	r.OffsetTo(0, 0);
 	r.bottom -= 2;
-	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "ButtonBar", 0));
+	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "ButtonBar", ri_TBR_DOCUMENT_WIN));
 	
 	r.left = fButtonBar->Frame().right + 4;
 	fToolBar->AddChild(fError = new BStringView(r, "error", "", B_FOLLOW_LEFT_RIGHT));
@@ -1100,7 +1102,7 @@ void PDoc::CreateFilePanel()
 		BView *vw = w->ChildAt(0);
 		FailNilMsg(vw, "Error building FilePanel");
 		
-		BMenu *m = HResources::GetMenu(20, true);
+		BMenu *m = HResources::GetMenu(ri_MEN_FP_MIMETYPES, true);
 		FailNilMsg(m, "Error building FilePanel");
 		m->SetFont(be_plain_font);
 		m->SetRadioMode(true);

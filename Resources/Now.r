@@ -31,11 +31,16 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
+//#include "Sources/Resources.h"
+
+
+//type rt_TIM
 type 'when'
 {
 	cstring;
 };
 
+//resource rt_TIM (ri_TIM_COMPILED, "Compilation date and time")
 resource 'when' (0, "Compilation date and time")
 {
 	$$date ", " $$time

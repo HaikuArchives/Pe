@@ -34,7 +34,7 @@
 #include "Types.r"
 
 
-resource 'MENU' (81, "Kind") {
+resource rt_POP (ri_POP_FND_METHOD, "Kind") {
 	"Method:",
 	{
 		Item		{ "Directory Scan",				'MFKn',	none,	noKey	},
@@ -43,14 +43,14 @@ resource 'MENU' (81, "Kind") {
 	}
 };
 
-resource 'MENU' (82, "Dir") {
+resource rt_MEN (ri_POP_FND_DIRNAME, "Dir") {
 	"Dir",
 	{
 		Item		{ "Other…",						'SelO',	none,	noKey	}
 	}
 };
 
-resource 'MENU' (83, "File Name") {
+resource rt_POP (ri_POP_FND_FILENAME, "File Name") {
 	"FileName",
 	{
 		Item		{ "Any File Name",				'chng',	none,	noKey	},
@@ -60,7 +60,7 @@ resource 'MENU' (83, "File Name") {
 	}
 };
 
-resource 'MENU' (84, "Grep Pattern") {
+resource rt_POP (ri_POP_FND_GREPPATTERN, "Grep Pattern") {
 	"Find:",
 	{
 		Item		{ "Add this pattern…",			'addP',	none,	noKey	},
@@ -72,31 +72,31 @@ resource 'MENU' (84, "Grep Pattern") {
 resource 'DLOG' (8, "Find") {
 	{ 0, 0, 350, 214 }, "Find", B_TITLED_WINDOW, NORMAL,
 	{
-		PopupMenu	{{   5,   9,  52,  25 }, "pats",	" ",					84, 1				},
-		Edit		{{  53,  10, 230,  42 }, "find",							"", "", "", 0, 0	},
-		Caption		{{  10,  46,  52,  62 }, "crepl",	"Replace:"									},
-		Edit		{{  53,  46, 230,  78 }, "repl",							"", "", "", 0, 0	},
+		PopupMenu	{{   5,   9,  52,  25 }, "pats",	" ",					ri_POP_FND_GREPPATTERN, 1	},
+		Edit		{{  53,  10, 230,  42 }, "find",							"", "", "", 0, 0			},
+		Caption		{{  10,  46,  52,  62 }, "crepl",	"Replace:"											},
+		Edit		{{  53,  46, 230,  78 }, "repl",							"", "", "", 0, 0			},
 
-		CheckBox	{{  10,  94,  99, 110 }, "case",	"Ignore Case"								},
-		CheckBox	{{  10, 116,  99, 132 }, "wrap",	"Wrap Around"								},
-		CheckBox	{{ 100,  94, 179, 110 }, "back",	"Backwards"									},
-		CheckBox	{{ 100, 116, 179, 132 }, "word",	"Entire Word"								},
-		CheckBox	{{ 180,  94, 250, 110 }, "grep",	"Grep"										},
-		CheckBox	{{ 180, 116, 250, 132 }, "btch",	"Batch"										},
+		CheckBox	{{  10,  94,  99, 110 }, "case",	"Ignore Case"										},
+		CheckBox	{{  10, 116,  99, 132 }, "wrap",	"Wrap Around"										},
+		CheckBox	{{ 100,  94, 179, 110 }, "back",	"Backwards"											},
+		CheckBox	{{ 100, 116, 179, 132 }, "word",	"Entire Word"										},
+		CheckBox	{{ 180,  94, 250, 110 }, "grep",	"Grep"												},
+		CheckBox	{{ 180, 116, 250, 132 }, "btch",	"Batch"												},
 		
-		Line		{{  10, 138, 340, 139 }															},
+		Line		{{  10, 138, 340, 139 }																	},
 		
-		CheckBox	{{  10, 144,  90, 160 }, "mult",	"Multi-File"								},
-		PopupMenu	{{  75, 142, 238, 162 }, "meth",	"Method:",				81, 45				},
-		CheckBox	{{ 270, 144, 340, 160 }, "recu",	"Recursive"									},
-		PopupMenu	{{  10, 164, 340, 184 }, "sdir",	"Starting Directory:",	82, 110				},
-		CheckBox	{{  10, 188, 115, 204 }, "text",	"Text Files Only"							},
-		PopupMenu	{{ 120, 186, 245, 206 }, "namp",	"",						83, 0				},
-		Edit		{{ 270, 186, 340, 206 }, "name",							"", "", "", 0, 0	},
+		CheckBox	{{  10, 144,  90, 160 }, "mult",	"Multi-File"										},
+		PopupMenu	{{  75, 142, 238, 162 }, "meth",	"Method:",				ri_POP_FND_METHOD, 45		},
+		CheckBox	{{ 270, 144, 340, 160 }, "recu",	"Recursive"											},
+		PopupMenu	{{  10, 164, 340, 184 }, "sdir",	"Starting Directory:",	ri_POP_FND_DIRNAME, 110		},
+		CheckBox	{{  10, 188, 115, 204 }, "text",	"Text Files Only"									},
+		PopupMenu	{{ 120, 186, 245, 206 }, "namp",	"",						ri_POP_FND_FILENAME, 0		},
+		Edit		{{ 270, 186, 340, 206 }, "name",							"", "", "", 0, 0			},
 
-		Button		{{ 260,  10, 340,  30 }, "bfnd",	"Find",					'Find'				},
-		Button		{{ 260,  40, 340,  60 }, "brpl",	"Replace",				'Rplc'				},
-		Button		{{ 260,  70, 340,  90 }, "br&f",	"Replace & Find",		'RpFn'				},
-		Button		{{ 260, 100, 340, 120 }, "ball",	"Replace All",			'RpAl'				}
+		Button		{{ 260,  10, 340,  30 }, "bfnd",	"Find",					'Find'						},
+		Button		{{ 260,  40, 340,  60 }, "brpl",	"Replace",				'Rplc'						},
+		Button		{{ 260,  70, 340,  90 }, "br&f",	"Replace & Find",		'RpFn'						},
+		Button		{{ 260, 100, 340, 120 }, "ball",	"Replace All",			'RpAl'						}
 	}
 };

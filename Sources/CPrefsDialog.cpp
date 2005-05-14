@@ -54,6 +54,7 @@
 #include "CMimeBox.h"
 #include "CGrepBox.h"
 #include "PGlossyWindow.h"
+#include "ResourcesBindings.h"
 
 typedef BStringItem CStringItem;
 
@@ -902,7 +903,7 @@ void CPrefsDialog::RegisterFields()
 
 void CPrefsDialog::InitKeybindingPage()
 {
-	int resID = 0;
+	int resID = ri_CMD_EDITING;
 	
 	while (true)
 	{
@@ -911,7 +912,7 @@ void CPrefsDialog::InitKeybindingPage()
 		const char *name;
 
 		size_t size;
-		const void *p = HResources::GetResource('Cmnd', resID, size, &name);
+		const void *p = HResources::GetResource(rt_CMD, resID, size, &name);
 		if (p == NULL)
 			break;
 
@@ -921,7 +922,7 @@ void CPrefsDialog::InitKeybindingPage()
 		MyItem *mom = new MyItem(name, 0);
 		fKBCommands->AddItem(mom);
 		
-		if (resID == 9)
+		if (resID == ri_CMD_EXTENSIONS)
 		{
 			BPopUpMenu menu("hoi");
 			PDoc::BuildExtensionsMenu(&menu);

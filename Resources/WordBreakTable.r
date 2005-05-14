@@ -31,14 +31,16 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
+#include "ResourcesMisc.h"
 
-type 'WBrT' {
+
+type rt_WBT {
 	array {
 		byte;
 	}
 };
 
-resource 'WBrT' (128)
+resource rt_WBT (ri_WBT_LWORDBREAKTABLE)
 {
 	{//	0		1		2		3		4		5
 		0x84,	0x85,	0x80,	0x00,	0x83,	0x83,

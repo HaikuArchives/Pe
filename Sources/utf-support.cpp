@@ -37,6 +37,7 @@
 #include "utf-support.h"
 #include "HAppResFile.h"
 #include "HError.h"
+#include "ResourcesUtf.h"
 
 unsigned char *alphaTable, *numTable, *alnumTable;
 
@@ -46,11 +47,10 @@ using namespace HResources;
 
 void InitUTFTables()
 {
-	numTable = (unsigned char *)GetResource('Utbl', 1);
+	numTable = (unsigned char *)GetResource(rt_UTBL, ri_UTF_TABLE_NUMBERS);
 	FailNilRes(numTable);
 	
-	int id = 0;
-	alphaTable = (unsigned char *)GetResource('Utbl', id);
+	alphaTable = (unsigned char *)GetResource(rt_UTBL, ri_UTF_TABLE_LETTERS);
 	FailNilRes(numTable);
 	
 	alnumTable = (unsigned char *)malloc(8192);
@@ -64,12 +64,9 @@ void InitUTFTables()
 	for (int i = 0; i < 8192 / sizeof(int); i++)
 		*c++ = *a++ | *b++;
 	
-	for (int i = 0; i < 11; i++)
+	for (int i = ri_UTF_MAP_01; i <= ri_UTF_MAP_11; i++)
 	{
-		if (i == 9)
-			mappings[i] = NULL;
-		else
-			mappings[i] = (unsigned short *)GetResource('UMap', i + 1);
+		mappings[i-1] = (i == ri_UTF_MAP_10) ? NULL : (unsigned short *)GetResource(rt_UMAP, i);
 	}
 } /* InitUTFTables */
 

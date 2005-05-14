@@ -34,11 +34,13 @@
 #include "Types.r"
 #include "KeyBindings.h"
 #include "PMessages.h"
+#include "ResourcesBindings.h"
+
 
 //		kmsg_OpenHeaderSource, { Shift, '\t' }, "Open Header/Source File",
 //		"Abort Shell Command",
 
-resource 'Cmnd' (0, "Editing commands") {
+resource rt_CMD (ri_CMD_EDITING, "Editing commands") {
 	{
 		kmsg_NrArgument,								"Numerical Argument Prefix",
 		kmsg_Recenter,									"Recenter",
@@ -97,7 +99,7 @@ resource 'Cmnd' (0, "Editing commands") {
 	}
 };
 
-resource 'Cmnd' (1, "File Menu") {
+resource rt_CMD (ri_CMD_FILE_MENU, "File Menu") {
 	{
 		msg_Quit,										"Quit",
 		msg_Revert,										"Revert",
@@ -116,7 +118,7 @@ resource 'Cmnd' (1, "File Menu") {
 	}
 };
 
-resource 'Cmnd' (2, "Edit Menu") {
+resource rt_CMD (ri_CMD_EDIT_MENU, "Edit Menu") {
 	{
 		msg_SelectParagraph,							"Select Paragraph",
 		msg_SelectLine,									"Select Line",
@@ -132,7 +134,7 @@ resource 'Cmnd' (2, "Edit Menu") {
 	}
 };
 
-resource 'Cmnd' (3, "Text Menu") {
+resource rt_CMD (ri_CMD_TEXT_MENU, "Text Menu") {
 	{
 		msg_ShowInBrowser,								"Show in Browser",
 		msg_Unwrap,										"Remove Linebreaks",
@@ -153,7 +155,7 @@ resource 'Cmnd' (3, "Text Menu") {
 	}
 };
 
-resource 'Cmnd' (4, "Search Menu") {
+resource rt_CMD (ri_CMD_SEARCH_MENU, "Search Menu") {
 	{
 		msg_GoToLine,									"Go To Line…",
 		msg_FindNextError,								"Jump to Next Error",
@@ -175,7 +177,7 @@ resource 'Cmnd' (4, "Search Menu") {
 	}
 };
 
-resource 'Cmnd' (5, "Window Menu") {
+resource rt_CMD (ri_CMD_WINDOW_MENU, "Window Menu") {
 	{
 		msg_Worksheet,									"Open Worksheet",
 		msg_Zoom,										"Zoom",
@@ -189,14 +191,14 @@ resource 'Cmnd' (5, "Window Menu") {
 	}
 };
 
-resource 'Cmnd' (6, "Help Menu") {
+resource rt_CMD (ri_CMD_HELP_MENU, "Help Menu") {
 	{
 		msg_About,										"About…",
 		msg_Help,										"Help…"
 	}
 };
 
-resource 'Cmnd' (7, "BeIDE Menu") {
+resource rt_CMD (ri_CMD_BEIDE_MENU, "BeIDE Menu") {
 	{
 		msg_IDE_Make,									"Make",
 		msg_IDE_Project2Group,							"Project -> Group",
@@ -206,7 +208,7 @@ resource 'Cmnd' (7, "BeIDE Menu") {
 	}
 };
 
-resource 'Cmnd' (8, "Miscellaneous") {
+resource rt_CMD (ri_CMD_MISCELLANEOUS, "Miscellaneous") {
 	{
 		kmsg_UnsplitWindow,								"Unsplit Window",
 		kmsg_SwitchActivePart,							"Switch to Other Part of Window",
@@ -217,7 +219,7 @@ resource 'Cmnd' (8, "Miscellaneous") {
 	}
 };
 
-resource 'Cmnd' (9, "Extensions") {
+resource rt_CMD (ri_CMD_EXTENSIONS, "Extensions") {
 	{
 	}
 };
@@ -226,7 +228,7 @@ resource 'Cmnd' (9, "Extensions") {
 // Opt = right Ctrl key on intel keyboard
 // Cmd = either Alt key on intel keyboard
 
-resource 'Bind' (0, "Bindings for Editing") {
+resource rt_BND (ri_BND_EDITING, "Bindings for Editing") {
 	{
 		0,				0x61,	0,		0,			kmsg_Move_Character_Left,
 		0,				0x63,	0,		0,			kmsg_Move_Character_Right,
@@ -306,7 +308,7 @@ resource 'Bind' (0, "Bindings for Editing") {
 	}
 };
 
-resource 'Bind' (1, "Bindings for File Menu") {
+resource rt_BND (ri_BND_FILE_MENU, "Bindings for File Menu") {
 	{
 		Cmd,			0x27,	0,		0,			msg_Quit,
 //		0,				0,		0, 		0,			msg_Revert,
@@ -324,7 +326,7 @@ resource 'Bind' (1, "Bindings for File Menu") {
 	}
 };
 
-resource 'Bind' (2, "Bindings for Edit Menu") {
+resource rt_BND (ri_BND_EDIT_MENU, "Bindings for Edit Menu") {
 	{
 		Cmd,			0x44,	0,		0,			msg_SelectLine,
 		Cmd,			0x3c,	0,		0,			'SALL',
@@ -338,7 +340,7 @@ resource 'Bind' (2, "Bindings for Edit Menu") {
 	}
 };
 
-resource 'Bind' (3, "Bindings for Text Menu") {
+resource rt_BND (ri_BND_TEXT_MENU, "Bindings for Text Menu") {
 	{
 		Cmd,			0x50,	0,		0,			msg_Balance,
 		Cmd,			0x11,	0,		0,			msg_Twiddle,
@@ -356,7 +358,7 @@ resource 'Bind' (3, "Bindings for Text Menu") {
 	}
 };
 
-resource 'Bind' (4, "Bindings for Search Menu") {
+resource rt_BND (ri_BND_SEARCH_MENU, "Bindings for Search Menu") {
 	{
 		Cmd,			0x53,	0,		0,			msg_GoToLine,	
 //		Cmd,			0x2e,	0,		0,			msg_FindNextError,
@@ -378,7 +380,7 @@ resource 'Bind' (4, "Bindings for Search Menu") {
 	}
 };
 
-resource 'Bind' (5, "Bindings for Window Menu") {
+resource rt_BND (ri_BND_WINDOW_MENU, "Bindings for Window Menu") {
 	{
 //		0,				0,		0, 		0,			msg_FontTabs,
 //		0,				0,		0, 		0,			msg_Info,
@@ -392,14 +394,14 @@ resource 'Bind' (5, "Bindings for Window Menu") {
 	}
 };
 
-resource 'Bind' (6, "Bindings for Help Menu") {
+resource rt_BND (ri_BND_HELP_MENU, "Bindings for Help Menu") {
 	{
 //		0,				0,		0, 		0,			msg_About,
 		0,				0x02,	0,		0,			msg_Help
 	}
 };
 
-resource 'Bind' (7, "Bindings for BeIDE Menu") {
+resource rt_BND (ri_BND_BEIDE_MENU, "Bindings for BeIDE Menu") {
 	{
 		Cmd,			0x52,	0,		0,			msg_IDE_Make,
 //		0,				0,		0, 		0,			msg_IDE_Project2Group,
@@ -409,7 +411,7 @@ resource 'Bind' (7, "Bindings for BeIDE Menu") {
 	}
 };
 
-resource 'Bind' (8, "Miscellaneous Bindings") {
+resource rt_BND (ri_BND_MISCELLANEOUS, "Miscellaneous Bindings") {
 	{
 		Ctrl,			0x4e,	0,		0,			msg_CancelCommand,
 		Cmd,			0x47,	0,		0,			msg_Execute,
@@ -418,7 +420,7 @@ resource 'Bind' (8, "Miscellaneous Bindings") {
 	}
 };
 
-resource 'Bind' (9, "Emacs Bindings") {
+resource rt_BND (ri_BND_EMACS, "Emacs Bindings") {
 	{
 		Ctrl,			0x2d,	0,		0,			kmsg_NrArgument,
 		Ctrl,			0x44,	0,		0,			kmsg_Recenter,

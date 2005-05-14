@@ -47,6 +47,7 @@
 #include "HPreferences.h"
 #include "HDefines.h"
 #include "MAlert.h"
+#include "ResourcesToolbars.h"
 
 inline int compare(const char *a, const char *b)
 {
@@ -128,7 +129,7 @@ CDiffWindow::CDiffWindow(BRect frame, const char *name)
 	
 	r.OffsetTo(0, 0);
 	r.bottom = r.top + kToolBarHeight - 2;
-	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "ButtonBar", 2));
+	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "ButtonBar", ri_TBR_DIFFERENCES_WIN));
 	fButtonBar->SetTarget(this);
 	
 	r = Bounds();

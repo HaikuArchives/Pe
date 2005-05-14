@@ -34,13 +34,13 @@
 #include "Types.r"
 
 
-//resource 'MENU' (400, "Font Popup") {
+//resource rt_POP (ri_POP_XFONT, "Font Popup") {
 //	"Font",
 //	{
 //	}
 //};
 //
-//resource 'MENU' (401, "Encoding Popup") {
+//resource rt_POP (ri_POP_XENCODING, "Encoding Popup") {
 //	"Encoding",
 //	{
 //		Item	{ "UTF-8", 'chng', none, noKey },
@@ -58,7 +58,7 @@
 //	}
 //};
 //
-//resource 'MENU' (402, "Line Breaks") {
+//resource rt_POP (ri_POP_XLINEBREAKS, "Line Breaks") {
 //	"Line Breaks",
 //	{
 //		Item	{ "Be", 'chng', none, noKey },
@@ -70,11 +70,11 @@
 resource 'DLOG' (10, "Window Options") {
 	{ 0, 0, 250, 140 }, "Window Options", B_TITLED_WINDOW, NORMAL,
 	{
-//		PopupMenu	{{ 	10,   8, 160,  28 }, "font",			"Font:",				400, 30					},
+//		PopupMenu	{{ 	10,   8, 160,  28 }, "font",			"Font:",				ri_POP_XFONT, 30		},
 //		Edit		{{ 161,  10, 240,  26 }, "size",			"Size:",				"", "0123456789", 2, 0	},
 //
-//		PopupMenu	{{  10,  33, 129,  53 }, "encoding",		"Encoding:",			401, 50					},
-//		PopupMenu	{{ 130,  33, 240,  53 }, "linebreaks",		"Linebreaks:",			402, 60					},
+//		PopupMenu	{{  10,  33, 129,  53 }, "encoding",		"Encoding:",			ri_POP_XENCODING, 50	},
+//		PopupMenu	{{ 130,  33, 240,  53 }, "linebreaks",		"Linebreaks:",			ri_POP_XLINEBREAKS, 60	},
 //
 //		CheckBox	{{  10,  60, 120,  76 }, "show tabs",		"Show Tabstops"									},
 //		Edit		{{ 130,  59, 240,  75 }, "tabs",			"Spaces per Tab:",		"", "0123456789", 3, 0	},

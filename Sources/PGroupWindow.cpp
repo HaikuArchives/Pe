@@ -46,6 +46,9 @@
 #include "MThread.h"
 #include "HButtonBar.h"
 #include "HPreferences.h"
+#include "HAppResFile.h"
+#include "ResourcesToolbars.h"
+#include "ResourcesMenus.h"
 
 const unsigned long msg_Done = 'done';
 
@@ -120,13 +123,19 @@ PGroupWindow::PGroupWindow(const entry_ref *doc)
 	
 	BRect r(Bounds());
 	
+	BMenuBar *mbar;
+	AddChild(mbar = HResources::GetMenuBar(r, ri_MBR_GROUP_WIN));
+	mbar->FindItem(msg_Quit)->SetTarget(be_app);
+
 	r.bottom = r.top + kToolBarHeight;
+	r.OffsetBy(0, mbar->Bounds().bottom + 1);
+	
 	AddChild(fToolBar = new PToolBar(r, "toolbar"));
 
 	r.bottom -= 2;
 	r.OffsetTo(0, 0);
 	
-	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "buttonbar", 1, this));
+	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "buttonbar", ri_TBR_GROUP_WIN, this));
 	
 	r = Bounds();
 	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT + 1;

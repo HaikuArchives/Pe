@@ -37,7 +37,7 @@
 
 /* Edit Window Menu */
 
-resource 'MENU' (0, "File Menu") {
+resource rt_MEN (ri_MEN_DW_FILE, "File Menu") {
 	"File",
 	{
 		Item		{ "New",					msg_New,						none,	'N'		},
@@ -45,7 +45,7 @@ resource 'MENU' (0, "File Menu") {
 		Item		{ "Open…",					msg_Open,						none,	'O'		},
 		Item		{ "Open from Server…",		msg_FtpOpen,					none,	noKey	},
 		Item		{ "Open Selection",			msg_OpenSelected,				none,	'D'		},
-		Submenu		{ 10																		},	
+		Submenu		{ ri_MEN_DW_RECENT															},	
 		Item		{ "Close",					msg_Close,						none,	'W'		},
 		Separator	{																			},
 		Item		{ "Save",					msg_Save,						none,	'S'		},
@@ -62,7 +62,7 @@ resource 'MENU' (0, "File Menu") {
 	}
 };
 
-resource 'MENU' (1, "Edit Menu") {
+resource rt_MEN (ri_MEN_DW_EDIT, "Edit Menu") {
 	"Edit",
 	{
 		Item		{ "Undo",					msg_Undo,						none,	'Z'		},
@@ -79,12 +79,12 @@ resource 'MENU' (1, "Edit Menu") {
 	}
 };
 
-resource 'MENU' (2, "Text Menu") {
+resource rt_MEN (ri_MEN_DW_TEXT, "Text Menu") {
 	"Text",
 	{
 		Item		{ "Balance",				msg_Balance,					none,	'B'		},
 		Item		{ "Twiddle",				msg_Twiddle,					none,	'\''	},
-		Submenu		{ 11																		},
+		Submenu		{ ri_MEN_DW_CHANGECASE														},
 		Item		{ "Change Encoding…",		msg_ConvertEncoding,			none,	noKey	},
 		Separator	{																			},
 		Item		{ "Shift Left",				msg_ShiftLeft,					none,	'['		},
@@ -101,7 +101,7 @@ resource 'MENU' (2, "Text Menu") {
 	}
 };
 
-resource 'MENU' (3, "Search Menu") {
+resource rt_MEN (ri_MEN_DW_SEARCH, "Search Menu") {
 	"Search",
 	{
 		Item		{ "Find…",					msg_FindCmd,					none,	'F'		},
@@ -125,7 +125,7 @@ resource 'MENU' (3, "Search Menu") {
 	}
 };
 
-resource 'MENU' (4, "Window Menu") {
+resource rt_MEN (ri_MEN_DW_WINDOW, "Window Menu") {
 	"Window",
 	{
 		Item		{ "File Options…",			msg_Info,						none,	noKey	},
@@ -143,7 +143,7 @@ resource 'MENU' (4, "Window Menu") {
 	}
 };
 
-resource 'MENU' (5, "Help Menu") {
+resource rt_MEN (ri_MEN_DW_HELP, "Help Menu") {
 	"Help",
 	{
 		Item		{ "Help…",					msg_Help,						none,	noKey	},
@@ -152,13 +152,13 @@ resource 'MENU' (5, "Help Menu") {
 	}
 };
 
-resource 'MENU' (6, "Extensions") {
+resource rt_MEN (ri_MEN_DW_EXTENSIONS, "Extensions") {
 	"Extensions",
 	{
 	}
 };
 
-resource 'MENU' (7, "BeIDE") {
+resource rt_MEN (ri_MEN_DW_BEIDE, "BeIDE") {
 	"BeIDE",
 	{
 		Item		{ "Bring to Front",			msg_IDE_BringToFront,			none,	noKey	},
@@ -171,13 +171,13 @@ resource 'MENU' (7, "BeIDE") {
 	}
 };
 
-resource 'MENU' (10, "Recent Menu") {
+resource rt_MEN (ri_MEN_DW_RECENT, "Recent Menu") {
 	"Open Recent",
 	{
 	}
 };
 
-resource 'MENU' (11, "Change Case Menu") {
+resource rt_MEN (ri_MEN_DW_CHANGECASE, "Change Case Menu") {
 	"Change Case",
 	{
 		Item		{ "Upper Case",				msg_ChangeCaseUpper,			none,	noKey	},
@@ -188,13 +188,19 @@ resource 'MENU' (11, "Change Case Menu") {
 	}
 };
 
-resource 'MBAR' (0, "Menu Bar") {
+resource rt_MBR (ri_MBR_DOCUMENT_WIN, "Menu Bar") {
 	{
-		0, 1, 2, 3, 6, 4, 5
+		ri_MEN_DW_FILE,
+		ri_MEN_DW_EDIT,
+		ri_MEN_DW_TEXT,
+		ri_MEN_DW_SEARCH,
+		ri_MEN_DW_EXTENSIONS,
+		ri_MEN_DW_WINDOW,
+		ri_MEN_DW_HELP
 	}
 };
 
-resource 'MENU' (20, "Mime types") {
+resource rt_MEN (ri_MEN_FP_MIMETYPES, "Mime types") {
 	"Mime Type",
 	{
 	}
@@ -202,7 +208,7 @@ resource 'MENU' (20, "Mime types") {
 
 /* Project Window Menu */
 
-resource 'MENU' (200)
+resource rt_MEN (ri_MEN_PW_FILE)
 {
 	"File",
 	{
@@ -216,7 +222,7 @@ resource 'MENU' (200)
 	}
 };
 
-resource 'MENU' (201)
+resource rt_MEN (ri_MEN_PW_EDIT)
 {
 	"Edit",
 	{
@@ -224,19 +230,19 @@ resource 'MENU' (201)
 	}
 };
 
-resource 'MBAR' (200)
-{	// group file
-	{ 200, 201 }
+resource rt_MBR (ri_MBR_PROJECT_WIN)
+{
+	{ ri_MEN_PW_FILE, ri_MEN_PW_EDIT }
 };
 
-resource 'MBAR' (201)
-{	// project file
-	{ 200 }
+resource rt_MBR (ri_MBR_GROUP_WIN)
+{
+	{ ri_MEN_PW_FILE }
 };
 
 /* Context Menus */
 
-resource 'MENU' (30, "Main view") {
+resource rt_POP (ri_POP_CTX_TEXT, "Main view") {
 	"pop-up",
 	{
 		Item		{ "Save",						msg_Save,					none,	noKey	},
