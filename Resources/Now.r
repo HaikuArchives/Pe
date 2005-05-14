@@ -31,7 +31,7 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
-//#include "Sources/Resources.h"
+//#include "Sources/ResourcesMisc.h"
 
 
 //type rt_TIM

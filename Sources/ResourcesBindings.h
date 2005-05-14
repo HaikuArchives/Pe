@@ -11,12 +11,12 @@
 #define RESOURCESBINDINGS_H
 
 
-/*** TYPES ***************************/
+/*** RESOURCE-TYPES ******************/
 #define rt_BND					'Bind'
 #define rt_CMD					'Cmnd'
 
 
-/*** ID'S ****************************/
+/*** RESOURCE-IDs ********************/
 
 // Commands (Don't change numbers until correspondent code is changed
 #define ri_CMD_EDITING				0

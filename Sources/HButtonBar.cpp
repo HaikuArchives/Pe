@@ -46,7 +46,7 @@
 HTool::HTool(HButtonBar *bar, float x, float width, int cmd=-1, const char *help="")
 	: fBar(bar), fCmd(cmd)
 	, fMenu(false), fToggle(false), fEnabled(true), fVisible(true), fDown(false), fOn(false)
-	, fIconStd(NULL), fIconAlt(NULL)
+	, fImageStd(NULL), fImageAlt(NULL)
 {
 	fHelp = strdup(help);
 	fFrame.Set(x, 3, x + width - 1, 18);
@@ -187,53 +187,11 @@ void HTool::DrawButton(unsigned char *icondat, bool pushed)
 	}
 } /* HTool::Draw */
 
-void HTool::ReadIcon(int resID)
+void HTool::ReadToolbarImage(unsigned char** dest, int resID)
 {
-	if (resID >= 0)
-	{
-		fIconStd = (unsigned char *)HResources::GetResource('MICN', resID);
-		FailNilRes(fIconStd);
-	}
-	else
-	{
-		fIconStd = (unsigned char *)malloc(256);
-		FailNil(fIconStd);
-		
-		BBitmap bm(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
-		BMimeType mt;
-		
-		try
-		{
-			switch (resID)
-			{
-				case -1:
-					FailOSErr(mt.SetTo("application/x-vnd.beunited.pe"));
-					FailOSErr(mt.GetIconForType("text/plain", &bm, B_MINI_ICON));
-					break;
-				case -2:
-				{
-					BNode n;
-					BPath p;
-					BNodeInfo ni;
-					
-					FailOSErr(find_directory(B_USER_CONFIG_DIRECTORY, &p));
-					FailOSErr(n.SetTo(p.Path()));
-					FailOSErr(ni.SetTo(&n));
-					FailOSErr(ni.GetTrackerIcon(&bm, B_MINI_ICON));
-					break;
-				}
-			}
-		}
-		catch (HErr& e)
-		{
-			e.DoError();
-			resID = 0;
-		}
-		
-		if (resID != -3)
-			memcpy(fIconStd, bm.Bits(), 256);
-	}
-} /* HTool::ReadIcon */
+	*dest = (unsigned char *)HResources::GetResource(rt_TBI, resID);
+	FailNilRes(*dest);
+} /* HTool::ReadToolbarImage */
 #pragma mark -
 
 HToolSeparator::HToolSeparator(HButtonBar *bar, float x)
@@ -260,14 +218,14 @@ HToolButton::HToolButton(HButtonBar *bar, int resID, int cmd, float x, int flags
 	fMenu = (flags & (1 << bfMenu)) != 0;
 	fToggle = (flags & (1 << bfToggle)) != 0 || fMenu;
 
-	ReadIcon(resID);
+	ReadToolbarImage(&fImageStd, resID);
 	
 	if (fMenu) fFrame.right += 7;
 } /* HToolButton::HToolButton */
 
 void HToolButton::Draw(bool pushed)
 {
-	DrawButton(fIconStd, pushed);
+	DrawButton(fImageStd, pushed);
 } /* HToolButton::Draw */
 
 void HToolButton::MouseEnter(bool pushed)
@@ -284,24 +242,21 @@ void HToolButton::MouseLeave()
 
 #pragma mark -
 
-HToolStateButton::HToolStateButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help)
+HToolStateButton::HToolStateButton(HButtonBar *bar, int resID1, int resID2, int cmd, float x, int flags, const char *help)
 	: HTool(bar, x, 16.0, cmd, help)
 {
 	fMenu = (flags & (1 << bfMenu)) != 0;
 	fToggle = true;
 
-	ReadIcon(resID);
+	ReadToolbarImage(&fImageStd, resID1);
+	ReadToolbarImage(&fImageAlt, resID2);
 	
 	if (fMenu) fFrame.right += 7;
-
-	fIconAlt = (unsigned char *)HResources::GetResource('MICN', resID + 1);
-	FailNilRes(fIconAlt);
-	
 } /* HToolStateButton::HToolStateButton */
 
 void HToolStateButton::Draw(bool pushed)
 {
-	DrawButton(fOn ? fIconAlt : fIconStd, pushed);
+	DrawButton(fOn ? fImageAlt : fImageStd, pushed);
 } /* HToolStateButton::Draw */
 
 void HToolStateButton::MouseEnter(bool pushed)
@@ -345,10 +300,10 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 	
 	while (bCnt--)
 	{
-		long bID, cmd, fl;
+		long bID1, bID2, cmd, fl;
 		char help[256];
 			
-		buf >> bID >> cmd >> fl >> help;
+		buf >> bID1 >> bID2 >> cmd >> fl >> help;
 		
 		if (fl & (1 << bfSpace))
 			x += 10.0;
@@ -357,9 +312,9 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 			if (fl & (1 << bfSeparator))
 				tool = new HToolSeparator(this, x);
 			else if (fl & (1 << bfDualIcon))
-				tool = new HToolStateButton(this, bID, cmd, x, fl, help);
+				tool = new HToolStateButton(this, bID1, bID2, cmd, x, fl, help);
 			else
-				tool = new HToolButton(this, bID, cmd, x, fl, help);
+				tool = new HToolButton(this, bID1, cmd, x, fl, help);
 
 			fTools.push_back(tool);
 			x = tool->Frame().right+6.0;

@@ -11,13 +11,13 @@
 #define RESOURCESMISC_H
 
 
-/*** TYPES ***************************/
+/*** RESOURCE-TYPES ******************/
 #define rt_WBT					'WBrT'
 #define rt_HTP					'HtmB'
 #define rt_TIM					'when'
 
 
-/*** ID'S ****************************/
+/*** RESOURCE-IDs ********************/
 
 // Wordbreaktable
 #define ri_WBT_LWORDBREAKTABLE		403

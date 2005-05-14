@@ -216,7 +216,7 @@ type 'DLOG' {
 };
 
 
-/* MiniIcon */
+/* MiniIcon + Tolbar Button Image */
 type 'MICN' {
 	hexstring;
 };

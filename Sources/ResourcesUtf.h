@@ -11,12 +11,12 @@
 #define RESOURCESUTF_H
 
 
-/*** TYPES ***************************/
+/*** RESOURCE-TYPES ******************/
 #define rt_UTBL					'Utbl'
 #define rt_UMAP					'UMap'
 
 
-/*** ID'S ****************************/
+/*** RESOURCE-IDs ********************/
 
 // Tables
 #define ri_UTF_TABLE_LETTERS		0

@@ -86,14 +86,14 @@ virtual	void MouseLeave();
 protected:
 	void DrawFrame(bool enter, bool active);
 	void DrawButton(unsigned char *icondat, bool pushed = false);
-	void ReadIcon(int resID);
+	void ReadToolbarImage(unsigned char** dest, int resID);
 
 	BRect fFrame;
 	HButtonBar *fBar;
 	char *fHelp;
 	int fCmd;
 	bool fMenu, fToggle, fEnabled, fVisible, fDown, fOn;
-	unsigned char *fIconStd, *fIconAlt;
+	unsigned char *fImageStd, *fImageAlt;
 };
 
 class HToolButton : public HTool {
@@ -107,7 +107,7 @@ virtual	void MouseLeave();
 
 class HToolStateButton : public HTool {
 public:
-			HToolStateButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help);
+			HToolStateButton(HButtonBar *bar, int resID1, int resID2, int cmd, float x, int flags, const char *help);
 			
 virtual	void Draw(bool pushed = false);
 virtual	void MouseEnter(bool pushed = false);

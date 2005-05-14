@@ -11,13 +11,13 @@
 #define RESOURCESMENUS_H
 
 
-/*** TYPES ***************************/
+/*** RESOURCE-TYPES ******************/
 #define rt_MBR					'MBAR'
 #define rt_MEN					'MENU'
 #define rt_POP					'MENU'
 
 
-/*** ID'S ****************************/
+/*** RESOURCE-IDs ********************/
 
 // Menubars
 #define ri_MBR_DOCUMENT_WIN			0

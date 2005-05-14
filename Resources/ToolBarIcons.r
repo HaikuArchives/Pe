@@ -32,10 +32,48 @@
 */
 
 #include "Types.r"
+#include "ResourcesToolbars.h"
 
 
-/* Save Document */
-resource 'MICN' (14) {
+resource rt_TBI (ri_TBI_NEW_DOCUMENT) {
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffffffffffffffffffffffff"
+	$"ffffffffffff00ffffffffffffffffff"
+	$"ffffffffff003f0000ffffffffffffff"
+	$"ffffffff003f4141410000ffffffffff"
+	$"ffffff003f4141414141410000ffffff"
+	$"ffff00414141414141414141410000ff"
+	$"ff004141414141414141414141410000"
+	$"004141424141414141414141410000b7"
+	$"b7000042424242424141424229900000"
+	$"ffb7000000434343434343009000b7b7"
+	$"ffffb700900000454545000000b7ffff"
+	$"ffffffb7006890004500b7b7ffffffff"
+	$"ffffffffb700000000b7b7ffffffffff"
+	$"ffffffffffb700b700b7ffffffffffff"
+	$"ffffffffffffb700b7ffffffffffffff"
+};
+
+resource rt_TBI (ri_TBI_OPEN_DOCUMENT) {
+	$"ffffffffff0000ffffffffffffffffff"
+	$"ffffffff0084840000ffff0000ffffff"
+	$"ffffff000000aa84840000d8d80000ff"
+	$"ffffff003f3f0000aa84848484d8d800"
+	$"0000ff003f3f3f1f0000aa8484848400"
+	$"003f00003f3f3f3f3f1f0000aa848400"
+	$"00d83f3f00003f3f3f3f3f3f00aa8400"
+	$"ff00d8d83f3f00003f3f3f3f00aa8400"
+	$"ff00d8d8d8d83f3f00003f3f00aa8400"
+	$"ffff00d8d8d8d8d83f3f003f00aa00ff"
+	$"ffff008484d8d8d8d8d8003f00aa00ff"
+	$"ffffff00008484d8d8d8d80000aa00ff"
+	$"ffffffffff00008484d8d80000aa00ff"
+	$"ffffffffffffff000084848400aa0010"
+	$"ffffffffffffffffff00008400000010"
+	$"ffffffffffffffffffffff00000010ff"
+};
+
+resource rt_TBI (ri_TBI_SAVE_DOCUMENT) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
@@ -54,8 +92,7 @@ resource 'MICN' (14) {
 	$"ffffffffffffff000e0effffffffffff"
 };
 
-/* Function Popupmenu */
-resource 'MICN' (10) {
+resource rt_TBI (ri_TBI_FUNCTION_POPUP) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
@@ -74,8 +111,7 @@ resource 'MICN' (10) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
-/* Header Popupmenu */
-resource 'MICN' (32) {
+resource rt_TBI (ri_TBI_HEADER_POPUP) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
@@ -94,8 +130,7 @@ resource 'MICN' (32) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
-/* Execute Command */
-resource 'MICN' (11) {
+resource rt_TBI (ri_TBI_EXECUTE_COMMAND) {
 	$"ffffffffffffffffffffff0000ffffff"
 	$"ffffffffffffffffffff00d8d800ffff"
 	$"ffffffffffffffffffff00fad8d800ff"
@@ -114,8 +149,7 @@ resource 'MICN' (11) {
 	$"ffffffff00000000ffffffffffffffff"
 };
 
-/* Find */
-resource 'MICN' (17) {
+resource rt_TBI (ri_TBI_FIND) {
 	$"ffffffffffffff0000000000ffffffff"
 	$"ffffffffff00003f3f3f3f3f0000ffff"
 	$"ffffffff003f3f00000000003f3f00ff"
@@ -134,8 +168,7 @@ resource 'MICN' (17) {
 	$"ff00000fffffffffffffffffffffffff"
 };
 
-/* Incremental Search */
-resource 'MICN' (13) {
+resource rt_TBI (ri_TBI_INC_SEARCH) {
 	$"ffffffffffffff0000000000ffffffff"
 	$"ffffffffff00003f3f3f3f3f0000ffff"
 	$"ffffffff003f3f00000000003f3f00ff"
@@ -154,8 +187,7 @@ resource 'MICN' (13) {
 	$"ff00000fffffffffff00ffffff00ffff"
 };
 
-/* Read Only Off */
-resource 'MICN' (15) {
+resource rt_TBI (ri_TBI_READONLY_OFF) {
 	$"ffffffffffffffffffff0b0000ffffff"
 	$"ffffffffffffffffff000b3f5a00ffff"
 	$"ffffffffffffffff005c0b3f5a5a00ff"
@@ -174,8 +206,7 @@ resource 'MICN' (15) {
 	$"0a000affffffffffffffffffffffffff"
 };
 
-/* Read Only On */
-resource 'MICN' (16) {
+resource rt_TBI (ri_TBI_READONLY_ON) {
 	$"ff2dffffffffffffffff0b0000ffffff"
 	$"2d2d2dffffffffffff000b3f5a00ffff"
 	$"ff2d2d2dffffffff005c0b3f5a5a00ff"
@@ -194,8 +225,7 @@ resource 'MICN' (16) {
 	$"0a000affffffffffffffffffffff2dff"
 };
 
-/* File Options */
-resource 'MICN' (12) {
+resource rt_TBI (ri_TBI_FILE_OPTIONS) {
 	$"ffffffffff000000ffffffffffffffff"
 	$"ffffffff00f2232400ffffffffffffff"
 	$"ffffff00f23ff2232400ffffffffffff"
@@ -214,8 +244,7 @@ resource 'MICN' (12) {
 	$"ffffffffffffffff001313ffffffffff"
 };
 
-/* Softwrap On */
-Resource 'MICN' (19) {
+Resource rt_TBI (ri_TBI_SOFTWRAP_ON) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ff1212121212121212bb1212121212ff"
 	$"ff123f3f3f3f3f3f3fbb3f3f3f3f12ff"
@@ -234,8 +263,7 @@ Resource 'MICN' (19) {
 	$"ff1212121212121212bb1212121212ff"
 };
 
-/* Softwrap Off */
-Resource 'MICN' (18) {
+Resource rt_TBI (ri_TBI_SOFTWRAP_OFF) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ff1212121212121212f21212121212ff"
 	$"ff123f3f3f3f3f3f3ff23f3f3f3f12ff"
@@ -254,8 +282,7 @@ Resource 'MICN' (18) {
 	$"ff1212121212121212f21212121212ff"
 };
 
-/* Edit As Project */
-Resource 'MICN' (31) {
+Resource rt_TBI (ri_TBI_EDIT_AS_PROJECT) {
 	$"fffffafafafafafafafaffffffffffff"
 	$"fffffafafafafafafafaffffffffffff" 
 	$"ffff090909090909090909090909ffff" 
@@ -274,8 +301,7 @@ Resource 'MICN' (31) {
 	$"ffff090909090909090909090909ffff"
 };
 
-/* ArrowRight */
-resource 'MICN' (26) {
+resource rt_TBI (ri_TBI_ARROW_RIGHT) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffff0000ffffffffff"
@@ -294,8 +320,7 @@ resource 'MICN' (26) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
-/* ArrowLeft */
-resource 'MICN' (25) {
+resource rt_TBI (ri_TBI_ARROW_LEFT) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffff0000ffffffffffffffffff"
@@ -314,8 +339,7 @@ resource 'MICN' (25) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
-/* ArrowRound */
-resource 'MICN' (27) {
+resource rt_TBI (ri_TBI_ARROW_CIRCLE) {
 	$"ffffffffff0000000000ffffffffffff"
 	$"ffffff0000fafafafafa0000ffffffff"
 	$"ffff00fafaf9f9f9f9f9f95d00ffffff"
@@ -334,48 +358,45 @@ resource 'MICN' (27) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
-/* Folder1 */
-resource 'MICN' (28) {
+resource rt_TBI (ri_TBI_FOLDER_1) {
 	$"ffffffffff0000ffffffffffffffffff"
-	$"ffffff000000840100ffff090bffffff"
-	$"00001e00fd0c0d8484000084d80b00ff"
-	$"00d80000fdfdfd0c0d8484d85ad8d801"
-	$"ff001fd8af11fdfdfd0c0d84d884d801"
-	$"ff00d81fd81f0d0dfdfdfd0c0dd88400"
-	$"ff001fd81fd8d81f0d90fdfdfd0a00ff"
-	$"ff00d81fd81fd8d8d8d8890dfa0a00ff"
-	$"ffff00d8d8d8d81fd8d8d80bfa0800ff"
-	$"4d4d4d4d4d4dd8d8d8d8d80bfa00ffff"
-	$"4d4d6d004d4dd8d8d8d8d8d80b00ffff"
-	$"4d4d00004d4dd8d8d8d8d8d803000e11"
-	$"4d4d4d004d4d84d8d8d8d8d800000f0f"
-	$"4d4d4d004d4d000084d8d8d800050fff"
-	$"4d4d8e008e4dffff000084d80011ffff"
-	$"4d4d4d4d4d4dffffffff000000ffffff"
+	$"ffffffff0084840000ffff0000ffffff"
+	$"ffffff000000aa84840000d8d80000ff"
+	$"ffffff003f3f0000aa84848484d8d800"
+	$"0000ff003f3f3f1f0000aa8484848400"
+	$"003f00003f3f3f3f3f1f0000aa848400"
+	$"00d83f3f00003f3f3f3f3f3f00aa8400"
+	$"ff00d8d83f3f00003f3f3f3f00aa8400"
+	$"ff00d8d8d8d83f3f00003f3f00aa8400"
+	$"4d4d4d4d4d4dd8d83f3f003f00aa00ff"
+	$"4d4d6d004d4dd8d8d8d8003f00aa00ff"
+	$"4d4d00004d4d84d8d8d8d80000aa00ff"
+	$"4d4d4d004d4d008484d8d80000aa00ff"
+	$"4d4d4d004d4dff000084848400aa0010"
+	$"4d4d8e008e4dffffff00008400000010"
+	$"4d4d4d4d4d4dffffffffff00000010ff"
 };
 
-/* Folder2 */
-resource 'MICN' (29) {
+resource rt_TBI (ri_TBI_FOLDER_2) {
 	$"ffffffffff0000ffffffffffffffffff"
-	$"ffffff000000840100ffff090bffffff"
-	$"00001e00fd0c0d8484000084d80b00ff"
-	$"00d80000fdfdfd0c0d8484d85ad8d801"
-	$"ff001fd8af11fdfdfd0c0d84d884d801"
-	$"ff00d81fd81f0d0dfdfdfd0c0dd88400"
-	$"ff001fd81fd8d81f0d90fdfdfd0a00ff"
-	$"ff00d81fd81fd8d8d8d8890dfa0a00ff"
-	$"ffff00d8d8d8d81fd8d8d80bfa0800ff"
-	$"4d4d4d4d4d4dd8d8d8d8d80bfa00ffff"
-	$"4d6d00006d4dd8d8d8d8d8d80b00ffff"
-	$"4d004d6dae4dd8d8d8d8d8d803000e11"
-	$"4d4d4dae4d4d84d8d8d8d8d800000f0f"
-	$"4d6dae4d4d4d000084d8d8d800050fff"
-	$"4d000000ae4dffff000084d80011ffff"
-	$"4d4d4d4d4d4dffffffff000000ffffff"
+	$"ffffffff0084840000ffff0000ffffff"
+	$"ffffff000000aa84840000d8d80000ff"
+	$"ffffff003f3f0000aa84848484d8d800"
+	$"0000ff003f3f3f1f0000aa8484848400"
+	$"003f00003f3f3f3f3f1f0000aa848400"
+	$"00d83f3f00003f3f3f3f3f3f00aa8400"
+	$"ff00d8d83f3f00003f3f3f3f00aa8400"
+	$"ff00d8d8d8d83f3f00003f3f00aa8400"
+	$"4d4d4d4d4d4dd8d83f3f003f00aa00ff"
+	$"4d6d00006d4dd8d8d8d8003f00aa00ff"
+	$"4d004d6dae4d84d8d8d8d80000aa00ff"
+	$"4d4d4dae4d4d008484d8d80000aa00ff"
+	$"4d6dae4d4d4dff000084848400aa0010"
+	$"4d000000ae4dffffff00008400000010"
+	$"4d4d4d4d4d4dffffffffff00000010ff"
 };
 
-/* FilePlus */
-resource 'MICN' (20) {
+resource rt_TBI (ri_TBI_FILE_ADD) {
 	$"ffffffffffffffff0000000000ffffff"
 	$"ffffffffffffffff00faf95d00ffffff"
 	$"ffffffffffffffff00faf95d00ffffff"
@@ -394,8 +415,7 @@ resource 'MICN' (20) {
 	$"ffffffffffb700b7ffb7ffffffffffff"
 };
 
-/* FileMinus */
-resource 'MICN' (21) {
+resource rt_TBI (ri_TBI_FILE_REMOVE) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
@@ -414,8 +434,7 @@ resource 'MICN' (21) {
 	$"ffffffffffb700b7ffb7ffffffffffff"
 };
 
-/* FilePencil */
-resource 'MICN' (22) {
+resource rt_TBI (ri_TBI_FILE_PENCIL) {
 	$"ffffffffffffffffffffffff0a0b0aff"
 	$"ffffffffffffffffffffff0a24858500"
 	$"ffffffffffffffffffff0a2486858501"
