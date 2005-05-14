@@ -37,16 +37,6 @@
 
 const int kMaxNameSize = 256;
 
-inline bool isidentf(char c)	
-{
-	return (isalpha(c) || ((c) == '_'));
-}
-
-inline bool isident(char c)	
-{
-	return (isalnum(c) || ((c) == '_'));
-}
-
 bool is_template(const char *text);
 const char *comment(const char *text, bool strippp = true,
 	CLanguageProxy* proxy = NULL);
@@ -59,6 +49,18 @@ const char *params(const char *text, char *&name, int& size);
 const char *ident(const char *text, CLanguageProxy& proxy);
 const char *i_extern(const char *text);
 void parse(const char *text);
+
+inline bool isidentf(char c)	
+{
+	// Could this be the first character of an identifier?
+	return (isalpha(c) || ((c) == '_'));
+}
+
+inline bool isident(char c)	
+{
+	// Could this be a subsequent character of an identifier?
+	return (isalnum(c) || ((c) == '_'));
+}
 
 const char *skip(const char *text, char ch)
 {
@@ -220,6 +222,14 @@ inline void name_append(const char*& text, char*& name, int& size)
 		text++;
 } /* name_append */
 
+inline void name_append(const char*& text, int textSize, char*& name, int& nameSize)
+{
+	while (textSize-- > 0)
+	{
+		name_append(text, name, nameSize);
+	}
+} /* name_append */
+
 void pragma(const char *&text, int offset, CLanguageProxy& proxy)
 {
 	while (isspace(*text))
@@ -305,54 +315,79 @@ const char *i_extern(const char *text)
 	return text;
 } /* i_extern */
 
+/** Puts all function parameters in the input buffer (\a text) to the
+ *	provided buffer \a name.
+ */
 const char *params(const char *text, char *&name, int& size)
 {
 	int c;
-	
+
 	while (true)
 	{
 		text = comment(text);
 
 		c = *text;
-		
+
 		if (c == '\'') 
 		{
 			text = skip(text+1, '\'');
 			continue;
 		}
-		
+
 		if (c == '"') 
 		{
 			text = skip(text+1, '"');
 			continue;
 		}
-		
+
 		if (c == '#') 
 		{
 			text = skip(text+1, '\n');
 			continue;
 		}
-		
+
 		if (c == '(')
 		{
 			text = parens(text+1, '(');
 			continue;
 		}
-		
+
 		if (c == ')')
 			return text+1;
-		
+
 		if (c == '\0')
 			return text;
-			
+
 		if (isidentf(c))
-		{ // fetch one param-spec:
+		{
+			// fetch a single parameter
+			int numParens = 0;
 			while(*text != ')' && *text != ',' && *text != '=')
-				name_append(text, name, size);
-			while(isspace(*name) && size>0) {
+			{
+				if (*text == '(')
+				{
+					const char *end = parens(text + 1, '(');
+					name_append(text, end - text, name, size);
+					numParens++;
+				} 
+				else
+					name_append(text, name, size);
+			}
+			if (numParens != 0 && numParens != 2)
+			{
+				// this ain't a valid parameter
+				// (returning this value is likely to let ident() fail...)
+				// ToDo: we should be able to cleanly break out of a parameter scan!
+				return text - 1;
+			}
+
+			// cut off trailing spaces from the name
+			while(size > 0 && isspace(name[-1])) {
 				name--;
 				size--;
 			}
+
+			// eat a default value
 			if (*text == '=') {
 				while(*text != ')' && *text != ',') {
 					if (*text == '(')
@@ -362,9 +397,15 @@ const char *params(const char *text, char *&name, int& size)
 				}
 				text = comment(text);
 			}
+
+			// If there is a parameter following, add ", " to the name
 			if (*text == ',') {
 				name_append(text, name, size);
-				*name++ = ' ';
+				if (size < kMaxNameSize - 1) 
+				{
+					*name++ = ' ';
+					size++;
+				}
 			}
 			continue;
 		}
