@@ -669,7 +669,8 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 		text = comment(text);
 		
 		if (*text == ':')
-		{	// [zooey]: what does this do? please explain!
+		{
+			// This is obviously a constructor with member initialization
 			while (*text != '{' && *text != ';')
 				text++;
 			if (*text == '{')
