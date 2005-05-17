@@ -94,12 +94,16 @@ static		vector<char*> sfTenLastDocs;
 virtual	void CreateFilePanel();
 			void CopyAttributes(BFile& from, BFile& to);
 
+			void StartWatchingFile(void);
+			void StopWatchingFile(void);
+
 			BLooper *fTarget;
 			string fMimeType;
 			bool fDirty;
 			bool fWaitForSave;
 			bool fReadOnly;
 			entry_ref *fFile;
+			node_ref fNodeRef;
 			URLData *fURL;
 			BFilePanel *fSavePanel;
 };

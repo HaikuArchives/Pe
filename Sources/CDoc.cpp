@@ -41,6 +41,8 @@
 #include "MAlert.h"
 #include "HPreferences.h"
 #include "CMessages.h"
+
+#include <NodeMonitor.h>
 #include <fs_attr.h>
 
 doclist CDoc::sfDocList;
@@ -61,23 +63,23 @@ CDoc::CDoc(const char* mimetype, BLooper *target, const entry_ref *doc)
 		entry_ref ref;
 		BEntry e;
 		FailOSErr(e.SetTo(doc, true));
-		
+
 		fFile = new entry_ref;
 		FailOSErr(e.GetRef(fFile));
-	
+
 		FailOSErr(e.SetTo(doc));
 		FailOSErr(e.GetParent(&gCWD));
 
 		BNode node;
 		FailOSErr(node.SetTo(fFile));
-		
+
 		struct stat st;
 		FailOSErr(node.GetStat(&st));
 
 		fReadOnly = ! ((gUid == st.st_uid && (S_IWUSR & st.st_mode)) ||
 							(gGid == st.st_gid && (S_IWGRP & st.st_mode)) ||
 							(S_IWOTH & st.st_mode));
-		
+
 		char s[NAME_MAX];
 		if (BNodeInfo(&node).GetType(s) == B_OK)
 			fMimeType = s;
@@ -106,10 +108,10 @@ CDoc::CDoc(BLooper *target, URLData& url)
 CDoc::~CDoc()
 {
 	sfDocList.remove(this);
-	
-	if (fSavePanel) delete fSavePanel;
-	if (fFile) delete fFile;
-	
+
+	delete fSavePanel;
+	delete fFile;
+
 	be_app->PostMessage(msg_DocClosed);
 } /* CDoc::~CDoc */
 
@@ -149,6 +151,29 @@ bool CDoc::QuitRequested()
 
 	return result;
 } /* CDoc::QuitRequested */
+
+void CDoc::StartWatchingFile()
+{
+	BWindow *window = dynamic_cast<BWindow *>(this);
+
+	if (fFile == NULL || window == NULL)
+		return;
+
+	// start monitoring this file for changes
+	BNode node(fFile);
+	if (node.GetNodeRef(&fNodeRef) == B_OK)
+		watch_node(&fNodeRef, B_WATCH_NAME | B_WATCH_STAT, window);
+} /* CDoc::StartWatchingFile */
+
+void CDoc::StopWatchingFile()
+{
+	BWindow *window = dynamic_cast<BWindow *>(this);
+
+	if (fFile == NULL || window == NULL)
+		return;
+
+	watch_node(&fNodeRef, B_STOP_WATCHING, window);
+} /* CDoc::StopWatchingFile */
 
 void CDoc::Read()
 {
@@ -222,8 +247,12 @@ void CDoc::Save()
 		{
 			if (existed)
 			{
-				FailOSErr(BFile(fFile, B_READ_ONLY).GetCreationTime(&created));
-	
+				StopWatchingFile();
+
+				BFile file;
+				FailOSErr(file.SetTo(fFile, B_READ_ONLY));
+				FailOSErr(file.GetCreationTime(&created));
+
 				string bname(name);
 				bname += '~';
 				
@@ -257,6 +286,9 @@ void CDoc::Save()
 
 			BNodeInfo(&file).SetType(fMimeType.c_str());
 			SetDirty(false);
+
+			file.Unset();
+			StartWatchingFile();
 		}
 		catch (HErr& err)
 		{
@@ -359,7 +391,9 @@ void CDoc::SaveRequested(entry_ref& directory, const char *name)
 		
 		fReadOnly = false;
 		
-		if (!fFile) fFile = new entry_ref;
+		if (!fFile)
+			fFile = new entry_ref;
+
 		FailNil(fFile);
 		FailOSErr(e.GetRef(fFile));
 		

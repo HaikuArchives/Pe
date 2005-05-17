@@ -49,7 +49,6 @@
 #include "CFtpStream.h"
 #include "CUrlOpener.h"
 #include "PKeyDownFilter.h"
-#include <fs_attr.h>
 #include "HButtonBar.h"
 #include "HPreferences.h"
 #include "MTextAddOn.h"
@@ -72,6 +71,9 @@
 #include "PProjectWindow.h"
 #include "ResourcesToolbars.h"
 #include "ResourcesMenus.h"
+
+#include <NodeMonitor.h>
+#include <fs_attr.h>
 
 static long sDocCount = 0;
 
@@ -97,18 +99,17 @@ PDoc::PDoc(const entry_ref *doc, bool show)
 	{
 		Read();
 
-		BPath p;
-		BEntry e(doc);
-		
-		e.GetPath(&p);
-		fStatus->SetPath(p.Path());
-		if (show)
-			AddRecent(p.Path());
+		BEntry entry(doc);
 
-		if (gPrefs->GetPrefInt("fullpath", 1))
-			SetTitle(p.Path());
-		else
-			SetTitle(doc->name);
+		BPath path;
+		entry.GetPath(&path);
+
+		fStatus->SetPath(path.Path());
+		if (show)
+			AddRecent(path.Path());
+
+		StartWatchingFile();
+		UpdateTitle();
 	}
 	else
 		fLastSaved = 0;
@@ -160,6 +161,9 @@ PDoc::~PDoc()
 		(*i)->Lock();
 		(*i)->Quit();
 	}
+
+	if (fFile != NULL)
+		StopWatchingFile();
 } /* PDoc::~PDoc */
 
 bool PDoc::QuitRequested()
@@ -309,6 +313,22 @@ void PDoc::InitWindow(const char *name)
 
 	ResetMenuShortcuts();
 } /* PDoc::InitWindow */
+
+void PDoc::UpdateTitle()
+{
+	if (fFile == NULL)
+		return;
+
+	BEntry entry(fFile);
+
+	BPath path;
+	entry.GetPath(&path);
+
+	if (gPrefs->GetPrefInt("fullpath", 1))
+		SetTitle(path.Path());
+	else
+		SetTitle(fFile->name);
+} /* PDoc::UpdateTitle */
 
 void PDoc::SaveOnServer(URLData& url)
 {
@@ -655,45 +675,12 @@ void PDoc::WindowActivated(bool active)
 		sfDocList.push_front(this);
 	}
 
-	try
-	{
-		if (active && gPrefs->GetPrefInt("verify", 1))
-		{
-			if (fFile)
-			{
-				BFile file;
-				FailOSErr(file.SetTo(fFile, B_READ_ONLY));
-				
-				time_t t;
-				FailOSErr(file.GetModificationTime(&t));
-				if (fLastSaved && t > fLastSaved + 1)
-				{
-					char s[PATH_MAX + 20];
-					sprintf(s, "File %s was modified, reload it?", fFile->name);
-					MInfoAlert a(s, "Reload", "Cancel");
-					
-					if (a.Go() == 1)
-						Read();
-				}
-				
-				fLastSaved = t;
-			}
-		}
-		if (active && gPrefs->GetPrefInt("show htmlpalette", 1)
+	if (active && gPrefs->GetPrefInt("show htmlpalette", 1)
 		&& gPrefs->GetPrefInt("show htmlpalette for html", 1)) {
 			BMessage msg(fMimeType == "text/html" 
 								? msg_ShowHTMLPalette 
 								: msg_HideHTMLPalette);
 			be_app->PostMessage(&msg);
-		}
-	}
-	catch (HErr& e)
-	{
-		delete fFile;
-		fFile = NULL;
-
-		MWarningAlert a("This file seems to have disappeared!");
-		a.Go();
 	}
 } /* PDoc::WindowActivated */
 
@@ -1347,6 +1334,71 @@ void PDoc::MessageReceived(BMessage *msg)
 	{
 		switch (what)
 		{
+			case B_NODE_MONITOR:
+				int32 opcode;
+				if (fFile == NULL || msg->FindInt32("opcode", &opcode) != B_OK)
+					break;
+
+				switch (opcode)
+				{
+					case B_ENTRY_MOVED:
+					{
+						int64 directory;
+						if (msg->FindInt64("to directory", &directory) == B_OK)
+							fFile->directory = directory;
+
+						const char *name;
+						if (msg->FindString("name", &name) == B_OK)
+							fFile->set_name(name);
+
+						UpdateTitle();
+						break;
+					}
+					case B_ENTRY_REMOVED:
+					{
+						delete fFile;
+						fFile = NULL;
+
+						MWarningAlert a("This file has been deleted!");
+						a.Go();
+						break;
+					}
+					case B_STAT_CHANGED:
+						try
+						{
+							if (gPrefs->GetPrefInt("verify", 1))
+							{
+								BFile file;
+								FailOSErr(file.SetTo(fFile, B_READ_ONLY));
+
+								time_t t;
+								FailOSErr(file.GetModificationTime(&t));
+								if (fLastSaved && t > fLastSaved + 1)
+								{
+									char s[PATH_MAX + 20];
+									sprintf(s, "File %s was modified by another application, reload it?", fFile->name);
+									MInfoAlert a(s, "Reload", "Cancel");
+
+									if (a.Go() == 1)
+										Read();
+								}
+
+								fLastSaved = t;
+							}
+						}
+						catch (HErr& e)
+						{
+							delete fFile;
+							fFile = NULL;
+
+							MWarningAlert a("This file seems to have disappeared!");
+							a.Go();
+						}
+						break;
+				}
+				msg->PrintToStream();
+				break;
+
 			case msg_CloseAll:
 			{
 				doclist lst = sfDocList;
@@ -1474,9 +1526,10 @@ void PDoc::MessageReceived(BMessage *msg)
 			case msg_PrefsChanged:
 				fText->SetViewColor(gPrefs->GetPrefColor("low color", kViewColor));
 				fText->Invalidate();
-				
+
 				fStatus->Draw(fStatus->Bounds());
 				ResetMenuShortcuts();
+				UpdateTitle();
 				break;
 			
 			case msg_SwitchHeaderSource:

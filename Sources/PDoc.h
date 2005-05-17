@@ -162,6 +162,7 @@ private:
 //			bool IDEOpenSourceHeader(entry_ref& ref);
 			
 			void ShowRecentMenu(BPoint where, bool showalways);
+			void UpdateTitle();
 
 			HButtonBar *fButtonBar;
 			vector<HDialog*> fDialogs;
