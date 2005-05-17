@@ -52,7 +52,7 @@ virtual			~CDoc();
 	
 			bool QuitRequested();
 			
-			void Read();
+			void Read(bool readAttributes = true);
 virtual	void ReadData(BPositionIO& file) = 0;
 virtual	void ReadAttr(BFile& file) = 0;
 

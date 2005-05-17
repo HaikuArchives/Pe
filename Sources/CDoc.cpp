@@ -175,17 +175,18 @@ void CDoc::StopWatchingFile()
 	watch_node(&fNodeRef, B_STOP_WATCHING, window);
 } /* CDoc::StopWatchingFile */
 
-void CDoc::Read()
+void CDoc::Read(bool readAttributes)
 {
 	if (!fFile && !fURL) THROW(("No file available"));
-	
+
 	if (fFile)
 	{
 		BFile file;
 		FailOSErr(file.SetTo(fFile, B_READ_ONLY));
-		
+
 		ReadData(file);
-		ReadAttr(file);
+		if (readAttributes)
+			ReadAttr(file);
 	}
 	else
 	{

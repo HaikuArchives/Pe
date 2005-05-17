@@ -1356,11 +1356,18 @@ void PDoc::MessageReceived(BMessage *msg)
 					}
 					case B_ENTRY_REMOVED:
 					{
-						delete fFile;
+						StopWatchingFile();
+
+						// ToDo: this is annoying, as CVS seems to delete the
+						//	file on commit (probably because of the RCS line)
+						//	Maybe we want to wait a bit and then check if there
+						//	appears a file with the same name again (and compare 
+						//	them).
+						/*delete fFile;
 						fFile = NULL;
 
 						MWarningAlert a("This file has been deleted!");
-						a.Go();
+						a.Go();*/
 						break;
 					}
 					case B_STAT_CHANGED:
@@ -1380,10 +1387,13 @@ void PDoc::MessageReceived(BMessage *msg)
 									MInfoAlert a(s, "Reload", "Cancel");
 
 									if (a.Go() == 1)
-										Read();
+										Read(false);
 								}
 
-								fLastSaved = t;
+								fLastSaved = time(NULL);
+									// if more than one update request was issued
+									// in the mean time, only the first one is
+									// considered
 							}
 						}
 						catch (HErr& e)
@@ -1396,7 +1406,6 @@ void PDoc::MessageReceived(BMessage *msg)
 						}
 						break;
 				}
-				msg->PrintToStream();
 				break;
 
 			case msg_CloseAll:
