@@ -3280,7 +3280,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 		IncSearchKey(&s, 1);
 		return true;
 	}
-	
+
 	float h = Bounds().Height();
 	BScrollBar *bar = fActivePart == 1 ? fVScrollBar1 : fVScrollBar2;
 	float barValue = bar->Value();
@@ -3668,6 +3668,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 			handled = false;
 			scroll = false;
 			clearLastCommand = false;
+			catchOffset = false;
 			break;
 	}
 
