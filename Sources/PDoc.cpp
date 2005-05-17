@@ -1357,6 +1357,7 @@ void PDoc::MessageReceived(BMessage *msg)
 					case B_ENTRY_REMOVED:
 					{
 						StopWatchingFile();
+						SetDirty(true);
 
 						// ToDo: this is annoying, as CVS seems to delete the
 						//	file on commit (probably because of the RCS line)
