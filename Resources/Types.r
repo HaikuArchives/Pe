@@ -36,7 +36,7 @@
 
 
 /* Menu */
-type rt_MEN {
+type rtyp_Menu {
 	cstring;										// Name
 	array {
 		switch {
@@ -68,7 +68,7 @@ type rt_MEN {
 
 
 /* MenuBar */
-type rt_MBR {
+type rtyp_Mbar {
 	array {
 		integer;									// Menu id's
 	};
@@ -239,7 +239,7 @@ type 'CURS' {
 
 
 /* Command */
-type rt_CMD {
+type rtyp_Cmnd {
 	longint = $$CountOf(binding);
 	array binding {
 		longint;									// Command
@@ -249,7 +249,7 @@ type rt_CMD {
 
 
 /* Bindings */
-type rt_BND {
+type rtyp_Bind {
 	longint = $$CountOf(cmdbinding);				// Number of Bindings
 	array cmdbinding {
 

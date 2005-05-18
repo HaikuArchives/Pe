@@ -34,13 +34,13 @@
 //#include "Sources/ResourcesMisc.h"
 
 
-//type rt_TIM
+//type rtyp_Time
 type 'when'
 {
 	cstring;
 };
 
-//resource rt_TIM (ri_TIM_COMPILED, "Compilation date and time")
+//resource rtyp_Time (rid_Time_Compiled, "Compilation date and time")
 resource 'when' (0, "Compilation date and time")
 {
 	$$date ", " $$time

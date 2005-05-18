@@ -903,7 +903,7 @@ void CPrefsDialog::RegisterFields()
 
 void CPrefsDialog::InitKeybindingPage()
 {
-	int resID = ri_CMD_EDITING;
+	int resID = rid_Cmnd_Editing;
 	
 	while (true)
 	{
@@ -912,7 +912,7 @@ void CPrefsDialog::InitKeybindingPage()
 		const char *name;
 
 		size_t size;
-		const void *p = HResources::GetResource(rt_CMD, resID, size, &name);
+		const void *p = HResources::GetResource(rtyp_Cmnd, resID, size, &name);
 		if (p == NULL)
 			break;
 
@@ -922,7 +922,7 @@ void CPrefsDialog::InitKeybindingPage()
 		MyItem *mom = new MyItem(name, 0);
 		fKBCommands->AddItem(mom);
 		
-		if (resID == ri_CMD_EXTENSIONS)
+		if (resID == rid_Cmnd_Extensions)
 		{
 			BPopUpMenu menu("hoi");
 			PDoc::BuildExtensionsMenu(&menu);

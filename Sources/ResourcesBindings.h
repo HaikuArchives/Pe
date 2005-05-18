@@ -12,35 +12,35 @@
 
 
 /*** RESOURCE-TYPES ******************/
-#define rt_BND					'Bind'
-#define rt_CMD					'Cmnd'
+#define rtyp_Bind				'Bind'
+#define rtyp_Cmnd				'Cmnd'
 
 
 /*** RESOURCE-IDs ********************/
 
 // Commands (Don't change numbers until correspondent code is changed
-#define ri_CMD_EDITING				0
-#define ri_CMD_FILE_MENU			1
-#define ri_CMD_EDIT_MENU			2
-#define ri_CMD_TEXT_MENU			3
-#define ri_CMD_SEARCH_MENU			4
-#define ri_CMD_WINDOW_MENU			5
-#define ri_CMD_HELP_MENU			6
-#define ri_CMD_BEIDE_MENU			7
-#define ri_CMD_MISCELLANEOUS		8
-#define ri_CMD_EXTENSIONS			9
+#define rid_Cmnd_Editing			0
+#define rid_Cmnd_FileMenu			1
+#define rid_Cmnd_EditMenu			2
+#define rid_Cmnd_TextMenu			3
+#define rid_Cmnd_SearchMenu			4
+#define rid_Cmnd_WindowMenu			5
+#define rid_Cmnd_HelpMenu			6
+#define rid_Cmnd_BeideMenu			7
+#define rid_Cmnd_Miscellaneous		8
+#define rid_Cmnd_Extensions			9
 
 // Bindings (Don't change numbers until correspondent code is changed
-#define ri_BND_EDITING				0
-#define ri_BND_FILE_MENU			1
-#define ri_BND_EDIT_MENU			2
-#define ri_BND_TEXT_MENU			3
-#define ri_BND_SEARCH_MENU			4
-#define ri_BND_WINDOW_MENU			5
-#define ri_BND_HELP_MENU			6
-#define ri_BND_BEIDE_MENU			7
-#define ri_BND_MISCELLANEOUS		8
-#define ri_BND_EMACS				9
+#define rid_Bind_Editing			0
+#define rid_Bind_FileMenu			1
+#define rid_Bind_EditMenu			2
+#define rid_Bind_TextMenu			3
+#define rid_Bind_SearchMenu			4
+#define rid_Bind_WindowMenu			5
+#define rid_Bind_HelpMenu			6
+#define rid_Bind_BeideMenu			7
+#define rid_Bind_Miscellaneous		8
+#define rid_Bind_Emacs				9
 
 
 #endif // RESOURCESBINDINGS_H

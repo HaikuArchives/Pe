@@ -63,7 +63,7 @@ BMenuBar* HResources::GetMenuBar(BRect r, int id)
 	FailNil(mbar);
 	
 	size_t size;
-	const short *lst = (short *)GetResource(rt_MBR, id, size);
+	const short *lst = (short *)GetResource(rtyp_Mbar, id, size);
 	FailNilRes(lst);
 	
 	for (uint32 i = 0; i < (size / 2); i++)
@@ -75,7 +75,7 @@ BMenuBar* HResources::GetMenuBar(BRect r, int id)
 BMenu* HResources::GetMenu(int id, bool popup)
 {
 	size_t size;
-	const char *m = (char *)GetResource(rt_MEN, id, size);
+	const char *m = (char *)GetResource(rtyp_Menu, id, size);
 	if (!m) throw HErr("Could not find resource!");
 	
 	BMemoryIO buf(m, size);

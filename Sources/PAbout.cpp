@@ -96,7 +96,7 @@ static const char *Now()
 #if STANDALONE
 	return "now";
 #else
-	static const char *now = (char *)HResources::GetResource(rt_TIM, ri_TIM_COMPILED);
+	static const char *now = (char *)HResources::GetResource(rtyp_Time, rid_Time_Compiled);
 	return now;
 #endif
 } /* Now */

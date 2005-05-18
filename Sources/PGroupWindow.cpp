@@ -124,7 +124,7 @@ PGroupWindow::PGroupWindow(const entry_ref *doc)
 	BRect r(Bounds());
 	
 	BMenuBar *mbar;
-	AddChild(mbar = HResources::GetMenuBar(r, ri_MBR_GROUP_WIN));
+	AddChild(mbar = HResources::GetMenuBar(r, rid_Mbar_GroupWin));
 	mbar->FindItem(msg_Quit)->SetTarget(be_app);
 
 	r.bottom = r.top + kToolBarHeight;
@@ -135,7 +135,7 @@ PGroupWindow::PGroupWindow(const entry_ref *doc)
 	r.bottom -= 2;
 	r.OffsetTo(0, 0);
 	
-	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "buttonbar", ri_TBR_GROUP_WIN, this));
+	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "buttonbar", rid_Tbar_GroupWin, this));
 	
 	r = Bounds();
 	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT + 1;

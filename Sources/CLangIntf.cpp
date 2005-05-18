@@ -94,7 +94,7 @@ CLangIntf::CLangIntf()
 {
 	if (sfWordBreakTable == NULL)
 	{
-		sfWordBreakTable = (unsigned char *)HResources::GetResource(rt_WBT, ri_WBT_LWORDBREAKTABLE);
+		sfWordBreakTable = (unsigned char *)HResources::GetResource(rtyp_Wbrt, rid_Wbrt_WordbreakTable);
 		if (sfWordBreakTable == NULL) THROW(("Missing Resource!"));
 	}
 	
@@ -116,7 +116,7 @@ CLangIntf::CLangIntf(const char *path, image_id image)
 {
 	if (sfWordBreakTable == NULL)
 	{
-		sfWordBreakTable = (unsigned char *)HResources::GetResource(rt_WBT, ri_WBT_LWORDBREAKTABLE);
+		sfWordBreakTable = (unsigned char *)HResources::GetResource(rtyp_Wbrt, rid_Wbrt_WordbreakTable);
 		if (sfWordBreakTable == NULL) THROW(("Missing Resource!"));
 	}
 	

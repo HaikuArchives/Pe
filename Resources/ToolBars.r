@@ -36,7 +36,7 @@
 
 
 /* Type: ToolbarButton */
-type rt_TBR {
+type rtyp_Tbar {
 	longint
 		standard			= 0,
 		dragger				= 1,
@@ -58,62 +58,62 @@ type rt_TBR {
 
 
 /* Document Window */
-resource rt_TBR (ri_TBR_DOCUMENT_WIN) {
+resource rtyp_Tbar (rid_Tbar_DocumentWin) {
 	standard,
 	{
-		ri_TBI_NEW_DOCUMENT,	0,					msg_New,			0,				"New Document",
-		ri_TBI_OPEN_DOCUMENT,	0,					msg_BtnOpen,		menu,			"Open Document",
-		ri_TBI_SAVE_DOCUMENT,	0,					msg_Save,			0,				"Save Document",
-		0,						0,					0,					separator,		"",
-		ri_TBI_EXECUTE_COMMAND,	0,					msg_Execute,		toggle,			"Execute Command",
-		ri_TBI_FUNCTION_POPUP,	0,					msg_FuncPopup,		menu,			"Function Popupmenu",
-		ri_TBI_HEADER_POPUP,	0,					msg_HeaderPopup,	menu,			"Header Popupmenu",
-		0,						0,					0,					separator,		"",
-		ri_TBI_FIND,			0,					msg_FindCmd,		0,				"Find",
-		ri_TBI_INC_SEARCH,		0,					msg_IncSearchBtn,	toggle,			"Incremental Search",
-		0,						0,					0,					separator,		"",
-		ri_TBI_READONLY_OFF,	ri_TBI_READONLY_ON,	msg_ReadOnly,		dual,			"Read Only",
-		ri_TBI_FILE_OPTIONS,	0,					msg_Info,			0,				"File Options…",
-		ri_TBI_SOFTWRAP_OFF,	ri_TBI_SOFTWRAP_ON,	msg_SoftWrap,		dual,			"Softwrap",
-		0,						0,					0,					separator,		"",
-		ri_TBI_EDIT_AS_PROJECT,	0,					msg_EditAsPrj,		0,				"Edit As Project"
+		rid_Timg_NewDocument,	0,						msg_New,			0,				"New Document",
+		rid_Timg_OpenDocument,	0,						msg_BtnOpen,		menu,			"Open Document",
+		rid_Timg_SaveDocument,	0,						msg_Save,			0,				"Save Document",
+		0,						0,						0,					separator,		"",
+		rid_Timg_ExecuteCmd,	0,						msg_Execute,		toggle,			"Execute Command",
+		rid_Timg_FunctionPopup,	0,						msg_FuncPopup,		menu,			"Function Popupmenu",
+		rid_Timg_HeaderPopup,	0,						msg_HeaderPopup,	menu,			"Header Popupmenu",
+		0,						0,						0,					separator,		"",
+		rid_Timg_Find,			0,						msg_FindCmd,		0,				"Find",
+		rid_Timg_IncSearch,		0,						msg_IncSearchBtn,	toggle,			"Incremental Search",
+		0,						0,						0,					separator,		"",
+		rid_Timg_ReadonlyOff,	rid_Timg_ReadonlyOn,	msg_ReadOnly,		dual,			"Read Only",
+		rid_Timg_FileOptions,	0,						msg_Info,			0,				"File Options…",
+		rid_Timg_SoftwrapOff,	rid_Timg_SoftwrapOn,	msg_SoftWrap,		dual,			"Softwrap",
+		0,						0,						0,					separator,		"",
+		rid_Timg_EditAsProject,	0,						msg_EditAsProject,	0,				"Edit As Project"
 	}
 };
 
 /* Differences Window */
-resource rt_TBR (ri_TBR_DIFFERENCES_WIN) {
+resource rtyp_Tbar (rid_Tbar_DifferencesWin) {
 	standard,
 	{
-		ri_TBI_FOLDER_1,		0,					msg_DiffFile1,		menu|toggle,	"File 1",
-		ri_TBI_FOLDER_2,		0,					msg_DiffFile2,		menu|toggle,	"File 2",
-		0,						0,					0,					separator,		"",
-		ri_TBI_ARROW_CIRCLE,	0,					msg_RefreshDiffs,	0,				"Refresh",
-		0,						0,					0,					separator,		"",
-		ri_TBI_ARROW_LEFT,		0,					msg_MergeTo1,		0,				"Merge to File 1",
-		ri_TBI_ARROW_RIGHT,		0,					msg_MergeTo2,		0,				"Merge to File 2",
+		rid_Timg_Folder1,		0,						msg_DiffFile1,		menu|toggle,	"File 1",
+		rid_Timg_Folder2,		0,						msg_DiffFile2,		menu|toggle,	"File 2",
+		0,						0,						0,					separator,		"",
+		rid_Timg_ArrowCircle,	0,						msg_RefreshDiffs,	0,				"Refresh",
+		0,						0,						0,					separator,		"",
+		rid_Timg_ArrowLeft,		0,						msg_MergeTo1,		0,				"Merge to File 1",
+		rid_Timg_ArrowRight,	0,						msg_MergeTo2,		0,				"Merge to File 2",
 	}
 };
 
 /* Group Window */
-resource rt_TBR (ri_TBR_GROUP_WIN) {
+resource rtyp_Tbar (rid_Tbar_GroupWin) {
 	acceptFirstClick,
 	{
-		ri_TBI_FILE_ADD,		0,					'Add ',				0,				"Add File",
-		ri_TBI_FILE_REMOVE,		0,					'Rmve',				0,				"Remove File",
-		0,						0,					0,					space,			"",
-		ri_TBI_SAVE_DOCUMENT,	0,					msg_Save,			0,				"Save Document"
+		rid_Timg_FileAdd,		0,						'Add ',				0,				"Add File",
+		rid_Timg_FileRemove,	0,						'Rmve',				0,				"Remove File",
+		0,						0,						0,					space,			"",
+		rid_Timg_SaveDocument,	0,						msg_Save,			0,				"Save Document"
 	}
 };
 
 /* Project Window */
-resource rt_TBR (ri_TBR_PROJECT_WIN) {
+resource rtyp_Tbar (rid_Tbar_ProjectWin) {
 	standard,
 	{
-		ri_TBI_FILE_ADD,		0,					'Add ',				0,				"Add File",
-		ri_TBI_FILE_REMOVE,		0,					'Rmve',				0,				"Remove File",
-		0,						0,					0,					space,			"",
-		ri_TBI_SAVE_DOCUMENT,	0,					msg_Save,			0,				"Save Document",
-		0,						0,					0,					space,			"",
-		ri_TBI_FILE_PENCIL,		0,					msg_EditAsText,		0,				"Edit Project as Text"
+		rid_Timg_FileAdd,		0,						'Add ',				0,				"Add File",
+		rid_Timg_FileRemove,	0,						'Rmve',				0,				"Remove File",
+		0,						0,						0,					space,			"",
+		rid_Timg_SaveDocument,	0,						msg_Save,			0,				"Save Document",
+		0,						0,						0,					space,			"",
+		rid_Timg_FilePencil,	0,						msg_EditAsText,		0,				"Edit Project as Text"
 	}
 };

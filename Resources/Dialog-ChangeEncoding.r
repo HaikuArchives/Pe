@@ -34,7 +34,7 @@
 #include "Types.r"
 
 
-resource rt_POP (ri_POP_ENC_CONV, "Conversion") {
+resource rtyp_Popu (rid_Popu_EncConv, "Conversion") {
 	"Conversion",
 	{
 		Item		{ "UTF-8",				'chng',	none,	noKey	},
@@ -59,8 +59,8 @@ resource 'DLOG' (7, "Convert") {
 	{ 0, 0, 210, 120 }, "Convert", B_TITLED_WINDOW, NORMAL,
 	{
 		Caption		{{  10,  10, 200,  26 }, "cap",		"Change the character encoding"				},
-		PopupMenu	{{   9,  29, 200,  59 }, "src",		"From:",			ri_POP_ENC_CONV, 40		},
-		PopupMenu	{{	 9,  49, 200,  79 }, "dest",	"To:",				ri_POP_ENC_CONV, 40		},
+		PopupMenu	{{   9,  29, 200,  59 }, "src",		"From:",			rid_Popu_EncConv, 40	},
+		PopupMenu	{{	 9,  49, 200,  79 }, "dest",	"To:",				rid_Popu_EncConv, 40	},
 
 		Button		{{ 140,  90, 200, 110 }, "ok",		"OK",				'ok  '					},
 		Button		{{  70,  90, 130, 110 }, "cancel",	"Cancel",			'cncl'					}

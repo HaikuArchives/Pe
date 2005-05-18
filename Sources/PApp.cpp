@@ -780,15 +780,15 @@ void PApp::MessageReceived(BMessage *msg)
 				new PAboutBox();
 				break;
 			
-			case msg_IDE_Make:
+			case msg_IdeMake:
 				PDoc::IDEMake();
 				break;
 			
-			case msg_IDE_BringToFront:
+			case msg_IdeBringToFront:
 				PDoc::IDEBringToFront();
 				break;
 			
-			case msg_IDE_Project2Group:
+			case msg_IdeProjectToGroup:
 				PDoc::IDEProject2Group();
 				break;
 			
@@ -975,7 +975,7 @@ void PApp::MessageReceived(BMessage *msg)
 					gGlossyWindow = new PGlossyWindow;
 				break;
 
-			case msg_ShowHTMLPalette:
+			case msg_ShowHtmlPalette:
 			{
 				BWindow *w = CHTMLBar::Instance();
 				BAutolock lock(w);
@@ -988,7 +988,7 @@ void PApp::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-			case msg_HideHTMLPalette:
+			case msg_HideHtmlPalette:
 			{
 				BWindow *w = CHTMLBar::Instance();
 				BAutolock lock(w);

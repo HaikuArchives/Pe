@@ -34,7 +34,7 @@
 #include "Types.r"
 
 
-resource rt_POP (ri_POP_FTP_PATH)
+resource rtyp_Popu (rid_Popu_FtpPath)
 {
 	"pub",
 	{
@@ -58,7 +58,7 @@ resource 'DLOG' (128, "Open from Server") {
 		
 		Line		{{ 106,  10, 107, 160 }														},
 		
-		PopupMenu	{{ 115,  10, 295,  30 }, "path",		"",				ri_POP_FTP_PATH, 0	},
+		PopupMenu	{{ 115,  10, 295,  30 }, "path",		"",				rid_Popu_FtpPath, 0	},
 		
 		List		{{ 115,  40, 365, 160 }, "list"												},
 		

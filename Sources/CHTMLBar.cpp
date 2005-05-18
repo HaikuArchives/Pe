@@ -89,17 +89,17 @@ CHTMLBar::CHTMLBar()
 			FailOSErr(r.SetTo(&f));
 			
 			size_t size;
-			p = r.FindResource(rt_HTP, (int32)ri_HTP_HTML_PALETTE, &size);
+			p = r.FindResource(rtyp_Htmp, (int32)rid_Htmp_HtmlPalette, &size);
 			if (p == NULL) THROW(("The custom HTML Palette file does not contain a valid palette resource"));
 		}
 		catch (HErr& e)
 		{
 			e.DoError();
-			p = HResources::GetResource(rt_HTP, ri_HTP_HTML_PALETTE, size);
+			p = HResources::GetResource(rtyp_Htmp, rid_Htmp_HtmlPalette, size);
 		}
 	}
 	else
-		p = HResources::GetResource(rt_HTP, ri_HTP_HTML_PALETTE, size);
+		p = HResources::GetResource(rtyp_Htmp, rid_Htmp_HtmlPalette, size);
 	
 	if (p == NULL) THROW(("Could not find a palette resource"));
 	
@@ -333,7 +333,7 @@ void CHTMLSimpleButton::Click(BPoint /*where*/)
 		PDoc *doc = PDoc::TopWindow();
 		if (doc)
 		{
-			BMessage msg(msg_HTMLButton);
+			BMessage msg(msg_HtmlButton);
 			
 			msg.AddString("glossy", fGlossary);
 			
@@ -406,7 +406,7 @@ void CHTMLMenu::Click(BPoint /*where*/)
 		PDoc *doc = PDoc::TopWindow();
 		if (doc)
 		{
-			BMessage msg(msg_HTMLButton);
+			BMessage msg(msg_HtmlButton);
 			
 			msg.AddString("glossy", item->fGlossy);
 			
@@ -454,7 +454,7 @@ void CHTMLDialog::Click(BPoint /*where*/)
 		PDoc *doc = PDoc::TopWindow();
 		if (doc)
 		{
-			BMessage msg(msg_HTMLExtension);
+			BMessage msg(msg_HtmlExtension);
 			
 			msg.AddString("ext", fExt);
 			

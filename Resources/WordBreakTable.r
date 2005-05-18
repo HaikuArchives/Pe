@@ -34,13 +34,13 @@
 #include "ResourcesMisc.h"
 
 
-type rt_WBT {
+type rtyp_Wbrt {
 	array {
 		byte;
 	}
 };
 
-resource rt_WBT (ri_WBT_LWORDBREAKTABLE)
+resource rtyp_Wbrt (rid_Wbrt_WordbreakTable)
 {
 	{//	0		1		2		3		4		5
 		0x84,	0x85,	0x80,	0x00,	0x83,	0x83,

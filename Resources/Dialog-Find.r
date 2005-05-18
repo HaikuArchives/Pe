@@ -34,7 +34,7 @@
 #include "Types.r"
 
 
-resource rt_POP (ri_POP_FND_METHOD, "Kind") {
+resource rtyp_Popu (rid_Popu_FndMethod, "Kind") {
 	"Method:",
 	{
 		Item		{ "Directory Scan",				'MFKn',	none,	noKey	},
@@ -43,14 +43,14 @@ resource rt_POP (ri_POP_FND_METHOD, "Kind") {
 	}
 };
 
-resource rt_MEN (ri_POP_FND_DIRNAME, "Dir") {
+resource rtyp_Menu (rid_Popu_FndDirname, "Dir") {
 	"Dir",
 	{
 		Item		{ "Other…",						'SelO',	none,	noKey	}
 	}
 };
 
-resource rt_POP (ri_POP_FND_FILENAME, "File Name") {
+resource rtyp_Popu (rid_Popu_FndFilename, "File Name") {
 	"FileName",
 	{
 		Item		{ "Any File Name",				'chng',	none,	noKey	},
@@ -60,7 +60,7 @@ resource rt_POP (ri_POP_FND_FILENAME, "File Name") {
 	}
 };
 
-resource rt_POP (ri_POP_FND_GREPPATTERN, "Grep Pattern") {
+resource rtyp_Popu (rid_Popu_FndGrepPattern, "Grep Pattern") {
 	"Find:",
 	{
 		Item		{ "Add this pattern…",			'addP',	none,	noKey	},
@@ -72,7 +72,7 @@ resource rt_POP (ri_POP_FND_GREPPATTERN, "Grep Pattern") {
 resource 'DLOG' (8, "Find") {
 	{ 0, 0, 350, 214 }, "Find", B_TITLED_WINDOW, NORMAL,
 	{
-		PopupMenu	{{   5,   9,  52,  25 }, "pats",	" ",					ri_POP_FND_GREPPATTERN, 1	},
+		PopupMenu	{{   5,   9,  52,  25 }, "pats",	" ",					rid_Popu_FndGrepPattern, 1	},
 		Edit		{{  53,  10, 230,  42 }, "find",							"", "", "", 0, 0			},
 		Caption		{{  10,  46,  52,  62 }, "crepl",	"Replace:"											},
 		Edit		{{  53,  46, 230,  78 }, "repl",							"", "", "", 0, 0			},
@@ -87,11 +87,11 @@ resource 'DLOG' (8, "Find") {
 		Line		{{  10, 138, 340, 139 }																	},
 		
 		CheckBox	{{  10, 144,  90, 160 }, "mult",	"Multi-File"										},
-		PopupMenu	{{  75, 142, 238, 162 }, "meth",	"Method:",				ri_POP_FND_METHOD, 45		},
+		PopupMenu	{{  75, 142, 238, 162 }, "meth",	"Method:",				rid_Popu_FndMethod, 45		},
 		CheckBox	{{ 270, 144, 340, 160 }, "recu",	"Recursive"											},
-		PopupMenu	{{  10, 164, 340, 184 }, "sdir",	"Starting Directory:",	ri_POP_FND_DIRNAME, 110		},
+		PopupMenu	{{  10, 164, 340, 184 }, "sdir",	"Starting Directory:",	rid_Popu_FndDirname, 110	},
 		CheckBox	{{  10, 188, 115, 204 }, "text",	"Text Files Only"									},
-		PopupMenu	{{ 120, 186, 245, 206 }, "namp",	"",						ri_POP_FND_FILENAME, 0		},
+		PopupMenu	{{ 120, 186, 245, 206 }, "namp",	"",						rid_Popu_FndFilename, 0		},
 		Edit		{{ 270, 186, 340, 206 }, "name",							"", "", "", 0, 0			},
 
 		Button		{{ 260,  10, 340,  30 }, "bfnd",	"Find",					'Find'						},

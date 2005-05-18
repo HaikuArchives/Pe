@@ -117,7 +117,7 @@ PDoc::PDoc(const entry_ref *doc, bool show)
 	fButtonBar->SetEnabled(msg_Save, false);
 	
 	if (!ProjectRoster->IsProjectType(MimeType()))
-		fButtonBar->SetVisible(msg_EditAsPrj, false);
+		fButtonBar->SetVisible(msg_EditAsProject, false);
 
 	if (show)
 		Show();
@@ -193,12 +193,12 @@ void PDoc::InitWindow(const char *name)
 	bool showIde = gPrefs->GetPrefInt("ide menu", 1);
 	
 	r = b;
-	fMBar = HResources::GetMenuBar(r, ri_MBR_DOCUMENT_WIN);
+	fMBar = HResources::GetMenuBar(r, rid_Mbar_DocumentWin);
 
 	// add the BeIDE menu, if desired
 	if (showIde)
 	{
-		BMenu *menu = HResources::GetMenu(ri_MEN_DW_BEIDE);
+		BMenu *menu = HResources::GetMenu(rid_Menu_DwBeide);
 		BMenuItem *ideMenuItem = new CMenuItem(menu);
 		fMBar->AddItem(ideMenuItem);
 	}
@@ -225,7 +225,7 @@ void PDoc::InitWindow(const char *name)
 	
 	r.OffsetTo(0, 0);
 	r.bottom -= 2;
-	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "ButtonBar", ri_TBR_DOCUMENT_WIN));
+	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "ButtonBar", rid_Tbar_DocumentWin));
 	
 	r.left = fButtonBar->Frame().right + 4;
 	fToolBar->AddChild(fError = new BStringView(r, "error", "", B_FOLLOW_LEFT_RIGHT));
@@ -295,7 +295,7 @@ void PDoc::InitWindow(const char *name)
 
 	fMBar->FindItem(msg_Info)->SetTarget(this);
 	fMBar->FindItem(msg_Preferences)->SetTarget(this);
-	fMBar->FindItem(msg_ChangeWD)->SetTarget(fText);
+	fMBar->FindItem(msg_ChangeWorkingDir)->SetTarget(fText);
 	fMBar->FindItem(msg_ChangeCaseLower)->SetTarget(fText);
 	fMBar->FindItem(msg_ChangeCaseUpper)->SetTarget(fText);
 	fMBar->FindItem(msg_ChangeCaseCap)->SetTarget(fText);
@@ -599,7 +599,7 @@ void PDoc::SaveACopy()
 	else
 		fSavePanel->SetPanelDirectory(&gCWD);
 
-	fSavePanel->SetMessage(new BMessage(msg_DoSaveACopy));
+	fSavePanel->SetMessage(new BMessage(msg_DoSaveCopy));
 	fSavePanel->SetTarget(this);
 
 	w->Unlock();
@@ -678,8 +678,8 @@ void PDoc::WindowActivated(bool active)
 	if (active && gPrefs->GetPrefInt("show htmlpalette", 1)
 		&& gPrefs->GetPrefInt("show htmlpalette for html", 1)) {
 			BMessage msg(fMimeType == "text/html" 
-								? msg_ShowHTMLPalette 
-								: msg_HideHTMLPalette);
+								? msg_ShowHtmlPalette 
+								: msg_HideHtmlPalette);
 			be_app->PostMessage(&msg);
 	}
 } /* PDoc::WindowActivated */
@@ -1089,7 +1089,7 @@ void PDoc::CreateFilePanel()
 		BView *vw = w->ChildAt(0);
 		FailNilMsg(vw, "Error building FilePanel");
 		
-		BMenu *m = HResources::GetMenu(ri_MEN_FP_MIMETYPES, true);
+		BMenu *m = HResources::GetMenu(rid_Menu_FpMimetypes, true);
 		FailNilMsg(m, "Error building FilePanel");
 		m->SetFont(be_plain_font);
 		m->SetRadioMode(true);
@@ -1497,11 +1497,11 @@ void PDoc::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-			case msg_SaveACopy:
+			case msg_SaveCopy:
 				SaveACopy();
 				break;
 			
-			case msg_DoSaveACopy:
+			case msg_DoSaveCopy:
 			{
 				entry_ref dir;
 				const char *name;
@@ -1554,7 +1554,7 @@ void PDoc::MessageReceived(BMessage *msg)
 				break;
 			}
 
-			case msg_HTMLExtension:
+			case msg_HtmlExtension:
 			{
 				const char *ext;
 				FailOSErr(msg->FindString("ext", &ext));
@@ -1637,23 +1637,23 @@ void PDoc::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-			case msg_IDE_Add:
+			case msg_IdeAdd:
 				IDEAddFile();
 				break;
 				
-			case msg_IDE_Remove:
+			case msg_IdeRemove:
 				IDERemoveFile();
 				break;
 			
-			case msg_IDE_Make:
+			case msg_IdeMake:
 				IDEMake();
 				break;
 			
-			case msg_IDE_BringToFront:
+			case msg_IdeBringToFront:
 				IDEBringToFront();
 				break;
 			
-			case msg_IDE_Project2Group:
+			case msg_IdeProjectToGroup:
 				IDEProject2Group();
 				break;
 			
@@ -1686,7 +1686,7 @@ void PDoc::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-			case msg_HTMLNew:
+			case msg_HtmlNew:
 			{
 				entry_ref doc;
 				BEntry e;
@@ -1759,7 +1759,7 @@ void PDoc::MessageReceived(BMessage *msg)
 				break;
 			}
 
-			case msg_EditAsPrj:
+			case msg_EditAsProject:
 			{	
 				if (IsDirty() || fText->IsDirty())
 					Save();

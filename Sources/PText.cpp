@@ -224,7 +224,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fLineMap = NULL;
 	fLineView = NULL;
 	
-	fMainPopUp = static_cast<BPopUpMenu*>(HResources::GetMenu(ri_POP_CTX_TEXT, true));
+	fMainPopUp = static_cast<BPopUpMenu*>(HResources::GetMenu(rid_Popu_CtxText, true));
 	FailNil(fMainPopUp);
 	fMainPopUp->SetFont(be_plain_font);
 	fMainPopUp->SetRadioMode(false);
@@ -3274,7 +3274,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 {
 	unsigned long what = msg->what;
 
-	if (fIncSearch && what == kmsg_Delete_Character_Left)
+	if (fIncSearch && what == kmsg_DeleteCharacterLeft)
 	{
 		char s = B_BACKSPACE;
 		IncSearchKey(&s, 1);
@@ -3296,32 +3296,32 @@ bool PText::DoKeyCommand(BMessage *msg)
 	
 	switch (what)
 	{
-		case kmsg_Move_Character_Left:
+		case kmsg_MoveCharacterLeft:
 			if (extend)
 				newAnchor = newCaret = min(fCaret, fAnchor);
 			else
 				newAnchor = newCaret = max(0, fCaret - fText.PrevCharLen(fCaret));
 			break;
-		case kmsg_Move_Character_Right:
+		case kmsg_MoveCharacterRight:
 			if (extend)
 				newAnchor = newCaret = max(fCaret, fAnchor);
 			else
 				newAnchor = newCaret = min(fCaret + fText.CharLen(fCaret), fText.Size());
 			break;
-		case kmsg_Move_Word_Left:
+		case kmsg_MoveWordLeft:
 			newAnchor = newCaret = FindWord(B_LEFT_ARROW);
 			break;
-		case kmsg_Move_Word_Right:
+		case kmsg_MoveWordRight:
 			newAnchor = newCaret = FindWord(B_RIGHT_ARROW);
 			break;
-		case kmsg_Move_SubWord_Left:
+		case kmsg_MoveSubwordLeft:
 			newAnchor = newCaret = FindWord(B_LEFT_ARROW, true);
 			break;
-		case kmsg_Move_SubWord_Right:
+		case kmsg_MoveSubwordRight:
 			newAnchor = newCaret = FindWord(B_RIGHT_ARROW, true);
 			break;
-		case kmsg_Move_to_Beginning_of_Line:
-		case kmsg_Extend_Selection_to_Beginning_of_Line:
+		case kmsg_MoveToBeginningOfLine:
+		case kmsg_ExtendSelectionToBeginningOfLine:
 		{
 			int ls = LineStart(line);
 			
@@ -3340,13 +3340,13 @@ bool PText::DoKeyCommand(BMessage *msg)
 			else
 				newCaret = ls;
 				
-			if (what == kmsg_Move_to_Beginning_of_Line)
+			if (what == kmsg_MoveToBeginningOfLine)
 				newAnchor = newCaret;
 			else
 				extend = true;
 			break;
 		}
-		case kmsg_Move_to_End_of_Line:
+		case kmsg_MoveToEndOfLine:
 			if (line < LineCount() - 1)
 			{
 				newCaret = LineStart(line + 1);
@@ -3355,7 +3355,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 			else
 				newAnchor = newCaret = fText.Size();
 			break;
-		case kmsg_Move_to_Previous_Line:
+		case kmsg_MoveToPreviousLine:
 			if (extend)
 				newAnchor = newCaret = min(fCaret, fAnchor);
 			else if (line > 0)
@@ -3364,7 +3364,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 				newAnchor = newCaret = 0;
 			catchOffset = extend;
 			break;
-		case kmsg_Move_to_Next_Line:
+		case kmsg_MoveToNextLine:
 			if (extend)
 				newAnchor = newCaret = max(fCaret, fAnchor);
 			else if (line < LineCount() - 1)
@@ -3373,21 +3373,21 @@ bool PText::DoKeyCommand(BMessage *msg)
 				newAnchor = newCaret = fText.Size();
 			catchOffset = extend;
 			break;
-		case kmsg_Move_to_Previous_Page:
+		case kmsg_MoveToPreviousPage:
 			bar->SetValue(barValue - linesPerPage * fLineHeight);
 			line = max(0, line - linesPerPage);
 			newAnchor = newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
 			scroll = false;
 			break;
-		case kmsg_Move_to_Next_Page:
+		case kmsg_MoveToNextPage:
 			bar->SetValue(barValue + linesPerPage * fLineHeight);
 			line = min(LineCount() - 1, line + linesPerPage);
 			newAnchor = newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
 			scroll = false;
 			break;
-		case kmsg_Move_to_Top_of_Page:
+		case kmsg_MoveToTopOfPage:
 			if (line > topline + 1)
 				line = topline;
 			else
@@ -3395,7 +3395,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 			newAnchor = newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
 			break;
-		case kmsg_Move_to_Bottom_of_Page:
+		case kmsg_MoveToBottomOfPage:
 			if (line + 1 < topline + linesPerPage)
 				line = min(LineCount() - 1, topline + linesPerPage);
 			else
@@ -3403,28 +3403,28 @@ bool PText::DoKeyCommand(BMessage *msg)
 			newAnchor = newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
 			break;
-		case kmsg_Move_to_Beginning_of_File:
+		case kmsg_MoveToBeginningOfFile:
 			newAnchor = newCaret = 0;
 			break;
-		case kmsg_Move_to_End_of_File:
+		case kmsg_MoveToEndOfFile:
 			newAnchor = newCaret = fText.Size();
 			break;
-		case kmsg_Delete_Character_Left:
+		case kmsg_DeleteCharacterLeft:
 			clearLastCommand = false;
 			BackspaceKeyDown();
 			newAnchor = newCaret = fCaret;
 			break;
-		case kmsg_Delete_Character_Right:
+		case kmsg_DeleteCharacterRight:
 			clearLastCommand = false;
 			DeleteKeyDown();
 			newAnchor = newCaret = fCaret;
 			break;
-		case kmsg_Delete_to_Beginning_of_Line:
+		case kmsg_DeleteToBeginningOfLine:
 			fAnchor = LineStart(line);
 			BackspaceKeyDown();
 			newAnchor = newCaret = fCaret;
 			break;
-		case kmsg_Delete_to_End_of_Line:
+		case kmsg_DeleteToEndOfLine:
 			if (fAnchor == fCaret)
 			{
 				if (line < LineCount() - 1)
@@ -3435,40 +3435,40 @@ bool PText::DoKeyCommand(BMessage *msg)
 			DeleteKeyDown();
 			newAnchor = newCaret = fCaret;
 			break;
-		case kmsg_Delete_to_End_of_File:
+		case kmsg_DeleteToEndOfFile:
 			if (fAnchor == fCaret)
 				fCaret = fText.Size();
 			DeleteKeyDown();
 			newAnchor = newCaret = fCaret;
 			break;
-		case kmsg_Extend_Selection_with_Character_Left:
+		case kmsg_ExtendSelectionWithCharacterLeft:
 			extend = true;
 			newCaret = max(0, fCaret - fText.PrevCharLen(fCaret));
 			break;
-		case kmsg_Extend_Selection_with_Character_Right:
+		case kmsg_ExtendSelectionWithCharacterRight:
 			extend = true;
 			newCaret = min(fCaret + fText.CharLen(fCaret), fText.Size());
 			break;
-		case kmsg_Extend_Selection_with_Previous_Word:
+		case kmsg_ExtendSelectionWithPreviousWord:
 			extend = true;
 			newCaret = FindWord(B_LEFT_ARROW);
 			break;
-		case kmsg_Extend_Selection_with_Next_Word:
+		case kmsg_ExtendSelectionWithNextWord:
 			extend = true;
 			newCaret = FindWord(B_RIGHT_ARROW);
 			break;
-		case kmsg_Extend_Selection_with_Previous_SubWord:
+		case kmsg_ExtendSelectionWithPreviousSubword:
 			extend = true;
 			newCaret = FindWord(B_LEFT_ARROW, true);
 			break;
-		case kmsg_Extend_Selection_with_Next_SubWord:
+		case kmsg_ExtendSelectionWithNextSubword:
 			extend = true;
 			newCaret = FindWord(B_RIGHT_ARROW, true);
 			break;
-		case kmsg_Extend_Selection_to_Current_Line:
+		case kmsg_ExtendSelectionToCurrentLine:
 			ChangeSelection(LineStart(line), line < LineCount() - 1 ? LineStart(line + 1) - 1 : fText.Size());
 			break;
-		case kmsg_Extend_Selection_to_Previous_Line:
+		case kmsg_ExtendSelectionToPreviousLine:
 			extend = true;
 			if (line > 0)
 				newCaret = LineStart(line - 1) + LinePosition2Offset(line - 1, fWalkOffset);
@@ -3476,7 +3476,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 				newCaret = 0;
 			catchOffset = false;
 			break;
-		case kmsg_Extend_Selection_to_Next_Line:
+		case kmsg_ExtendSelectionToNextLine:
 			extend = true;
 			if (line < LineCount() - 1)
 				newCaret = LineStart(line + 1) + LinePosition2Offset(line + 1, fWalkOffset);
@@ -3484,14 +3484,14 @@ bool PText::DoKeyCommand(BMessage *msg)
 				newCaret = fText.Size();
 			catchOffset = false;
 			break;
-		case kmsg_Extend_Selection_to_End_of_Line:
+		case kmsg_ExtendSelectionToEndOfLine:
 			extend = true;
 			if (line < LineCount() - 1)
 				newCaret = LineStart(line + 1) - fText.PrevCharLen(LineStart(line + 1));
 			else	
 				newCaret = fText.Size();
 			break;
-		case kmsg_Extend_Selection_to_Beginning_of_Page:
+		case kmsg_ExtendSelectionToBeginningOfPage:
 			extend = true;
 			if (line > topline)
 			{
@@ -3513,7 +3513,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 			newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
 			break;
-		case kmsg_Extend_Selection_to_End_of_Page:
+		case kmsg_ExtendSelectionToEndOfPage:
 			extend = true;
 			if (line + 1 < topline + linesPerPage)
 				line = min(LineCount() - 1, topline + linesPerPage);
@@ -3522,40 +3522,40 @@ bool PText::DoKeyCommand(BMessage *msg)
 			newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
 			break;
-		case kmsg_Extend_Selection_to_Beginning_of_File:
+		case kmsg_ExtendSelectionToBeginningOfFile:
 			extend = true;
 			newCaret = 0;
 			break;
-		case kmsg_Extend_Selection_to_End_of_File:
+		case kmsg_ExtendSelectionToEndOfFile:
 			extend = true;
 			newCaret = fText.Size();
 			break;
-		case kmsg_Scroll_One_Line_Up:
+		case kmsg_ScrollOneLineUp:
 			bar->SetValue(barValue - fLineHeight);
 			scroll = false;
 			catchOffset = false;
 			break;
-		case kmsg_Scroll_One_Line_Down:
+		case kmsg_ScrollOneLineDown:
 			bar->SetValue(barValue + fLineHeight);
 			scroll = false;
 			catchOffset = false;
 			break;
-		case kmsg_Scroll_Page_Up:
+		case kmsg_ScrollPageUp:
 			bar->SetValue(barValue - linesPerPage * fLineHeight);
 			scroll = false;
 			catchOffset = false;
 			break;
-		case kmsg_Scroll_Page_Down:
+		case kmsg_ScrollPageDown:
 			bar->SetValue(barValue + linesPerPage * fLineHeight);
 			scroll = false;
 			catchOffset = false;
 			break;
-		case kmsg_Scroll_to_Start_of_File:
+		case kmsg_ScrollToStartOfFile:
 			bar->SetValue(0);
 			scroll = false;
 			catchOffset = false;
 			break;
-		case kmsg_Scroll_to_End_of_File:
+		case kmsg_ScrollToEndOfFile:
 		{
 			float vmin, vmax;
 			bar->GetRange(&vmin, &vmax);
@@ -3622,7 +3622,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 		case kmsg_NrArgument:
 			FailOSErr(msg->FindInt32("Nr Argument", (long *)&fNrArgument));
 			break;
-		case kmsg_Cut_Word:
+		case kmsg_CutWord:
 			fAnchor = fCaret;
 			if (fNrArgument > 0 && fNrArgument < 10)
 			{
@@ -3634,7 +3634,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 			RegisterCommand(new PCutCmd(this, fLastKillPoint == fAnchor));
 			fLastKillPoint = fAnchor;
 			break;
-		case kmsg_Cut_Word_Backward:
+		case kmsg_CutWordBackward:
 			fAnchor = fCaret;
 			if (fNrArgument > 0 && fNrArgument < 10)
 			{
@@ -3646,7 +3646,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 			RegisterCommand(new PCutCmd(this, (fLastKillPoint == fAnchor || fAppendNextCut) ? 2 : 0));
 			fLastKillPoint = newAnchor = newCaret = fCaret;
 			break;
-		case kmsg_Cut_to_End_of_Line:
+		case kmsg_CutToEndOfLine:
 			fAnchor = fCaret;
 			if (fNrArgument > 0 && fNrArgument < 10)
 			{
@@ -5482,18 +5482,18 @@ void PText::MessageReceived(BMessage *msg)
 				SelectParagraph();
 				break;
 			
-			case msg_ChangeWD:
+			case msg_ChangeWorkingDir:
 			{
 				if (!gCwdPanel)
 					gCwdPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this),
-						NULL, B_DIRECTORY_NODE, false, new BMessage(msg_ChangedWD));
+						NULL, B_DIRECTORY_NODE, false, new BMessage(msg_ChangedWorkingDir));
 				else
 					gCwdPanel->SetTarget(this);
 				gCwdPanel->Show();
 				break;
 			}
 			
-			case msg_ChangedWD:
+			case msg_ChangedWorkingDir:
 			{
 				entry_ref ref;
 				BEntry e;
@@ -5593,7 +5593,7 @@ void PText::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-			case msg_HTMLButton:
+			case msg_HtmlButton:
 			{
 				const char* glossy;
 				FailOSErr(msg->FindString("glossy", &glossy));

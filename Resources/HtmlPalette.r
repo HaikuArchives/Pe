@@ -51,10 +51,10 @@ mv "HTML Palette" $PE_SETTINGS_DIR
 #include "ResourcesMisc.h"
 
 #define msg_ShowInBrowser		'Brws'
-#define msg_HTMLNew				'HNew'
+#define msg_HtmlNew				'HNew'
 
 
-type rt_HTP {
+type rtyp_Htmp {
 	cstring;									// Bar name
 	longint;									// Flags (unused for now)
 	longint;									// Width of the bar
@@ -85,12 +85,12 @@ type rt_HTP {
 	};
 };
 
-resource rt_HTP (ri_HTP_HTML_PALETTE) {
+resource rtyp_Htmp (rid_Htmp_HtmlPalette) {
 	"Html Palette",
 	0,
 	85,
 	{
-		Command	{ "New", msg_HTMLNew },
+		Command	{ "New", msg_HtmlNew },
 		Menu		{ "Font",
 						{
 							"Teletype",		"<tt>$selection$$insert$</tt>",

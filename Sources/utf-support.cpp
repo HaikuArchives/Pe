@@ -47,10 +47,10 @@ using namespace HResources;
 
 void InitUTFTables()
 {
-	numTable = (unsigned char *)GetResource(rt_UTBL, ri_UTF_TABLE_NUMBERS);
+	numTable = (unsigned char *)GetResource(rtyp_Utbl, rid_Utbl_TableNumbers);
 	FailNilRes(numTable);
 	
-	alphaTable = (unsigned char *)GetResource(rt_UTBL, ri_UTF_TABLE_LETTERS);
+	alphaTable = (unsigned char *)GetResource(rtyp_Utbl, rid_Utbl_TableLetters);
 	FailNilRes(numTable);
 	
 	alnumTable = (unsigned char *)malloc(8192);
@@ -64,9 +64,9 @@ void InitUTFTables()
 	for (int i = 0; i < 8192 / sizeof(int); i++)
 		*c++ = *a++ | *b++;
 	
-	for (int i = ri_UTF_MAP_01; i <= ri_UTF_MAP_11; i++)
+	for (int i = rid_Umap_Map01; i <= rid_Umap_Map11; i++)
 	{
-		mappings[i-1] = (i == ri_UTF_MAP_10) ? NULL : (unsigned short *)GetResource(rt_UMAP, i);
+		mappings[i-1] = (i == rid_Umap_Map10) ? NULL : (unsigned short *)GetResource(rtyp_Umap, i);
 	}
 } /* InitUTFTables */
 

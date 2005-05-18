@@ -34,13 +34,13 @@
 #include "ResourcesUtf.h"
 
 
-type rt_UMAP {
+type rtyp_Umap {
 	array {
 		integer;
 	};
 };
 
-resource rt_UMAP (ri_UTF_MAP_01) {
+resource rtyp_Umap (rid_Umap_Map01) {
 	{
 		0,		1,		2,		3,		4,		5,		6,		7,
 		8,		9,		10,		11,		12,		13,		14,		15,
@@ -77,7 +77,7 @@ resource rt_UMAP (ri_UTF_MAP_01) {
 	}
 };
 
-resource rt_UMAP (ri_UTF_MAP_02) {
+resource rtyp_Umap (rid_Umap_Map02) {
 	{
 		0,		1,		2,		3,		4,		5,		6,		7,
 		8,		9,		10,		11,		12,		13,		14,		15,
@@ -114,7 +114,7 @@ resource rt_UMAP (ri_UTF_MAP_02) {
 	}
 };
 
-resource rt_UMAP (ri_UTF_MAP_03) {
+resource rtyp_Umap (rid_Umap_Map03) {
 	{
 		0,		1,		2,		3,		4,		5,		6,		7,
 		8,		9,		10,		11,		12,		13,		14,		15,
@@ -151,7 +151,7 @@ resource rt_UMAP (ri_UTF_MAP_03) {
 	}
 };
 
-resource rt_UMAP (ri_UTF_MAP_04) {
+resource rtyp_Umap (rid_Umap_Map04) {
 	{
 		0,		1,		2,		3,		4,		5,		6,		7,
 		8,		9,		10,		11,		12,		13,		14,		15,
@@ -188,7 +188,7 @@ resource rt_UMAP (ri_UTF_MAP_04) {
 	}
 };
 
-resource rt_UMAP (ri_UTF_MAP_05) {
+resource rtyp_Umap (rid_Umap_Map05) {
 	{
 		0,		1,		2,		3,		4,		5,		6,		7,
 		8,		9,		10,		11,		12,		13,		14,		15,
@@ -225,7 +225,7 @@ resource rt_UMAP (ri_UTF_MAP_05) {
 	}
 };
 
-resource rt_UMAP (ri_UTF_MAP_06) {
+resource rtyp_Umap (rid_Umap_Map06) {
 	{
 		0,		1,		2,		3,		4,		5,		6,		7,
 		8,		9,		10,		11,		12,		13,		14,		15,
@@ -262,7 +262,7 @@ resource rt_UMAP (ri_UTF_MAP_06) {
 	}
 };
 
-resource rt_UMAP (ri_UTF_MAP_07) {
+resource rtyp_Umap (rid_Umap_Map07) {
 	{
 		0,		1,		2,		3,		4,		5,		6,		7,
 		8,		9,		10,		11,		12,		13,		14,		15,
@@ -299,7 +299,7 @@ resource rt_UMAP (ri_UTF_MAP_07) {
 	}
 };
 
-resource rt_UMAP (ri_UTF_MAP_08) {
+resource rtyp_Umap (rid_Umap_Map08) {
 	{
 		0,		1,		2,		3,		4,		5,		6,		7,
 		8,		9,		10,		11,		12,		13,		14,		15,
@@ -336,7 +336,7 @@ resource rt_UMAP (ri_UTF_MAP_08) {
 	}
 };
 
-resource rt_UMAP (ri_UTF_MAP_09) {
+resource rtyp_Umap (rid_Umap_Map09) {
 	{
 		0,		1,		2,		3,		4,		5,		6,		7,
 		8,		9,		10,		11,		12,		13,		14,		15,
@@ -373,7 +373,7 @@ resource rt_UMAP (ri_UTF_MAP_09) {
 	}
 };
 
-resource rt_UMAP (ri_UTF_MAP_11) {
+resource rtyp_Umap (rid_Umap_Map11) {
 	{
 		0,		1,		2,		3,		4,		5,		6,		7,
 		8,		9,		10,		11,		12,		13,		14,		15,

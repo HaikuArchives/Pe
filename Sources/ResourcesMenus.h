@@ -12,57 +12,57 @@
 
 
 /*** RESOURCE-TYPES ******************/
-#define rt_MBR					'MBAR'
-#define rt_MEN					'MENU'
-#define rt_POP					'MENU'
+#define rtyp_Mbar				'MBAR'
+#define rtyp_Menu				'MENU'
+#define rtyp_Popu				'MENU'
 
 
 /*** RESOURCE-IDs ********************/
 
 // Menubars
-#define ri_MBR_DOCUMENT_WIN			0
-#define ri_MBR_GROUP_WIN			1
-#define ri_MBR_PROJECT_WIN			2
+#define rid_Mbar_DocumentWin		0
+#define rid_Mbar_GroupWin			1
+#define rid_Mbar_ProjectWin			2
 
 // Menus: Document Window
-#define ri_MEN_DW_FILE				0
-#define ri_MEN_DW_EDIT				1
-#define ri_MEN_DW_TEXT				2
-#define ri_MEN_DW_SEARCH			3
-#define ri_MEN_DW_WINDOW			4
-#define ri_MEN_DW_HELP				5
-#define ri_MEN_DW_EXTENSIONS		6
-#define ri_MEN_DW_BEIDE				7
-#define ri_MEN_DW_RECENT			10
-#define ri_MEN_DW_CHANGECASE		11
+#define rid_Menu_DwFile				0
+#define rid_Menu_DwEdit				1
+#define rid_Menu_DwText				2
+#define rid_Menu_DwSearch			3
+#define rid_Menu_DwWindow			4
+#define rid_Menu_DwHelp				5
+#define rid_Menu_DwExtensions		6
+#define rid_Menu_DwBeide			7
+#define rid_Menu_DwRecent			10
+#define rid_Menu_DwChangeCase		11
 // Menus: File Panel (Document Window)
-#define ri_MEN_FP_MIMETYPES			20
+#define rid_Menu_FpMimetypes		20
 // Menus: Project/Group Window
-#define ri_MEN_PW_FILE				200
-#define ri_MEN_PW_EDIT				201
+#define rid_Menu_PwFile				200
+#define rid_Menu_PwEdit				201
 
 // Popupmenus: Document Window
-#define ri_POP_CTX_TEXT				30
+#define rid_Popu_CtxText			30
 // Popupmenus: Find-Dialog
-#define ri_POP_FND_METHOD			81
-#define ri_POP_FND_DIRNAME			82
-#define ri_POP_FND_FILENAME			83
-#define ri_POP_FND_GREPPATTERN		84
+#define rid_Popu_FndMethod			81
+#define rid_Popu_FndDirname			82
+#define rid_Popu_FndFilename		83
+#define rid_Popu_FndGrepPattern		84
 // Popupmenus: Prefs
-#define ri_POP_PRF_FONT				90
-#define ri_POP_PRF_LANG				91
-#define ri_POP_PRF_STATE			92
-#define ri_POP_PRF_DEFLANG			93
+#define rid_Popu_PrfFont			90
+#define rid_Popu_PrfLang			91
+#define rid_Popu_PrfState			92
+#define rid_Popu_PrfDefaultLang		93
 // Popupmenus: Change Encoding
-#define ri_POP_ENC_CONV				111
+#define rid_Popu_EncConv			111
 // Popupmenus: FTP-Open
-#define ri_POP_FTP_PATH				128
+#define rid_Popu_FtpPath			128
 // Popupmenus: Info
-#define ri_POP_INF_MIMETYPES		101
-#define ri_POP_INF_FONT				400
-#define ri_POP_INF_ENCODING			401
-#define ri_POP_INF_LINEBREAKS		402
-#define ri_POP_INF_LANGUAGE			403
+#define rid_Popu_InfMimetypes		101
+#define rid_Popu_InfFont			400
+#define rid_Popu_InfEncoding		401
+#define rid_Popu_InfLinebreaks		402
+#define rid_Popu_InfLanguage		403
 
 
 #endif // RESOURCESMENUS_H

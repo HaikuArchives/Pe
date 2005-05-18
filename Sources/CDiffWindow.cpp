@@ -129,7 +129,7 @@ CDiffWindow::CDiffWindow(BRect frame, const char *name)
 	
 	r.OffsetTo(0, 0);
 	r.bottom = r.top + kToolBarHeight - 2;
-	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "ButtonBar", ri_TBR_DIFFERENCES_WIN));
+	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "ButtonBar", rid_Tbar_DifferencesWin));
 	fButtonBar->SetTarget(this);
 	
 	r = Bounds();

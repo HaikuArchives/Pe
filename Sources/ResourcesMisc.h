@@ -12,22 +12,22 @@
 
 
 /*** RESOURCE-TYPES ******************/
-#define rt_WBT					'WBrT'
-#define rt_HTP					'HtmB'
-#define rt_TIM					'when'
+#define rtyp_Wbrt				'WBrT'
+#define rtyp_Htmp				'HtmB'
+#define rtyp_Time				'when'
 
 
 /*** RESOURCE-IDs ********************/
 
 // Wordbreaktable
-#define ri_WBT_LWORDBREAKTABLE		403
+#define rid_Wbrt_WordbreakTable		403
 
 // HTML-Palette
-#define ri_HTP_HTML_PALETTE			0
+#define rid_Htmp_HtmlPalette		0
 
 
 // Compilation Date and Time
-#define ri_TIM_COMPILED				0
+#define rid_Time_Compiled			0
 
 
 #endif // RESOURCESMISC_H

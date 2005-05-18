@@ -34,9 +34,9 @@
 #include "ResourcesUtf.h"
 
 
-read rt_UTBL (ri_UTF_TABLE_LETTERS, "letters")
+read rtyp_Utbl (rid_Utbl_TableLetters, "letters")
 	"UTF-Table-Letters";
 
-read rt_UTBL (ri_UTF_TABLE_NUMBERS, "numbers")
+read rtyp_Utbl (rid_Utbl_TableNumbers, "numbers")
 	"UTF-Table-Numbers";
 

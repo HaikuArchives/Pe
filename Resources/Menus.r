@@ -37,7 +37,7 @@
 
 /* Edit Window Menu */
 
-resource rt_MEN (ri_MEN_DW_FILE, "File Menu") {
+resource rtyp_Menu (rid_Menu_DwFile, "File Menu") {
 	"File",
 	{
 		Item		{ "New",					msg_New,						none,	'N'		},
@@ -45,13 +45,13 @@ resource rt_MEN (ri_MEN_DW_FILE, "File Menu") {
 		Item		{ "Open…",					msg_Open,						none,	'O'		},
 		Item		{ "Open from Server…",		msg_FtpOpen,					none,	noKey	},
 		Item		{ "Open Selection",			msg_OpenSelected,				none,	'D'		},
-		Submenu		{ ri_MEN_DW_RECENT															},	
+		Submenu		{ rid_Menu_DwRecent															},	
 		Item		{ "Close",					msg_Close,						none,	'W'		},
 		Separator	{																			},
 		Item		{ "Save",					msg_Save,						none,	'S'		},
 		Item		{ "Save As…",				msg_SaveAs,						none,	noKey	},
 		Item		{ "Save on Server…",		msg_FtpSave,					none,	noKey	},
-		Item		{ "Save a Copy As…",		msg_SaveACopy,					none,	noKey	},
+		Item		{ "Save a Copy As…",		msg_SaveCopy,					none,	noKey	},
 		Item		{ "Save All",				msg_SaveAll,					none,	noKey	},
 		Item		{ "Revert…",				msg_Revert,						none,	noKey	},
 		Separator	{																			},
@@ -62,7 +62,7 @@ resource rt_MEN (ri_MEN_DW_FILE, "File Menu") {
 	}
 };
 
-resource rt_MEN (ri_MEN_DW_EDIT, "Edit Menu") {
+resource rtyp_Menu (rid_Menu_DwEdit, "Edit Menu") {
 	"Edit",
 	{
 		Item		{ "Undo",					msg_Undo,						none,	'Z'		},
@@ -79,12 +79,12 @@ resource rt_MEN (ri_MEN_DW_EDIT, "Edit Menu") {
 	}
 };
 
-resource rt_MEN (ri_MEN_DW_TEXT, "Text Menu") {
+resource rtyp_Menu (rid_Menu_DwText, "Text Menu") {
 	"Text",
 	{
 		Item		{ "Balance",				msg_Balance,					none,	'B'		},
 		Item		{ "Twiddle",				msg_Twiddle,					none,	'\''	},
-		Submenu		{ ri_MEN_DW_CHANGECASE														},
+		Submenu		{ rid_Menu_DwChangeCase														},
 		Item		{ "Change Encoding…",		msg_ConvertEncoding,			none,	noKey	},
 		Separator	{																			},
 		Item		{ "Shift Left",				msg_ShiftLeft,					none,	'['		},
@@ -101,7 +101,7 @@ resource rt_MEN (ri_MEN_DW_TEXT, "Text Menu") {
 	}
 };
 
-resource rt_MEN (ri_MEN_DW_SEARCH, "Search Menu") {
+resource rtyp_Menu (rid_Menu_DwSearch, "Search Menu") {
 	"Search",
 	{
 		Item		{ "Find…",					msg_FindCmd,					none,	'F'		},
@@ -125,14 +125,14 @@ resource rt_MEN (ri_MEN_DW_SEARCH, "Search Menu") {
 	}
 };
 
-resource rt_MEN (ri_MEN_DW_WINDOW, "Window Menu") {
+resource rtyp_Menu (rid_Menu_DwWindow, "Window Menu") {
 	"Window",
 	{
 		Item		{ "File Options…",			msg_Info,						none,	noKey	},
 		Item		{ "Preferences…",			msg_Preferences,				none,	noKey	},
-		Item		{ "Working Directory…",		msg_ChangeWD,					none,	noKey	},
+		Item		{ "Working Directory…",		msg_ChangeWorkingDir,			none,	noKey	},
 		Item		{ "Glossary",				msg_ShowGlossary,				none,	noKey	},
-		Item		{ "HTML Palette",			msg_ShowHTMLPalette,			none,	noKey	},
+		Item		{ "HTML Palette",			msg_ShowHtmlPalette,			none,	noKey	},
 		Separator	{																			},
 		Item		{ "Stack",					msg_Stack,						none,	noKey	},
 		Item		{ "Tile",					msg_Tile,						none,	noKey	},
@@ -143,7 +143,7 @@ resource rt_MEN (ri_MEN_DW_WINDOW, "Window Menu") {
 	}
 };
 
-resource rt_MEN (ri_MEN_DW_HELP, "Help Menu") {
+resource rtyp_Menu (rid_Menu_DwHelp, "Help Menu") {
 	"Help",
 	{
 		Item		{ "Help…",					msg_Help,						none,	noKey	},
@@ -152,32 +152,32 @@ resource rt_MEN (ri_MEN_DW_HELP, "Help Menu") {
 	}
 };
 
-resource rt_MEN (ri_MEN_DW_EXTENSIONS, "Extensions") {
+resource rtyp_Menu (rid_Menu_DwExtensions, "Extensions") {
 	"Extensions",
 	{
 	}
 };
 
-resource rt_MEN (ri_MEN_DW_BEIDE, "BeIDE") {
+resource rtyp_Menu (rid_Menu_DwBeide, "BeIDE") {
 	"BeIDE",
 	{
-		Item		{ "Bring to Front",			msg_IDE_BringToFront,			none,	noKey	},
+		Item		{ "Bring to Front",			msg_IdeBringToFront,			none,	noKey	},
 		Separator	{																			},
-		Item		{ "Add File",				msg_IDE_Add,					none,	noKey	},
-		Item		{ "Remove File",			msg_IDE_Remove,					none,	noKey	},
-		Item		{ "Project -> Group",		msg_IDE_Project2Group,			none,	noKey	},
+		Item		{ "Add File",				msg_IdeAdd,						none,	noKey	},
+		Item		{ "Remove File",			msg_IdeRemove,					none,	noKey	},
+		Item		{ "Project -> Group",		msg_IdeProjectToGroup,			none,	noKey	},
 		Separator	{																			},
-		Item		{ "Make",					msg_IDE_Make,					none,	'M'		}
+		Item		{ "Make",					msg_IdeMake,					none,	'M'		}
 	}
 };
 
-resource rt_MEN (ri_MEN_DW_RECENT, "Recent Menu") {
+resource rtyp_Menu (rid_Menu_DwRecent, "Recent Menu") {
 	"Open Recent",
 	{
 	}
 };
 
-resource rt_MEN (ri_MEN_DW_CHANGECASE, "Change Case Menu") {
+resource rtyp_Menu (rid_Menu_DwChangeCase, "Change Case Menu") {
 	"Change Case",
 	{
 		Item		{ "Upper Case",				msg_ChangeCaseUpper,			none,	noKey	},
@@ -188,19 +188,19 @@ resource rt_MEN (ri_MEN_DW_CHANGECASE, "Change Case Menu") {
 	}
 };
 
-resource rt_MBR (ri_MBR_DOCUMENT_WIN, "Menu Bar") {
+resource rtyp_Mbar (rid_Mbar_DocumentWin, "Menu Bar") {
 	{
-		ri_MEN_DW_FILE,
-		ri_MEN_DW_EDIT,
-		ri_MEN_DW_TEXT,
-		ri_MEN_DW_SEARCH,
-		ri_MEN_DW_EXTENSIONS,
-		ri_MEN_DW_WINDOW,
-		ri_MEN_DW_HELP
+		rid_Menu_DwFile,
+		rid_Menu_DwEdit,
+		rid_Menu_DwText,
+		rid_Menu_DwSearch,
+		rid_Menu_DwExtensions,
+		rid_Menu_DwWindow,
+		rid_Menu_DwHelp
 	}
 };
 
-resource rt_MEN (ri_MEN_FP_MIMETYPES, "Mime types") {
+resource rtyp_Menu (rid_Menu_FpMimetypes, "Mime types") {
 	"Mime Type",
 	{
 	}
@@ -208,7 +208,7 @@ resource rt_MEN (ri_MEN_FP_MIMETYPES, "Mime types") {
 
 /* Project Window Menu */
 
-resource rt_MEN (ri_MEN_PW_FILE)
+resource rtyp_Menu (rid_Menu_PwFile)
 {
 	"File",
 	{
@@ -222,7 +222,7 @@ resource rt_MEN (ri_MEN_PW_FILE)
 	}
 };
 
-resource rt_MEN (ri_MEN_PW_EDIT)
+resource rtyp_Menu (rid_Menu_PwEdit)
 {
 	"Edit",
 	{
@@ -230,19 +230,19 @@ resource rt_MEN (ri_MEN_PW_EDIT)
 	}
 };
 
-resource rt_MBR (ri_MBR_PROJECT_WIN)
+resource rtyp_Mbar (rid_Mbar_ProjectWin)
 {
-	{ ri_MEN_PW_FILE, ri_MEN_PW_EDIT }
+	{ rid_Menu_PwFile, rid_Menu_PwEdit }
 };
 
-resource rt_MBR (ri_MBR_GROUP_WIN)
+resource rtyp_Mbar (rid_Mbar_GroupWin)
 {
-	{ ri_MEN_PW_FILE }
+	{ rid_Menu_PwFile }
 };
 
 /* Context Menus */
 
-resource rt_POP (ri_POP_CTX_TEXT, "Main view") {
+resource rtyp_Popu (rid_Popu_CtxText, "Main view") {
 	"pop-up",
 	{
 		Item		{ "Save",						msg_Save,					none,	noKey	},

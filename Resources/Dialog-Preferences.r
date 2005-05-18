@@ -34,19 +34,19 @@
 #include "Types.r"
 
 
-resource rt_POP (ri_POP_PRF_FONT, "Font menu") {
+resource rtyp_Popu (rid_Popu_PrfFont, "Font menu") {
 	"Font",
 	{
 	}
 };
 
-resource rt_POP (ri_POP_PRF_LANG, "Language menu") {
+resource rtyp_Popu (rid_Popu_PrfLang, "Language menu") {
 	"Language",
 	{
 	}
 };
 
-resource rt_POP (ri_POP_PRF_STATE, "Saved State") {
+resource rtyp_Popu (rid_Popu_PrfState, "Saved State") {
 	"Language",
 	{
 		Item		{ "Pe",		'chng',	none,	noKey	},
@@ -54,7 +54,7 @@ resource rt_POP (ri_POP_PRF_STATE, "Saved State") {
 	}
 };
 
-resource rt_POP (ri_POP_PRF_DEFLANG, "Default Language menu") {
+resource rtyp_Popu (rid_Popu_PrfDefaultLang, "Default Language menu") {
 	"Language",
 	{
 		Item		{ "None",	'chng',	none,	noKey	},
@@ -124,7 +124,7 @@ resource 'DLOG' (132, "Preferences") {
 
 			TabSheet			{ "Editor", "How the editor should behave"													},
 				CheckBox		{{   0,   0, 140,  16 }, "stab",		"Show Tabstops"										},
-				Edit			{{ 150,   0, 290,  16 }, "tabs",		"Spaces per Tab:",			"", "0123456789", 3, 90	},
+				Edit			{{ 150,   0, 290,  16 }, "tabs",		"Spaces per Tab:",		"", "0123456789", 3, 90		},
 
 				CheckBox		{{   0,  20, 140,  36 }, "syco",		"Syntax Colouring"									},
 				CheckBox		{{ 150,  20, 290,  36 }, "auin",		"Auto Indent"										},
@@ -140,11 +140,11 @@ resource 'DLOG' (132, "Preferences") {
 											
 				Line			{{   0, 103, 290, 104 }},
 
-				PopupMenu		{{   0, 111, 190, 127 }, "font",		"Font:",					ri_POP_PRF_FONT, 50		},
-				Edit			{{ 200, 111, 290, 127 }, "fons",		"Size:",					"", "0123456789", 2, 40	},
+				PopupMenu		{{   0, 111, 190, 127 }, "font",		"Font:",				rid_Popu_PrfFont, 50		},
+				Edit			{{ 200, 111, 290, 127 }, "fons",		"Size:",				"", "0123456789", 2, 40		},
 
-				PopupMenu		{{   0, 131, 190, 147 }, "alfo",		"Alt. Font:",				ri_POP_PRF_FONT, 50		},
-				Edit			{{ 200, 131, 290, 147 }, "alfs",		"Size:",					"", "0123456789", 2, 40	},
+				PopupMenu		{{   0, 131, 190, 147 }, "alfo",		"Alt. Font:",			rid_Popu_PrfFont, 50		},
+				Edit			{{ 200, 131, 290, 147 }, "alfs",		"Size:",				"", "0123456789", 2, 40		},
 
 			TabSheetEnd			{																							},
 
@@ -234,12 +234,12 @@ resource 'DLOG' (132, "Preferences") {
 				Line			{{   0,  40, 290,  41 }},
 				
 				Caption			{{   0,  50, 200,  66 }, "lc",			"Suffix Mapping:"									},
-				PopupMenu		{{   0,  70, 120,  86 }, "lang",		"Language:",				ri_POP_PRF_LANG, 55		},
-				Edit			{{ 130,  70, 290,  86 }, "sufx",		"Suffixes:",				"", "", 0, 45			},
+				PopupMenu		{{   0,  70, 120,  86 }, "lang",		"Language:",			rid_Popu_PrfLang, 55		},
+				Edit			{{ 130,  70, 290,  86 }, "sufx",		"Suffixes:",			"", "", 0, 45				},
 				
 				Line			{{   0,  93, 290,  94 }},
 				
-				PopupMenu		{{   0, 101, 200, 117 }, "dela",		"Default Language:",		ri_POP_PRF_DEFLANG, 90	},
+				PopupMenu		{{   0, 101, 200, 117 }, "dela",		"Default Language:",	rid_Popu_PrfDefaultLang, 90	},
 			TabSheetEnd			{																							},
 			
 			TabSheet			{ "Projects", "Project window options"														},
@@ -276,7 +276,7 @@ resource 'DLOG' (132, "Preferences") {
 				CheckBox		{{   0,  60, 140,  76 }, "rese",		"Selection"											},
 				CheckBox		{{   0,  80, 140,  96 }, "resc",		"Scrollbar Settings"								},
 				CheckBox		{{   0, 100, 140, 116 }, "recw",		"Working Directory"									},
-				PopupMenu		{{   0, 120, 140, 140 }, "sast",		"Use state format:",		ri_POP_PRF_STATE, 90	},
+				PopupMenu		{{   0, 120, 140, 140 }, "sast",		"Use state format:",		rid_Popu_PrfState, 90	},
 			TabSheetEnd			{																							},
 
 			TabSheet			{ "Worksheet", "Options having effect on worksheets"										},

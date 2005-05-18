@@ -35,7 +35,7 @@
 #include "ResourcesToolbars.h"
 
 
-resource rt_TBI (ri_TBI_NEW_DOCUMENT) {
+resource rtyp_Timg (rid_Timg_NewDocument) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffff00ffffffffffffffffff"
@@ -54,7 +54,7 @@ resource rt_TBI (ri_TBI_NEW_DOCUMENT) {
 	$"ffffffffffffb700b7ffffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_OPEN_DOCUMENT) {
+resource rtyp_Timg (rid_Timg_OpenDocument) {
 	$"ffffffffff0000ffffffffffffffffff"
 	$"ffffffff0084840000ffff0000ffffff"
 	$"ffffff000000aa84840000d8d80000ff"
@@ -73,7 +73,7 @@ resource rt_TBI (ri_TBI_OPEN_DOCUMENT) {
 	$"ffffffffffffffffffffff00000010ff"
 };
 
-resource rt_TBI (ri_TBI_SAVE_DOCUMENT) {
+resource rtyp_Timg (rid_Timg_SaveDocument) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
@@ -92,7 +92,7 @@ resource rt_TBI (ri_TBI_SAVE_DOCUMENT) {
 	$"ffffffffffffff000e0effffffffffff"
 };
 
-resource rt_TBI (ri_TBI_FUNCTION_POPUP) {
+resource rtyp_Timg (rid_Timg_FunctionPopup) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
@@ -111,7 +111,7 @@ resource rt_TBI (ri_TBI_FUNCTION_POPUP) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_HEADER_POPUP) {
+resource rtyp_Timg (rid_Timg_HeaderPopup) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
@@ -130,7 +130,7 @@ resource rt_TBI (ri_TBI_HEADER_POPUP) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_EXECUTE_COMMAND) {
+resource rtyp_Timg (rid_Timg_ExecuteCmd) {
 	$"ffffffffffffffffffffff0000ffffff"
 	$"ffffffffffffffffffff00d8d800ffff"
 	$"ffffffffffffffffffff00fad8d800ff"
@@ -149,7 +149,7 @@ resource rt_TBI (ri_TBI_EXECUTE_COMMAND) {
 	$"ffffffff00000000ffffffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_FIND) {
+resource rtyp_Timg (rid_Timg_Find) {
 	$"ffffffffffffff0000000000ffffffff"
 	$"ffffffffff00003f3f3f3f3f0000ffff"
 	$"ffffffff003f3f00000000003f3f00ff"
@@ -168,7 +168,7 @@ resource rt_TBI (ri_TBI_FIND) {
 	$"ff00000fffffffffffffffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_INC_SEARCH) {
+resource rtyp_Timg (rid_Timg_IncSearch) {
 	$"ffffffffffffff0000000000ffffffff"
 	$"ffffffffff00003f3f3f3f3f0000ffff"
 	$"ffffffff003f3f00000000003f3f00ff"
@@ -187,7 +187,7 @@ resource rt_TBI (ri_TBI_INC_SEARCH) {
 	$"ff00000fffffffffff00ffffff00ffff"
 };
 
-resource rt_TBI (ri_TBI_READONLY_OFF) {
+resource rtyp_Timg (rid_Timg_ReadonlyOff) {
 	$"ffffffffffffffffffff0b0000ffffff"
 	$"ffffffffffffffffff000b3f5a00ffff"
 	$"ffffffffffffffff005c0b3f5a5a00ff"
@@ -206,7 +206,7 @@ resource rt_TBI (ri_TBI_READONLY_OFF) {
 	$"0a000affffffffffffffffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_READONLY_ON) {
+resource rtyp_Timg (rid_Timg_ReadonlyOn) {
 	$"ff2dffffffffffffffff0b0000ffffff"
 	$"2d2d2dffffffffffff000b3f5a00ffff"
 	$"ff2d2d2dffffffff005c0b3f5a5a00ff"
@@ -225,7 +225,7 @@ resource rt_TBI (ri_TBI_READONLY_ON) {
 	$"0a000affffffffffffffffffffff2dff"
 };
 
-resource rt_TBI (ri_TBI_FILE_OPTIONS) {
+resource rtyp_Timg (rid_Timg_FileOptions) {
 	$"ffffffffff000000ffffffffffffffff"
 	$"ffffffff00f2232400ffffffffffffff"
 	$"ffffff00f23ff2232400ffffffffffff"
@@ -244,7 +244,7 @@ resource rt_TBI (ri_TBI_FILE_OPTIONS) {
 	$"ffffffffffffffff001313ffffffffff"
 };
 
-Resource rt_TBI (ri_TBI_SOFTWRAP_ON) {
+Resource rtyp_Timg (rid_Timg_SoftwrapOn) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ff1212121212121212bb1212121212ff"
 	$"ff123f3f3f3f3f3f3fbb3f3f3f3f12ff"
@@ -263,7 +263,7 @@ Resource rt_TBI (ri_TBI_SOFTWRAP_ON) {
 	$"ff1212121212121212bb1212121212ff"
 };
 
-Resource rt_TBI (ri_TBI_SOFTWRAP_OFF) {
+Resource rtyp_Timg (rid_Timg_SoftwrapOff) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ff1212121212121212f21212121212ff"
 	$"ff123f3f3f3f3f3f3ff23f3f3f3f12ff"
@@ -282,7 +282,7 @@ Resource rt_TBI (ri_TBI_SOFTWRAP_OFF) {
 	$"ff1212121212121212f21212121212ff"
 };
 
-Resource rt_TBI (ri_TBI_EDIT_AS_PROJECT) {
+Resource rtyp_Timg (rid_Timg_EditAsProject) {
 	$"fffffafafafafafafafaffffffffffff"
 	$"fffffafafafafafafafaffffffffffff" 
 	$"ffff090909090909090909090909ffff" 
@@ -301,7 +301,7 @@ Resource rt_TBI (ri_TBI_EDIT_AS_PROJECT) {
 	$"ffff090909090909090909090909ffff"
 };
 
-resource rt_TBI (ri_TBI_ARROW_RIGHT) {
+resource rtyp_Timg (rid_Timg_ArrowRight) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffff0000ffffffffff"
@@ -320,7 +320,7 @@ resource rt_TBI (ri_TBI_ARROW_RIGHT) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_ARROW_LEFT) {
+resource rtyp_Timg (rid_Timg_ArrowLeft) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffff0000ffffffffffffffffff"
@@ -339,7 +339,7 @@ resource rt_TBI (ri_TBI_ARROW_LEFT) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_ARROW_CIRCLE) {
+resource rtyp_Timg (rid_Timg_ArrowCircle) {
 	$"ffffffffff0000000000ffffffffffff"
 	$"ffffff0000fafafafafa0000ffffffff"
 	$"ffff00fafaf9f9f9f9f9f95d00ffffff"
@@ -358,7 +358,7 @@ resource rt_TBI (ri_TBI_ARROW_CIRCLE) {
 	$"ffffffffffffffffffffffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_FOLDER_1) {
+resource rtyp_Timg (rid_Timg_Folder1) {
 	$"ffffffffff0000ffffffffffffffffff"
 	$"ffffffff0084840000ffff0000ffffff"
 	$"ffffff000000aa84840000d8d80000ff"
@@ -377,7 +377,7 @@ resource rt_TBI (ri_TBI_FOLDER_1) {
 	$"4d4d4d4d4d4dffffffffff00000010ff"
 };
 
-resource rt_TBI (ri_TBI_FOLDER_2) {
+resource rtyp_Timg (rid_Timg_Folder2) {
 	$"ffffffffff0000ffffffffffffffffff"
 	$"ffffffff0084840000ffff0000ffffff"
 	$"ffffff000000aa84840000d8d80000ff"
@@ -396,7 +396,7 @@ resource rt_TBI (ri_TBI_FOLDER_2) {
 	$"4d4d4d4d4d4dffffffffff00000010ff"
 };
 
-resource rt_TBI (ri_TBI_FILE_ADD) {
+resource rtyp_Timg (rid_Timg_FileAdd) {
 	$"ffffffffffffffff0000000000ffffff"
 	$"ffffffffffffffff00faf95d00ffffff"
 	$"ffffffffffffffff00faf95d00ffffff"
@@ -415,7 +415,7 @@ resource rt_TBI (ri_TBI_FILE_ADD) {
 	$"ffffffffffb700b7ffb7ffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_FILE_REMOVE) {
+resource rtyp_Timg (rid_Timg_FileRemove) {
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
 	$"ffffffffffffffffffffffffffffffff"
@@ -434,7 +434,7 @@ resource rt_TBI (ri_TBI_FILE_REMOVE) {
 	$"ffffffffffb700b7ffb7ffffffffffff"
 };
 
-resource rt_TBI (ri_TBI_FILE_PENCIL) {
+resource rtyp_Timg (rid_Timg_FilePencil) {
 	$"ffffffffffffffffffffffff0a0b0aff"
 	$"ffffffffffffffffffffff0a24858500"
 	$"ffffffffffffffffffff0a2486858501"

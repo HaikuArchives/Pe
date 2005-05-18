@@ -166,7 +166,7 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 	{
 		FailOSErr(gPrefsDir.CreateFile("keybindings", &file));
 
-		long resID = ri_BND_EDITING, cnt = 0;
+		long resID = rid_Bind_Editing, cnt = 0;
 		BMallocIO b;
 		
 		b << cnt;
@@ -176,7 +176,7 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 			size_t size;
 			const void *p;
 			
-			if ((p = HResources::GetResource(rt_BND, resID++, size)) == NULL)
+			if ((p = HResources::GetResource(rtyp_Bind, resID++, size)) == NULL)
 				break;
 			
 			BMemoryIO buf(p, size);

@@ -189,7 +189,7 @@ void HTool::DrawButton(unsigned char *icondat, bool pushed)
 
 void HTool::ReadToolbarImage(unsigned char** dest, int resID)
 {
-	*dest = (unsigned char *)HResources::GetResource(rt_TBI, resID);
+	*dest = (unsigned char *)HResources::GetResource(rtyp_Timg, resID);
 	FailNilRes(*dest);
 } /* HTool::ReadToolbarImage */
 #pragma mark -
@@ -285,7 +285,7 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 	long bCnt, flags;
 	const void *p;
 	size_t size;
-	p = HResources::GetResource(rt_TBR, resID, size);
+	p = HResources::GetResource(rtyp_Tbar, resID, size);
 	FailNilRes(p);
 	
 	BMemoryIO buf(p, size);
