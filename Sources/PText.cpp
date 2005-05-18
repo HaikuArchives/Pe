@@ -3470,19 +3470,39 @@ bool PText::DoKeyCommand(BMessage *msg)
 			break;
 		case kmsg_ExtendSelectionToPreviousLine:
 			extend = true;
-			if (line > 0)
-				newCaret = LineStart(line - 1) + LinePosition2Offset(line - 1, fWalkOffset);
+			if (line > 0) {
+				newCaret = LineStart(line - 1);
+				if (fAnchor != fCaret) 
+				{
+					// extend selection
+					newCaret += LinePosition2Offset(line - 1, fWalkOffset);
+				} 
+				else 
+				{
+					// start selection
+					newCaret += fCaret - LineStart(line);
+				}
+			} 
 			else
 				newCaret = 0;
-			catchOffset = false;
+
+			if (fAnchor != fCaret)
+				catchOffset = false;
 			break;
 		case kmsg_ExtendSelectionToNextLine:
 			extend = true;
-			if (line < LineCount() - 1)
-				newCaret = LineStart(line + 1) + LinePosition2Offset(line + 1, fWalkOffset);
+			if (line < LineCount() - 1) 
+			{
+				newCaret = LineStart(line + 1);
+				if (fAnchor != fCaret) 
+					newCaret += LinePosition2Offset(line + 1, fWalkOffset);
+				else
+					newCaret += fCaret - LineStart(line);
+			} 
 			else
 				newCaret = fText.Size();
-			catchOffset = false;
+			if (fAnchor != fCaret)
+				catchOffset = false;
 			break;
 		case kmsg_ExtendSelectionToEndOfLine:
 			extend = true;
