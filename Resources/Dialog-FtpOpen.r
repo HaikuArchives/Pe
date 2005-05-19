@@ -51,7 +51,7 @@ resource 'DLOG' (128, "Open from Server") {
 		CheckBox	{{  12,  48, 100,  64 }, "pssv",		"Passive"							},
 		Caption		{{  10,  70, 100,  86 }, "cuser",		"User Name:"						},
 		Edit		{{  10,  90, 100, 106 }, "user",		"",				"", "", 24, 0		},
-		Caption		{{  10, 110, 100, 126 }, "csrvr",		"Password:"							},
+		Caption		{{  10, 110, 100, 126 }, "cpass",		"Password:"							},
 		Edit		{{  10, 130, 100, 146 }, "pass",		"",				"", "", 128, 0		},
 		
 		Button		{{  25, 160,  85, 180 }, "cnct",		"Connect",		'cnct'				},
