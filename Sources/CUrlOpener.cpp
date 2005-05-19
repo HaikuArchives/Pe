@@ -58,7 +58,7 @@ long CUrlOpener::Execute()
 {
 	try
 	{
-		char username[256], password[256];
+		string username, password;
 		URLData& url = fURL;
 		
 		if (! url.IsValid())
@@ -74,7 +74,8 @@ long CUrlOpener::Execute()
 		if (! ok)
 			return 0;
 		
-		URLData url2(url.Server(), username, password, url.Path(), url.File());
+		URLData url2(url.Server(), username.c_str(), password.c_str(), 
+						 url.Path(), url.File());
 		gApp->NewWindow(url2);
 	}
 	catch (HErr& e)

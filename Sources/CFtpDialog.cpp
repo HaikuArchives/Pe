@@ -40,7 +40,6 @@
 #include "CFtpStream.h"
 #include "PMessages.h"
 #include "PDoc.h"
-#include "CLogin.h"
 #include "HError.h"
 #include "HPreferences.h"
 #ifdef BONE_BUILD
@@ -49,59 +48,26 @@
 #endif
 #include <socket.h>
 #include <netdb.h>
-#include <String.h>
+#include <Box.h>
+
+static string sfPassword;
 
 const unsigned long
 	msg_SelectedListItem = 'slct',
 	msg_SelectedDirectory = 'dirS',
 	msg_ToggleDot = 'dotT';
 
-filter_result CPassWordSniffer::Filter(BMessage *msg, BHandler **target)
-{
-	BTextView *tv = dynamic_cast<BTextView*>(*target);
-
-	if (tv)
-	{
-		// copy selection
-		long st, en;
-
-		tv->GetSelection(&st, &en);
-		fShadow->Select(st, en);
-		
-		unsigned long c;
-		msg->FindInt32("raw_char", (long *)&c);
-
-		if (c != B_TAB && c != B_RETURN)
-			BMessenger(fShadow).SendMessage(msg);
-		
-		if (isprint(c) || c > 128)
-		{
-			msg->ReplaceString("bytes", "*");
-			msg->ReplaceInt32("key", 0x19);
-			msg->ReplaceInt8("byte", '*');
-			msg->ReplaceInt32("raw_char", '*');
-			msg->ReplaceInt32("modifiers", 0);
-		}
-	}
-	
-	return B_DISPATCH_MESSAGE;
-} /* CPassWordSniffer::Filter */
-
 CFtpDialog::CFtpDialog(BRect frame, const char *name, window_type type, int flags,
 	BWindow *owner, BPositionIO& data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	BTextControl *password = dynamic_cast<BTextControl*>(FindView("pass"));
+	password->TextView()->HideTyping(true);
 	fDirectoryPopup = dynamic_cast<BMenuField*>(FindView("path"))->Menu();
 	fList = dynamic_cast<BListView*>(FindView("list"));
 	
-	BTextView *shadow;
-	AddChild(shadow = new BTextView(BRect(0, 0, 0, 0), "shadow", BRect(0, 0, 0, 0), 0, 0));
-	
-	if (password)
-		password->TextView()->AddFilter(new CPassWordSniffer(shadow));
-	
 	fList->SetInvocationMessage(new BMessage(msg_SelectedListItem));
+	fList->SetListType(B_MULTIPLE_SELECTION_LIST);
 
 	fReply = new char[1024];
 	fPath = new char[PATH_MAX];
@@ -111,26 +77,31 @@ CFtpDialog::CFtpDialog(BRect frame, const char *name, window_type type, int flag
 	SetDefaultButton(static_cast<BButton*>(FindView("cnct")));
 	
 	SetText("srvr", gPrefs->GetPrefString("last ftp server"));
+	SetText("user", gPrefs->GetPrefString("last ftp user"));
 
-	if (strlen(CLogin::Username()))
-	{
-		SetText("user", CLogin::Username());
-		SetText("pass", "********");
-		shadow->SetText(CLogin::Password());
-	}
+	if (sfPassword.length())
+		SetText("pass", sfPassword.c_str());
+
+	if (strlen(GetText("srvr")) && strlen(GetText("user")))
+		password->MakeFocus();
 	else
-	{
-		SetText("user", gPrefs->GetPrefString("last ftp user"));
-		if (strlen(GetText("srvr")) && strlen(GetText("user")))
-			password->MakeFocus();
-		else
-			FindView("srvr")->MakeFocus();
-	}
+		FindView("srvr")->MakeFocus();
 	
 	static_cast<BControl*>(FindView("dotf"))->SetMessage(new BMessage(msg_ToggleDot));
 	
 	FindView("name")->Hide();
 	SetOn("pssv", gPrefs->GetPrefInt("passive ftp", 1));
+
+
+//	BBox* box = static_cast<BBox*>(FindView("Box"));
+/*
+	BBox* box = (BBox*)FindView("Box");
+	box->SetResizingMode(B_FOLLOW_TOP|B_FOLLOW_RIGHT);
+	box->SetLabel("");
+*/
+	SetSizeLimits(300, 99999, 280, 99999);
+//	Create();
+//	Layout();
 
 #if 0
 	// Build Extension->Mimetype list // Takes looong
@@ -227,6 +198,7 @@ BBitmap* CFtpDialog::GetIcon(const char *mimeType, const char *tryExtension)
 void CFtpDialog::MakeItSave(const char *name)
 {
 	fSave = true;
+	fList->SetListType(B_SINGLE_SELECTION_LIST);
 	FindView("name")->Show();
 	
 	const char *t = strrchr(name, '/');
@@ -243,47 +215,78 @@ void CFtpDialog::MakeItSave(const char *name)
 
 bool CFtpDialog::OKClicked()
 {
-	CFtpListItem *i = dynamic_cast<CFtpListItem*>(fList->ItemAt(fList->CurrentSelection()));
-	if (i == reinterpret_cast<CFtpListItem*>(NULL) && !fSave)
-	{
-		beep();
-		return false;
-	}
+	CFtpListItem *i;
+	BTextView *tv;
 
-	if (i && i->IsDirectory())
+	if (fSave)
 	{
-		ChangeDirectory();
-		return false;
-	}
-	else
-	{
-		Hide();
-	
-		try
+		i = dynamic_cast<CFtpListItem*>(fList->ItemAt(fList->CurrentSelection()));
+		if (i && i->IsDirectory())
 		{
-			BTextView *tv = dynamic_cast<BTextView*>(FindView("shadow"));
-			FailNil(tv);
-
-			if (fSave)
+			ChangeDirectory();
+			return false;
+		}
+		else
+		{
+			try
 			{
+				tv = dynamic_cast<BTextView*>(FindView("shadow"));
+				FailNil(tv);
 				BMessage msg(msg_DoFtpSave);
 				msg.AddPointer("url", new URLData(GetText("srvr"), GetText("user"),
 					tv->Text(), fPath, GetText("name")));
 				fOwner->PostMessage(&msg);
 			}
-			else
+			catch (HErr& e)
 			{
-				URLData url(GetText("srvr"), GetText("user"), tv->Text(), fPath, *i);
-				gApp->NewWindow(url);
+				e.DoError();
 			}
 		}
-		catch (HErr& e)
-		{
-			e.DoError();
-		}
-		
-		return true;
 	}
+	else
+	{
+		int32 dirCnt = 0;
+		int32 filCnt = 0;
+		int32 n = -1;
+		while ((i = dynamic_cast<CFtpListItem*>(fList->ItemAt(fList->CurrentSelection(++n))))) {
+			if (i && i->IsDirectory())
+				dirCnt++;
+			else
+				filCnt++;
+		}
+		printf("## dirs:  %li\n", dirCnt);
+		printf("## files: %li\n\n", filCnt);
+		if (dirCnt == 1  && filCnt == 0)
+		{
+			ChangeDirectory();
+			return false;
+		}
+		else if (dirCnt == 0 && filCnt > 0)
+		{
+			n = -1;
+			Hide();
+			while ((i = dynamic_cast<CFtpListItem*>(fList->ItemAt(fList->CurrentSelection(++n))))) {
+				try
+				{
+					URLData url(GetText("srvr"), GetText("user"), GetText("pass"), fPath, *i);
+					printf("LOAD: %s %s\n", fPath, GetText("user"));
+					gApp->NewWindow(url);
+				}
+				catch (HErr& e)
+				{
+					e.DoError();
+				}
+			}
+			
+			return true;
+		}
+		else
+		{
+			beep();
+			printf("WRONG\n");
+		}
+	}
+	return false;
 } // CFtpDialog::OKClicked
 
 void CFtpDialog::MessageReceived(BMessage *msg)
@@ -385,9 +388,6 @@ void CFtpDialog::Connect()
 {
 	try
 	{
-		BTextView *tv = dynamic_cast<BTextView*>(FindView("shadow"));
-		FailNil(tv);
-
 		if (fSocket >= 0)
 		{
 			if (fSocketFD) s_close(fSocketFD);
@@ -431,7 +431,7 @@ void CFtpDialog::Connect()
 				case 2:
 					if (*fReply == '3')
 					{
-						s_printf(fSocketFD, "pass %s\r\n", tv->Text());
+						s_printf(fSocketFD, "pass %s\r\n", GetText("pass"));
 						state = 3;
 						break;
 					}
@@ -451,10 +451,9 @@ void CFtpDialog::Connect()
 			}
 		}
 
-		CLogin::SetUsername(GetText("user"));
-		gPrefs->SetPrefString("last ftp user", CLogin::Username());
+		gPrefs->SetPrefString("last ftp user", GetText("user"));
 		gPrefs->SetPrefString("last ftp server", GetText("srvr"));
-		CLogin::SetPassword(tv->Text());
+		sfPassword = GetText("pass");
 
 		GetPWD();
 	}

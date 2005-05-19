@@ -46,34 +46,14 @@ public:
 			
 			enum { sResID = 12 };
 			
-			void Connect(const char *server, char *username, char *password, bool *ok);
+			void Connect(const char *server, string& username, string& password, bool *ok);
 			
 virtual	bool OKClicked();
 virtual	bool CancelClicked();
 			
-static		const char* Username();
-static		const char* Password();
-
-static		void SetUsername(const char *username)
-					{ strcpy(sfUsername, username); }
-static		void SetPassword(const char *password)
-					{ strcpy(sfPassword, password); }
-			
 private:
-static		char sfUsername[], sfPassword[];
 			
-			char *fUsername, *fPassword;
 			bool *fOK;
 };
-
-inline const char* CLogin::Username()
-{
-	return sfUsername;
-} /* CLogin::Username */
-
-inline const char *CLogin::Password()
-{
-	return sfPassword;
-} /* CLogin::Password */
 
 #endif // CLOGIN_H

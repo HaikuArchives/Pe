@@ -261,16 +261,16 @@ void CFtpStream::Automaton(int action)
 		FailOSErr(connect(ctrl, (struct sockaddr *)&sa, sizeof(sa)));
 		
 		mail_pop_account pa;
-		char username[256], password[256];
+		string username, password;
 
-		strcpy(username, strlen(fURL.Username()) ? fURL.Username() : "anonymous");
+		username = strlen(fURL.Username()) ? fURL.Username() : "anonymous";
 
 		if (strlen(fURL.Password()))
-			strcpy(password, fURL.Password());
+			password = fURL.Password();
 		else if (get_pop_account(&pa) == B_OK)
-			strcpy(password, pa.reply_to);
+			password = pa.reply_to;
 		else
-			strcpy(password, "no.one@nowhere.na");
+			password = "no.one@nowhere.na";
 		
 		struct sockaddr_in saData;
 		memset(&saData, 0, sizeof(saData));
@@ -286,14 +286,14 @@ void CFtpStream::Automaton(int action)
 				case 1:
 					if ((r / 100) != 2)
 						THROW(("Connect failed: %s", msg));
-					s_printf(csSock, "user %s\r\n", username);
+					s_printf(csSock, "user %s\r\n", username.c_str());
 					state = 2;
 					break;
 				
 				case 2:
 					if ((r / 100) == 3)
 					{
-						s_printf(csSock, "pass %s\r\n", password);
+						s_printf(csSock, "pass %s\r\n", password.c_str());
 						state = 3;
 						break;
 					}

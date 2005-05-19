@@ -37,27 +37,18 @@
 #include "CLogin.h"
 #include "CFtpDialog.h"
 
-char CLogin::sfUsername[25] = "", CLogin::sfPassword[129] = "";
+string sfUsername, sfPassword;
 
 CLogin::CLogin(BRect frame, const char *name, window_type type, int flags,
 				BWindow *owner, BPositionIO& data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
-	BTextControl *pwd = dynamic_cast<BTextControl*>(FindView("password"));
-	if (sfUsername[0])
-		pwd->SetText("********");
-	
-	BTextView *shadow;
-	AddChild(shadow = new BTextView(BRect(0, 0, 0, 0), "shadow", BRect(0, 0, 0, 0), 0, 0));
-	shadow->SetText(sfPassword);
-	
-	if (pwd)
-		pwd->TextView()->AddFilter(new CPassWordSniffer(shadow));
-
-	BTextControl *username = dynamic_cast<BTextControl*>(FindView("username"));
-	if (sfUsername[0])
-		username->SetText(sfUsername);
-	username->MakeFocus(true);
+	SetText("username", sfUsername.c_str());
+	SetText("password", sfPassword.c_str());
+	if (sfUsername.length())
+		FindView("password")->MakeFocus(true);
+	else
+		FindView("usename")->MakeFocus(true);
 } /* CLogin::CLogin */
 
 CLogin::~CLogin()
@@ -66,16 +57,9 @@ CLogin::~CLogin()
 			
 bool CLogin::OKClicked()
 {
-	BTextView *tv = dynamic_cast<BTextView*>(FindView("shadow"));
-
-	if (tv)
-	{
-		strcpy(fUsername, GetText("username"));
-		strcpy(sfUsername, fUsername);
-		strcpy(fPassword, tv->Text());
-		strcpy(sfPassword, fPassword);
-		*fOK = true;
-	}
+	sfUsername = GetText("username");
+	sfPassword = GetText("password");
+	*fOK = true;
 
 	return true;
 } /* CLogin::OKClicked */
@@ -86,7 +70,7 @@ bool CLogin::CancelClicked()
 	return true;
 } /* CLogin::CancelClicked */
 
-void CLogin::Connect(const char *server, char *username, char *password, bool *ok)
+void CLogin::Connect(const char *server, string& username, string& password, bool *ok)
 {
 	char name[NAME_MAX];
 	BStringView *cap = dynamic_cast<BStringView*>(FindView("server"));
@@ -96,12 +80,12 @@ void CLogin::Connect(const char *server, char *username, char *password, bool *o
 		cap->SetText(name);
 	}
 	
-	fUsername = username;
-	fPassword = password;
 	fOK = ok;
 	
 	Show();
 	
 	long l;
 	wait_for_thread(Thread(), &l);
+	username = sfUsername;
+	password = sfPassword;
 } /* CLogin::Connect */
