@@ -4,7 +4,7 @@
 #define CFILTERCHOICEDIALOG_H
 
 #include <String.h>
-#include <Window.h>
+#include "HDialog.h"
 
 class BListView;
 class BListItem;
@@ -47,7 +47,7 @@ public:
 };
 
 // CFilterChoiceDialog
-class CFilterChoiceDialog : public BWindow {
+class CFilterChoiceDialog : public HDialog {
 public:
 	class Listener {
 	public:
@@ -61,7 +61,7 @@ public:
 
 public:
 	CFilterChoiceDialog(const char *title, CFilterChoiceModel *model,
-		BRect centerOver, int defaultSelectGroup = 0);
+		int defaultSelectGroup = 0);
 	virtual ~CFilterChoiceDialog();
 
 	virtual void MessageReceived(BMessage *message);
@@ -85,7 +85,7 @@ private:
 	class SeparatorListItem;
 	class Filter;
 
-	void _PlaceWindow(BRect centerOver);
+	void _ResizeWindow();
 
 	void _DispatchKeyDown(BMessage *message, BHandler *handler);
 	void _DispatchMouseDown(BMessage *message, BHandler *handler);

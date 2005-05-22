@@ -366,10 +366,9 @@ CFilterChoiceDialog::Filter::Accept(const ChoiceItemInfo* info, bool& matched)
 
 // constructor
 CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
-	CFilterChoiceModel *model, BRect centerOver, int defaultSelectGroup)
-	: BWindow(BRect(0, 0, kDefaultDialogWidth, kDefaultDialogHeight), title,
-			  B_MODAL_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-			  B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
+	CFilterChoiceModel *model, int defaultSelectGroup)
+	: HDialog(BRect(0, 0, kDefaultDialogWidth, kDefaultDialogHeight), title,
+			  B_MODAL_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE),
 	  fModel(model),
 	  fListener(NULL),
 	  fFilterString(),
@@ -385,6 +384,8 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 	  fItalicFont(),
 	  fWindowActive(false)
 {
+	// dialog setup
+	SetPlacement( H_PLACE_DEFAULT);
 	// root view
 	BRect bounds = Bounds();
 	fRootView = new(nothrow) BView(bounds, "root", B_FOLLOW_ALL, 0);
@@ -483,7 +484,7 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 		}
 	}
 	_SelectAnyVisibleItem();
-	_PlaceWindow(centerOver);
+	_ResizeWindow();
 }
 
 // destructor
@@ -604,9 +605,9 @@ CFilterChoiceDialog::DialogAborted()
 		fListener->FilterChoiceDialogAborted(this);
 }
 
-// _PlaceWindow
+// _SizeWindow
 void
-CFilterChoiceDialog::_PlaceWindow(BRect centerOver)
+CFilterChoiceDialog::_ResizeWindow()
 {
 	// resize the window frame, so that all list items are visible
 	BRect frame(Frame());
@@ -639,33 +640,7 @@ CFilterChoiceDialog::_PlaceWindow(BRect centerOver)
 		else if (listBounds.Height() < desiredListHeight)
 			frame.bottom += desiredListHeight - listBounds.Height();
 	}
-	// center the window frame over the given rect
-	if (centerOver.IsValid()) {
-		frame.OffsetTo(
-			centerOver.left + (centerOver.Width() - frame.Width()) / 2,
-			centerOver.top + (centerOver.Height() - frame.Height()) / 2);
-	}
-	// adjust the window frame so that it fits on screen
-	BRect screenFrame(BScreen().Frame());
-	// leave a bit room for the window decoration
-	screenFrame.left += 20;
-	screenFrame.right -= 20;
-	screenFrame.top += 30;
-	screenFrame.bottom -= 20;
-	if (frame.Width() > screenFrame.Width())
-		frame.right = frame.left + screenFrame.Width();
-	if (frame.Height() > screenFrame.Height())
-		frame.bottom = frame.top + screenFrame.Height();
-	if (frame.left < screenFrame.left)
-		frame.OffsetTo(screenFrame.left, frame.top);
-	if (frame.top < screenFrame.top)
-		frame.OffsetTo(frame.left, screenFrame.top);
-	if (frame.right > screenFrame.right)
-		frame.OffsetBy(screenFrame.right - frame.right, 0);
-	if (frame.bottom > screenFrame.bottom)
-		frame.OffsetBy(0, screenFrame.bottom - frame.bottom);
-	// apply the changes
-	MoveTo(frame.LeftTop());
+	// apply the change
 	ResizeTo(frame.Width(), frame.Height());
 }
 

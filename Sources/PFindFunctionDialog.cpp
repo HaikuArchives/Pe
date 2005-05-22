@@ -138,9 +138,9 @@ PFindFunctionDialogController::PFindFunctionDialogController(PText *text)
 {
 	FailNil(fChoiceModel);
 	text->ScanForFunctions(*this);
-	fDialog = new(nothrow) CFilterChoiceDialog("Find Function", fChoiceModel,
-		text->ConvertToScreen(text->Bounds().OffsetToCopy(B_ORIGIN)), 1);
+	fDialog = new(nothrow) CFilterChoiceDialog("Find Function", fChoiceModel, 1);
 	FailNil(fDialog);
+	fDialog->SetCaller(text->Window());
 	fDialog->SetListener(this);
 	fDialog->Show();
 }
