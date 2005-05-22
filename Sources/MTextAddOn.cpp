@@ -56,79 +56,107 @@ MTextAddOn::MTextAddOn(MIDETextView& inTextView, const char *extension)
 
 MTextAddOn::~MTextAddOn()
 {
-	fText.RedrawDirtyLines();
-	if (fDirty) fText.RegisterCommand(fCmd);
+	if (fText.LockLooper()) {
+		fText.RedrawDirtyLines();
+		if (fDirty) fText.RegisterCommand(fCmd);
+		fText.UnlockLooper();
+	}
 } /* MTextAddOn::~MTextAddOn */
 
 const char* MTextAddOn::Text()
 {
-	return fText.Text();
+	const char* text = "";
+	if (fText.LockLooper()) {
+		text = fText.Text();
+		fText.UnlockLooper();
+	}
+	return text;
 } /* MTextAddOn::Text */
 
 int32 MTextAddOn::TextLength() const
 {
-	return fText.Size();
+	int32 len = 0;
+	if (fText.LockLooper()) {
+		len = fText.Size();
+		fText.UnlockLooper();
+	}
+	return len;
 } /* MTextAddOn::TextLenght */
 
 void MTextAddOn::GetSelection(int32 *start, int32 *end) const
 {
-	int32 a = fText.Anchor(), c = fText.Caret();
-	*start = min(a, c);
-	*end = max(a, c);
+	if (fText.LockLooper()) {
+		int32 a = fText.Anchor(), c = fText.Caret();
+		*start = min(a, c);
+		*end = max(a, c);
+		fText.UnlockLooper();
+	}
 } /* MTextAddOn::GetSelection */
 
 void MTextAddOn::Select(int32 newStart, int32 newEnd)
 {
-	fText.Select(newStart, newEnd, true, false);
+	if (fText.LockLooper()) {
+		fText.Select(newStart, newEnd, true, false);
+		fText.UnlockLooper();
+	}
 } /* MTextAddOn::Select */
 
 void MTextAddOn::Delete()
 {
-	int32 start, end;
-	GetSelection(&start, &end);
-	
-	ExtAction action;
-	action.aType = eaDelete;
-	action.aOffset = start;
-	action.aText = (char *)malloc(end - start + 1);
-	FailNil(action.aText);
-	fText.TextBuffer().Copy(action.aText, start, end - start);
-	action.aText[end - start] = 0;
-	fCmd->Actions().push_back(action);
-	
-	fText.Delete(start, end);
-	fText.SetCaret(start);
-	
-	fDirty = true;
+	if (fText.LockLooper()) {
+		int32 start, end;
+		GetSelection(&start, &end);
+		
+		ExtAction action;
+		action.aType = eaDelete;
+		action.aOffset = start;
+		action.aText = (char *)malloc(end - start + 1);
+		FailNil(action.aText);
+		fText.TextBuffer().Copy(action.aText, start, end - start);
+		action.aText[end - start] = 0;
+		fCmd->Actions().push_back(action);
+		
+		fText.Delete(start, end);
+		fText.SetCaret(start);
+		
+		fDirty = true;
+		fText.UnlockLooper();
+	}
 } /* MTextAddOn::Delete */
 
 void MTextAddOn::Insert(const char* inText)
 {
-	Insert(inText, strlen(inText));
+	if (fText.LockLooper()) {
+		Insert(inText, strlen(inText));
 
-	fDirty = true;
+		fDirty = true;
+		fText.UnlockLooper();
+	}
 } /* MTextAddOn::Insert */
 
 void MTextAddOn::Insert(const char* text, int32 length)
 {
-	int32 start, end;
-	GetSelection(&start, &end);
+	if (fText.LockLooper()) {
+		int32 start, end;
+		GetSelection(&start, &end);
+		
+		if (start != end)
+			Delete();
 	
-	if (start != end)
-		Delete();
-
-	ExtAction action;
-	action.aType = eaInsert;
-	action.aOffset = start;
-	action.aText = (char *)malloc(length + 1);
-	FailNil(action.aText);
-	memcpy(action.aText, text, length);
-	action.aText[length] = 0;
-	fCmd->Actions().push_back(action);
-
-	fText.Insert(text, length, start);
-
-	fDirty = true;
+		ExtAction action;
+		action.aType = eaInsert;
+		action.aOffset = start;
+		action.aText = (char *)malloc(length + 1);
+		FailNil(action.aText);
+		memcpy(action.aText, text, length);
+		action.aText[length] = 0;
+		fCmd->Actions().push_back(action);
+	
+		fText.Insert(text, length, start);
+	
+		fDirty = true;
+		fText.UnlockLooper();
+	}
 } /* MTextAddOn::Insert */
 
 BWindow* MTextAddOn::Window()
