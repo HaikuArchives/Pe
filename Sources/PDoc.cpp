@@ -1172,6 +1172,9 @@ struct ExtensionInfo {
 	perform_edit_func extension;
 	char* name;
 	uint16 hash;
+	//
+	PText* currText;
+	//
 	bool operator< (const ExtensionInfo& other) const {
 		return strcasecmp(name, other.name) < 0;
 	}
@@ -1279,15 +1282,26 @@ void PDoc::BuildExtensionsMenu(BMenu *addOnMenu)
 	}
 } /* PDoc::BuildExtensionsMenu */
 
+static int32 perform_extension(void* data)
+{
+	ExtensionInfo* extInfo = reinterpret_cast<ExtensionInfo*>(data);
+	if (extInfo) {
+		MTextAddOn intf(*extInfo->currText, extInfo->name);
+		(*extInfo->extension)(&intf);
+	}
+	return B_OK;
+}
+
 void PDoc::PerformExtension(int nr)
 {
 	if (sExtensions[nr].extension != NULL)
 	{
-		MTextAddOn intf(*fText, sExtensions[nr].name);
-
 		UpdateIfNeeded();
-
-		(*sExtensions[nr].extension)(&intf);
+		sExtensions[nr].currText = fText;
+		thread_id tid = spawn_thread(perform_extension, sExtensions[nr].name, 
+											  B_NORMAL_PRIORITY, (void*)&sExtensions[nr]);
+		if (tid > 0)
+			resume_thread(tid);
 	}
 	else if (modifiers() & B_OPTION_KEY)
 	{
