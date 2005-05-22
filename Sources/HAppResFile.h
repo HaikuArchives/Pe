@@ -36,6 +36,9 @@
 #ifndef HAPPRESFILE_H
 #define HAPPRESFILE_H
 
+class BMenuBar;
+class BMenu;
+
 namespace HResources {
 
 #if (B_BEOS_VERSION <= B_BEOS_VERSION_4)
