@@ -327,7 +327,7 @@ void HPreferences::WritePrefFile()
 		if (!(*pi).second)
 			continue;
 		else if (strchr((*pi).second, '\n') == NULL)
-			fprintf(f, "%s=%s\n", (*pi).first.name, (*pi).second);
+			fprintf(f, "%s=%s\n", (*pi).first.c_str(), (*pi).second);
 		else
 		{
 			char *buf = (char *)malloc(2 * strlen((*pi).second));
@@ -356,7 +356,7 @@ void HPreferences::WritePrefFile()
 
 			*a = 0;
 
-			fprintf(f, "%s=%s\n", (*pi).first.name, buf);
+			fprintf(f, "%s=%s\n", (*pi).first.c_str(), buf);
 			free(buf);
 		}
 	}

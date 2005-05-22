@@ -41,20 +41,7 @@
 
 //using namespace std;
 
-struct HPrefName {
-	char name[32];
-	
-	HPrefName(const HPrefName& n)	{ strcpy(name, n.name); };
-	HPrefName(const char *n)		{ if (strlen(n) > 28) throw HErr("Prefname too long"); strcpy(name, n); };
-	HPrefName()						{ name[0] = 0; };
-	
-	bool operator< (const HPrefName& pref) const
-	{
-		return strcmp(name, pref.name) < 0;
-	};
-};
-
-typedef map<HPrefName, char*> PrefMap;
+typedef map<string, char*> PrefMap;
 
 class HPreferences {
 public:
