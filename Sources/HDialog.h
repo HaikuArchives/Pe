@@ -71,7 +71,7 @@ static	T* CreateDialog(const char *name, BWindow *owner,
 						window_type type = B_TITLED_WINDOW, 
 						int flags = B_ASYNCHRONOUS_CONTROLS);
 static	T* CreateDialog(BWindow *owner, BPositionIO& tmpl,
-						HPlacementType placement = H_PLACE_DEFAULT);
+						HPlacementType placement = H_PLACE_LAST_POS);
 };
 
 template <class T>
