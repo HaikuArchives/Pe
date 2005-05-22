@@ -40,7 +40,7 @@
 #include "PMessages.h"
 
 CGoToLine::CGoToLine(BRect frame, const char *name, window_type type, int flags,
-	BWindow *owner, BPositionIO& data)
+	BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	FindView("line")->MakeFocus();

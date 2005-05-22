@@ -46,7 +46,7 @@
 #include "MAlert.h"
 
 CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data)
+			BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	fDoc = dynamic_cast<PDoc*>(owner);

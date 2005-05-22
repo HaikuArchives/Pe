@@ -58,7 +58,7 @@ const unsigned long
 	msg_ToggleDot = 'dotT';
 
 CFtpDialog::CFtpDialog(BRect frame, const char *name, window_type type, int flags,
-	BWindow *owner, BPositionIO& data)
+	BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	BTextControl *password = dynamic_cast<BTextControl*>(FindView("pass"));

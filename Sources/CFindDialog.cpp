@@ -61,7 +61,7 @@ const unsigned long
 CFindDialog* gFindDialog;
 
 CFindDialog::CFindDialog(BRect frame, const char *name,
-		window_type type, int flags, BWindow *owner, BPositionIO& data)
+		window_type type, int flags, BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	gFindDialog = this;

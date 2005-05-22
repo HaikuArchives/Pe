@@ -175,7 +175,8 @@ void HColorControl::MouseDown(BPoint where)
 	
 		if (fDown)
 		{
-			HColorPicker2 *getColor = DialogCreator<HColorPicker2>::CreateDialog(Window());
+			HColorPicker2 *getColor 
+				= DialogCreator<HColorPicker2>::CreateDialog(Window());
 			
 			BMessage msg(msg_NewColor);
 			msg.AddData("color", B_RGB_COLOR_TYPE, &fColor, sizeof(fColor));

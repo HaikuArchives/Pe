@@ -542,7 +542,7 @@ void HColorSquare::SetValue(float value)
 #pragma mark -
 
 HColorPicker2::HColorPicker2(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data)
+			BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	fSlider = static_cast<HColorSlider*>(FindView("v"));

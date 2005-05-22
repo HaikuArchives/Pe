@@ -43,7 +43,7 @@ class PDoc;
 class CInfoDialog : public HDialog {
 public:
 		CInfoDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data);
+			BWindow *owner, BPositionIO* data);
 		
 		enum { sResID = 6 };
 		

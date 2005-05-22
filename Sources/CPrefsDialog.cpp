@@ -85,7 +85,7 @@ const unsigned long
 	msg_LanguageSelected = 'lang';
 
 CPrefsDialog::CPrefsDialog(BRect frame, const char *name, window_type type, int flags,
-	BWindow *owner, BPositionIO& data)
+	BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	fPageSetup = NULL;

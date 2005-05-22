@@ -54,7 +54,7 @@ class CFindDialog : public HDialog
 	enum { sResID = 8 };
 		
 	CFindDialog(BRect frame, const char *name,
-		window_type type, int flags, BWindow *owner, BPositionIO& data);
+		window_type type, int flags, BWindow *owner, BPositionIO* data);
 
 	virtual void DoFind(unsigned long cmd);
 	virtual void MessageReceived(BMessage *msg);

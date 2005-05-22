@@ -49,7 +49,7 @@ class CPrefsDialog : public HDialog
 {
 public:
 		CPrefsDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data);
+			BWindow *owner, BPositionIO* data);
 		~CPrefsDialog();
 
 	enum { sResID = 132 };

@@ -42,7 +42,7 @@ class COpenSelection : public HDialog
 {
   public:
 	COpenSelection(BRect frame, const char *name, window_type type, int flags,
-		BWindow *owner, BPositionIO& data);
+		BWindow *owner, BPositionIO* data);
 		
 	enum { sResID = 3 };
 		

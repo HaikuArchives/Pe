@@ -41,7 +41,7 @@
 #include "PMessages.h"
 
 CConvertDialog::CConvertDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data)
+			BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	PDoc *doc = dynamic_cast<PDoc*>(owner);

@@ -68,14 +68,14 @@ public:
 		enum { sResID = 1 };
 		
 		CCopyContainingDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data);
+			BWindow *owner, BPositionIO* data);
 
 virtual bool OKClicked();
 virtual bool CancelClicked();
 };
 
 CCopyContainingDialog::CCopyContainingDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data)
+			BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	SetOn("sel", sSelectionOnly);

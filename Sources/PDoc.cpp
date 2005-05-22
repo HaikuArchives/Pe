@@ -1519,6 +1519,7 @@ void PDoc::MessageReceived(BMessage *msg)
 				if (gPrefs->GetPrefInt("window to workspace", 1))
 					pa->FindDialog()->SetWorkspaces(c);
 				
+				pa->FindDialog()->SetCaller(this);
 				pa->FindDialog()->Show();
 				
 				pa->FindDialog()->Activate(true);
@@ -1737,7 +1738,8 @@ void PDoc::MessageReceived(BMessage *msg)
 			
 			case msg_FtpOpen:
 			{
-				CFtpDialog *ftpo = DialogCreator<CFtpDialog>::CreateDialog(NULL);
+				CFtpDialog *ftpo 
+					= DialogCreator<CFtpDialog>::CreateDialog(/*"FtpDialog",*/ NULL);
 				ftpo->Show();
 				break;
 			}
@@ -1753,7 +1755,8 @@ void PDoc::MessageReceived(BMessage *msg)
 			
 			case msg_FtpSave:
 			{
-				CFtpDialog *ftps = DialogCreator<CFtpDialog>::CreateDialog(this);
+				CFtpDialog *ftps 
+					= DialogCreator<CFtpDialog>::CreateDialog(/*"FtpDialog", */NULL);
 				ftps->MakeItSave(Title());
 				ftps->Show();
 				break;

@@ -73,17 +73,22 @@ BRect dRect::ToBe()
 #pragma mark -
 #pragma mark --- HDialog ---
 
+int16 HDialog::sfDlgNr = 1;
+
 HDialog::HDialog(BRect frame, const char *name, window_type type,
-	int flags, BWindow *owner, BPositionIO& data)
+	int flags, BWindow *owner, BPositionIO* data)
 	: BWindow(frame, name, type, flags)
+	, fCaller( NULL)
+	, fPlacement( H_PLACE_LAST_POS)
 {
 	fOwner = owner;
 	
 	frame.OffsetTo(0, 0);
 
 	AddChild(fMainView = new HDlogView(frame, "main"));
-	
-	BuildIt(data);
+
+	if (data)	
+		_BuildIt(*data);
 	
 	AddCommonFilter(new BMessageFilter(B_KEY_DOWN,KeyDownFilter));
 
@@ -92,6 +97,10 @@ HDialog::HDialog(BRect frame, const char *name, window_type type,
 		BMessage m(msg_AddDialog);
 		m.AddPointer("dialog", this);
 		fOwner->PostMessage(&m);
+		
+		// [zooey]: let dialog float above owner:
+		SetFeel( B_FLOATING_SUBSET_WINDOW_FEEL);
+		AddToSubset(fOwner);
 	}
 } /* HDialog::HDialog */
 
@@ -146,32 +155,205 @@ void HDialog::MessageReceived(BMessage *inMessage)
 	}
 } /* HDialog::MessageReceived */
 
-// Make sure dialog comes up under cursor for us FFM lovers - CP 040324
-// [zooey]: moved into HDialog so that *every* Pe-dialog uses this.
-void HDialog::Show() {
-	if (focus_follows_mouse()) {
-		Lock();
-		BView* v = ChildAt(0); 	// grab some BView to obtain mouse position
-		if (v) {
-			BPoint mousePos;
-			uint32 mbuttons;
-			v->GetMouse(&mousePos, &mbuttons, false);
-			v->ConvertToScreen(&mousePos);
-			BRect r = ConvertToScreen(Bounds());
-			float w = r.Width();
-			float h = r.Height();
-			BScreen screen(this);
-			BRect sr = screen.Frame();
-			float sw = sr.Width();
-			float sh = sr.Height();
-			// try to avoid showing window-parts offscreen:
-			float x = MAX(5.0, MIN(sw-w-5, mousePos.x-w/2));
-			float y = MAX(20.0, MIN(sh-h-5, mousePos.y-h/2));
-			MoveTo(x, y);
-		}
-		Unlock();
+void		do_window_action(int32 window_id, int32 action, 
+							 BRect zoomRect, bool zoom);
+
+void HDialog::_PlaceWindow() {
+	BRect newFrame = Frame();
+	BScreen screen(this);
+	BRect sr = screen.Frame();
+	float sw = sr.Width();
+	float sh = sr.Height();
+	HPlacementType placement = fPlacement;
+	if (placement == H_PLACE_LAST_POS) {
+		// fetch last position and re-activate that:
+		string dlgRect = string("dialog ") + Name() + " rect";
+		string dlgOrigin = string("dialog ") + Name() + " origin";
+		BRect lastFrame;
+		if (gPrefs)
+			lastFrame = gPrefs->GetPrefRect(dlgRect.c_str(), BRect());
+		if (lastFrame.IsValid()) {
+			newFrame = lastFrame;
+			BRect ownerFrame = fOwner->Frame();
+			const char* origin = NULL;
+			if (gPrefs)
+				origin = gPrefs->GetPrefString(dlgOrigin.c_str(), NULL);
+			if (fOwner && origin) {
+				// frame was stored relative to owner, so we move to same
+				// relative position, but first we need to find out which
+				// window-corner the coordinates relate to:
+				if (!strcmp(origin,"LT"))
+					newFrame.OffsetBy(ownerFrame.LeftTop());
+				else if (!strcmp(origin,"RT"))
+					newFrame.OffsetBy(ownerFrame.RightTop());
+				else if (!strcmp(origin,"LB"))
+					newFrame.OffsetBy(ownerFrame.LeftBottom());
+				else if (!strcmp(origin,"RB"))
+					newFrame.OffsetBy(ownerFrame.RightBottom());
+			}
+		} else
+			placement = H_PLACE_DEFAULT;
+				// no last position available, fallback to default placement
 	}
+	if (placement == H_PLACE_OUT_OF_THE_WAY) {
+		// move dialog close to edges of caller, such that it hides as
+		// little of the caller's space as possible:
+		BWindow *caller = fOwner ? fOwner : fCaller;
+		if (caller) {
+			if (caller->Lock()) {
+				BRect cr = caller->Frame();
+				float w = newFrame.Width();
+				float h = newFrame.Height();
+	
+				// horizontal
+				float spaceToLeft = cr.left;
+				float spaceToRight = sw-cr.right;
+				char horizontalChoice;
+				if (spaceToRight >= w - B_V_SCROLL_BAR_WIDTH)
+					horizontalChoice = 'R';
+				else if (spaceToLeft >= w)
+					horizontalChoice = 'L';
+				else {
+					// prefer to obscure right side, as that usually contains 
+					// less text:
+					if (spaceToRight > spaceToLeft / 2)
+						horizontalChoice = 'R';
+					else
+						horizontalChoice = 'L';
+				}
+				float horizontalSpaceCoeff 
+					= (horizontalChoice == 'L' ? spaceToLeft : spaceToRight) / w;
+	
+				// vertical 
+				float spaceToTop = cr.top;
+				float spaceToBottom = sh-cr.bottom;
+				char verticalChoice;
+				if (spaceToBottom >= h - B_H_SCROLL_BAR_HEIGHT)
+					verticalChoice = 'B';
+				else if (spaceToTop >= h)
+					verticalChoice = 'T';
+				else {
+					// prefer to obscure bottom side, as toolbar lives at top:
+					if (spaceToBottom > spaceToTop / 2)
+						verticalChoice = 'B';
+					else
+						verticalChoice = 'T';
+				}
+				float verticalSpaceCoeff
+					= (verticalChoice == 'T' ? spaceToTop : spaceToBottom) / h;
+	
+				// we are going to warp the mouse into the dialog, but this
+				// may have unwanted side-effects if the mouse is moving over 
+				// other documents during the warp (which will activate these
+				// documents instead of the current one).
+				// In order to avoid these problems, we get the current 
+				// mouse-coords and position the dialog such that the mouse
+				// should warp into it with less risk of activating other
+				// windows (which is still possible, though, as the caller
+				// window might be obscured by other windows).
+				BView* view = caller->ChildAt(0);
+				BPoint mousePos(sw/2,sh/2);
+				if (view) {
+					uint32 buttons;
+					view->GetMouse( &mousePos, &buttons, false);
+					view->ConvertToScreen(&mousePos);
+				}
+	
+				// prefer horizontal or vertical according to window's layout
+				// (i.e. prefer smaller axis):
+				float hvFract = cr.Width()/cr.Height();
+				if (horizontalSpaceCoeff > verticalSpaceCoeff * hvFract) {
+					if (horizontalChoice == 'L')
+						newFrame.OffsetTo(BPoint(cr.left-w, mousePos.y-h/2));
+					else
+						newFrame.OffsetTo(BPoint(cr.right-B_V_SCROLL_BAR_WIDTH, 
+												 mousePos.y-h/2));
+				} else {
+					if (verticalChoice == 'T')
+						newFrame.OffsetTo(BPoint(mousePos.x-w/2, cr.top-h));
+					else
+						newFrame.OffsetTo(BPoint(mousePos.x-w/2, 
+												 cr.bottom-B_H_SCROLL_BAR_HEIGHT));
+				}
+				caller->Unlock();
+			} else
+				placement = H_PLACE_DEFAULT;
+					// can't lock caller, fallback to default placement
+		} else
+			placement = H_PLACE_DEFAULT;
+				// no caller, fallback to default placement
+	}
+	if (placement == H_PLACE_DEFAULT) {
+		// center horizontally, position 1/3 vertically:
+		BWindow *caller = fOwner ? fOwner : fCaller;
+		if (caller)
+		{
+			BRect r = caller->Frame();
+			newFrame.OffsetTo(r.left + (r.Width() - newFrame.Width()) / 2,
+							  r.top + (r.Height() - newFrame.Height()) / 3);
+		}
+		else
+		{
+			BScreen s;
+			newFrame.OffsetTo((s.Frame().Width() - newFrame.Width()) / 2,
+							  (s.Frame().Height() - newFrame.Height()) / 3);
+		}
+	}
+	float w = newFrame.Width();
+	float h = newFrame.Height();
+	ResizeTo(w, h);
+	// try to avoid showing window-parts offscreen:
+	newFrame.left = MAX(5.0, MIN(sw-w-5, newFrame.left));
+	newFrame.top = MAX(20.0, MIN(sh-h-5, newFrame.top));
+	MoveTo(newFrame.LeftTop());
+}
+
+static void WarpMouseToWindow(const char* windowName);
+
+void HDialog::Show() {
+	_PlaceWindow();
 	BWindow::Show();
+	if (focus_follows_mouse())
+		WarpMouseToWindow(Name());
+}
+
+void HDialog::Hide() {
+	if (fPlacement == H_PLACE_LAST_POS) {
+		string dlgRect = string("dialog ") + Name() + " rect";
+		string dlgOrigin = string("dialog ") + Name() + " origin";
+		BRect frame = Frame();
+		char origin[3] = "";
+		BWindow* caller = fOwner ? fOwner : fCaller;
+		if (caller) {
+			BRect cr = caller->Frame();
+			// store coordinates relative to closest corner of owner-frame:
+			origin[0] = 
+				(fabs(cr.left-frame.left) < fabs(frame.left-cr.right))
+					? 'L'
+					: 'R';
+			origin[1] = 
+				(fabs(cr.top-frame.top) < fabs(frame.top-cr.bottom))
+					? 'T'
+					: 'B';
+			origin[2] = '\0';
+			if (!strcmp(origin,"LT"))
+				frame.OffsetTo(frame.LeftTop()-cr.LeftTop());
+			else if (!strcmp(origin,"RT"))
+				frame.OffsetTo(frame.LeftTop()-cr.RightTop());
+			else if (!strcmp(origin,"LB"))
+				frame.OffsetTo(frame.LeftTop()-cr.LeftBottom());
+			else if (!strcmp(origin,"RB"))
+				frame.OffsetTo(frame.LeftTop()-cr.RightBottom());
+		}
+		if (gPrefs) {
+			if (origin[0] == '\0')
+				gPrefs->RemovePref(dlgOrigin.c_str());
+			else
+				gPrefs->SetPrefString(dlgOrigin.c_str(), origin);
+			gPrefs->SetPrefRect(dlgRect.c_str(), frame);
+		}
+	}
+	BWindow::Hide();
 }
 
 bool HDialog::OKClicked()
@@ -391,7 +573,7 @@ void HDialog::CreateField(int kind, BPositionIO& data, BView*& inside)
 	}
 } /* HDialog::CreateField */
 
-void HDialog::BuildIt(BPositionIO& data)
+void HDialog::_BuildIt(BPositionIO& data)
 {
 	int kind, cnt;
 	BView *contains = fMainView;
@@ -416,26 +598,6 @@ void HDialog::RegisterFieldCreator(int kind, FieldCreator fieldCreator)
 void HDialog::RegisterFields()
 {
 } /* HDialog::RegisterFields */
-
-BRect GetPosition(dRect dr, BWindow *owner)
-{
-	BRect frame = dr.ToBe();
-	
-	if (owner)
-	{
-		BRect r = owner->Frame();
-		frame.OffsetTo(r.left + (r.Width() - frame.Width()) / 2,
-			r.top + (r.Height() - frame.Height()) / 3);
-	}
-	else
-	{
-		BScreen s;
-		frame.OffsetBy((s.Frame().Width() - frame.Width()) / 2,
-			(s.Frame().Height() - frame.Height()) / 3);
-	}
-	
-	return frame;
-} /* GetPosition */
 
 int HDialog::GetValue(const char *id) const
 {
@@ -511,4 +673,80 @@ filter_result HDialog::KeyDownFilter(BMessage* msg, BHandler**,
 	   }
 	}
 	return B_DISPATCH_MESSAGE;
+}
+
+
+// [zooey]: warp-mouse action copied over from opentracker...
+/****************************************************************************
+** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING **
+**                                                                         **
+**                          DANGER, WILL ROBINSON!                         **
+**                                                                         **
+** The rest of the interfaces contained here are part of BeOS's            **
+**                                                                         **
+**                     >> PRIVATE NOT FOR PUBLIC USE <<                    **
+**                                                                         **
+**                                                       implementation.   **
+**                                                                         **
+** These interfaces              WILL CHANGE        in future releases.    **
+** If you use them, your app     WILL BREAK         at some future time.   **
+**                                                                         **
+** (And yes, this does mean that binaries built from Pe will not           **
+** be compatible with some future releases of the OS.  When that happens,  **
+** we will provide an updated version of this file to keep compatibility.) **
+**                                                                         **
+** WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING **
+****************************************************************************/
+
+// from interface_defs.h
+struct window_info {
+	team_id		team;
+    int32   	id;	  		  /* window's token */
+
+	int32		thread;
+	int32		client_token;
+	int32		client_port;
+	uint32		workspaces;
+
+	int32		layer;
+    uint32	  	w_type;    	  /* B_TITLED_WINDOW, etc. */
+    uint32      flags;	  	  /* B_WILL_FLOAT, etc. */
+	int32		window_left;
+	int32		window_top;
+	int32		window_right;
+	int32		window_bottom;
+	int32		show_hide_level;
+	bool		is_mini;
+	char		name[1];
+};
+
+// from interface_misc.h
+enum window_action {
+	B_MINIMIZE_WINDOW,
+	B_BRING_TO_FRONT
+};
+
+// from interface_misc.h
+void		do_window_action(int32 window_id, int32 action, 
+							 BRect zoomRect, bool zoom);
+window_info	*get_window_info(int32 a_token);
+int32		*get_token_list(team_id app, int32 *count);
+
+static void WarpMouseToWindow(const char* windowName)
+{
+	int32 count;
+	int32 *tokens = get_token_list(-1, &count);
+	team_id pe_team = be_app->Team();
+	bool found = false;
+	for (int32 i = count-1; i>=0 && !found; i--) {
+		window_info* windowInfo = get_window_info(tokens[i]);
+		if (windowInfo && windowInfo->team == pe_team
+		&& !strcmp(windowInfo->name, windowName)) {
+			do_window_action(windowInfo->id, B_BRING_TO_FRONT, BRect(0,0,0,0), 
+							 false);
+			found = true;
+		}
+		free(windowInfo);
+	}
+	free(tokens);
 }

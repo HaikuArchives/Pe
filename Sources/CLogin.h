@@ -41,7 +41,7 @@
 class CLogin : public HDialog {
 public:
 			CLogin(BRect frame, const char *name, window_type type, int flags,
-				BWindow *owner, BPositionIO& data);
+				BWindow *owner, BPositionIO* data);
 			~CLogin();
 			
 			enum { sResID = 12 };

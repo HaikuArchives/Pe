@@ -38,6 +38,7 @@
 
 #include "HStream.h"
 #include "HAppResFile.h"
+#include "HPreferences.h"
 
 struct dRect {
 	short left, top, right, bottom;
@@ -45,28 +46,52 @@ struct dRect {
 	BRect ToBe();
 };
 
-template <class T>
-class DialogCreator {
-public:
-static	T* CreateDialog(BWindow *owner);
-static	T* CreateDialog(BWindow *owner, BPositionIO& tmpl);
+enum HPlacementType {
+	H_PLACE_ANY = 0,
+		// unspecified placement (i.e. none)
+	H_PLACE_DEFAULT,
+		// center horizontally, and 1/3 towards the top
+	H_PLACE_LAST_POS,
+		// place at last known position, relative to closest corner
+		// of calling window (if any)
+	H_PLACE_OUT_OF_THE_WAY
+		// automatically place such that the dialog doesn't obscure
+		// the caller window.
 };
 
 template <class T>
-T* DialogCreator<T>::CreateDialog(BWindow *owner)
+class DialogCreator {
+public:
+static	T* CreateDialog(BWindow *owner, BWindow *caller = NULL,
+						HPlacementType placement = H_PLACE_LAST_POS);
+static	T* CreateDialog(const char *name, BWindow *owner, 
+						BWindow *caller = NULL, 
+						BRect frame = BRect(0,0,199,99), 
+						HPlacementType placement = H_PLACE_LAST_POS, 
+						window_type type = B_TITLED_WINDOW, 
+						int flags = B_ASYNCHRONOUS_CONTROLS);
+static	T* CreateDialog(BWindow *owner, BPositionIO& tmpl,
+						HPlacementType placement = H_PLACE_DEFAULT);
+};
+
+template <class T>
+T* DialogCreator<T>::CreateDialog(BWindow *owner, BWindow *caller,
+								  HPlacementType placement)
 {
 	size_t size;
 	const void *p = HResources::GetResource('DLOG', T::sResID, size);
 	if (!p) throw HErr("missing resource");
 	BMemoryIO buf(p, size);
 	
-	T *d = CreateDialog(owner, buf);
+	T *d = CreateDialog(owner, buf, placement);
+	d->SetCaller( caller);
 	
 	return d;
 } /* CreateDialog */
 
 template <class T>
-T* DialogCreator<T>::CreateDialog(BWindow *owner, BPositionIO& tmpl)
+T* DialogCreator<T>::CreateDialog(BWindow *owner, BPositionIO& tmpl,
+								  HPlacementType placement)
 {
 	T::RegisterFields();
 
@@ -76,8 +101,25 @@ T* DialogCreator<T>::CreateDialog(BWindow *owner, BPositionIO& tmpl)
 	int f;
 
 	tmpl >> r >> n >> t >> f;
-	return new T(GetPosition(r, owner), n, t, f, owner, tmpl);
+	BRect resFrame = r.ToBe();
+	T* d = new T(resFrame, n, t, f, owner, &tmpl);
+	if (placement != H_PLACE_ANY)
+		d->SetPlacement(placement);
+	return d;
 } /* DialogCreator<T>::CreateDialog */
+
+template <class T>
+T* DialogCreator<T>::CreateDialog(const char *name, BWindow *owner, 
+								  BWindow *caller,
+								  BRect frame, HPlacementType placement,
+								  window_type type, int flags)
+{
+	T* d = new T(frame, name, type, flags, owner);
+	d->SetCaller( caller);
+ 	if (placement != H_PLACE_ANY)
+	 	d->SetPlacement(placement);
+	return d;
+}
 
 template <class T>
 void MakeDialog(BWindow* owner, T*& dlog)
@@ -90,19 +132,20 @@ typedef void (*FieldCreator)(int kind, BPositionIO& data, BView*& inside);
 class HDialog : public BWindow {
 public:
 			HDialog(BRect frame, const char *name, window_type type, int flags,
-				BWindow *owner, BPositionIO& data);
+				BWindow *owner=NULL, BPositionIO* data=NULL);
 			~HDialog();
 	
 			enum { sResID = 100 };
 	
 			void CreateField(int kind, BPositionIO& data, BView*& inside);
-virtual	void MessageReceived(BMessage *msg);
+virtual		void MessageReceived(BMessage *msg);
 
-virtual	void Show();
+virtual		void Show();
+virtual		void Hide();
 
-virtual	bool OKClicked();
-virtual	bool CancelClicked();
-virtual	void UpdateFields();
+virtual		bool OKClicked();
+virtual		bool CancelClicked();
+virtual		void UpdateFields();
 
 			bool IsOn(const char *name) const;
 			void SetOn(const char *name, bool on = true);
@@ -120,21 +163,29 @@ virtual	void UpdateFields();
 			int GetValue(const char *id) const;
 			void SetValue(const char *id, int v);
 			
+			void SetCaller( BWindow* caller)
+										{ fCaller = caller; }
+			void SetPlacement( HPlacementType placement)
+										{ fPlacement = placement; }
+			
 static		void RegisterFieldCreator(int kind, FieldCreator fieldCreator);
 static		void RegisterFields();
 
 protected:
 			static filter_result HDialog::KeyDownFilter(BMessage* msg, 
-																	  BHandler**,
-																	  BMessageFilter* filter);
+														BHandler**,
+														BMessageFilter* filter);
 
-			void BuildIt(BPositionIO& data);
+			void _BuildIt(BPositionIO& data);
+			void _PlaceWindow();
 	
 			BView *fMainView;
 			BWindow *fOwner;
+			BWindow *fCaller;
+			HPlacementType fPlacement;
+static		int16 sfDlgNr;
 };
 
-BRect GetPosition(dRect dr, BWindow *owner);
 extern float gFactor;
 
 

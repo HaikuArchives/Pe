@@ -43,7 +43,7 @@ class CFtpDialog : public HDialog
 {
   public:
 	CFtpDialog(BRect frame, const char *name, window_type type, int flags,
-			   BWindow *owner, BPositionIO& data);
+			   BWindow *owner, BPositionIO* data);
 	~CFtpDialog();
 	
 	enum { sResID = 128 };

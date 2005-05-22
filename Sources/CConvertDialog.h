@@ -41,7 +41,7 @@
 class CConvertDialog : public HDialog {
 public:
 		CConvertDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data);
+			BWindow *owner, BPositionIO* data);
 		
 		enum { sResID = 7 };
 		

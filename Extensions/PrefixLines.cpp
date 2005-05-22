@@ -67,14 +67,14 @@ public:
 		enum { sResID = 1 };
 		
 		CPrefixDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data);
+			BWindow *owner, BPositionIO* data);
 
 virtual bool OKClicked();
 virtual bool CancelClicked();
 };
 
 CPrefixDialog::CPrefixDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data)
+			BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	if (sBefore)

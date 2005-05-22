@@ -35,12 +35,11 @@
 
 #include "pe.h"
 #include "CLogin.h"
-#include "CFtpDialog.h"
 
 string sfUsername, sfPassword;
 
 CLogin::CLogin(BRect frame, const char *name, window_type type, int flags,
-				BWindow *owner, BPositionIO& data)
+				BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	SetText("username", sfUsername.c_str());

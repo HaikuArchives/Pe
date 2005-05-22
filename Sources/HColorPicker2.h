@@ -45,7 +45,7 @@ class HColorDemo;
 class HColorPicker2 : public HDialog {
 public:
 		HColorPicker2(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO& data);
+			BWindow *owner, BPositionIO* data);
 		
 		enum { sResID = 100 };
 		

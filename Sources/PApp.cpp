@@ -113,7 +113,8 @@ long CPrefOpener::Execute()
 {
 	try
 	{
-		CPrefsDialog *prefsDialog = DialogCreator<CPrefsDialog>::CreateDialog(NULL);
+		CPrefsDialog *prefsDialog 
+			= DialogCreator<CPrefsDialog>::CreateDialog(NULL);
 		prefsDialog->Run();
 		
 		PApp *app = dynamic_cast<PApp*>(be_app);
@@ -272,7 +273,9 @@ PApp::PApp()
 		RestoreRecentMenu();
 
 		gRxInstalled = true;
-		fFindDialog = DialogCreator<CFindDialog>::CreateDialog(NULL);
+		fFindDialog 
+			= DialogCreator<CFindDialog>::CreateDialog(NULL, PDoc::TopWindow(),
+																	 H_PLACE_OUT_OF_THE_WAY);
 		fFindDialog->Run();
 		
 		InitSelectedMap();
@@ -804,7 +807,8 @@ void PApp::MessageReceived(BMessage *msg)
 			
 			case msg_FtpOpen:
 			{
-				CFtpDialog *ftpo = DialogCreator<CFtpDialog>::CreateDialog(NULL);
+				CFtpDialog *ftpo 
+					= DialogCreator<CFtpDialog>::CreateDialog(/*"FtpDialog",*/NULL);
 				ftpo->Show();
 				break;
 			}
