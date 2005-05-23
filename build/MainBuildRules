@@ -234,17 +234,17 @@ rule PreProcessRez
 }
 
 if $(OSPLAT) = PPC {
-actions PreProcessRez
-{
-	mwcc -preprocess -o "$(<)_tmp" $(HDRS) $(>) ;
-	$(REZ) -t -o "$(<)" $(HDRS) "$(<)_tmp" ;
-}
+	actions PreProcessRez
+	{
+		mwcc -preprocess -o "$(<)_tmp" $(HDRS) $(>) ;
+		$(REZ) -t -o "$(<)" $(HDRS) "$(<)_tmp" ;
+	}
 } else {
-actions PreProcessRez
-{
-	gcc -E -x c -o - $(HDRS) $(>) | sed 's/^#.*//g' > "$(<)_tmp" ;
-	$(REZ) -o "$(<)" -t $(HDRS) "$(<)_tmp" ;
-}
+	actions PreProcessRez
+	{
+		gcc -E -x c -o "$(<)_tmp" $(HDRS) $(>)  ;
+		$(REZ) -o "$(<)" -t $(HDRS) "$(<)_tmp" ;
+	}
 }
 
 rule RezHeader
@@ -332,6 +332,11 @@ rule PeExtension
 		RezHeader $(rsrc:B).r.h : $(rsrc) ;
 	}
 	SharedLibrary $(ext) : $(srcs) : $(libs) ;
+}
+
+actions PeExtension
+{	# create a link to the folder where libhekkel.so lives
+	ln -sfn ../lib $(DISTRO_DIR)/Extensions/lib ;
 }
 
 rule SubDirSysHdrs
