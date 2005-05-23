@@ -36,7 +36,9 @@
 #ifndef HDLOGVIEW_H
 #define HDLOGVIEW_H
 
-class HDlogView : public BView {
+#include "HLibHekkel.h"
+
+class IMPEXP_LIBHEKKEL HDlogView : public BView {
 public:
 		HDlogView(BRect frame, const char *name);
 		~HDlogView();

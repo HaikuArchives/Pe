@@ -35,6 +35,8 @@
 
 #include "pe.h"
 
+#include "HStream.h"
+
 void ReadCString(BPositionIO& inStream, int inMaxLen, char *outString)
 {
 	long l = 1;

@@ -291,7 +291,7 @@ const char *ident(const char *text, CLanguageProxy& proxy, char *&scope)
 		return i_extern(text);
 	else if (strcmp(nameBuf, "header") == 0) {
 		// first add "header"
-		while (!isspace(text)) {
+		while (!isspace(*text)) {
 			name_append(text, name, size);
 		}
 		// then a space
@@ -332,7 +332,7 @@ const char *ident(const char *text, CLanguageProxy& proxy, char *&scope)
 		// save the "options" location
 		start = text;		
 		// then add "options"
-		while (!isspace(text)) {
+		while (!isspace(*text)) {
 			name_append(text, name, size);
 		}
 		// terminate

@@ -38,7 +38,9 @@
 
 #include <Box.h>
 
-class HBox : public BBox {
+#include "HLibHekkel.h"
+
+class IMPEXP_LIBHEKKEL HBox : public BBox {
 public:
 		HBox(BRect bounds,
 				const char *name = NULL,

@@ -36,7 +36,9 @@
 #ifndef HHELPWINDOW_H
 #define HHELPWINDOW_H
 
-class HHelpView : public BView {
+#include "HLibHekkel.h"
+
+class IMPEXP_LIBHEKKEL HHelpView : public BView {
 public:
 			HHelpView(BRect r, const char *helptext);
 			~HHelpView();
@@ -47,7 +49,7 @@ private:
 			char *fHelpText;
 };
 
-class HHelpWindow : public BWindow {
+class IMPEXP_LIBHEKKEL HHelpWindow : public BWindow {
 public:
 			HHelpWindow(BRect r, const char *msg);
 };

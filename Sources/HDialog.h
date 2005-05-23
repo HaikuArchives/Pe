@@ -36,17 +36,19 @@
 #ifndef HDIALOG_H
 #define HDIALOG_H
 
+#include "HLibHekkel.h"
+
 #include "HStream.h"
 #include "HAppResFile.h"
 #include "HPreferences.h"
 
-struct dRect {
+struct IMPEXP_LIBHEKKEL dRect {
 	short left, top, right, bottom;
 	
 	BRect ToBe();
 };
 
-enum HPlacementType {
+IMPEXP_LIBHEKKEL enum HPlacementType {
 	H_PLACE_ANY = 0,
 		// unspecified placement (i.e. none)
 	H_PLACE_DEFAULT,
@@ -129,7 +131,7 @@ void MakeDialog(BWindow* owner, T*& dlog)
 
 typedef void (*FieldCreator)(int kind, BPositionIO& data, BView*& inside);
 
-class HDialog : public BWindow {
+class IMPEXP_LIBHEKKEL HDialog : public BWindow {
 public:
 			HDialog(BRect frame, const char *name, window_type type, int flags,
 				BWindow *owner=NULL, BPositionIO* data=NULL);
@@ -172,7 +174,7 @@ static		void RegisterFieldCreator(int kind, FieldCreator fieldCreator);
 static		void RegisterFields();
 
 protected:
-			static filter_result HDialog::KeyDownFilter(BMessage* msg, 
+			static filter_result KeyDownFilter(BMessage* msg, 
 														BHandler**,
 														BMessageFilter* filter);
 
@@ -186,7 +188,7 @@ protected:
 static		int16 sfDlgNr;
 };
 
-extern float gFactor;
+extern IMPEXP_LIBHEKKEL float gFactor;
 
 
 #endif // HDIALOG_H

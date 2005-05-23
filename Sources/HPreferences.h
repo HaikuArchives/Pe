@@ -36,14 +36,16 @@
 #ifndef HPREFERENCES_H
 #define HPREFERENCES_H
 
+#include "HLibHekkel.h"
+
 #include "pe.h"
 #include "HError.h"
 
-//using namespace std;
+#include <string>
 
 typedef map<string, char*> PrefMap;
 
-class HPreferences {
+class IMPEXP_LIBHEKKEL HPreferences {
 public:
 	HPreferences(const char *preffilename);
 	virtual ~HPreferences();
@@ -81,6 +83,6 @@ protected:
 	BLocker fLock;
 };
 
-extern HPreferences *gPrefs;
+extern IMPEXP_LIBHEKKEL HPreferences *gPrefs;
 
 #endif // HPREFERENCES_H

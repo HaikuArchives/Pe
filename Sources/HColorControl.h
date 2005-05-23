@@ -36,7 +36,9 @@
 #ifndef HCOLORCONTROL_H
 #define HCOLORCONTROL_H
 
-class HColorControl : public BView {
+#include "HLibHekkel.h"
+
+class IMPEXP_LIBHEKKEL HColorControl : public BView {
 public:
 		HColorControl(BRect r, const char *name, const char *label, rgb_color color);
 		~HColorControl();

@@ -36,7 +36,9 @@
 #ifndef CCOLORUTILS_H
 #define CCOLORUTILS_H
 
-struct roSColor
+#include "HLibHekkel.h"
+
+struct IMPEXP_LIBHEKKEL roSColor
 { 
     float  m_Red; 
     float  m_Green; 
@@ -45,7 +47,7 @@ struct roSColor
     float  m_Hue;
 };
 
-enum {
+IMPEXP_LIBHEKKEL enum {
 	kLowColor,
 	kSelectionColor,
 	kInvisiblesColor,
@@ -75,26 +77,30 @@ enum {
 	kLastColor
 };
 
-extern rgb_color gColor[kLastColor], gInvColor[kLastColor];
+extern IMPEXP_LIBHEKKEL rgb_color gColor[kLastColor], gInvColor[kLastColor];
 
-extern unsigned char gSelectedMap[256];
-extern unsigned char gDisabledMap[256];
-void InitSelectedMap();
+extern IMPEXP_LIBHEKKEL unsigned char gSelectedMap[256];
+extern IMPEXP_LIBHEKKEL unsigned char gDisabledMap[256];
+IMPEXP_LIBHEKKEL void InitSelectedMap();
 
-void rgb2ro(rgb_color rgb, roSColor& ro);
-rgb_color ro2rgb(roSColor& ro);
+IMPEXP_LIBHEKKEL void rgb2ro(rgb_color rgb, roSColor& ro);
+IMPEXP_LIBHEKKEL rgb_color ro2rgb(roSColor& ro);
+IMPEXP_LIBHEKKEL 
 void rgb2hsv(float r, float g, float b, float& h, float& s, float& v);
+IMPEXP_LIBHEKKEL 
 void hsv2rgb(float h, float s, float v, float& r, float& g, float& b);
+IMPEXP_LIBHEKKEL 
 void rgb2f(rgb_color rgb, float& r, float& g, float& b, float& a);
-rgb_color f2rgb(float r, float g, float b, float a = 0.0);
+IMPEXP_LIBHEKKEL rgb_color f2rgb(float r, float g, float b, float a = 0.0);
 
+IMPEXP_LIBHEKKEL 
 rgb_color DistinctColor(rgb_color highColor, rgb_color lowColor);
-void DefineInvColors(rgb_color selectionColor);
-rgb_color LookupDistinctColor(rgb_color highColor);
+IMPEXP_LIBHEKKEL void DefineInvColors(rgb_color selectionColor);
+IMPEXP_LIBHEKKEL rgb_color LookupDistinctColor(rgb_color highColor);
 
 #ifndef B_BEOS_VERSION_DANO
-bool operator==(const rgb_color& a, const rgb_color& b);
-bool operator!=(const rgb_color& a, const rgb_color& b);
+IMPEXP_LIBHEKKEL bool operator==(const rgb_color& a, const rgb_color& b);
+IMPEXP_LIBHEKKEL bool operator!=(const rgb_color& a, const rgb_color& b);
 #endif
 
 #endif // CCOLORUTILS_H

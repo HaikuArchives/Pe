@@ -36,13 +36,15 @@
 #ifndef HCOLORPICKER2_H
 #define HCOLORPICKER2_H
 
+#include "HLibHekkel.h"
+
 class HColorSquare;
 class HColorSlider;
 class HColorDemo;
 
 #include "HDialog.h"
 
-class HColorPicker2 : public HDialog {
+class IMPEXP_LIBHEKKEL HColorPicker2 : public HDialog {
 public:
 		HColorPicker2(BRect frame, const char *name, window_type type, int flags,
 			BWindow *owner, BPositionIO* data);

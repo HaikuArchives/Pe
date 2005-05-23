@@ -48,7 +48,9 @@
 
 #include <Handler.h>
 
-class HLazyObject : public BHandler {
+#include "HLibHekkel.h"
+
+class IMPEXP_LIBHEKKEL HLazyObject : public BHandler {
 public:
 		HLazyObject(BLooper *looper);
 		~HLazyObject();

@@ -38,7 +38,9 @@
 
 #include <GraphicsDefs.h>
 
-const rgb_color
+#include "HLibHekkel.h"
+
+IMPEXP_LIBHEKKEL const rgb_color
 	kViewColor = { 216, 216, 216, 255 },
 	kShadow = { 184, 184, 184, 255 },
 	kDarkShadow  = { 150, 150, 150, 255 },
@@ -47,7 +49,7 @@ const rgb_color
 	kBlack = { 0, 0, 0, 255 },
 	kRed = { 255, 0, 0, 255 };
 
-const ulong
+IMPEXP_LIBHEKKEL const ulong
 	msg_OK				= 'ok  ',
 	msg_Cancel			= 'cncl',
 	msg_FieldChanged	= 'chng';

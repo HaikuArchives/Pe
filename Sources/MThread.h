@@ -8,8 +8,10 @@
 
 #include <Locker.h>
 
+#include "HLibHekkel.h"
 
-class MThread
+
+class IMPEXP_LIBHEKKEL MThread
 {
 public:
  								MThread(

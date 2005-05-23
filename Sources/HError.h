@@ -36,6 +36,8 @@
 #ifndef HERROR_H
 #define HERROR_H
 
+#include "HLibHekkel.h"
+
 #include <cerrno>
 #include <syslog.h>
 
@@ -45,9 +47,9 @@
 #	define ASSERT_OR_THROW(x)		if (!(x)) throw HErr("Assertion failed at %s:%d: %s", __FILE__, __LINE__, #x)
 #endif
 
-const char kDefaultMessage[] = "An OS error occurred: %s";
+IMPEXP_LIBHEKKEL const char kDefaultMessage[] = "An OS error occurred: %s";
 
-class HErr
+class IMPEXP_LIBHEKKEL HErr
 {
   protected:
 	HErr();

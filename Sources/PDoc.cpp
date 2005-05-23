@@ -51,7 +51,7 @@
 #include "PKeyDownFilter.h"
 #include "HButtonBar.h"
 #include "HPreferences.h"
-#include "MTextAddOn.h"
+#include "MTextAddOnImpl.h"
 #include "PCmd.h"
 #include "CGoToLine.h"
 #include "CInfoDialog.h"
@@ -1286,7 +1286,7 @@ static int32 perform_extension(void* data)
 {
 	ExtensionInfo* extInfo = reinterpret_cast<ExtensionInfo*>(data);
 	if (extInfo) {
-		MTextAddOn intf(*extInfo->currText, extInfo->name);
+		MTextAddOnImpl intf(*extInfo->currText, extInfo->name);
 		(*extInfo->extension)(&intf);
 	}
 	return B_OK;

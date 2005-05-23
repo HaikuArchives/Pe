@@ -36,6 +36,8 @@
 #ifndef HAPPRESFILE_H
 #define HAPPRESFILE_H
 
+#include "HLibHekkel.h"
+
 class BMenuBar;
 class BMenu;
 
@@ -51,13 +53,22 @@ namespace HResources {
 	void R4_Dummy();
 #endif
 
+IMPEXP_LIBHEKKEL
 BMenuBar* GetMenuBar(BRect frame, int id);
+
+IMPEXP_LIBHEKKEL
 BMenu* GetMenu(int id, bool popup = false);
 
+IMPEXP_LIBHEKKEL
 const void *GetResource(unsigned long type, int id);
+
+IMPEXP_LIBHEKKEL
 const void *GetResource(unsigned long type, int id, size_t& size);
+
+IMPEXP_LIBHEKKEL
 const void *GetResource(unsigned long type, int id, size_t& size, const char **name);
 
+IMPEXP_LIBHEKKEL
 const void *GetNamedResource(unsigned long type, const char *name);
 
 }

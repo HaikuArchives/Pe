@@ -7,15 +7,18 @@ if $(OSPLAT) = X86 {
 	C++FLAGS += -Wno-sign-compare -Wno-overloaded-virtual ;
 } else {
 	# generate precompiled pe-headers on PPC:
-	Depends libhekkel.a : $(PREFIX_FILE) ;
+	Depends libhekkel.so : $(PREFIX_FILE) ;
 	PreCompile $(PREFIX_FILE) : [ FDirName $(TOP) Sources pe.pch++ ] ;
 	C++FLAGS += -prefix $(PREFIX_FILE) ;
 
 	SubDirSysHdrs $(TOP) regex ;
 }
 
+SAVED_DEFINES = $(DEFINES) ;
+DEFINES += H_BUILDING_LIBHEKKEL ;
+
 # <pe-src>
-Library libhekkel.a : 
+SharedLibrary libhekkel.so : 
 	HAppResFile.cpp
 	HBox.cpp
 	HButtonBar.cpp
@@ -33,8 +36,12 @@ Library libhekkel.a :
 	MAlert.cpp
 	MTextAddOn.cpp
 	MThread.cpp
+	:	$(RX_LIB) be net $(STDC++LIB)
 	;
 # </pe-src>
+MakeLocate libhekkel.so : $(DISTRO_DIR)/lib ;
+
+DEFINES = $(SAVED_DEFINES) ;
 
 #<pe-src>
 Application pe : 
@@ -76,6 +83,7 @@ Application pe :
 	CStdErrParser.cpp
 	CUrlOpener.cpp
 	FontStyle.cpp
+	MTextAddOnImpl.cpp
 	PAbout.cpp
 	PApp.cpp
 	PCmd.cpp
@@ -99,7 +107,7 @@ Application pe :
 	Sstdio.cpp
 	utf-support.cpp
 	Utils.cpp
-	:	libhekkel.a $(RX_LIB) be net $(STDC++LIB) tracker mail textencoding 
+	:	libhekkel.so $(RX_LIB) be net $(STDC++LIB) tracker mail textencoding 
 	;
 #	</pe-src>
 if $(OSPLAT) = X86 {

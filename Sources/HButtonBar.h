@@ -36,16 +36,18 @@
 #ifndef HBUTTONBAR_H
 #define HBUTTONBAR_H
 
+#include "HLibHekkel.h"
+
 class HHelpWindow;
 class HButtonBar;
 
-struct BtnTemplate {
+struct IMPEXP_LIBHEKKEL BtnTemplate {
 	long resID;
 	long cmd;
 	long flags;
 };
 
-enum BtnFlags {
+IMPEXP_LIBHEKKEL enum BtnFlags {
 	bfMenu,
 	bfToggle,
 	bfSpace,
@@ -53,13 +55,13 @@ enum BtnFlags {
 	bfDualIcon
 };
 
-enum BtnBarFlags {
+IMPEXP_LIBHEKKEL enum BtnBarFlags {
 	bbDragger,
 	bbAcceptFirstClick
 };
 
 
-class HTool {
+class IMPEXP_LIBHEKKEL HTool {
 public:
 			HTool(HButtonBar *bar, float x, float width, int cmd, const char *help);
 virtual	~HTool();
@@ -96,7 +98,7 @@ protected:
 	unsigned char *fImageStd, *fImageAlt;
 };
 
-class HToolButton : public HTool {
+class IMPEXP_LIBHEKKEL HToolButton : public HTool {
 public:
 			HToolButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help);
 			
@@ -105,7 +107,7 @@ virtual	void MouseEnter(bool pushed = false);
 virtual	void MouseLeave();
 };
 
-class HToolStateButton : public HTool {
+class IMPEXP_LIBHEKKEL HToolStateButton : public HTool {
 public:
 			HToolStateButton(HButtonBar *bar, int resID1, int resID2, int cmd, float x, int flags, const char *help);
 			
@@ -114,14 +116,14 @@ virtual	void MouseEnter(bool pushed = false);
 virtual	void MouseLeave();
 };
 
-class HToolSeparator : public HTool {
+class IMPEXP_LIBHEKKEL HToolSeparator : public HTool {
 public:
 			HToolSeparator(HButtonBar *bar, float x);
 			
 virtual	void Draw(bool pushed = false);
 };
 
-class HButtonBar : public BView {
+class IMPEXP_LIBHEKKEL HButtonBar : public BView {
 public:
 			HButtonBar(BRect frame, const char *name, int resID, BHandler *target = NULL);
 			~HButtonBar();

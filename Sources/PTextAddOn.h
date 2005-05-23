@@ -63,9 +63,9 @@
 	
 */
 
-#include "MTextAddOn.h"
+#include "MTextAddOnImpl.h"
 
-class PTextAddOn : public MTextAddOn{
+class PTextAddOn : public MTextAddOnImpl {
 public:
 			PTextAddOn(MIDETextView&	inTextView);
 			PTextAddOn(MIDETextView&	inTextView, const char *extension);

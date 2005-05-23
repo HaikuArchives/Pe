@@ -18,17 +18,19 @@
 #ifndef MALERT_H
 #define MALERT_H
 
+#include "HLibHekkel.h"
+
 #include <Alert.h>
 
 
-enum AlertReplies {
+IMPEXP_LIBHEKKEL enum AlertReplies {
 	kOKButton = 1,
 	kCancelButton = 2,
 	kSaveButton = 1,
 	kDontSaveButton = 3
 };
 
-class MAlert
+class IMPEXP_LIBHEKKEL MAlert
 {
 		BAlert *				fAlert;
 		long					fResult;
@@ -63,7 +65,7 @@ static	void					SetAlertIsNoisy(
 typedef MAlert MInfoAlert;
 
 
-class MBlankAlert :
+class IMPEXP_LIBHEKKEL MBlankAlert :
 	public MAlert
 {
 public:
@@ -75,7 +77,7 @@ public:
 };
 
 
-class MIdeaAlert :
+class IMPEXP_LIBHEKKEL MIdeaAlert :
 	public MAlert
 {
 public:
@@ -87,7 +89,7 @@ public:
 };
 
 
-class MWarningAlert :
+class IMPEXP_LIBHEKKEL MWarningAlert :
 	public MAlert
 {
 public:
@@ -99,7 +101,7 @@ public:
 };
 
 
-class MStopAlert :
+class IMPEXP_LIBHEKKEL MStopAlert :
 	public MAlert
 {
 public:

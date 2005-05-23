@@ -1,3 +1,4 @@
+// [zooey, 2005]: made MTextAddon really an abstract class
 //==================================================================
 //	MTextAddOn.h
 //	Copyright 1996  Metrowerks Corporation, All Rights Reserved.
@@ -8,47 +9,25 @@
 #ifndef MTEXTADDON_H
 #define MTEXTADDON_H
 
-class PExtCmd;
-class PText;
-typedef PText MIDETextView;
+#include "HLibHekkel.h"
+
 class BWindow;
 struct entry_ref;
 
-class MTextAddOn
+class IMPEXP_LIBHEKKEL MTextAddOn
 {
 public:
-								MTextAddOn(
-									MIDETextView&	inTextView);
-
-								MTextAddOn(
-									MIDETextView&	inTextView,
-									const char *extension);
-
 	virtual						~MTextAddOn();
-	virtual	const char*			Text();
-	virtual	int32				TextLength() const;
-	virtual	void				GetSelection(
-									int32 *start, 
-									int32 *end) const;
-	virtual	void				Select(
-									int32 newStart, 
-									int32 newEnd);
-	virtual void				Delete();
-	virtual void				Insert(
-									const char* inText);
-	virtual void				Insert(
-									const char* text, 
-									int32 length);
+	virtual	const char*			Text() = 0;
+	virtual	int32				TextLength() const = 0;
+	virtual	void				GetSelection(int32 *start, int32 *end) const = 0;
+	virtual	void				Select(int32 newStart, int32 newEnd) = 0;
+	virtual void				Delete() = 0;
+	virtual void				Insert(const char* inText) = 0;
+	virtual void				Insert(const char* text, int32 length) = 0;
 
-	virtual	BWindow*			Window();
-	virtual status_t			GetRef(
-									entry_ref&	outRef);
-
-private:
-
-	MIDETextView&				fText;
-	PExtCmd						*fCmd;
-	bool							fDirty;
+	virtual	BWindow*			Window() = 0;
+	virtual status_t			GetRef(entry_ref& outRef) = 0;
 };
 
 #if !__INTEL__

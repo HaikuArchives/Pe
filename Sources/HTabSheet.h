@@ -36,9 +36,11 @@
 #ifndef HTABSHEET_H
 #define HTABSHEET_H
 
-const ulong msg_Flip = 'flip';
+#include "HLibHekkel.h"
 
-class HTabSheet : public BView {
+IMPEXP_LIBHEKKEL const ulong msg_Flip = 'flip';
+
+class IMPEXP_LIBHEKKEL HTabSheet : public BView {
 public:
 		HTabSheet(BRect frame, const char *name);
 		~HTabSheet();

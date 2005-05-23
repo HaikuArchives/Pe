@@ -33,147 +33,16 @@
 	Created: 09/12/97 21:07:17
 */
 
+/*
+ * [zooey]: do not remove this file, as its main purpose is to make sure
+ *          that libhekkel.so exports the MTextAddOn class.
+ */
+
 #include "pe.h"
-#include "PText.h"
-#include "PDoc.h"
+
 #include "MTextAddOn.h"
-#include "PCmd.h"
-#include "HError.h"
-
-MTextAddOn::MTextAddOn(MIDETextView& inTextView)
-	: fText(inTextView)
-{
-	fCmd = new PExtCmd(&fText, "Extension");
-	fDirty = false;
-} /* MTextAddOn::MTextAddOn */
-
-MTextAddOn::MTextAddOn(MIDETextView& inTextView, const char *extension)
-	: fText(inTextView)
-{
-	fCmd = new PExtCmd(&fText, extension);
-	fDirty = false;
-} /* MTextAddOn::MTextAddOn */
 
 MTextAddOn::~MTextAddOn()
 {
-	if (fText.LockLooper()) {
-		fText.RedrawDirtyLines();
-		if (fDirty) fText.RegisterCommand(fCmd);
-		fText.UnlockLooper();
-	}
-} /* MTextAddOn::~MTextAddOn */
-
-const char* MTextAddOn::Text()
-{
-	const char* text = "";
-	if (fText.LockLooper()) {
-		text = fText.Text();
-		fText.UnlockLooper();
-	}
-	return text;
-} /* MTextAddOn::Text */
-
-int32 MTextAddOn::TextLength() const
-{
-	int32 len = 0;
-	if (fText.LockLooper()) {
-		len = fText.Size();
-		fText.UnlockLooper();
-	}
-	return len;
-} /* MTextAddOn::TextLenght */
-
-void MTextAddOn::GetSelection(int32 *start, int32 *end) const
-{
-	if (fText.LockLooper()) {
-		int32 a = fText.Anchor(), c = fText.Caret();
-		*start = min(a, c);
-		*end = max(a, c);
-		fText.UnlockLooper();
-	}
-} /* MTextAddOn::GetSelection */
-
-void MTextAddOn::Select(int32 newStart, int32 newEnd)
-{
-	if (fText.LockLooper()) {
-		fText.Select(newStart, newEnd, true, false);
-		fText.UnlockLooper();
-	}
-} /* MTextAddOn::Select */
-
-void MTextAddOn::Delete()
-{
-	if (fText.LockLooper()) {
-		int32 start, end;
-		GetSelection(&start, &end);
-		
-		ExtAction action;
-		action.aType = eaDelete;
-		action.aOffset = start;
-		action.aText = (char *)malloc(end - start + 1);
-		FailNil(action.aText);
-		fText.TextBuffer().Copy(action.aText, start, end - start);
-		action.aText[end - start] = 0;
-		fCmd->Actions().push_back(action);
-		
-		fText.Delete(start, end);
-		fText.SetCaret(start);
-		
-		fDirty = true;
-		fText.UnlockLooper();
-	}
-} /* MTextAddOn::Delete */
-
-void MTextAddOn::Insert(const char* inText)
-{
-	if (fText.LockLooper()) {
-		Insert(inText, strlen(inText));
-
-		fDirty = true;
-		fText.UnlockLooper();
-	}
-} /* MTextAddOn::Insert */
-
-void MTextAddOn::Insert(const char* text, int32 length)
-{
-	if (fText.LockLooper()) {
-		int32 start, end;
-		GetSelection(&start, &end);
-		
-		if (start != end)
-			Delete();
-	
-		ExtAction action;
-		action.aType = eaInsert;
-		action.aOffset = start;
-		action.aText = (char *)malloc(length + 1);
-		FailNil(action.aText);
-		memcpy(action.aText, text, length);
-		action.aText[length] = 0;
-		fCmd->Actions().push_back(action);
-	
-		fText.Insert(text, length, start);
-	
-		fDirty = true;
-		fText.UnlockLooper();
-	}
-} /* MTextAddOn::Insert */
-
-BWindow* MTextAddOn::Window()
-{
-	return fText.Window();
-} /* MTextAddOn::Window */
-
-status_t MTextAddOn::GetRef(entry_ref&	outRef)
-{
-	status_t err = B_NO_ERROR;
-	
-	PDoc *doc = static_cast<PDoc*>(Window());
-	if (doc->File())
-		outRef = *doc->File();
-	else
-		err = B_ERROR;
-	
-	return err;
-} /* MTextAddOn::GetRef */
+}
 

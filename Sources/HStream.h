@@ -36,6 +36,8 @@
 #ifndef HSTREAM_H
 #define HSTREAM_H
 
+#include "HLibHekkel.h"
+
 #include "HError.h"
 
 template <class S>
@@ -101,31 +103,32 @@ class HStream
 	stream_type& fStream;
 };
 
-void ReadCString(BPositionIO& stream, int maxLen, char *s);
+IMPEXP_LIBHEKKEL void ReadCString(BPositionIO& stream, int maxLen, char *s);
 
 template<class D>
-inline BPositionIO& operator>>(BPositionIO& s, D& d)
+inline IMPEXP_LIBHEKKEL BPositionIO& operator>>(BPositionIO& s, D& d)
 {
 	if (s.Read(&d, sizeof(D)) != sizeof(D))
 		throw HErr("Error reading");
 	return s;
 } /* operator>> */
 
-inline BPositionIO& operator>>(BPositionIO& stream, char *string)
+inline IMPEXP_LIBHEKKEL BPositionIO& operator>>(BPositionIO& stream, char *string)
 {
 	ReadCString(stream, 255, string);
 	return stream;
 } /* operator>> */
 
 template<class D>
-inline BPositionIO& operator<<(BPositionIO& s, const D& d)
+inline IMPEXP_LIBHEKKEL BPositionIO& operator<<(BPositionIO& s, const D& d)
 {
 	if (s.Write(&d, sizeof(D)) != sizeof(D))
 		throw HErr("Error writing");
 	return s;
 } /* operator<< */
 
-inline BPositionIO& operator<<(BPositionIO& stream, const char *string)
+inline IMPEXP_LIBHEKKEL 
+BPositionIO& operator<<(BPositionIO& stream, const char *string)
 {
 	int sl = strlen(string) + 1;
 	if (stream.Write(string, sl) != sl)
