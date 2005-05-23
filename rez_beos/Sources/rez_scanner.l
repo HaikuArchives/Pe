@@ -264,6 +264,7 @@ ${hexdigit}{1,8}										yylval = strtol(yytext + 1, &d, 16); return NUMBER;
 														}
 \#define[ \t]+{ident}/\(								error("Macro's with parameters are not supported yet");
 \#define[ \t]+{ident}[ \t]+[^\n]+						AddMacro(yytext);
+\#[ \t]+[0-9]+[^\n]*
 [ \n\r\t]+
 .														return yytext[0];
 %%
