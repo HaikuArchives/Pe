@@ -768,6 +768,7 @@ void PApp::MessageReceived(BMessage *msg)
 				if (gPrefs->GetPrefInt("window to workspace", 1))
 					FindDialog()->SetWorkspaces(c);
 				
+				FindDialog()->SetCaller(PDoc::TopWindow());
 				FindDialog()->Show();
 				
 				FindDialog()->Activate(true);
@@ -808,7 +809,7 @@ void PApp::MessageReceived(BMessage *msg)
 			case msg_FtpOpen:
 			{
 				CFtpDialog *ftpo 
-					= DialogCreator<CFtpDialog>::CreateDialog(/*"FtpDialog",*/NULL);
+					= DialogCreator<CFtpDialog>::CreateDialog("FtpDialog", NULL);
 				ftpo->Show();
 				break;
 			}
