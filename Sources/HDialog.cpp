@@ -274,23 +274,24 @@ void HDialog::_PlaceWindow()
 		if (lastFrame.IsValid()) 
 		{
 			newFrame = lastFrame;
-			BRect ownerFrame = fOwner->Frame();
 			const char* origin = NULL;
 			if (gPrefs)
 				origin = gPrefs->GetPrefString(dlgOrigin.c_str(), NULL);
-			if (fOwner && origin) 
+			BWindow* caller = fOwner ? fOwner : fCaller;
+			if (caller && origin) 
 			{
-				// frame was stored relative to owner, so we move to same
+				// frame was stored relative to caller, so we move to same
 				// relative position, but first we need to find out which
 				// window-corner the coordinates relate to:
+				BRect callerFrame = caller->Frame();
 				if (!strcmp(origin,"LT"))
-					newFrame.OffsetBy(ownerFrame.LeftTop());
+					newFrame.OffsetBy(callerFrame.LeftTop());
 				else if (!strcmp(origin,"RT"))
-					newFrame.OffsetBy(ownerFrame.RightTop());
+					newFrame.OffsetBy(callerFrame.RightTop());
 				else if (!strcmp(origin,"LB"))
-					newFrame.OffsetBy(ownerFrame.LeftBottom());
+					newFrame.OffsetBy(callerFrame.LeftBottom());
 				else if (!strcmp(origin,"RB"))
-					newFrame.OffsetBy(ownerFrame.RightBottom());
+					newFrame.OffsetBy(callerFrame.RightBottom());
 			}
 		} 
 		else if (placement == H_PLACE_OUT_OF_THE_WAY)
