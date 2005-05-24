@@ -124,7 +124,6 @@ XRes pe :
 	Dialog-Find.rsrc
 	Dialog-FontTabs.rsrc
 	Dialog-Ftp.rsrc
-	Dialog-FtpOpen.rsrc
 	Dialog-GotoLine.rsrc
 	Dialog-Info.rsrc
 	Dialog-Login.rsrc

@@ -1,4 +1,4 @@
-/*	$Id$
+	/*	$Id$
 	
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
@@ -58,50 +58,18 @@ const unsigned long
 	msg_ToggleDot = 'dotT';
 
 CFtpDialog::CFtpDialog(BRect frame, const char *name, window_type type, int flags,
-	BWindow *owner, BPositionIO* data)
-	: HDialog(frame, name, type, flags, owner, data)
+	BWindow *owner)
+	: HDialog(frame, name, type, flags, owner, NULL)
 {
-	BTextControl *password = dynamic_cast<BTextControl*>(FindView("pass"));
-	password->TextView()->HideTyping(true);
-	fDirectoryPopup = dynamic_cast<BMenuField*>(FindView("path"))->Menu();
-	fList = dynamic_cast<BListView*>(FindView("list"));
-	
-	fList->SetInvocationMessage(new BMessage(msg_SelectedListItem));
-	fList->SetListType(B_MULTIPLE_SELECTION_LIST);
 
 	fReply = new char[1024];
 	fPath = new char[PATH_MAX];
 	fSave = false;
 	fSocket = -1;
 
-	SetDefaultButton(static_cast<BButton*>(FindView("cnct")));
-	
-	SetText("srvr", gPrefs->GetPrefString("last ftp server"));
-	SetText("user", gPrefs->GetPrefString("last ftp user"));
+	Create();
 
-	if (sfPassword.length())
-		SetText("pass", sfPassword.c_str());
-
-	if (strlen(GetText("srvr")) && strlen(GetText("user")))
-		password->MakeFocus();
-	else
-		FindView("srvr")->MakeFocus();
-	
-	static_cast<BControl*>(FindView("dotf"))->SetMessage(new BMessage(msg_ToggleDot));
-	
-	FindView("name")->Hide();
-	SetOn("pssv", gPrefs->GetPrefInt("passive ftp", 1));
-
-
-//	BBox* box = static_cast<BBox*>(FindView("Box"));
-/*
-	BBox* box = (BBox*)FindView("Box");
-	box->SetResizingMode(B_FOLLOW_TOP|B_FOLLOW_RIGHT);
-	box->SetLabel("");
-*/
-	SetSizeLimits(300, 99999, 280, 99999);
-//	Create();
-//	Layout();
+	Layout();
 
 #if 0
 	// Build Extension->Mimetype list // Takes looong
@@ -175,6 +143,132 @@ CFtpDialog::~CFtpDialog()
 		closesocket(fSocket);
 } // CFtpDialog::~CFtpDialog
 
+void CFtpDialog::Create(void)
+{
+	fMainView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	// Server-Box
+	fLoginBox = new BBox(Bounds(), "", B_FOLLOW_RIGHT|B_FOLLOW_TOP);
+	fMainView->AddChild(fLoginBox);
+	fServerName = new HTextControl(fLoginBox, "srvr");
+	fUserName = new HTextControl(fLoginBox, "user");
+	fPassword = new HTextControl(fLoginBox, "pass");
+	fPassword->TextView()->HideTyping(true);
+	fUsePassive = new HCheckBox(fLoginBox, "pssv");
+	fUsePassive->SetValue(gPrefs->GetPrefInt("passive ftp", 1));
+	fConnectButton = new HButton(fLoginBox, "cnct", 'cnct');
+
+	fFileName = new HTextControl(fMainView, "name", 
+								 B_FOLLOW_LEFT_RIGHT|B_FOLLOW_BOTTOM);
+
+	// Buttons
+	fCancelButton = new HButton(fMainView, "cncl", 'cncl', 
+								B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
+	fOkButton = new HButton(fMainView, "ok", 'ok  ', 
+							B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
+
+	// List
+	fDirectoryField = new HMenuField(fMainView, "path");
+	fShowDotted = new HCheckBox(fMainView, "dotf", 
+								new BMessage(msg_ToggleDot),
+								B_FOLLOW_RIGHT|B_FOLLOW_TOP);
+
+	fListView = new BListView(Bounds(), "list", B_MULTIPLE_SELECTION_LIST, 
+							  B_FOLLOW_ALL);
+	fListView->SetInvocationMessage(new BMessage(msg_SelectedListItem));
+	fListView->SetListType(B_MULTIPLE_SELECTION_LIST);
+	fScrollView = new BScrollView("scrll", fListView, B_FOLLOW_ALL, 
+								  B_FRAME_EVENTS, false, true);
+	fMainView->AddChild(fScrollView);
+
+	SetDefaultButton(fConnectButton);
+	
+	fServerName->SetText(gPrefs->GetPrefString("last ftp server"));
+	fUserName->SetText(gPrefs->GetPrefString("last ftp user"));
+
+	if (sfPassword.length())
+		fPassword->SetText(sfPassword.c_str());
+
+	if (strlen(GetText("srvr")) && strlen(GetText("user")))
+		fPassword->MakeFocus();
+	else
+		fServerName->MakeFocus();
+	
+	fFileName->Hide();
+
+} // CFtpDialog::Create
+
+void CFtpDialog::Layout(void)
+{
+	fServerName->ResizeLocalized("Host:");
+	fUserName->ResizeLocalized("Username:");
+	fPassword->ResizeLocalized("Password:");
+	fUsePassive->ResizeLocalized("Passive Mode");
+	fConnectButton->ResizeLocalized("Connect");
+	fCancelButton->ResizeLocalized("Cancel");
+	fOkButton->ResizeLocalized("Open");
+	fShowDotted->ResizeLocalized("Show All!");
+	fDirectoryField->ResizeLocalized();
+	fFileName->ResizeLocalized();
+
+	//### Layout
+	float dx = fMainView->StringWidth("m");
+	float dy = fMainView->StringWidth("n");
+
+	// Server-Box
+	//
+	fServerName->MoveTo(dx, dy);
+	fUserName->MoveTo(dx, fServerName->Bottom()+dy);
+	fPassword->MoveTo(dx, fUserName->Bottom()+dy);
+	fUsePassive->MoveTo(dx, fPassword->Bottom()+dy);
+	fConnectButton->MoveTo(2*dx, fUsePassive->Bottom()+dy);
+	//
+	float bw = max(max(dx*10, fCancelButton->Width()), fOkButton->Width());
+	bw = max(bw, fServerName->Right());
+	bw = max(bw, fUserName->Right());
+	bw = max(bw, fPassword->Right());
+	bw = max(bw, fUsePassive->Right());
+	bw = max(bw, fConnectButton->Right()+2*dx);
+	//
+	fServerName->ResizeWidth(bw);
+	fUserName->ResizeWidth(bw);
+	fPassword->ResizeWidth(bw);
+	fUsePassive->ResizeWidth(bw);
+	fConnectButton->ResizeWidth(bw-2*dx);
+	//
+	fLoginBox->MoveTo(fMainView->Frame().right-bw-3*dx, dy);
+	fLoginBox->ResizeTo(bw+2*dx, fConnectButton->Bottom()+dy);
+
+	// Buttons
+	fOkButton->MoveTo(fLoginBox->Frame().left+dx, 
+					  fMainView->Frame().bottom-dy-fOkButton->Height());
+	fOkButton->ResizeWidth(bw);
+	//
+	fCancelButton->MoveTo(fOkButton->Left(), 
+						  fOkButton->Top()-dy-fCancelButton->Height());
+	fCancelButton->ResizeWidth(bw);
+
+	// List
+	fDirectoryField->MoveTo(dx, dy);
+	fShowDotted->MoveTo(fLoginBox->Frame().left-fShowDotted->Width()-dx, 
+						dy);
+	//
+	fScrollView->MoveTo(dx, fDirectoryField->Bottom()+dy);
+	fScrollView->ResizeTo(fShowDotted->Right()-dx, 
+						  Frame().Height()-fDirectoryField->Bottom()-2*dy);
+	//
+	fFileName->MoveTo(dx, 
+					  fScrollView->Frame().bottom-fFileName->Height());
+	fFileName->ResizeWidth(fScrollView->Frame().Width());
+	//
+	float minW = 200;
+	float minH = 100;
+	minW = max(minW, 
+		       bw + 3*dx + fShowDotted->Width() 
+			       + fDirectoryField->Width());
+	minH = max(minH, fLoginBox->Frame().bottom+2*fOkButton->Height()+3*dy);
+	ResizeToLimits(minW, 99999, minH, 99999);
+} // CFtpDialog::Layout
+
 BBitmap* CFtpDialog::GetIcon(const char *mimeType, const char *tryExtension)
 {
 	map<string,string>::iterator iterExt;
@@ -198,17 +292,17 @@ BBitmap* CFtpDialog::GetIcon(const char *mimeType, const char *tryExtension)
 void CFtpDialog::MakeItSave(const char *name)
 {
 	fSave = true;
-	fList->SetListType(B_SINGLE_SELECTION_LIST);
-	FindView("name")->Show();
-	
+	fListView->SetListType(B_SINGLE_SELECTION_LIST);
+
+	fFileName->Show();
+	fScrollView->ResizeBy(0, -fFileName->Height() - 2);
 	const char *t = strrchr(name, '/');
 	if (t)
-		SetText("name", t + 1);
+		fFileName->SetText(t + 1);
 	else
-		SetText("name", name);
+		fFileName->SetText(name);
 	
-	BButton *btn = static_cast<BButton*>(FindView("ok  "));
-	btn->SetLabel("Save");
+	fOkButton->SetLabel("Save");
 	
 	SetTitle("Save on Server");
 } // CFtpDialog::MakeItSave
@@ -216,11 +310,11 @@ void CFtpDialog::MakeItSave(const char *name)
 bool CFtpDialog::OKClicked()
 {
 	CFtpListItem *i;
-	BTextView *tv;
 
 	if (fSave)
 	{
-		i = dynamic_cast<CFtpListItem*>(fList->ItemAt(fList->CurrentSelection()));
+		i = dynamic_cast<CFtpListItem*>(
+			fListView->ItemAt(fListView->CurrentSelection()));
 		if (i && i->IsDirectory())
 		{
 			ChangeDirectory();
@@ -230,11 +324,9 @@ bool CFtpDialog::OKClicked()
 		{
 			try
 			{
-				tv = dynamic_cast<BTextView*>(FindView("shadow"));
-				FailNil(tv);
 				BMessage msg(msg_DoFtpSave);
 				msg.AddPointer("url", new URLData(GetText("srvr"), GetText("user"),
-					tv->Text(), fPath, GetText("name")));
+					GetText("pass"), fPath, GetText("name")));
 				fOwner->PostMessage(&msg);
 			}
 			catch (HErr& e)
@@ -248,7 +340,8 @@ bool CFtpDialog::OKClicked()
 		int32 dirCnt = 0;
 		int32 filCnt = 0;
 		int32 n = -1;
-		while ((i = dynamic_cast<CFtpListItem*>(fList->ItemAt(fList->CurrentSelection(++n))))) {
+		while ((i = dynamic_cast<CFtpListItem*>(
+			fListView->ItemAt(fListView->CurrentSelection(++n))))) {
 			if (i && i->IsDirectory())
 				dirCnt++;
 			else
@@ -265,7 +358,8 @@ bool CFtpDialog::OKClicked()
 		{
 			n = -1;
 			Hide();
-			while ((i = dynamic_cast<CFtpListItem*>(fList->ItemAt(fList->CurrentSelection(++n))))) {
+			while ((i = dynamic_cast<CFtpListItem*>(
+				fListView->ItemAt(fListView->CurrentSelection(++n))))) {
 				try
 				{
 					URLData url(GetText("srvr"), GetText("user"), GetText("pass"), fPath, *i);
@@ -303,16 +397,16 @@ void CFtpDialog::MessageReceived(BMessage *msg)
 			FailOSErr(msg->FindPointer("source", (void**)&src));
 			
 			strcpy(fPath, "/");
-			if (src != fDirectoryPopup->ItemAt(0))
+			if (src != fDirectoryField->Menu()->ItemAt(0))
 			{
 				int i = 1;
 
 				while (true)
 				{
-					if (i >= fDirectoryPopup->CountItems())
+					if (i >= fDirectoryField->Menu()->CountItems())
 						break;
 					
-					BMenuItem *I = fDirectoryPopup->ItemAt(i);
+					BMenuItem *I = fDirectoryField->Menu()->ItemAt(i);
 					
 					strcat(fPath, I->Label());
 					strcat(fPath, "/");
@@ -330,7 +424,8 @@ void CFtpDialog::MessageReceived(BMessage *msg)
 		
 		case msg_SelectedListItem:
 		{
-			CFtpListItem *i = dynamic_cast<CFtpListItem*>(fList->ItemAt(fList->CurrentSelection()));
+			CFtpListItem *i = dynamic_cast<CFtpListItem*>(
+				fListView->ItemAt(fListView->CurrentSelection()));
 			if (i == reinterpret_cast<CFtpListItem*>(NULL))
 			{
 				beep();
@@ -472,7 +567,7 @@ void CFtpDialog::Connect()
 
 void CFtpDialog::UpdateDirectoryPopup()
 {
-	BMenu* menu = fDirectoryPopup;
+	BMenu* menu = fDirectoryField->Menu();
 	BMenuItem *item;
 	
 	while ((item = menu->ItemAt(menu->CountItems() - 1)) != NULL)
@@ -505,8 +600,8 @@ void CFtpDialog::ListDirectory()
 		return;
 	}
 	
-	for (int i = fList->CountItems() - 1; i >= 0; i--)
-		delete fList->RemoveItem(i);
+	for (int i = fListView->CountItems() - 1; i >= 0; i--)
+		delete fListView->RemoveItem(i);
 	
 	int data = 0;
 	
@@ -611,7 +706,7 @@ void CFtpDialog::ListDirectory()
 								item = new CFtpListItem(this, s);
 								if (item->IsValid() && (showAll || !item->IsDotFile()))
 								{
-									fList->AddItem(item);
+									fListView->AddItem(item);
 								}
 								else
 									delete item;
@@ -619,7 +714,7 @@ void CFtpDialog::ListDirectory()
 							if (entryCount == 0)
 								THROW(("Could not get listing."));
 
-							fList->Invalidate();
+							fListView->Invalidate();
 							UpdateIfNeeded();
 							s_close(dsf);
 							if (!passive)

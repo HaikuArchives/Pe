@@ -38,18 +38,20 @@
 
 #include "Sstdio.h"
 #include "HDialog.h"
+#include "HDlogView.h"
 
 class CFtpDialog : public HDialog
 {
   public:
 	CFtpDialog(BRect frame, const char *name, window_type type, int flags,
-			   BWindow *owner, BPositionIO* data);
+			     BWindow *owner);
 	~CFtpDialog();
 	
-	enum { sResID = 128 };
-
 	virtual bool OKClicked();
 	virtual void MessageReceived(BMessage *msg);
+	
+	void Create();
+	void Layout();
 	
 	void MakeItSave(const char *name);
 	BBitmap* GetIcon(const char *mimeType, const char *tryExtension="");
@@ -63,8 +65,6 @@ class CFtpDialog : public HDialog
   	void ChangeDirectory();
   	void GetPWD();
   	
-	BMenu *fDirectoryPopup;
-	BListView *fList;
 	int fSocket;
 	char *fPath;
 	SOCK *fSocketFD;
@@ -72,6 +72,21 @@ class CFtpDialog : public HDialog
 	bool fSave;
 	map<string,BBitmap*> fIcons;
 	map<string,string> fExtMime;
+	
+	// Interface
+	BBox* fLoginBox;
+	HTextControl* fServerName;
+	HTextControl* fUserName;
+	HTextControl* fPassword;
+	HTextControl* fFileName;
+	HButton* fConnectButton;
+	HButton* fCancelButton;
+	HButton* fOkButton;
+	HMenuField* fDirectoryField;
+	HCheckBox* fShowDotted;
+	HCheckBox* fUsePassive;
+	BListView* fListView;
+	BScrollView* fScrollView;
 };
 
 #endif // CFTPDIALOG_H

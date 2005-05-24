@@ -12,7 +12,6 @@ RezObjects
 	Dialog-Find.r
 	Dialog-FontTabs.r
 	Dialog-Ftp.r
-	Dialog-FtpOpen.r
 	Dialog-GotoLine.r
 	Dialog-Info.r
 	Dialog-Login.r
