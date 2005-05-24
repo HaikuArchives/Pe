@@ -166,10 +166,12 @@ virtual		void UpdateFields();
 			void SetValue(const char *id, int v);
 			
 			void SetCaller( BWindow* caller)
-										{ fCaller = caller; }
+										{ fCaller = BMessenger(NULL, caller); }
 			void SetPlacement( HPlacementType placement)
 										{ fPlacement = placement; }
 			
+			void ResizeToLimits(float min, float maxW, float minH, float maxH);
+
 static		void RegisterFieldCreator(int kind, FieldCreator fieldCreator);
 static		void RegisterFields();
 
@@ -183,7 +185,7 @@ protected:
 	
 			BView *fMainView;
 			BWindow *fOwner;
-			BWindow *fCaller;
+			BMessenger fCaller;
 			HPlacementType fPlacement;
 static		int16 sfDlgNr;
 };

@@ -78,7 +78,6 @@ int16 HDialog::sfDlgNr = 1;
 HDialog::HDialog(BRect frame, const char *name, window_type type,
 	int flags, BWindow *owner, BPositionIO* data)
 	: BWindow(frame, name, type, flags)
-	, fCaller( NULL)
 	, fPlacement( H_PLACE_LAST_POS)
 {
 	fOwner = owner;
@@ -87,7 +86,7 @@ HDialog::HDialog(BRect frame, const char *name, window_type type,
 
 	AddChild(fMainView = new HDlogView(frame, "main"));
 
-	if (data)	
+	if (data)
 		_BuildIt(*data);
 	
 	AddCommonFilter(new BMessageFilter(B_KEY_DOWN,KeyDownFilter));
@@ -113,6 +112,15 @@ HDialog::~HDialog()
 		fOwner->PostMessage(&m);
 	}
 } /* HDialog::~HDialog */
+
+void HDialog::ResizeToLimits(float minW, float maxW, float minH, float maxH)
+{
+	SetSizeLimits(minW, maxW, minH, maxH);
+	BRect frame = Frame();
+	float w = min(maxW, max(minW, frame.Width()));
+	float h = min(maxH, max(minH, frame.Height()));
+	ResizeTo(w, h);
+}
 
 bool HDialog::IsOn(const char *name) const
 {
@@ -158,16 +166,22 @@ void HDialog::MessageReceived(BMessage *inMessage)
 void		do_window_action(int32 window_id, int32 action, 
 							 BRect zoomRect, bool zoom);
 
-static bool DetermineOutOfTheWayFrame(BWindow* caller, BRect& newFrame,
-												  const BRect& screenRect) 
+static bool DetermineOutOfTheWayFrame(BMessenger& caller, BRect& newFrame,
+									  const BRect& screenRect)
 {
 	// move newFrame close to edges of caller, such that it hides as
 	// little of the caller's space as possible:
-	if (caller && caller->Lock()) 
+	if (caller.LockTarget()) 
 	{
+		BRect cr;
+		BLooper* looper;
+		caller.Target(&looper);
+		BWindow* window = dynamic_cast<BWindow*>(looper);
+		if (window)
+			cr = window->Frame();
+
 		float sw = screenRect.Width();
 		float sh = screenRect.Height();
-		BRect cr = caller->Frame();
 		float w = newFrame.Width();
 		float h = newFrame.Height();
 
@@ -219,7 +233,7 @@ static bool DetermineOutOfTheWayFrame(BWindow* caller, BRect& newFrame,
 		// should warp into it with less risk of activating other
 		// windows (which is still possible, though, as the caller
 		// window might be obscured by other windows).
-		BView* view = caller->ChildAt(0);
+		BView* view = window->ChildAt(0);
 		BPoint mousePos(sw/2,sh/2);
 		if (view) 
 		{
@@ -247,7 +261,7 @@ static bool DetermineOutOfTheWayFrame(BWindow* caller, BRect& newFrame,
 				newFrame.OffsetTo(BPoint(mousePos.x-w/2, 
 										 cr.bottom-B_H_SCROLL_BAR_HEIGHT));
 		}
-		caller->Unlock();
+		looper->Unlock();
 		return true;
 	} 
 
@@ -255,7 +269,22 @@ static bool DetermineOutOfTheWayFrame(BWindow* caller, BRect& newFrame,
 	return false;		
 }
 
-void HDialog::_PlaceWindow() 
+static BRect CallerFrame(BMessenger& caller)
+{
+	BRect rect;
+	if (caller.LockTarget())
+	{
+		BLooper* looper;
+		caller.Target(&looper);
+		BWindow* window = dynamic_cast<BWindow*>(looper);
+		if (window)
+			rect = window->Frame();
+		looper->Unlock();
+	}
+	return rect;
+}
+
+void HDialog::_PlaceWindow()
 {
 	BRect newFrame = Frame();
 	BScreen screen(this);
@@ -263,41 +292,38 @@ void HDialog::_PlaceWindow()
 	float sw = sr.Width();
 	float sh = sr.Height();
 	HPlacementType placement = fPlacement;
+	BRect callerFrame = fOwner ? fOwner->Frame() : CallerFrame(fCaller);
 	if (placement == H_PLACE_LAST_POS || placement == H_PLACE_OUT_OF_THE_WAY) 
 	{
 		// fetch last position and re-activate that:
 		string dlgRect = string("dialog ") + Name() + " rect";
 		string dlgOrigin = string("dialog ") + Name() + " origin";
 		BRect lastFrame;
-		if (gPrefs)
-			lastFrame = gPrefs->GetPrefRect(dlgRect.c_str(), BRect());
+		lastFrame = gPrefs->GetPrefRect(dlgRect.c_str(), BRect());
 		if (lastFrame.IsValid()) 
 		{
 			newFrame = lastFrame;
 			const char* origin = NULL;
-			if (gPrefs)
-				origin = gPrefs->GetPrefString(dlgOrigin.c_str(), NULL);
-			BWindow* caller = fOwner ? fOwner : fCaller;
-			if (caller && origin) 
+			origin = gPrefs->GetPrefString(dlgOrigin.c_str(), NULL);
+			if (callerFrame.IsValid() && origin) 
 			{
 				// frame was stored relative to caller, so we move to same
 				// relative position, but first we need to find out which
 				// window-corner the coordinates relate to:
-				BRect callerFrame = caller->Frame();
-				if (!strcmp(origin,"LT"))
+				if (!strcmp(origin, "LT"))
 					newFrame.OffsetBy(callerFrame.LeftTop());
-				else if (!strcmp(origin,"RT"))
+				else if (!strcmp(origin, "RT"))
 					newFrame.OffsetBy(callerFrame.RightTop());
-				else if (!strcmp(origin,"LB"))
+				else if (!strcmp(origin, "LB"))
 					newFrame.OffsetBy(callerFrame.LeftBottom());
-				else if (!strcmp(origin,"RB"))
+				else if (!strcmp(origin, "RB"))
 					newFrame.OffsetBy(callerFrame.RightBottom());
 			}
 		} 
 		else if (placement == H_PLACE_OUT_OF_THE_WAY)
 		{	// move window out of the way on first open:
-			if (!DetermineOutOfTheWayFrame(fOwner ? fOwner : fCaller, 
-													 newFrame, sr))
+			BMessenger caller = fOwner ? BMessenger(NULL, fOwner) : fCaller;
+			if (!DetermineOutOfTheWayFrame(caller, newFrame, sr))
 				placement = H_PLACE_DEFAULT;
 					// unable to access caller, fallback to default placement
 		}
@@ -308,12 +334,12 @@ void HDialog::_PlaceWindow()
 	if (placement == H_PLACE_DEFAULT) 
 	{
 		// center horizontally, position 1/3 vertically:
-		BWindow *caller = fOwner ? fOwner : fCaller;
-		if (caller)
+		if (callerFrame.IsValid())
 		{
-			BRect r = caller->Frame();
-			newFrame.OffsetTo(r.left + (r.Width() - newFrame.Width()) / 2,
-							  r.top + (r.Height() - newFrame.Height()) / 3);
+			newFrame.OffsetTo(
+				callerFrame.left + (callerFrame.Width()-newFrame.Width()) / 2,
+				callerFrame.top + (callerFrame.Height()-newFrame.Height()) / 3
+			);
 		}
 		else
 		{
@@ -354,10 +380,9 @@ void HDialog::Hide()
 		string dlgOrigin = string("dialog ") + Name() + " origin";
 		BRect frame = Frame();
 		char origin[3] = "";
-		BWindow* caller = fOwner ? fOwner : fCaller;
-		if (caller) 
+		BRect cr = fOwner ? fOwner->Frame() : CallerFrame(fCaller);
+		if (cr.IsValid())
 		{
-			BRect cr = caller->Frame();
 			// store coordinates relative to closest corner of owner-frame:
 			origin[0] = 
 				(fabs(cr.left-frame.left) < fabs(frame.left-cr.right))
@@ -368,23 +393,20 @@ void HDialog::Hide()
 					? 'T'
 					: 'B';
 			origin[2] = '\0';
-			if (!strcmp(origin,"LT"))
+			if (!strcmp(origin, "LT"))
 				frame.OffsetTo(frame.LeftTop()-cr.LeftTop());
-			else if (!strcmp(origin,"RT"))
+			else if (!strcmp(origin, "RT"))
 				frame.OffsetTo(frame.LeftTop()-cr.RightTop());
-			else if (!strcmp(origin,"LB"))
+			else if (!strcmp(origin, "LB"))
 				frame.OffsetTo(frame.LeftTop()-cr.LeftBottom());
-			else if (!strcmp(origin,"RB"))
+			else if (!strcmp(origin, "RB"))
 				frame.OffsetTo(frame.LeftTop()-cr.RightBottom());
 		}
-		if (gPrefs) 
-		{
-			if (origin[0] == '\0')
-				gPrefs->RemovePref(dlgOrigin.c_str());
-			else
-				gPrefs->SetPrefString(dlgOrigin.c_str(), origin);
-			gPrefs->SetPrefRect(dlgRect.c_str(), frame);
-		}
+		if (origin[0] == '\0')
+			gPrefs->RemovePref(dlgOrigin.c_str());
+		else
+			gPrefs->SetPrefString(dlgOrigin.c_str(), origin);
+		gPrefs->SetPrefRect(dlgRect.c_str(), frame);
 	}
 	BWindow::Hide();
 }
