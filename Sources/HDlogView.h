@@ -51,4 +51,78 @@ private:
 		vector<BRect> fLines;
 };
 
+class IMPEXP_LIBHEKKEL HButton : public BButton {
+public:
+	HButton(BView* view, const char* name, uint32 cmd, 
+			uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+	void ResizeLocalized(const char* label);
+	float Left(void) { return Frame().left; }
+	float Right(void) { return Frame().right; }
+	float Top(void) { return Frame().top; }
+	float Bottom(void) { return Frame().bottom; }
+	float Width(void) { return Frame().Width(); }
+	float Height(void) { return Frame().Height(); }
+	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
+	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+};
+
+class IMPEXP_LIBHEKKEL HStringView : public BStringView {
+public:
+	HStringView(BView* view, uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+	void ResizeLocalized(const char* label);
+	float Left(void) { return Frame().left; }
+	float Right(void) { return Frame().right; }
+	float Top(void) { return Frame().top; }
+	float Bottom(void) { return Frame().bottom; }
+	float Width(void) { return Frame().Width(); }
+	float Height(void) { return Frame().Height(); }
+	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
+	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+};
+
+class IMPEXP_LIBHEKKEL HTextControl : public BTextControl {
+public:
+	HTextControl(BView* view, const char* name, 
+				 uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+	void ResizeLocalized(const char* label=NULL);
+	float Left(void) { return Frame().left; }
+	float Right(void) { return Frame().right; }
+	float Top(void) { return Frame().top; }
+	float Bottom(void) { return Frame().bottom; }
+	float Width(void) { return Frame().Width(); }
+	float Height(void) { return Frame().Height(); }
+	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
+	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+};
+
+class IMPEXP_LIBHEKKEL HMenuField : public BMenuField {
+public:
+	HMenuField(BView* view, const char* name, 
+			   uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+	void ResizeLocalized(const char* label=NULL);
+	float Left(void) { return Frame().left; }
+	float Right(void) { return Frame().right; }
+	float Top(void) { return Frame().top; }
+	float Bottom(void) { return Frame().bottom; }
+	float Width(void) { return Frame().Width(); }
+	float Height(void) { return Frame().Height(); }
+	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
+	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+};
+
+class IMPEXP_LIBHEKKEL HCheckBox : public BCheckBox {
+public:
+	HCheckBox(BView* view, const char* name, BMessage* msg = NULL, 
+			  uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+	void ResizeLocalized(const char* label=NULL);
+	float Left(void) { return Frame().left; }
+	float Right(void) { return Frame().right; }
+	float Top(void) { return Frame().top; }
+	float Bottom(void) { return Frame().bottom; }
+	float Width(void) { return Frame().Width(); }
+	float Height(void) { return Frame().Height(); }
+	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
+	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+};
+
 #endif // HDLOGVIEW_H

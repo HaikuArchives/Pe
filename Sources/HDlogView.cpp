@@ -78,3 +78,69 @@ void HDlogView::AddMyLine(BRect r)
 {
 	fLines.push_back(r);
 } /* HDlogView::AddMyLine */
+
+
+HButton::HButton(BView* view, const char* name, uint32 cmd, uint32 resizingMode)
+: BButton(BRect(0, 0, 100, 50), name, "", new BMessage(cmd), resizingMode)
+{
+	view->AddChild(this);
+} /* HButton::HButton */
+
+void HButton::ResizeLocalized(const char* label)
+{
+	SetLabel(label);
+	ResizeToPreferred();
+} /* HButton::ResizeLocalized */
+
+
+HStringView::HStringView(BView* view, uint32 resizingMode)
+: BStringView(BRect(0, 0, 100, 50), "", "", resizingMode)
+{
+	view->AddChild(this);
+} /* HStringView::HStringView */
+
+void HStringView::ResizeLocalized(const char* label)
+{
+	SetText(label);
+	ResizeToPreferred();
+} /* HStringView::ResizeLocalized */
+
+
+HTextControl::HTextControl(BView* view, const char* name, uint32 resizingMode)
+: BTextControl(BRect(0, 0, 100, 50), name, NULL, "", NULL, resizingMode)
+{
+	view->AddChild(this);
+} /* HTextControl::HTextControl */
+
+void HTextControl::ResizeLocalized(const char* label)
+{
+	SetLabel(label);
+	ResizeToPreferred();
+} /* HTextControl::ResizeLocalized */
+
+
+HMenuField::HMenuField(BView* view, const char* name, uint32 resizingMode)
+: BMenuField(BRect(0, 0, 100, 50), name, NULL, new BMenu(""), resizingMode)
+{
+	view->AddChild(this);
+} /* HMenuField::HMenuField */
+
+void HMenuField::ResizeLocalized(const char* label)
+{
+	ResizeToPreferred();
+} /* HMenuField::ResizeLocalized */
+
+
+HCheckBox::HCheckBox(BView* view, const char* name, BMessage* msg, 
+					 uint32 resizingMode)
+: BCheckBox(BRect(0, 0, 100, 50), name, "", NULL, resizingMode)
+{
+	view->AddChild(this);
+} /* HCheckBox::HCheckBox */
+
+void HCheckBox::ResizeLocalized(const char* label)
+{
+	SetLabel(label);
+	ResizeToPreferred();
+} /* HCheckBox::ResizeLocalized */
+
