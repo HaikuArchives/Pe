@@ -150,6 +150,9 @@ PDoc::PDoc(URLData& url)
 	
 	fButtonBar->SetEnabled(msg_Save, false);
 	
+	if (!ProjectRoster->IsProjectType(MimeType()))
+		fButtonBar->SetVisible(msg_EditAsProject, false);
+
 	Show();
 } /* PDoc::PDoc */
 
@@ -1753,7 +1756,7 @@ void PDoc::MessageReceived(BMessage *msg)
 			case msg_FtpOpen:
 			{
 				CFtpDialog *ftpo 
-					= DialogCreator<CFtpDialog>::CreateDialog(/*"FtpDialog",*/ NULL);
+					= DialogCreator<CFtpDialog>::CreateDialog("FtpDialog", NULL, this);
 				ftpo->Show();
 				break;
 			}
@@ -1770,7 +1773,7 @@ void PDoc::MessageReceived(BMessage *msg)
 			case msg_FtpSave:
 			{
 				CFtpDialog *ftps 
-					= DialogCreator<CFtpDialog>::CreateDialog(/*"FtpDialog", */NULL);
+					= DialogCreator<CFtpDialog>::CreateDialog("FtpDialog", NULL, this);
 				ftps->MakeItSave(Title());
 				ftps->Show();
 				break;
