@@ -158,27 +158,128 @@ void HDialog::MessageReceived(BMessage *inMessage)
 void		do_window_action(int32 window_id, int32 action, 
 							 BRect zoomRect, bool zoom);
 
-void HDialog::_PlaceWindow() {
+static bool DetermineOutOfTheWayFrame(BWindow* caller, BRect& newFrame,
+												  const BRect& screenRect) 
+{
+	// move newFrame close to edges of caller, such that it hides as
+	// little of the caller's space as possible:
+	if (caller && caller->Lock()) 
+	{
+		float sw = screenRect.Width();
+		float sh = screenRect.Height();
+		BRect cr = caller->Frame();
+		float w = newFrame.Width();
+		float h = newFrame.Height();
+
+		// horizontal
+		float spaceToLeft = cr.left;
+		float spaceToRight = sw-cr.right;
+		char horizontalChoice;
+		if (spaceToRight >= w - B_V_SCROLL_BAR_WIDTH)
+			horizontalChoice = 'R';
+		else if (spaceToLeft >= w)
+			horizontalChoice = 'L';
+		else 
+		{
+			// prefer to obscure right side, as that usually contains 
+			// less text:
+			if (spaceToRight > spaceToLeft / 2)
+				horizontalChoice = 'R';
+			else
+				horizontalChoice = 'L';
+		}
+		float horizontalSpaceCoeff 
+			= (horizontalChoice == 'L' ? spaceToLeft : spaceToRight) / w;
+
+		// vertical 
+		float spaceToTop = cr.top;
+		float spaceToBottom = sh-cr.bottom;
+		char verticalChoice;
+		if (spaceToBottom >= h - B_H_SCROLL_BAR_HEIGHT)
+			verticalChoice = 'B';
+		else if (spaceToTop >= h)
+			verticalChoice = 'T';
+		else 
+		{
+			// prefer to obscure bottom side, as toolbar lives at top:
+			if (spaceToBottom > spaceToTop / 2)
+				verticalChoice = 'B';
+			else
+				verticalChoice = 'T';
+		}
+		float verticalSpaceCoeff
+			= (verticalChoice == 'T' ? spaceToTop : spaceToBottom) / h;
+
+		// we are going to warp the mouse into the dialog, but this
+		// may have unwanted side-effects if the mouse is moving over 
+		// other documents during the warp (which will activate these
+		// documents instead of the current one).
+		// In order to avoid these problems, we get the current 
+		// mouse-coords and position the dialog such that the mouse
+		// should warp into it with less risk of activating other
+		// windows (which is still possible, though, as the caller
+		// window might be obscured by other windows).
+		BView* view = caller->ChildAt(0);
+		BPoint mousePos(sw/2,sh/2);
+		if (view) 
+		{
+			uint32 buttons;
+			view->GetMouse( &mousePos, &buttons, false);
+			view->ConvertToScreen(&mousePos);
+		}
+
+		// prefer horizontal or vertical according to window's layout
+		// (i.e. prefer smaller axis):
+		float hvFract = cr.Width()/cr.Height();
+		if (horizontalSpaceCoeff > verticalSpaceCoeff * hvFract) 
+		{
+			if (horizontalChoice == 'L')
+				newFrame.OffsetTo(BPoint(cr.left-w, mousePos.y-h/2));
+			else
+				newFrame.OffsetTo(BPoint(cr.right-B_V_SCROLL_BAR_WIDTH, 
+										 mousePos.y-h/2));
+		} 
+		else 
+		{
+			if (verticalChoice == 'T')
+				newFrame.OffsetTo(BPoint(mousePos.x-w/2, cr.top-h));
+			else
+				newFrame.OffsetTo(BPoint(mousePos.x-w/2, 
+										 cr.bottom-B_H_SCROLL_BAR_HEIGHT));
+		}
+		caller->Unlock();
+		return true;
+	} 
+
+	// no caller or can't lock it
+	return false;		
+}
+
+void HDialog::_PlaceWindow() 
+{
 	BRect newFrame = Frame();
 	BScreen screen(this);
 	BRect sr = screen.Frame();
 	float sw = sr.Width();
 	float sh = sr.Height();
 	HPlacementType placement = fPlacement;
-	if (placement == H_PLACE_LAST_POS) {
+	if (placement == H_PLACE_LAST_POS || placement == H_PLACE_OUT_OF_THE_WAY) 
+	{
 		// fetch last position and re-activate that:
 		string dlgRect = string("dialog ") + Name() + " rect";
 		string dlgOrigin = string("dialog ") + Name() + " origin";
 		BRect lastFrame;
 		if (gPrefs)
 			lastFrame = gPrefs->GetPrefRect(dlgRect.c_str(), BRect());
-		if (lastFrame.IsValid()) {
+		if (lastFrame.IsValid()) 
+		{
 			newFrame = lastFrame;
 			BRect ownerFrame = fOwner->Frame();
 			const char* origin = NULL;
 			if (gPrefs)
 				origin = gPrefs->GetPrefString(dlgOrigin.c_str(), NULL);
-			if (fOwner && origin) {
+			if (fOwner && origin) 
+			{
 				// frame was stored relative to owner, so we move to same
 				// relative position, but first we need to find out which
 				// window-corner the coordinates relate to:
@@ -191,99 +292,20 @@ void HDialog::_PlaceWindow() {
 				else if (!strcmp(origin,"RB"))
 					newFrame.OffsetBy(ownerFrame.RightBottom());
 			}
-		} else
+		} 
+		else if (placement == H_PLACE_OUT_OF_THE_WAY)
+		{	// move window out of the way on first open:
+			if (!DetermineOutOfTheWayFrame(fOwner ? fOwner : fCaller, 
+													 newFrame, sr))
+				placement = H_PLACE_DEFAULT;
+					// unable to access caller, fallback to default placement
+		}
+		else
 			placement = H_PLACE_DEFAULT;
 				// no last position available, fallback to default placement
 	}
-	if (placement == H_PLACE_OUT_OF_THE_WAY) {
-		// move dialog close to edges of caller, such that it hides as
-		// little of the caller's space as possible:
-		BWindow *caller = fOwner ? fOwner : fCaller;
-		if (caller) {
-			if (caller->Lock()) {
-				BRect cr = caller->Frame();
-				float w = newFrame.Width();
-				float h = newFrame.Height();
-	
-				// horizontal
-				float spaceToLeft = cr.left;
-				float spaceToRight = sw-cr.right;
-				char horizontalChoice;
-				if (spaceToRight >= w - B_V_SCROLL_BAR_WIDTH)
-					horizontalChoice = 'R';
-				else if (spaceToLeft >= w)
-					horizontalChoice = 'L';
-				else {
-					// prefer to obscure right side, as that usually contains 
-					// less text:
-					if (spaceToRight > spaceToLeft / 2)
-						horizontalChoice = 'R';
-					else
-						horizontalChoice = 'L';
-				}
-				float horizontalSpaceCoeff 
-					= (horizontalChoice == 'L' ? spaceToLeft : spaceToRight) / w;
-	
-				// vertical 
-				float spaceToTop = cr.top;
-				float spaceToBottom = sh-cr.bottom;
-				char verticalChoice;
-				if (spaceToBottom >= h - B_H_SCROLL_BAR_HEIGHT)
-					verticalChoice = 'B';
-				else if (spaceToTop >= h)
-					verticalChoice = 'T';
-				else {
-					// prefer to obscure bottom side, as toolbar lives at top:
-					if (spaceToBottom > spaceToTop / 2)
-						verticalChoice = 'B';
-					else
-						verticalChoice = 'T';
-				}
-				float verticalSpaceCoeff
-					= (verticalChoice == 'T' ? spaceToTop : spaceToBottom) / h;
-	
-				// we are going to warp the mouse into the dialog, but this
-				// may have unwanted side-effects if the mouse is moving over 
-				// other documents during the warp (which will activate these
-				// documents instead of the current one).
-				// In order to avoid these problems, we get the current 
-				// mouse-coords and position the dialog such that the mouse
-				// should warp into it with less risk of activating other
-				// windows (which is still possible, though, as the caller
-				// window might be obscured by other windows).
-				BView* view = caller->ChildAt(0);
-				BPoint mousePos(sw/2,sh/2);
-				if (view) {
-					uint32 buttons;
-					view->GetMouse( &mousePos, &buttons, false);
-					view->ConvertToScreen(&mousePos);
-				}
-	
-				// prefer horizontal or vertical according to window's layout
-				// (i.e. prefer smaller axis):
-				float hvFract = cr.Width()/cr.Height();
-				if (horizontalSpaceCoeff > verticalSpaceCoeff * hvFract) {
-					if (horizontalChoice == 'L')
-						newFrame.OffsetTo(BPoint(cr.left-w, mousePos.y-h/2));
-					else
-						newFrame.OffsetTo(BPoint(cr.right-B_V_SCROLL_BAR_WIDTH, 
-												 mousePos.y-h/2));
-				} else {
-					if (verticalChoice == 'T')
-						newFrame.OffsetTo(BPoint(mousePos.x-w/2, cr.top-h));
-					else
-						newFrame.OffsetTo(BPoint(mousePos.x-w/2, 
-												 cr.bottom-B_H_SCROLL_BAR_HEIGHT));
-				}
-				caller->Unlock();
-			} else
-				placement = H_PLACE_DEFAULT;
-					// can't lock caller, fallback to default placement
-		} else
-			placement = H_PLACE_DEFAULT;
-				// no caller, fallback to default placement
-	}
-	if (placement == H_PLACE_DEFAULT) {
+	if (placement == H_PLACE_DEFAULT) 
+	{
 		// center horizontally, position 1/3 vertically:
 		BWindow *caller = fOwner ? fOwner : fCaller;
 		if (caller)
@@ -310,21 +332,30 @@ void HDialog::_PlaceWindow() {
 
 static void WarpMouseToWindow(const char* windowName);
 
-void HDialog::Show() {
+void HDialog::Show() 
+{
 	_PlaceWindow();
 	BWindow::Show();
-	if (focus_follows_mouse())
+
+	// in focus follows mouse mode, we warp the mouse into the window,
+	// but only if the window has been triggered by keyboard (which we
+	// think is the case if any modifier key is currently pressed):
+	if ((modifiers() & ~(B_CAPS_LOCK | B_SCROLL_LOCK | B_NUM_LOCK)) != 0
+		&& focus_follows_mouse())
 		WarpMouseToWindow(Name());
 }
 
-void HDialog::Hide() {
-	if (fPlacement == H_PLACE_LAST_POS) {
+void HDialog::Hide() 
+{
+	if (fPlacement == H_PLACE_LAST_POS || fPlacement == H_PLACE_OUT_OF_THE_WAY) 
+	{
 		string dlgRect = string("dialog ") + Name() + " rect";
 		string dlgOrigin = string("dialog ") + Name() + " origin";
 		BRect frame = Frame();
 		char origin[3] = "";
 		BWindow* caller = fOwner ? fOwner : fCaller;
-		if (caller) {
+		if (caller) 
+		{
 			BRect cr = caller->Frame();
 			// store coordinates relative to closest corner of owner-frame:
 			origin[0] = 
@@ -345,7 +376,8 @@ void HDialog::Hide() {
 			else if (!strcmp(origin,"RB"))
 				frame.OffsetTo(frame.LeftTop()-cr.RightBottom());
 		}
-		if (gPrefs) {
+		if (gPrefs) 
+		{
 			if (origin[0] == '\0')
 				gPrefs->RemovePref(dlgOrigin.c_str());
 			else

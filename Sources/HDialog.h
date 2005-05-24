@@ -57,8 +57,8 @@ IMPEXP_LIBHEKKEL enum HPlacementType {
 		// place at last known position, relative to closest corner
 		// of calling window (if any)
 	H_PLACE_OUT_OF_THE_WAY
-		// automatically place such that the dialog doesn't obscure
-		// the caller window.
+		// on first open, automatically place such that the dialog doesn't 
+		// obscure the caller window. Afterwards behave just like H_PLACE_LAST_POS
 };
 
 template <class T>
