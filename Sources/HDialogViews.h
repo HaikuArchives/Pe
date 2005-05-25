@@ -68,8 +68,8 @@ public:
 	float Bottom(void) { return Frame().bottom; }
 	float Width(void) { return Frame().Width(); }
 	float Height(void) { return Frame().Height(); }
-	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
-	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+	void SetWidth(float Width) { ResizeTo(Width, Height()); }
+	void SetHeight(float Height) { ResizeTo(Width(), Height); }
 };
 
 class IMPEXP_LIBHEKKEL HStringView : public BStringView {
@@ -82,8 +82,8 @@ public:
 	float Bottom(void) { return Frame().bottom; }
 	float Width(void) { return Frame().Width(); }
 	float Height(void) { return Frame().Height(); }
-	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
-	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+	void SetWidth(float Width) { ResizeTo(Width, Height()); }
+	void SetHeight(float Height) { ResizeTo(Width(), Height); }
 };
 
 class IMPEXP_LIBHEKKEL HTextControl : public BTextControl {
@@ -97,8 +97,8 @@ public:
 	float Bottom(void) { return Frame().bottom; }
 	float Width(void) { return Frame().Width(); }
 	float Height(void) { return Frame().Height(); }
-	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
-	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+	void SetWidth(float Width) { ResizeTo(Width, Height()); }
+	void SetHeight(float Height) { ResizeTo(Width(), Height); }
 };
 
 class IMPEXP_LIBHEKKEL HMenuField : public BMenuField {
@@ -112,8 +112,8 @@ public:
 	float Bottom(void) { return Frame().bottom; }
 	float Width(void) { return Frame().Width(); }
 	float Height(void) { return Frame().Height(); }
-	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
-	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+	void SetWidth(float Width) { ResizeTo(Width, Height()); }
+	void SetHeight(float Height) { ResizeTo(Width(), Height); }
 };
 
 class IMPEXP_LIBHEKKEL HCheckBox : public BCheckBox {
@@ -127,8 +127,8 @@ public:
 	float Bottom(void) { return Frame().bottom; }
 	float Width(void) { return Frame().Width(); }
 	float Height(void) { return Frame().Height(); }
-	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
-	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+	void SetWidth(float Width) { ResizeTo(Width, Height()); }
+	void SetHeight(float Height) { ResizeTo(Width(), Height); }
 };
 
 class IMPEXP_LIBHEKKEL HScrollView : public BScrollView {
@@ -145,8 +145,26 @@ public:
 	float Bottom(void) { return Frame().bottom; }
 	float Width(void) { return Frame().Width(); }
 	float Height(void) { return Frame().Height(); }
-	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
-	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+	void SetWidth(float Width) { ResizeTo(Width, Height()); }
+	void SetHeight(float Height) { ResizeTo(Width(), Height); }
+};
+
+class IMPEXP_LIBHEKKEL HBox : public BBox {
+public:
+		HBox(BView* view, const char *name = NULL,
+				uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP,
+				uint32 flags = B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP,
+				border_style border = B_FANCY_BORDER);
+		
+virtual	void Draw(BRect update);
+		float Left(void) { return Frame().left; }
+		float Right(void) { return Frame().right; }
+		float Top(void) { return Frame().top; }
+		float Bottom(void) { return Frame().bottom; }
+		float Width(void) { return Frame().Width(); }
+		float Height(void) { return Frame().Height(); }
+		void SetWidth(float Width) { ResizeTo(Width, Height()); }
+		void SetHeight(float Height) { ResizeTo(Width(), Height); }
 };
 
 #endif // HDLOGVIEW_H

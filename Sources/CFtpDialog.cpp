@@ -48,7 +48,6 @@
 #endif
 #include <socket.h>
 #include <netdb.h>
-#include <Box.h>
 
 static string sfPassword;
 
@@ -227,11 +226,11 @@ void CFtpDialog::Layout(void)
 	bw = max(bw, fUsePassive->Right());
 	bw = max(bw, fConnectButton->Right()+2*dx);
 	//
-	fServerName->ResizeWidth(bw);
-	fUserName->ResizeWidth(bw);
-	fPassword->ResizeWidth(bw);
-	fUsePassive->ResizeWidth(bw);
-	fConnectButton->ResizeWidth(bw-2*dx);
+	fServerName->SetWidth(bw);
+	fUserName->SetWidth(bw);
+	fPassword->SetWidth(bw);
+	fUsePassive->SetWidth(bw);
+	fConnectButton->SetWidth(bw-2*dx);
 	//
 	fLoginBox->MoveTo(fMainView->Right()-bw-3*dx, dy);
 	fLoginBox->ResizeTo(bw+2*dx, fConnectButton->Bottom()+dy);
@@ -239,11 +238,11 @@ void CFtpDialog::Layout(void)
 	// Buttons
 	fOkButton->MoveTo(fLoginBox->Left()+dx, 
 					  fMainView->Bottom()-dy-fOkButton->Height());
-	fOkButton->ResizeWidth(bw);
+	fOkButton->SetWidth(bw);
 	//
 	fCancelButton->MoveTo(fOkButton->Left(), 
 						  fOkButton->Top()-dy-fCancelButton->Height());
-	fCancelButton->ResizeWidth(bw);
+	fCancelButton->SetWidth(bw);
 
 	// List
 	fDirectoryField->MoveTo(dx, dy);
@@ -255,7 +254,7 @@ void CFtpDialog::Layout(void)
 	//
 	fFileName->MoveTo(dx, 
 					  fScrollView->Bottom()-fFileName->Height());
-	fFileName->ResizeWidth(fScrollView->Width());
+	fFileName->SetWidth(fScrollView->Width());
 	//
 	float minW = 200;
 	float minH = 100;

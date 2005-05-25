@@ -40,12 +40,11 @@
 #include "HDialog.h"
 #include "HTabSheet.h"
 #include "HColorControl.h"
-#include "HDlogView.h"
+#include "HDialogViews.h"
 #include "HStream.h"
 #include "HDefines.h"
 #include "HError.h"
 #include "MAlert.h"
-#include "HBox.h"
 
 const unsigned long
 	msg_AddDialog		= 'ADlg',

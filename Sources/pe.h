@@ -63,6 +63,7 @@
 #include <ScrollView.h>
 #include <StringView.h>
 #include <TextControl.h>
+#include <Box.h>
 /* Note that <UnicodeBlockObjects.h> is not included on purpose. */
 #include <Window.h>
 

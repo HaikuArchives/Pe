@@ -20,13 +20,12 @@ DEFINES += H_BUILDING_LIBHEKKEL ;
 # <pe-src>
 SharedLibrary libhekkel.so : 
 	HAppResFile.cpp
-	HBox.cpp
 	HButtonBar.cpp
 	HColorControl.cpp
 	HColorPicker2.cpp
 	HColorUtils.cpp
 	HDialog.cpp
-	HDlogView.cpp
+	HDialogViews.cpp
 	HError.cpp
 	HHelpWindow.cpp
 	HLazyObject.cpp

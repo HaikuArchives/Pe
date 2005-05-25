@@ -36,7 +36,7 @@
 #include "pe.h"
 #include "HTabSheet.h"
 #include "HDialog.h"
-#include "HDlogView.h"
+#include "HDialogViews.h"
 #include "HDefines.h"
 
 const int

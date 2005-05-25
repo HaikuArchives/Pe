@@ -38,8 +38,7 @@
 
 #include "Sstdio.h"
 #include "HDialog.h"
-#include "HDlogView.h"
-#include "HBox.h"
+#include "HDialogViews.h"
 
 class CFtpDialog : public HDialog
 {
