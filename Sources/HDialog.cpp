@@ -539,7 +539,7 @@ void HDialog::CreateField(int kind, BPositionIO& data, BView*& inside)
 		case 'capt':
 			data >> r >> name >> label;
 			inside->AddChild(v = new BStringView(r.ToBe(), name, label));
-			v->SetViewColor(kViewColor);
+			v->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			break;
 		case 'popu':
 		{

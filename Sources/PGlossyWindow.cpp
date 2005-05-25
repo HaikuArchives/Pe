@@ -82,19 +82,19 @@ void PGlossyItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 	
 	if (IsSelected())
 	{
-		owner->SetLowColor(kShadow);
-		owner->SetHighColor(kViewColor);
+		owner->SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+		owner->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	}
 	else
 	{	
-		owner->SetLowColor(kViewColor);
+		owner->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		owner->SetHighColor(kWhite);
 	}
 	
 	owner->FillRect(bounds, B_SOLID_LOW);
 	
 	owner->StrokeLine(bounds.LeftTop(), bounds.RightTop());
-	owner->SetHighColor(IsSelected() ? kDarkShadow : kShadow);
+	owner->SetHighColor(IsSelected() ? tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT) : tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	owner->StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
 	
 	owner->SetHighColor(kBlack);

@@ -46,8 +46,8 @@
 PStatus::PStatus(BRect frame, PText *txt)
 	: BView(frame, "status", B_FOLLOW_BOTTOM | B_FOLLOW_LEFT, B_WILL_DRAW)
 {
-	SetViewColor(kViewColor);
-	SetLowColor(kViewColor);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	BFont font(be_plain_font);
 	font.SetSize(10);
@@ -71,14 +71,14 @@ void PStatus::Draw(BRect updateRect)
 {
 	BRect b(Bounds());
 	
-	SetHighColor(kDarkShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	StrokeLine(b.LeftTop(), b.RightTop());
 	b.top++;
 
 	font_height fh;
 	be_plain_font->GetHeight(&fh);
 
-	SetHighColor(kShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	StrokeLine(b.RightBottom(), b.LeftBottom());
 	StrokeLine(b.RightTop(), b.RightBottom());
 	
@@ -87,8 +87,8 @@ void PStatus::Draw(BRect updateRect)
 	StrokeLine(b.LeftTop(), b.LeftBottom());
 
 	b.InsetBy(1, 1);
-	SetLowColor(kViewColor);
-	SetViewColor(kViewColor);
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	FillRect(b, B_SOLID_LOW);
 
 	SetHighColor(kBlack);

@@ -40,7 +40,7 @@
 HDlogView::HDlogView(BRect frame, const char *name)
 	: BView(frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 {
-	SetViewColor(kViewColor);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 } /* HDlogView::HDlogView */
 		
 HDlogView::~HDlogView()
@@ -61,12 +61,12 @@ void HDlogView::Draw(BRect update)
 			BRect r = *ri;
 			if (r.Width() > r.Height())
 			{
-				AddLine(r.LeftTop(), r.RightTop(), kShadow);
+				AddLine(r.LeftTop(), r.RightTop(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 				AddLine(r.LeftBottom(), r.RightBottom(), kWhite);
 			}
 			else
 			{
-				AddLine(r.LeftTop(), r.LeftBottom(), kShadow);
+				AddLine(r.LeftTop(), r.LeftBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 				AddLine(r.RightTop(), r.RightBottom(), kWhite);
 			}
 		}
@@ -180,19 +180,19 @@ void HBox::Draw(BRect update)
 		DrawString(Label(), BPoint(6, lh));
 		
 		BeginLineArray(10);
-		AddLine(BPoint(l, t + lh / 2), BPoint(l + 4, t + lh / 2), kShadow);
+		AddLine(BPoint(l, t + lh / 2), BPoint(l + 4, t + lh / 2), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		AddLine(BPoint(l + 1, t + lh / 2 + 1), BPoint(l + 5, t + lh / 2 + 1), kWhite);
 		
-		AddLine(BPoint(l + w + 4, t + lh / 2), BPoint(r, t + lh / 2), kShadow);
+		AddLine(BPoint(l + w + 4, t + lh / 2), BPoint(r, t + lh / 2), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		AddLine(BPoint(l + w + 4, t + lh / 2 + 1), BPoint(r - 1, t + lh / 2 + 1), kWhite);
 		
-		AddLine(BPoint(l, t + lh / 2), BPoint(l, b), kShadow);
+		AddLine(BPoint(l, t + lh / 2), BPoint(l, b), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		AddLine(BPoint(l + 1, t + lh / 2 + 1), BPoint(l + 1, b - 2), kWhite);
 		
-		AddLine(BPoint(l, b - 1), BPoint(r - 1, b - 1), kShadow);
+		AddLine(BPoint(l, b - 1), BPoint(r - 1, b - 1), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		AddLine(BPoint(l, b), BPoint(r, b), kWhite);
 				
-		AddLine(BPoint(r - 1, b - 1), BPoint(r - 1, t + lh / 2), kShadow);
+		AddLine(BPoint(r - 1, b - 1), BPoint(r - 1, t + lh / 2), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		AddLine(BPoint(r, b), BPoint(r, t + lh / 2), kWhite);
 		
 		EndLineArray();
@@ -200,16 +200,16 @@ void HBox::Draw(BRect update)
 	else
 	{
 		BeginLineArray(8);
-		AddLine(BPoint(l, t), BPoint(r - 1, t), kShadow);
+		AddLine(BPoint(l, t), BPoint(r - 1, t), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		AddLine(BPoint(l + 1, t + 1), BPoint(r - 2, t + 1), kWhite);
 		
-		AddLine(BPoint(l, t), BPoint(l, b - 1), kShadow);
+		AddLine(BPoint(l, t), BPoint(l, b - 1), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		AddLine(BPoint(l + 1, t + 1), BPoint(l + 1, b - 2), kWhite);
 		
-		AddLine(BPoint(l, b - 1), BPoint(r - 1, b - 1), kShadow);
+		AddLine(BPoint(l, b - 1), BPoint(r - 1, b - 1), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		AddLine(BPoint(l, b), BPoint(r, b), kWhite);
 				
-		AddLine(BPoint(r - 1, b - 1), BPoint(r - 1, t), kShadow);
+		AddLine(BPoint(r - 1, b - 1), BPoint(r - 1, t), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		AddLine(BPoint(r, b), BPoint(r, t), kWhite);
 		
 		EndLineArray();

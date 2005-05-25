@@ -60,15 +60,15 @@ void HColorDemo::Draw(BRect update)
 	BRect r(Bounds());
 	
 	BeginLineArray(8);
-	AddLine(r.LeftTop(), r.RightTop(), kShadow);
-	AddLine(r.LeftTop(), r.LeftBottom(), kShadow);
+	AddLine(r.LeftTop(), r.RightTop(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	AddLine(r.LeftTop(), r.LeftBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	AddLine(r.LeftBottom(), r.RightBottom(), kWhite);
 	AddLine(r.RightBottom(), r.RightTop(), kWhite);
 	r.InsetBy(1, 1);
-	AddLine(r.LeftTop(), r.RightTop(), kDarkShadow);
-	AddLine(r.LeftTop(), r.LeftBottom(), kDarkShadow);
-	AddLine(r.LeftBottom(), r.RightBottom(), kDarkShadow);
-	AddLine(r.RightBottom(), r.RightTop(), kDarkShadow);
+	AddLine(r.LeftTop(), r.RightTop(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	AddLine(r.LeftTop(), r.LeftBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	AddLine(r.LeftBottom(), r.RightBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	AddLine(r.RightBottom(), r.RightTop(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	EndLineArray();
 	
 	r.InsetBy(1, 1);
@@ -162,7 +162,7 @@ void HColorSlider::Draw(BRect /* updateRect */)
 	}
 	else
 	{
-		SetHighColor(kShadow);
+		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		StrokeLine(r.LeftTop(), r.LeftBottom());
 		StrokeLine(r.LeftTop(), r.RightTop());
 		SetHighColor(kWhite);
@@ -172,7 +172,7 @@ void HColorSlider::Draw(BRect /* updateRect */)
 
 	r.InsetBy(1, 1);
 	
-	SetHighColor(kDarkShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	StrokeRect(r);
 	
 	r.InsetBy(1, 1);
@@ -224,16 +224,16 @@ void HColorSlider::Draw(BRect /* updateRect */)
 		EndLineArray();
 	}
 	
-	SetHighColor(kViewColor);
+	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	FillRect(knob);
 	
 	BeginLineArray(6);
 	AddLine(BPoint(knob.left + 1, knob.top + 1),	BPoint(knob.left + 1, knob.bottom - 2),	kWhite);
 	AddLine(BPoint(knob.left + 1, knob.top + 1),	BPoint(knob.right - 2, knob.top + 1),	kWhite);
-	AddLine(BPoint(knob.left, knob.bottom),			BPoint(knob.right, knob.bottom),		kDarkShadow);
-	AddLine(BPoint(knob.right, knob.bottom),		BPoint(knob.right, knob.top), 			kDarkShadow);
-	AddLine(BPoint(knob.left + 2, knob.bottom - 1),	BPoint(knob.right - 1, knob.bottom - 1),kShadow);
-	AddLine(BPoint(knob.right - 1, knob.bottom - 1),BPoint(knob.right - 1, knob.top + 1), 	kShadow);
+	AddLine(BPoint(knob.left, knob.bottom),			BPoint(knob.right, knob.bottom),		tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	AddLine(BPoint(knob.right, knob.bottom),		BPoint(knob.right, knob.top), 			tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	AddLine(BPoint(knob.left + 2, knob.bottom - 1),	BPoint(knob.right - 1, knob.bottom - 1),tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	AddLine(BPoint(knob.right - 1, knob.bottom - 1),BPoint(knob.right - 1, knob.top + 1), 	tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	EndLineArray();
 	
 	SetHighColor(kBlack);
@@ -419,12 +419,12 @@ void HColorSquare::Draw(BRect update)
 	StrokeLine(b.RightTop(), b.RightBottom());
 	StrokeLine(b.LeftBottom(), b.RightBottom());
 	
-	SetHighColor(kShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	StrokeLine(b.LeftTop(), b.RightTop());
 	StrokeLine(b.LeftTop(), b.LeftBottom());
 	
 	b.InsetBy(1, 1);
-	SetHighColor(kDarkShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	StrokeRect(b);
 
 	b.InsetBy(1, 1);

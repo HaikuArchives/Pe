@@ -58,7 +58,7 @@ HColorControl::~HColorControl()
 void HColorControl::Draw(BRect /*updateRect*/)
 {
 	BRect r(Bounds());
-	SetLowColor(kViewColor);
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	font_height fh;
 	BFont font;
@@ -99,7 +99,7 @@ void HColorControl::Draw(BRect /*updateRect*/)
 		SetHighColor(c);
 		FillRect(r);
 		
-		SetHighColor(kShadow);
+		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		r.InsetBy(-1, -1);
 		r.OffsetBy(-1, -1);
 		StrokeLine(r.LeftBottom(), r.LeftTop());
@@ -107,7 +107,7 @@ void HColorControl::Draw(BRect /*updateRect*/)
 	}
 	else
 	{
-		SetHighColor(kShadow);
+		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		StrokeLine(r.LeftBottom(), r.RightBottom());
 		StrokeLine(r.RightTop(), r.RightBottom());
 		r.OffsetBy(-1, -1);

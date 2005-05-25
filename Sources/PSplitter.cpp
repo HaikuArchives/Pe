@@ -76,17 +76,17 @@ void PSplitter::Draw(BRect update)
 {
 	BRect b(Bounds());
 	
-	SetHighColor(kDarkShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	StrokeRect(b);
 	b.InsetBy(1, 1);
 	
 	SetHighColor(kWhite);
 	StrokeLine(b.LeftTop(), b.RightTop());	b.top += 1;
-	SetHighColor(kViewColor);
+	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	StrokeLine(b.LeftTop(), b.RightTop());	b.top += 1;
-	SetHighColor(kShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	StrokeLine(b.LeftTop(), b.RightTop());	b.top += 1;
-	SetHighColor(kDarkShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	StrokeLine(b.LeftTop(), b.RightTop());
 } /* PSplitter::Draw */
 

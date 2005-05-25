@@ -159,13 +159,13 @@ void PMessageItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 	
 	if (IsSelected())
 	{
-		owner->SetLowColor(kShadow);
-		owner->SetHighColor(kDarkShadow);
+		owner->SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+		owner->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	}
 	else
 	{
-		owner->SetLowColor(kViewColor);
-		owner->SetHighColor(kShadow);
+		owner->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		owner->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	}
 
 	owner->StrokeLine(r.LeftBottom(), r.RightBottom());

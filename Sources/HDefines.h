@@ -41,13 +41,13 @@
 #include "HLibHekkel.h"
 
 IMPEXP_LIBHEKKEL const rgb_color
-	kViewColor = { 216, 216, 216, 255 },
-	kShadow = { 184, 184, 184, 255 },
-	kDarkShadow  = { 150, 150, 150, 255 },
-	kVeryDark = { 100, 100, 100, 255 },
+//	kViewColor = { 216, 216, 216, 255 },	=> ui_color(B_PANEL_BACKGROUND_COLOR)
+//	kShadow = { 184, 184, 184, 255 },		=> tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT)
+//	kDarkShadow  = { 150, 150, 150, 255 },	=> tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT)
+//	kVeryDark = { 100, 100, 100, 255 },		=> tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT)
+//	kRed = { 255, 0, 0, 255 },
 	kWhite = { 255, 255, 255, 255 },
-	kBlack = { 0, 0, 0, 255 },
-	kRed = { 255, 0, 0, 255 };
+	kBlack = { 0, 0, 0, 255 };
 
 IMPEXP_LIBHEKKEL const ulong
 	msg_OK				= 'ok  ',

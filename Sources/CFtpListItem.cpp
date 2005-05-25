@@ -119,7 +119,7 @@ void CFtpListItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 {
 	try
 	{
-		owner->SetLowColor(IsSelected() ? kShadow : kWhite);
+		owner->SetLowColor(IsSelected() ? tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT) : kWhite);
 		BRect r(bounds);
 		owner->FillRect(r, B_SOLID_LOW);
 		r.InsetBy(1, 1);

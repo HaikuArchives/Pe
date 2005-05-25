@@ -105,8 +105,8 @@ void CKeyCapturer::Draw(BRect)
 	BeginLineArray(4);
 
 	r.InsetBy(-2, -2);
-	AddLine(r.LeftTop(), r.RightTop(), kShadow);
-	AddLine(r.LeftTop(), r.LeftBottom(), kShadow);
+	AddLine(r.LeftTop(), r.RightTop(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	AddLine(r.LeftTop(), r.LeftBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	AddLine(r.RightTop(), r.RightBottom(), kWhite);
 	AddLine(r.LeftBottom(), r.RightBottom(), kWhite);
 
@@ -117,7 +117,7 @@ void CKeyCapturer::Draw(BRect)
 	if (IsFocus())
 		SetHighColor(keyboard_navigation_color());
 	else	
-		SetHighColor(kDarkShadow);
+		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	
 	StrokeRect(r);
 

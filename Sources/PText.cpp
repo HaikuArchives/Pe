@@ -4601,11 +4601,11 @@ void PText::Draw(BRect updateRect)
 
 			BPoint p1(0, fSplitAt - kSplitterHeight), p2(updateRect.right, fSplitAt - kSplitterHeight);
 			BeginLineArray(5);
-			AddLine(p1, p2, kDarkShadow);	p1.y++; p2.y++;
+			AddLine(p1, p2, tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));	p1.y++; p2.y++;
 			AddLine(p1, p2, kWhite);			p1.y++; p2.y++;
-			AddLine(p1, p2, kViewColor);	p1.y++; p2.y++;
-			AddLine(p1, p2, kShadow);		p1.y++; p2.y++;
-			AddLine(p1, p2, kDarkShadow);	p1.y++; p2.y++;
+			AddLine(p1, p2, ui_color(B_PANEL_BACKGROUND_COLOR));	p1.y++; p2.y++;
+			AddLine(p1, p2, tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));		p1.y++; p2.y++;
+			AddLine(p1, p2, tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));	p1.y++; p2.y++;
 			EndLineArray();
 		}
 	}
@@ -5080,11 +5080,11 @@ void PText::RedrawDirtyLines()
 	{
 		BPoint p1(0, fSplitAt - kSplitterHeight), p2(b.right, fSplitAt - kSplitterHeight);
 		BeginLineArray(5);
-		AddLine(p1, p2, kDarkShadow);	p1.y++; p2.y++;
+		AddLine(p1, p2, tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));	p1.y++; p2.y++;
 		AddLine(p1, p2, kWhite);			p1.y++; p2.y++;
-		AddLine(p1, p2, kViewColor);	p1.y++; p2.y++;
-		AddLine(p1, p2, kShadow);		p1.y++; p2.y++;
-		AddLine(p1, p2, kDarkShadow);	p1.y++; p2.y++;
+		AddLine(p1, p2, ui_color(B_PANEL_BACKGROUND_COLOR));	p1.y++; p2.y++;
+		AddLine(p1, p2, tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));		p1.y++; p2.y++;
+		AddLine(p1, p2, tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));	p1.y++; p2.y++;
 		EndLineArray();
 	}
 	

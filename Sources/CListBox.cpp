@@ -52,7 +52,7 @@ CListBox::CListBox(BRect frame, const char *name)
 {
 	fSelfChange = true;
 
-	SetViewColor(kViewColor);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BRect r(Bounds());
 	r.InsetBy(2, 2);

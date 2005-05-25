@@ -232,7 +232,7 @@ void PDoc::InitWindow(const char *name)
 	
 	r.left = fButtonBar->Frame().right + 4;
 	fToolBar->AddChild(fError = new BStringView(r, "error", "", B_FOLLOW_LEFT_RIGHT));
-	fError->SetViewColor(kViewColor);
+	fError->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fError->SetFont(be_plain_font);
 	fError->SetHighColor(kBlack);
 
@@ -1552,7 +1552,7 @@ void PDoc::MessageReceived(BMessage *msg)
 			}
 			
 			case msg_PrefsChanged:
-				fText->SetViewColor(gPrefs->GetPrefColor("low color", kViewColor));
+				fText->SetViewColor(gPrefs->GetPrefColor("low color", ui_color(B_PANEL_BACKGROUND_COLOR)));
 				fText->Invalidate();
 
 				fStatus->Draw(fStatus->Bounds());

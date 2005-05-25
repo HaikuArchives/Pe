@@ -97,7 +97,7 @@ void CPathItem::DrawItem(LView *owner, BRect bounds, bool /*complete*/)
 	TruncPathString(buf, 133, (int)Width());
 	
 	if (IsSelected())
-		owner->SetLowColor(kDarkShadow);
+		owner->SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	else
 		owner->SetLowColor(kWhite);
 	

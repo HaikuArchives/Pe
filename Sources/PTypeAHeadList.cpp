@@ -61,7 +61,7 @@ void PGroupStatus::Draw(BRect /*update*/)
 	
 	FillRect(b, B_SOLID_LOW);
 
-	SetHighColor(kDarkShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	StrokeLine(b.LeftTop(), b.RightTop());
 	b.top++;
 
@@ -69,7 +69,7 @@ void PGroupStatus::Draw(BRect /*update*/)
 	be_plain_font->GetHeight(&fh);
 	float l = b.top + fh.ascent;
 
-	SetHighColor(kShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	StrokeLine(b.RightBottom(), b.LeftBottom());
 //	StrokeLine(b.RightTop(), b.RightBottom());
 	
@@ -145,8 +145,8 @@ void PGroupStatus::AttachedToWindow()
 {
 	fOwner = Window();
 
-	SetLowColor(kViewColor);
-	SetViewColor(kViewColor);
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 } /* PGroupStatus::AttachedToWindow */
 
 void PGroupStatus::SetPath(const char *path)

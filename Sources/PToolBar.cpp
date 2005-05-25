@@ -47,15 +47,15 @@ PToolBar::PToolBar(BRect frame, const char *name)
 
 void PToolBar::Draw(BRect /*update*/)
 {
-	SetLowColor(kViewColor);
-	SetViewColor(kViewColor);
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	BRect b(Bounds());
 	b.bottom -= 1;
 		
 	FillRect(b, B_SOLID_LOW);
 
-	SetHighColor(kDarkShadow);
+	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	StrokeLine(b.LeftBottom(), b.RightBottom());
 	
 	SetHighColor(kBlack);
@@ -73,7 +73,7 @@ void PToolBar::Draw(BRect /*update*/)
 		{
 			float x;
 			
-			SetHighColor(kDarkShadow);
+			SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	
 			for (x = fHOffset; x < r.right; x += fTabWidth)
 				StrokeLine(BPoint(x, r.bottom - kTabStopHeight + 1), BPoint(x, r.bottom - 1));

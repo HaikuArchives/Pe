@@ -105,15 +105,15 @@ void HTool::DrawFrame(bool enter, bool active)
 	r.InsetBy(-1, -1);
 	if (enter)
 	{
-		lt = active ? kShadow : kWhite;
-		rb = active ? kWhite : kDarkShadow;
-		m1 = kDarkShadow;
+		lt = active ? tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT) : kWhite;
+		rb = active ? kWhite : tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT);
+		m1 = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT);
 		m2 = kWhite;
 	}
 	else
 	{
-		lt = m2 = active ? kDarkShadow : kViewColor;
-		rb = m1 = active ? kWhite : kViewColor;
+		lt = m2 = active ? tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT) : ui_color(B_PANEL_BACKGROUND_COLOR);
+		rb = m1 = active ? kWhite : ui_color(B_PANEL_BACKGROUND_COLOR);
 	}
 
 	fBar->BeginLineArray(fMenu ? 6 : 4);
@@ -152,7 +152,7 @@ void HTool::DrawButton(unsigned char *icondat, bool pushed)
 	else
 		icon.SetBits(icondat, 256, 0, B_COLOR_8_BIT);
 
-	fBar->SetHighColor(kViewColor);
+	fBar->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fBar->FillRect(fFrame);
 
 	if (fVisible) {
@@ -169,9 +169,9 @@ void HTool::DrawButton(unsigned char *icondat, bool pushed)
 			if (pushed)
 				fBar->SetLowColor(BScreen().ColorForIndex(gSelectedMap[0x1b]));
 			else
-				fBar->SetLowColor(kViewColor);
+				fBar->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			fBar->FillRect(r, B_SOLID_LOW);
-			fBar->SetLowColor(kViewColor);
+			fBar->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			
 			float x = fFrame.left + 18;
 			float y = fFrame.top + 7;
@@ -204,7 +204,7 @@ void HToolSeparator::Draw(bool pushed)
 	float x = fFrame.left+2.0;
 	
 	fBar->BeginLineArray(2);
-	fBar->AddLine(BPoint(x, fFrame.top), BPoint(x, fFrame.bottom), kDarkShadow);
+	fBar->AddLine(BPoint(x, fFrame.top), BPoint(x, fFrame.bottom), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	fBar->AddLine(BPoint(x+1.0, fFrame.top), BPoint(x+1.0, fFrame.bottom), kWhite);
 	fBar->EndLineArray();
 } /* HToolSeparator::Draw */
@@ -334,7 +334,7 @@ void HButtonBar::Draw(BRect update)
 {
 	BRect bounds(Bounds());
 	
-	SetHighColor(kViewColor);
+	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	FillRect(bounds);
 	
 	if (fDragger)
@@ -347,11 +347,11 @@ void HButtonBar::Draw(BRect update)
 		BeginLineArray(2 * x * y);
 		while (true)
 		{
-			AddLine(p1, p1, kDarkShadow);
+			AddLine(p1, p1, tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 			AddLine(p2, p2, kWhite);
 			p1.x += 3;
 			p2.x += 3;
-			AddLine(p1, p1, kDarkShadow);
+			AddLine(p1, p1, tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 			AddLine(p2, p2, kWhite);
 			if (--y == 0) break;
 			p1.x = 3; p1.y += 3;

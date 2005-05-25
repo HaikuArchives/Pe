@@ -221,7 +221,7 @@ CHTMLButton::~CHTMLButton()
 
 void CHTMLButton::Draw()
 {
-	fPane->SetLowColor(kViewColor);
+	fPane->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fPane->SetFont(be_plain_font);
 	
 	fPane->FillRect(fFrame, B_SOLID_LOW);
@@ -232,17 +232,17 @@ void CHTMLButton::Draw()
 	
 	fPane->BeginLineArray(9);
 	
-	fPane->AddLine(r.LeftBottom(), r.RightBottom(), kVeryDark);
+	fPane->AddLine(r.LeftBottom(), r.RightBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT));
 	
 	r.bottom -= 1;
 	
-	fPane->AddLine(BPoint(r.left + 1, r.bottom), r.RightBottom(), kDarkShadow);
-	fPane->AddLine(r.RightBottom(), BPoint(r.right, r.top + 1), kDarkShadow);
+	fPane->AddLine(BPoint(r.left + 1, r.bottom), r.RightBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	fPane->AddLine(r.RightBottom(), BPoint(r.right, r.top + 1), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 
 	r.InsetBy(1, 1);
 
-	fPane->AddLine(r.LeftBottom(), r.RightBottom(), kShadow);
-	fPane->AddLine(r.RightBottom(), r.RightTop(), kShadow);
+	fPane->AddLine(r.LeftBottom(), r.RightBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	fPane->AddLine(r.RightBottom(), r.RightTop(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	fPane->AddLine(r.LeftTop(), r.RightTop(), kWhite);
 	fPane->AddLine(r.LeftTop(), r.LeftBottom(), kWhite);
 

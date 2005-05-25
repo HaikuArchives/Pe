@@ -67,7 +67,6 @@ CFtpDialog::CFtpDialog(BRect frame, const char *name, window_type type, int flag
 	fSocket = -1;
 
 	Create();
-
 	Layout();
 
 #if 0
@@ -252,15 +251,13 @@ void CFtpDialog::Layout(void)
 	fScrollView->ResizeTo(fShowDotted->Right()-dx, 
 						  Frame().Height()-fDirectoryField->Bottom()-2*dy);
 	//
-	fFileName->MoveTo(dx, 
-					  fScrollView->Bottom()-fFileName->Height());
+	fFileName->MoveTo(dx, fScrollView->Bottom()-fFileName->Height());
 	fFileName->SetWidth(fScrollView->Width());
 	//
 	float minW = 200;
 	float minH = 100;
 	minW = max(minW, 
-		       bw + 3*dx + fShowDotted->Width() 
-			       + fDirectoryField->Width());
+		       bw + 3*dx + fShowDotted->Width() + fDirectoryField->Width());
 	minH = max(minH, fLoginBox->Bottom()+2*fOkButton->Height()+3*dy);
 	ResizeToLimits(minW, 99999, minH, 99999);
 } // CFtpDialog::Layout

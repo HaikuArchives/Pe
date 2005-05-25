@@ -45,8 +45,8 @@ const int
 HTabSheet::HTabSheet(BRect frame, const char *name)
 	: BView(frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_NAVIGABLE)
 {
-	SetViewColor(kViewColor);
-	SetLowColor(kViewColor);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetFont(be_plain_font);
 	
 	fListArea = frame;
@@ -112,16 +112,16 @@ void HTabSheet::Draw(BRect update)
 	BeginLineArray(8);
 
 	f.InsetBy(-2, -2);
-	AddLine(f.LeftTop(), f.RightTop(), kShadow);
-	AddLine(f.LeftTop(), f.LeftBottom(), kShadow);
+	AddLine(f.LeftTop(), f.RightTop(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	AddLine(f.LeftTop(), f.LeftBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	AddLine(f.RightTop(), f.RightBottom(), kWhite);
 	AddLine(f.LeftBottom(), f.RightBottom(), kWhite);
 	
 	f.InsetBy(1, 1);
-	AddLine(f.LeftTop(), f.RightTop(), kDarkShadow);
-	AddLine(f.LeftTop(), f.LeftBottom(), kDarkShadow);
-	AddLine(f.RightTop(), f.RightBottom(), kShadow);
-	AddLine(f.LeftBottom(), f.RightBottom(), kShadow);
+	AddLine(f.LeftTop(), f.RightTop(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	AddLine(f.LeftTop(), f.LeftBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+	AddLine(f.RightTop(), f.RightBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+	AddLine(f.LeftBottom(), f.RightBottom(), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	
 	EndLineArray();
 } /* HTabSheet::Draw */

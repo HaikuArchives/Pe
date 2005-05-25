@@ -109,7 +109,7 @@ void CMimeItem::DrawItem(BView *owner, BRect bounds, bool)
 	if (IsSelected())
 	{
 		bm.SetBits(fIconSelected, 256, 0, B_COLOR_8_BIT);
-		owner->SetLowColor(kShadow);
+		owner->SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	}
 	else
 	{

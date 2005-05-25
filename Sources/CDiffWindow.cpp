@@ -845,7 +845,7 @@ void CDiffItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 	}
 	
 	if (IsSelected())
-		owner->SetLowColor(kShadow);
+		owner->SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	else
 		owner->SetLowColor(kWhite);
 
@@ -877,7 +877,7 @@ void CDiffDItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 	}
 	
 	if (IsSelected())
-		owner->SetLowColor(kShadow);
+		owner->SetLowColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	else
 		owner->SetLowColor(kWhite);
 
