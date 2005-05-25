@@ -183,7 +183,7 @@ protected:
 			void _BuildIt(BPositionIO& data);
 			void _PlaceWindow();
 	
-			BView *fMainView;
+			class HDlogView *fMainView;
 			BWindow *fOwner;
 			BMessenger fCaller;
 			HPlacementType fPlacement;

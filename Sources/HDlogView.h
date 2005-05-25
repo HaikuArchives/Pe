@@ -46,6 +46,12 @@ public:
 virtual	void Draw(BRect update);
 
 		void AddMyLine(BRect r);
+		float Left(void) { return Frame().left; }
+		float Right(void) { return Frame().right; }
+		float Top(void) { return Frame().top; }
+		float Bottom(void) { return Frame().bottom; }
+		float Width(void) { return Frame().Width(); }
+		float Height(void) { return Frame().Height(); }
 
 private:
 		vector<BRect> fLines;
@@ -115,6 +121,24 @@ public:
 	HCheckBox(BView* view, const char* name, BMessage* msg = NULL, 
 			  uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
 	void ResizeLocalized(const char* label=NULL);
+	float Left(void) { return Frame().left; }
+	float Right(void) { return Frame().right; }
+	float Top(void) { return Frame().top; }
+	float Bottom(void) { return Frame().bottom; }
+	float Width(void) { return Frame().Width(); }
+	float Height(void) { return Frame().Height(); }
+	void ResizeWidth(float Width) { ResizeTo(Width, Height()); }
+	void ResizeHeight(float Height) { ResizeTo(Width(), Height); }
+};
+
+class IMPEXP_LIBHEKKEL HScrollView : public BScrollView {
+public:
+	HScrollView(BView* view, const char *name, BView *target,
+				uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP,
+				uint32 flags = 0,
+				bool horizontal = false,
+				bool vertical = false,
+				border_style border = B_FANCY_BORDER);
 	float Left(void) { return Frame().left; }
 	float Right(void) { return Frame().right; }
 	float Top(void) { return Frame().top; }

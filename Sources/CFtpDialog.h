@@ -39,6 +39,7 @@
 #include "Sstdio.h"
 #include "HDialog.h"
 #include "HDlogView.h"
+#include "HBox.h"
 
 class CFtpDialog : public HDialog
 {
@@ -74,7 +75,7 @@ class CFtpDialog : public HDialog
 	map<string,string> fExtMime;
 	
 	// Interface
-	BBox* fLoginBox;
+	HBox* fLoginBox;
 	HTextControl* fServerName;
 	HTextControl* fUserName;
 	HTextControl* fPassword;
@@ -86,7 +87,7 @@ class CFtpDialog : public HDialog
 	HCheckBox* fShowDotted;
 	HCheckBox* fUsePassive;
 	BListView* fListView;
-	BScrollView* fScrollView;
+	HScrollView* fScrollView;
 };
 
 #endif // CFTPDIALOG_H

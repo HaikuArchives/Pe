@@ -37,6 +37,16 @@
 #include "HBox.h"
 #include "HDefines.h"
 
+
+HBox::HBox(BView* view, const char *name = NULL,
+			uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP,
+			uint32 flags = B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP,
+			border_style border = B_FANCY_BORDER)
+: BBox(BRect(0, 0, 100, 50), name, resizingMode, flags, border)
+{
+	view->AddChild(this);
+} /* HBox::HBox */
+
 void HBox::Draw(BRect update)
 {
 	BRect R(Bounds());

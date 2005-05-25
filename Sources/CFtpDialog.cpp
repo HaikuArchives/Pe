@@ -147,8 +147,7 @@ void CFtpDialog::Create(void)
 {
 	fMainView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	// Server-Box
-	fLoginBox = new BBox(Bounds(), "", B_FOLLOW_RIGHT|B_FOLLOW_TOP);
-	fMainView->AddChild(fLoginBox);
+	fLoginBox = new HBox(fMainView, "", B_FOLLOW_RIGHT|B_FOLLOW_TOP);
 	fServerName = new HTextControl(fLoginBox, "srvr");
 	fUserName = new HTextControl(fLoginBox, "user");
 	fPassword = new HTextControl(fLoginBox, "pass");
@@ -176,9 +175,8 @@ void CFtpDialog::Create(void)
 							  B_FOLLOW_ALL);
 	fListView->SetInvocationMessage(new BMessage(msg_SelectedListItem));
 	fListView->SetListType(B_MULTIPLE_SELECTION_LIST);
-	fScrollView = new BScrollView("scrll", fListView, B_FOLLOW_ALL, 
+	fScrollView = new HScrollView(fMainView, "scrll", fListView, B_FOLLOW_ALL, 
 								  B_FRAME_EVENTS, false, true);
-	fMainView->AddChild(fScrollView);
 
 	SetDefaultButton(fConnectButton);
 	
@@ -235,12 +233,12 @@ void CFtpDialog::Layout(void)
 	fUsePassive->ResizeWidth(bw);
 	fConnectButton->ResizeWidth(bw-2*dx);
 	//
-	fLoginBox->MoveTo(fMainView->Frame().right-bw-3*dx, dy);
+	fLoginBox->MoveTo(fMainView->Right()-bw-3*dx, dy);
 	fLoginBox->ResizeTo(bw+2*dx, fConnectButton->Bottom()+dy);
 
 	// Buttons
-	fOkButton->MoveTo(fLoginBox->Frame().left+dx, 
-					  fMainView->Frame().bottom-dy-fOkButton->Height());
+	fOkButton->MoveTo(fLoginBox->Left()+dx, 
+					  fMainView->Bottom()-dy-fOkButton->Height());
 	fOkButton->ResizeWidth(bw);
 	//
 	fCancelButton->MoveTo(fOkButton->Left(), 
@@ -249,23 +247,22 @@ void CFtpDialog::Layout(void)
 
 	// List
 	fDirectoryField->MoveTo(dx, dy);
-	fShowDotted->MoveTo(fLoginBox->Frame().left-fShowDotted->Width()-dx, 
-						dy);
+	fShowDotted->MoveTo(fLoginBox->Left()-fShowDotted->Width()-dx, dy);
 	//
 	fScrollView->MoveTo(dx, fDirectoryField->Bottom()+dy);
 	fScrollView->ResizeTo(fShowDotted->Right()-dx, 
 						  Frame().Height()-fDirectoryField->Bottom()-2*dy);
 	//
 	fFileName->MoveTo(dx, 
-					  fScrollView->Frame().bottom-fFileName->Height());
-	fFileName->ResizeWidth(fScrollView->Frame().Width());
+					  fScrollView->Bottom()-fFileName->Height());
+	fFileName->ResizeWidth(fScrollView->Width());
 	//
 	float minW = 200;
 	float minH = 100;
 	minW = max(minW, 
 		       bw + 3*dx + fShowDotted->Width() 
 			       + fDirectoryField->Width());
-	minH = max(minH, fLoginBox->Frame().bottom+2*fOkButton->Height()+3*dy);
+	minH = max(minH, fLoginBox->Bottom()+2*fOkButton->Height()+3*dy);
 	ResizeToLimits(minW, 99999, minH, 99999);
 } // CFtpDialog::Layout
 
