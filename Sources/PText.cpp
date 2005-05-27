@@ -3470,17 +3470,18 @@ bool PText::DoKeyCommand(BMessage *msg)
 			break;
 		case kmsg_ExtendSelectionToPreviousLine:
 			extend = true;
-			if (line > 0) {
-				newCaret = LineStart(line - 1);
+			if (line > 0) 
+			{
 				if (fAnchor != fCaret) 
 				{
 					// extend selection
-					newCaret += LinePosition2Offset(line - 1, fWalkOffset);
+					newCaret = LineStart(line - 1)
+								+ LinePosition2Offset(line - 1, fWalkOffset);
 				} 
 				else 
 				{
 					// start selection
-					newCaret += fCaret - LineStart(line);
+					newCaret = Column2Offset(line - 1, Offset2Column(fCaret));
 				}
 			} 
 			else
@@ -3493,11 +3494,15 @@ bool PText::DoKeyCommand(BMessage *msg)
 			extend = true;
 			if (line < LineCount() - 1) 
 			{
-				newCaret = LineStart(line + 1);
 				if (fAnchor != fCaret) 
-					newCaret += LinePosition2Offset(line + 1, fWalkOffset);
-				else
-					newCaret += fCaret - LineStart(line);
+				{
+					// extend selection
+					newCaret = LineStart(line + 1)
+								+ LinePosition2Offset(line + 1, fWalkOffset);
+				} else {
+					// start selection
+					newCaret = Column2Offset(line + 1, Offset2Column(fCaret));
+				}
 			} 
 			else
 				newCaret = fText.Size();
