@@ -80,6 +80,8 @@ static long sDocCount = 0;
 const float
 	kStatusWidth = 80;
 
+int PDoc::sfNewCount = -1;
+
 PDoc::PDoc(const entry_ref *doc, bool show)
 	: BWindow(NextPosition(), "Untitled", B_DOCUMENT_WINDOW, 0,
 		1 << current_workspace())
@@ -167,7 +169,29 @@ PDoc::~PDoc()
 
 	if (fFile != NULL)
 		StopWatchingFile();
+	
+	if (fLastSaved == 0)
+	{
+		// closing a new (unsaved) document (a.k.a. 'Untitled') defines
+		// the default document frame:
+		gPrefs->SetPrefRect("default document rect", Frame());
+		sfNewCount = -1;
+	}
 } /* PDoc::~PDoc */
+
+void PDoc::Show()
+{
+	// try to avoid showing window-parts offscreen:
+	BRect newFrame = Frame();
+	BScreen screen(this);
+	BRect sr = screen.Frame();
+	newFrame.left = MAX(5.0, MIN(sr.Width()-newFrame.Width()-5, newFrame.left));
+	newFrame.top = MAX(20.0, MIN(sr.Height()-newFrame.Height()-5, newFrame.top));
+	MoveTo(newFrame.LeftTop());
+
+	BWindow::Show();
+	fInitialFrame = Frame();
+}
 
 bool PDoc::QuitRequested()
 {
@@ -380,25 +404,9 @@ void PDoc::ReadAttr(BFile& file)
 			FailIOErr(file.ReadAttr("pe-info", ai.type, 0, p, ai.size));
 			
 			BMessage msg;
-//			FailOSErr(msg.Unflatten(p));
 			if (msg.Unflatten(p) != B_OK) return;
 
-			BRect f;
-			if (gRestorePosition &&
-				msg.FindRect("windowposition", &f) == B_NO_ERROR)
-			{
-				{
-					BScreen s;
-					f = f & s.Frame();
-				}
-				if (f.IsValid() && f.Width() > 100 && f.Height() > 100)
-				{
-					MoveTo(f.left, f.top);
-					ResizeTo(f.Width(), f.Height());
-					fText->AdjustScrollBars();
-				}
-			}
-
+			msg.FindRect("windowposition", &fLastStoredFrame);
 			fText->SetSettings(msg);
 		}
 		else if (file.GetAttrInfo("FontPrefs", &ai) == B_NO_ERROR)
@@ -410,28 +418,20 @@ void PDoc::ReadAttr(BFile& file)
 			
 			BMemoryIO mem(p, ai.size);
 
-			BRect f;
-			mem >> f;
+			mem >> fLastStoredFrame;
 			
-			if (gRestorePosition)
-			{
-				{
-					BScreen s;
-					f = f & s.Frame();
-				}
-	
-				if (f.IsValid() && f.Width() > 100 && f.Height() > 100)
-				{
-					MoveTo(f.left, f.top);
-					ResizeTo(f.Width(), f.Height());
-				}
-			}
-
 			fText->SetSettingsMW(mem);
 		}
-// no settings data found, see if it is a Mac file and adjust encoding:
 		else if (fText->LineEndType() == leCR)
+			// no settings data found, see if it is a Mac file and adjust encoding:
 			fText->SetEncoding(B_MACINTOSH_ROMAN);
+
+		if (gRestorePosition && fLastStoredFrame.IsValid())
+		{
+			MoveTo(fLastStoredFrame.left, fLastStoredFrame.top);
+			ResizeTo(fLastStoredFrame.Width(), fLastStoredFrame.Height());
+			fText->AdjustScrollBars();
+		}
 	}
 	catch (HErr& e) {}
 	if (p) free(p);
@@ -481,13 +481,19 @@ void PDoc::WriteAttr(BFile& file)
 
 	try
 	{
+		BRect frame = Frame();
+		if (frame == fInitialFrame && fLastStoredFrame.IsValid())
+			// return to last stored position if frame had only been
+			// moved automatically (in order to stay in screen-bounds)
+			frame = fLastStoredFrame;
+
 		switch (gSavedState)
 		{
 			case 0:
 			{
 				BMessage msg;
 				fText->GetSettings(msg);
-				msg.AddRect("windowposition", Frame());
+				msg.AddRect("windowposition", frame);
 		
 				ssize_t s = msg.FlattenedSize();
 				p = (char *)malloc(s);
@@ -500,7 +506,7 @@ void PDoc::WriteAttr(BFile& file)
 			{
 				BMallocIO data;
 				
-				data << Frame();
+				data << frame;
 				fText->GetSettingsMW(data);
 				
 				FailIOErr(file.WriteAttr("FontPrefs", 'type', 0, data.Buffer(), data.BufferLength()));
@@ -941,30 +947,29 @@ void PDoc::OpenSelection()
 
 BRect PDoc::NextPosition(bool inc)
 {
-	BRect sr, r;
-	{
-		BScreen screen;
-		sr = screen.Frame();
-	}
-	
-	static int cnt = -1;
-
-	if (inc)
-		cnt++;
-	
 	BFont textFont;
 	gPrefs->InitTextFont(&textFont);
-	r.top = 25 + (cnt % 8) * 20;
-	r.left = 40 - (cnt % 8) * 4 + (cnt / 8) * 8;
-	r.right = min((double)sr.right - 100,
-		r.left + 80 * textFont.StringWidth(" ") + B_V_SCROLL_BAR_WIDTH + 5);
 	float lh;
 	font_height fh;
-	be_fixed_font->GetHeight(&fh);
+	textFont.GetHeight(&fh);
 	lh = fh.ascent + fh.descent + fh.leading;
-	r.bottom = min(sr.bottom - 100, 50 * lh);
+
+	BRect initialDefaultRect(
+		40, 25,	
+		40 + 80*textFont.StringWidth("m") + B_V_SCROLL_BAR_WIDTH + 5, 
+		25 + 40*lh + B_H_SCROLL_BAR_HEIGHT
+	);
+	BRect defaultFrame = gPrefs->GetPrefRect("default document rect", 
+											 initialDefaultRect);
+
+	if (inc)
+		sfNewCount++;
+	else if (sfNewCount < 0)
+		sfNewCount = 0;
+	defaultFrame.OffsetBy( -(sfNewCount % 8) * 4 + (sfNewCount / 8) * 8, 
+						   (sfNewCount % 8) * 20);
 	
-	return r;
+	return defaultFrame;
 } /* PDoc::NextPosition */
 
 void PDoc::MakeWorksheet()

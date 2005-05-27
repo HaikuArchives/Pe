@@ -50,27 +50,27 @@ class HDialog;
 class BStringView;
 
 template <class T>
-class PDialog
+class PDialog 
 {
   public:
   	bool operator() (HDialog*& d)
 	  	{	return typeid(*d) == typeid(T);	}
 };
 
-class PDoc
-	: public BWindow, public CDoc
+class PDoc : public BWindow, public CDoc 
 {
 public:
 			PDoc(const entry_ref *ref = NULL, bool show = true);
-	PDoc(URLData& url);
-virtual	~PDoc();
+			PDoc(URLData& url);
+virtual		~PDoc();
 		
-virtual	bool QuitRequested();
-virtual	void MessageReceived(BMessage *msg);
+virtual		void Show();
+virtual		bool QuitRequested();
+virtual		void MessageReceived(BMessage *msg);
 
 static		void Stack();
 static		void Tile();
-static 	void UpdateShortCuts();
+static 		void UpdateShortCuts();
 
 			PText* TextView() const;
 			PStatus* Status() const;
@@ -95,7 +95,7 @@ static		PDoc* TopWindow();
 static		void LoadAddOns();
 static		void BuildExtensionsMenu(BMenu *addOnMenu);
 
-virtual	void SetDirty(bool dirty);
+virtual		void SetDirty(bool dirty);
 
 virtual 	BHandler* ResolveSpecifier(BMessage *msg, int32 index,
 						BMessage *specifier, int32 form, const char *property);
@@ -130,16 +130,16 @@ private:
 
 			void SaveOnServer(URLData& url);
 
-virtual	void CreateFilePanel();
-virtual	void SaveRequested(entry_ref& directory, const char *name);
-virtual	void NameAFile(char *name);
+virtual		void CreateFilePanel();
+virtual		void SaveRequested(entry_ref& directory, const char *name);
+virtual		void NameAFile(char *name);
 
-virtual	void ReadData(BPositionIO& file);
-virtual	void ReadAttr(BFile& file);
-virtual	void WriteData(BPositionIO& file);
-virtual	void WriteAttr(BFile& file);
+virtual		void ReadData(BPositionIO& file);
+virtual		void ReadAttr(BFile& file);
+virtual		void WriteData(BPositionIO& file);
+virtual		void WriteAttr(BFile& file);
 
-virtual	void MenusBeginning();
+virtual		void MenusBeginning();
 			
 			void OpenSelection();
 public:
@@ -179,6 +179,10 @@ private:
 			bool fIsWorksheet;
 			int fWindowMenuLength;
 			time_t fLastSaved;
+			BRect fLastStoredFrame;
+			BRect fInitialFrame;
+
+static		int sfNewCount;
 };
 
 inline PText* PDoc::TextView() const
