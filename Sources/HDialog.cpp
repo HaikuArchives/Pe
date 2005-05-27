@@ -77,10 +77,9 @@ int16 HDialog::sfDlgNr = 1;
 HDialog::HDialog(BRect frame, const char *name, window_type type,
 	int flags, BWindow *owner, BPositionIO* data)
 	: BWindow(frame, name, type, flags)
-	, fPlacement( H_PLACE_LAST_POS)
+	, fOwner(owner)
+	, fPlacement(H_PLACE_LAST_POS)
 {
-	fOwner = owner;
-	
 	frame.OffsetTo(0, 0);
 
 	AddChild(fMainView = new HDlogView(frame, "main"));
@@ -165,109 +164,6 @@ void HDialog::MessageReceived(BMessage *inMessage)
 void		do_window_action(int32 window_id, int32 action, 
 							 BRect zoomRect, bool zoom);
 
-static bool DetermineOutOfTheWayFrame(BMessenger& caller, BRect& newFrame,
-									  const BRect& screenRect)
-{
-	// move newFrame close to edges of caller, such that it hides as
-	// little of the caller's space as possible:
-	if (caller.LockTarget()) 
-	{
-		BRect cr;
-		BLooper* looper;
-		caller.Target(&looper);
-		BWindow* window = dynamic_cast<BWindow*>(looper);
-		if (window)
-			cr = window->Frame();
-
-		float sw = screenRect.Width();
-		float sh = screenRect.Height();
-		float w = newFrame.Width();
-		float h = newFrame.Height();
-
-		// horizontal
-		float spaceToLeft = cr.left;
-		float spaceToRight = sw-cr.right;
-		char horizontalChoice;
-		if (spaceToRight >= w - B_V_SCROLL_BAR_WIDTH)
-			horizontalChoice = 'R';
-		else if (spaceToLeft >= w)
-			horizontalChoice = 'L';
-		else 
-		{
-			// prefer to obscure right side, as that usually contains 
-			// less text:
-			if (spaceToRight > spaceToLeft / 2)
-				horizontalChoice = 'R';
-			else
-				horizontalChoice = 'L';
-		}
-		float horizontalSpaceCoeff 
-			= (horizontalChoice == 'L' ? spaceToLeft : spaceToRight) / w;
-
-		// vertical 
-		float spaceToTop = cr.top;
-		float spaceToBottom = sh-cr.bottom;
-		char verticalChoice;
-		if (spaceToBottom >= h - B_H_SCROLL_BAR_HEIGHT)
-			verticalChoice = 'B';
-		else if (spaceToTop >= h)
-			verticalChoice = 'T';
-		else 
-		{
-			// prefer to obscure bottom side, as toolbar lives at top:
-			if (spaceToBottom > spaceToTop / 2)
-				verticalChoice = 'B';
-			else
-				verticalChoice = 'T';
-		}
-		float verticalSpaceCoeff
-			= (verticalChoice == 'T' ? spaceToTop : spaceToBottom) / h;
-
-		// we are going to warp the mouse into the dialog, but this
-		// may have unwanted side-effects if the mouse is moving over 
-		// other documents during the warp (which will activate these
-		// documents instead of the current one).
-		// In order to avoid these problems, we get the current 
-		// mouse-coords and position the dialog such that the mouse
-		// should warp into it with less risk of activating other
-		// windows (which is still possible, though, as the caller
-		// window might be obscured by other windows).
-		BView* view = window->ChildAt(0);
-		BPoint mousePos(sw/2,sh/2);
-		if (view) 
-		{
-			uint32 buttons;
-			view->GetMouse( &mousePos, &buttons, false);
-			view->ConvertToScreen(&mousePos);
-		}
-
-		// prefer horizontal or vertical according to window's layout
-		// (i.e. prefer smaller axis):
-		float hvFract = cr.Width()/cr.Height();
-		if (horizontalSpaceCoeff > verticalSpaceCoeff * hvFract) 
-		{
-			if (horizontalChoice == 'L')
-				newFrame.OffsetTo(BPoint(cr.left-w, mousePos.y-h/2));
-			else
-				newFrame.OffsetTo(BPoint(cr.right-B_V_SCROLL_BAR_WIDTH, 
-										 mousePos.y-h/2));
-		} 
-		else 
-		{
-			if (verticalChoice == 'T')
-				newFrame.OffsetTo(BPoint(mousePos.x-w/2, cr.top-h));
-			else
-				newFrame.OffsetTo(BPoint(mousePos.x-w/2, 
-										 cr.bottom-B_H_SCROLL_BAR_HEIGHT));
-		}
-		looper->Unlock();
-		return true;
-	} 
-
-	// no caller or can't lock it
-	return false;		
-}
-
 static BRect CallerFrame(BMessenger& caller)
 {
 	BRect rect;
@@ -292,7 +188,7 @@ void HDialog::_PlaceWindow()
 	float sh = sr.Height();
 	HPlacementType placement = fPlacement;
 	BRect callerFrame = fOwner ? fOwner->Frame() : CallerFrame(fCaller);
-	if (placement == H_PLACE_LAST_POS || placement == H_PLACE_OUT_OF_THE_WAY) 
+	if (placement == H_PLACE_LAST_POS)
 	{
 		// fetch last position and re-activate that:
 		string dlgRect = string("dialog ") + Name() + " rect";
@@ -319,13 +215,6 @@ void HDialog::_PlaceWindow()
 					newFrame.OffsetBy(callerFrame.RightBottom());
 			}
 		} 
-		else if (placement == H_PLACE_OUT_OF_THE_WAY)
-		{	// move window out of the way on first open:
-			BMessenger caller = fOwner ? BMessenger(NULL, fOwner) : fCaller;
-			if (!DetermineOutOfTheWayFrame(caller, newFrame, sr))
-				placement = H_PLACE_DEFAULT;
-					// unable to access caller, fallback to default placement
-		}
 		else
 			placement = H_PLACE_DEFAULT;
 				// no last position available, fallback to default placement
@@ -342,9 +231,8 @@ void HDialog::_PlaceWindow()
 		}
 		else
 		{
-			BScreen s;
-			newFrame.OffsetTo((s.Frame().Width() - newFrame.Width()) / 2,
-							  (s.Frame().Height() - newFrame.Height()) / 3);
+			newFrame.OffsetTo((sr.Width() - newFrame.Width()) / 2,
+								   (sr.Height() - newFrame.Height()) / 3);
 		}
 	}
 	float w = newFrame.Width();
@@ -363,6 +251,8 @@ void HDialog::Show()
 	_PlaceWindow();
 	BWindow::Show();
 
+	fInitialFrame = Frame();
+
 	// in focus follows mouse mode, we warp the mouse into the window,
 	// but only if the window has been triggered by keyboard (which we
 	// think is the case if any modifier key is currently pressed):
@@ -373,11 +263,11 @@ void HDialog::Show()
 
 void HDialog::Hide() 
 {
-	if (fPlacement == H_PLACE_LAST_POS || fPlacement == H_PLACE_OUT_OF_THE_WAY) 
-	{
+	BRect frame = Frame();
+	if (!IsHidden() && fPlacement == H_PLACE_LAST_POS && frame != fInitialFrame)
+	{	// store dialog's position only if changed since last time
 		string dlgRect = string("dialog ") + Name() + " rect";
 		string dlgOrigin = string("dialog ") + Name() + " origin";
-		BRect frame = Frame();
 		char origin[3] = "";
 		BRect cr = fOwner ? fOwner->Frame() : CallerFrame(fCaller);
 		if (cr.IsValid())
@@ -422,7 +312,6 @@ bool HDialog::CancelClicked()
 
 void HDialog::UpdateFields()
 {
-//	beep();
 } /* HDialog::UpdateFields */
 
 void HDialog::SetText(const char *name, const char *text)
@@ -755,7 +644,7 @@ filter_result HDialog::KeyDownFilter(BMessage* msg, BHandler**,
 // from interface_defs.h
 struct window_info {
 	team_id		team;
-    int32   	id;	  		  /* window's token */
+	int32   	id;	  		  /* window's token */
 
 	int32		thread;
 	int32		client_token;
@@ -763,8 +652,8 @@ struct window_info {
 	uint32		workspaces;
 
 	int32		layer;
-    uint32	  	w_type;    	  /* B_TITLED_WINDOW, etc. */
-    uint32      flags;	  	  /* B_WILL_FLOAT, etc. */
+	uint32		w_type;    	  /* B_TITLED_WINDOW, etc. */
+	uint32		flags;	  	  /* B_WILL_FLOAT, etc. */
 	int32		window_left;
 	int32		window_top;
 	int32		window_right;
@@ -781,8 +670,8 @@ enum window_action {
 };
 
 // from interface_misc.h
-void		do_window_action(int32 window_id, int32 action, 
-							 BRect zoomRect, bool zoom);
+void		 do_window_action(int32 window_id, int32 action, 
+							  BRect zoomRect, bool zoom);
 window_info	*get_window_info(int32 a_token);
 int32		*get_token_list(team_id app, int32 *count);
 
@@ -792,10 +681,12 @@ static void WarpMouseToWindow(const char* windowName)
 	int32 *tokens = get_token_list(-1, &count);
 	team_id pe_team = be_app->Team();
 	bool found = false;
-	for (int32 i = count-1; i>=0 && !found; i--) {
+	for (int32 i = count-1; i>=0 && !found; i--) 
+	{
 		window_info* windowInfo = get_window_info(tokens[i]);
 		if (windowInfo && windowInfo->team == pe_team
-		&& !strcmp(windowInfo->name, windowName)) {
+		&& !strcmp(windowInfo->name, windowName)) 
+		{
 			do_window_action(windowInfo->id, B_BRING_TO_FRONT, BRect(0,0,0,0), 
 							 false);
 			found = true;

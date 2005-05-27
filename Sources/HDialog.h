@@ -56,9 +56,6 @@ IMPEXP_LIBHEKKEL enum HPlacementType {
 	H_PLACE_LAST_POS,
 		// place at last known position, relative to closest corner
 		// of calling window (if any)
-	H_PLACE_OUT_OF_THE_WAY
-		// on first open, automatically place such that the dialog doesn't 
-		// obscure the caller window. Afterwards behave just like H_PLACE_LAST_POS
 };
 
 template <class T>
@@ -134,7 +131,7 @@ typedef void (*FieldCreator)(int kind, BPositionIO& data, BView*& inside);
 class IMPEXP_LIBHEKKEL HDialog : public BWindow {
 public:
 			HDialog(BRect frame, const char *name, window_type type, int flags,
-				BWindow *owner=NULL, BPositionIO* data=NULL);
+					BWindow *owner=NULL, BPositionIO* data=NULL);
 			~HDialog();
 	
 			enum { sResID = 100 };
@@ -165,10 +162,8 @@ virtual		void UpdateFields();
 			int GetValue(const char *id) const;
 			void SetValue(const char *id, int v);
 			
-			void SetCaller( BWindow* caller)
-										{ fCaller = BMessenger(NULL, caller); }
-			void SetPlacement( HPlacementType placement)
-										{ fPlacement = placement; }
+			void SetCaller( BWindow* caller);
+			void SetPlacement( HPlacementType placement);
 			
 			void ResizeToLimits(float min, float maxW, float minH, float maxH);
 
@@ -176,9 +171,8 @@ static		void RegisterFieldCreator(int kind, FieldCreator fieldCreator);
 static		void RegisterFields();
 
 protected:
-			static filter_result KeyDownFilter(BMessage* msg, 
-														BHandler**,
-														BMessageFilter* filter);
+			static filter_result KeyDownFilter(BMessage* msg, BHandler**,
+											   BMessageFilter* filter);
 
 			void _BuildIt(BPositionIO& data);
 			void _PlaceWindow();
@@ -187,8 +181,19 @@ protected:
 			BWindow *fOwner;
 			BMessenger fCaller;
 			HPlacementType fPlacement;
+			BRect fInitialFrame;
 static		int16 sfDlgNr;
 };
+
+inline void HDialog::SetCaller( BWindow* caller) 
+{ 
+	fCaller = BMessenger(NULL, caller); 
+}
+
+inline void HDialog::SetPlacement( HPlacementType placement)
+{
+	fPlacement = placement;
+}
 
 extern IMPEXP_LIBHEKKEL float gFactor;
 
