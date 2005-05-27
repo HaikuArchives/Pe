@@ -147,9 +147,8 @@ CFindDialog::CFindDialog(BRect frame, const char *name,
 
 bool CFindDialog::QuitRequested()
 {
-	do
+	while (!IsHidden())
 		Hide();
-	while (!IsHidden())	;
 
 	gPrefs->SetPrefInt("Search Backwards", IsOn("back"));
 	gPrefs->SetPrefInt("Search Entire Word", IsOn("word"));
