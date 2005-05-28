@@ -230,6 +230,109 @@ inline void name_append(const char*& text, int textSize, char*& name, int& nameS
 	}
 } /* name_append */
 
+const char *class_struct_union(const char *start, const char *&text,
+	const char *nameBuf, char *name, int &size, int &offset,
+	CLanguageProxy &proxy)
+{
+	*name++ = ' ';
+	size++;
+
+	char tempBuf[kMaxNameSize];
+	int tempPos = 0;
+
+	// always only get the last possible identifier - that will
+	// filter out things like "class IMPEXP_BE BClass"
+	while (isidentf(text[0])) {
+		char *temp = tempBuf;
+		tempPos = 0;
+
+		while (isident(*text))
+			name_append(text, temp, tempPos);
+
+		text = comment(text);
+	}
+
+	if (tempPos != 0)
+	{
+		const char *temp = tempBuf;
+		name_append(temp, tempPos, name, size);
+
+		// may be a class member ( ("::" <identifier>)* )
+		while (*text == ':' && text[1] == ':')
+		{
+			name_append(text, name, size);
+			name_append(text, name, size);
+			
+			text = comment(text);
+			
+			if (isidentf(*text))
+				while (isident(*text))
+					name_append(text, name, size);
+			
+			text = comment(text);
+		}
+
+		*name = 0;
+		
+		// [zooey]: ugly *HACK* to avoid something like
+		//	     struct stat *get_stat() {
+		// to be seen as struct-decl when in fact it's a function...
+		const char *delimiterPos = strpbrk( text, ";{(");
+		if (delimiterPos && *delimiterPos == '(') 
+		{	// If '(' is found before ';' or '{', we handle this as
+			// a function, not a type-declaration:
+			return text;
+		}
+			
+		while (*text != '{' && *text != ';')
+		{	// skip inheritance decls (like 'public x, private y'):
+			if (!*text)
+				return text;
+			text = comment(text + 1);
+		}
+
+		if (*text == '{' && proxy.Types())
+		{
+			char match[256];
+			long l = min((long)255, text - start);
+			
+			strncpy(match, start, l);
+			match[l] = 0;
+	
+			proxy.AddFunction(nameBuf, match, offset, false);
+		}
+	}
+	
+	if (*text == '{')
+		text = parens(text + 1, '{');
+	
+	text = comment(text);
+	
+	while (isidentf(*text))
+	{
+		char match[kMaxNameSize];
+		
+		name = strchr(nameBuf, ' ') + 1;
+		
+		strncpy(match, nameBuf, name - nameBuf - 1);
+		match[name - nameBuf - 1] = 0;
+
+		while (isident(*text))
+			name_append(text, name, size);
+
+		*name = 0;
+		
+		if (proxy.Types())
+			proxy.AddFunction(nameBuf, match, offset, false);
+		
+		text = comment(text);
+		while (*text == ',' || *text == '*')
+			text = comment(text + 1);
+	}
+	
+	return text;
+} /* class_struct_union */
+
 void pragma(const char *&text, int offset, CLanguageProxy& proxy)
 {
 	while (isspace(*text))
@@ -467,87 +570,7 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 	else if (strcmp(nameBuf, "class") == 0 || strcmp(nameBuf, "struct") == 0
 		|| strcmp(nameBuf, "union") == 0)
 	{
-		*name++ = ' ';
-		
-		if (isidentf(*text))
-		{
-			while (isident(*text))
-				name_append(text, name, size);
-
-			// may be a class member ( ("::" <identifier>)* )
-			while (*text == ':' && text[1] == ':')
-			{
-				name_append(text, name, size);
-				name_append(text, name, size);
-				
-				text = comment(text);
-				
-				if (isidentf(*text))
-					while (isident(*text))
-						name_append(text, name, size);
-				
-				text = comment(text);
-			}
-
-			*name = 0;
-			
-			// [zooey]: ugly *HACK* to avoid something like
-			//	     struct stat *get_stat() {
-			// to be seen as struct-decl when in fact it's a function...
-			const char *delimiterPos = strpbrk( text, ";{(");
-			if (delimiterPos && *delimiterPos == '(') 
-			{	// If '(' is found before ';' or '{', we handle this as
-				// a function, not a type-declaration:
-				return text;
-			}
-				
-			while (*text != '{' && *text != ';')
-			{	// skip inheritance decls (like 'public x, private y'):
-				if (!*text)
-					return text;
-				text = comment(text + 1);
-			}
-
-			if (*text == '{' && proxy.Types())
-			{
-				char match[256];
-				long l = min((long)255, text - start);
-				
-				strncpy(match, start, l);
-				match[l] = 0;
-		
-				proxy.AddFunction(nameBuf, match, offset, false);
-			}
-		}
-		
-		if (*text == '{')
-			text = parens(text + 1, '{');
-		
-		text = comment(text);
-		
-		while (isidentf(*text))
-		{
-			char match[kMaxNameSize];
-			
-			name = strchr(nameBuf, ' ') + 1;
-			
-			strncpy(match, nameBuf, name - nameBuf - 1);
-			match[name - nameBuf - 1] = 0;
-
-			while (isident(*text))
-				name_append(text, name, size);
-
-			*name = 0;
-			
-			if (proxy.Types())
-				proxy.AddFunction(nameBuf, match, offset, false);
-			
-			text = comment(text);
-			while (*text == ',' || *text == '*')
-				text = comment(text + 1);
-		}
-		
-		return text;
+		return class_struct_union(start, text, nameBuf, name, size, offset, proxy);
 	}
 	
 	if (is_template(text))
