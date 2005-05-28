@@ -524,6 +524,23 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 	int size = 0, paramSize = 0, offset = start - proxy.Text();
 	bool destructor = false;
 	
+	if (strncmp(text, "__declspec", 10) == 0)
+	{
+		const char *par = text+10;
+		while(isspace(*par))
+			par++;
+		if (*par == '(')
+		{
+			par = strchr(par, ')');
+		}
+		if (par)
+		{
+			text = par+1;
+			while(isspace(*text))
+				text++;
+		}
+	}
+
 	while (isident(*text))
 		name_append(text, name, size);
 	
