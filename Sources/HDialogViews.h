@@ -103,7 +103,9 @@ public:
 
 class IMPEXP_LIBHEKKEL HMenuField : public BMenuField {
 public:
-	HMenuField(BView* view, const char* name, 
+	HMenuField(BView* view, const char* name,
+			   uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+	HMenuField(BView* view, const char* name, BMenu* menu,
 			   uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
 	void ResizeLocalized(const char* label=NULL);
 	float Left(void) { return Frame().left; }

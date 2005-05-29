@@ -120,13 +120,21 @@ void HTextControl::ResizeLocalized(const char* label)
 
 
 HMenuField::HMenuField(BView* view, const char* name, uint32 resizingMode)
-: BMenuField(BRect(0, 0, 100, 50), name, NULL, new BMenu(""), resizingMode)
+: BMenuField(BRect(0, 0, 100, 50), name, NULL, new BMenu(""), false, resizingMode)
+{
+	view->AddChild(this);
+} /* HMenuField::HMenuField */
+
+HMenuField::HMenuField(BView* view, const char* name, BMenu* menu,
+					   uint32 resizingMode)
+: BMenuField(BRect(0, 0, 100, 50), name, NULL, menu, false, resizingMode)
 {
 	view->AddChild(this);
 } /* HMenuField::HMenuField */
 
 void HMenuField::ResizeLocalized(const char* label)
 {
+	SetLabel(label);
 	ResizeToPreferred();
 } /* HMenuField::ResizeLocalized */
 
@@ -173,11 +181,13 @@ void HBox::Draw(BRect update)
 	
 	if (Label())
 	{
+		BFont font;
+		GetFont(&font);
 		font_height fh;
-		be_plain_font->GetHeight(&fh);
+		font.GetHeight(&fh);
 		float lh = fh.ascent + fh.descent, w = StringWidth(Label()) + 4;
 		
-		DrawString(Label(), BPoint(6, lh));
+		DrawString(Label(), BPoint(7, fh.ascent));
 		
 		BeginLineArray(10);
 		AddLine(BPoint(l, t + lh / 2), BPoint(l + 4, t + lh / 2), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
