@@ -6,8 +6,6 @@ SubDirHdrs $(TOP) Sources ;
 RezObjects
 	Bindings.r
 	Cursor.r
-	Dialog-ChangeCase.r
-	Dialog-ChangeEncoding.r
 	Dialog-Colorpicker.r
 	Dialog-Find.r
 	Dialog-FontTabs.r

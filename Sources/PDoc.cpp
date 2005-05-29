@@ -1655,8 +1655,7 @@ void PDoc::MessageReceived(BMessage *msg)
 			
 			case msg_ConvertEncoding:
 			{
-				CConvertDialog *d;
-				GetDialog(d);
+				DialogCreator<CConvertDialog>::CreateDialog("Conversion", this);
 				break;
 			}
 			

@@ -37,20 +37,29 @@
 #define CCONVERTDIALOG_H
 
 #include "HDialog.h"
+#include "HDialogViews.h"
 
 class CConvertDialog : public HDialog {
 public:
-		CConvertDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO* data);
-		
-		enum { sResID = 7 };
+		CConvertDialog(BRect frame, const char *name, window_type type, 
+					   int flags, BWindow *owner);
 		
 virtual	bool OKClicked();
 virtual	bool CancelClicked();
 virtual	void UpdateFields();
 
 private:
-		BMenu *fFrom, *fTo;
+		void Create();
+		void Layout();
+		void SetupEncodingMenu(BMenu* menu);
+		
+		HBox *fBox;
+		BMenu *fFrom;
+		BMenu *fTo;
+		HMenuField *fSrc;
+		HMenuField *fDest;
+		HButton *fOkButton;
+		HButton *fCancelButton; 
 };
 
 #endif // CCONVERTDIALOG_H
