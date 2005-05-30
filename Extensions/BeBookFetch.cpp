@@ -283,16 +283,20 @@ void PopUpSelection(vector<BString>& Results, MTextAddOn *addon)
 		selections.AddItem(item);
 	}
 
-	// Gotta love C++ syntaxis, sigh... Anyway, here we get a nice BPoint to
-	// popup the results.
-	float x = addon->Window()->FindView("ButtonBar")->Frame().right + 2;
-	float y = addon->Window()->FindView("ToolBar")->Frame().Height() - 2;
+	// Here we get a nice BPoint to popup the results (end of the toolbar).
+	BPoint menupos;
 
-	BPoint menupos = addon->Window()->Frame().LeftTop() + BPoint(x, y);
+	if (addon->Window()->Lock()) {
+		float x = addon->Window()->FindView("ButtonBar")->Frame().right + 2;
+		float y = addon->Window()->FindView("ToolBar")->Frame().Height() - 2;
+
+		menupos = addon->Window()->Frame().LeftTop() + BPoint(x, y);
+		addon->Window()->Unlock();
+	}
 
 	BMenuItem* item = selections.Go(menupos, false, true);
 
-	if (NULL != item)
+	if (item != NULL)
 	{
 		int index = item->Command();
 		char* arg = (char *)Results[index].String();
