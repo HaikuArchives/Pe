@@ -37,15 +37,21 @@
 #define CGOTOLINE_H
 
 #include "HDialog.h"
+#include "HDialogViews.h"
 
 class CGoToLine : public HDialog {
 public:
 		CGoToLine(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO* data);
-		
-		enum { sResID = 4 };
+				  BWindow *owner);
 		
 virtual	bool OKClicked();
+private:
+		void Create();
+		void Layout();
+		
+		HTextControl *fLine;
+		HButton *fOkButton;
+		HButton *fCancelButton;
 };
 
 #endif // CGOTOLINE_H

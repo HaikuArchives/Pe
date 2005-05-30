@@ -1641,8 +1641,7 @@ void PDoc::MessageReceived(BMessage *msg)
 			
 			case msg_GoToLine:
 			{
-				CGoToLine *d;
-				GetDialog(d);
+				DialogCreator<CGoToLine>::CreateDialog("Go To Line", this);
 				break;
 			}
 			

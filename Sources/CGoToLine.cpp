@@ -40,24 +40,63 @@
 #include "PMessages.h"
 
 CGoToLine::CGoToLine(BRect frame, const char *name, window_type type, int flags,
-	BWindow *owner, BPositionIO* data)
-	: HDialog(frame, name, type, flags, owner, data)
+	BWindow *owner)
+	: HDialog(frame, name, type, flags | B_NOT_RESIZABLE, owner)
 {
-	FindView("line")->MakeFocus();
+	Create();
+	Layout();
+
+	SetDefaultButton(fOkButton);
+	fLine->MakeFocus();
 	Show();
 } /* CGoToLine::CGoToLine */
 		
 bool CGoToLine::OKClicked()
 {
-	BMessage m(msg_DoGoToLine);
-	
 	double line;
 	if (GetDouble("line", line) && line == (int)line)
 	{
+		BMessage m(msg_DoGoToLine);
 		m.AddInt32("line", (int)line);
-		fOwner->PostMessage(&m,
-			static_cast<PDoc*>(fOwner)->TextView());
+		fOwner->PostMessage(&m,	static_cast<PDoc*>(fOwner)->TextView());
 	}
 	
 	return true;
 } /* CGoToLine::OKClicked */
+
+void CGoToLine::Create(void)
+{
+	fMainView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fLine = new HTextControl(fMainView, "line");
+	// Buttons
+	fCancelButton = new HButton(fMainView, "cncl", 'cncl', 
+								B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
+	fOkButton = new HButton(fMainView, "ok", 'ok  ', 
+							B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM);
+}
+
+void CGoToLine::Layout(void)
+{
+	fLine->ResizeLocalized("Line:");
+	fCancelButton->ResizeLocalized("Cancel");
+	fOkButton->ResizeLocalized("Ok");
+
+	float div = fLine->StringWidth("Line:")+20;
+	fLine->SetDivider(div);
+	fLine->SetWidth(div+fLine->TextView()->StringWidth("1234567")+10);
+
+	//### Layout
+	float dx = fMainView->StringWidth("m");
+	float dy = fMainView->StringWidth("n");
+
+	fLine->MoveTo(dx, dy);
+	
+	fOkButton->MoveTo(fMainView->Right()-fOkButton->Width()-dx, 
+					  fMainView->Bottom()-dy-fOkButton->Height());
+	fCancelButton->MoveTo(fOkButton->Left()-fCancelButton->Width()-dx, 
+					 	  fMainView->Bottom()-dy-fCancelButton->Height());
+	
+	float minW = fOkButton->Width()+fCancelButton->Width()+3*dx;
+	float minH = fLine->Bottom()+fOkButton->Height()+4*dy;
+	ResizeToLimits(minW, minW, minH, minH);
+}
