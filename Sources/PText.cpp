@@ -1385,8 +1385,12 @@ void PText::SplitterMoved(g_unit_t dy)
 
 	if (ns > kSplitMinimum)
 		fVScrollBar1->Show();
-	else if (!fVScrollBar1->IsHidden())
-		fVScrollBar1->Hide();
+	else 
+	{
+		while (!fVScrollBar1->IsHidden())
+			fVScrollBar1->Hide();
+		FillRect(ConvertFromParent(fVScrollBar1->Frame()), B_SOLID_LOW);
+	}
 
 	if (src.Height() - ns < kSplitMinimum)
 	{
@@ -1398,6 +1402,16 @@ void PText::SplitterMoved(g_unit_t dy)
 	}
 	else if (fVScrollBar2->IsHidden())
 		fVScrollBar2->Show();
+
+	if (!fVScrollBar1->IsHidden())
+	{
+		// [zooey]: I don't really know why, but we need to invalidate the upper
+		//          scrollbar manually, otherwise dragging the splitter leaves
+		//			"dirt":
+		BRect sb1Invalid = fVScrollBar1->Bounds();
+		sb1Invalid.top = sb1Invalid.bottom - B_H_SCROLL_BAR_HEIGHT - dy - 2;
+		fVScrollBar1->Invalidate(sb1Invalid);
+	}
 
 	src.top = fSplitAt - kSplitterHeight;
 	dst = src;
@@ -1412,7 +1426,6 @@ void PText::SplitterMoved(g_unit_t dy)
 	}
 	else
 		src.top = dst.bottom - 1;
-
 	Invalidate(src);
 
 	fSplitAt = ns;
@@ -5557,14 +5570,6 @@ void PText::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-//			case msg_DoChangeCase:
-//			{
-//				long newCase;
-//				FailOSErr(msg->FindInt32("newcase", &newCase));
-//				RegisterCommand(new PChangeCaseCmd(this, newCase));
-//				break;
-//			}
-			
 			case msg_ChangeCaseLower:
 			{
 				RegisterCommand(new PChangeCaseCmd(this, 1));
@@ -5796,6 +5801,22 @@ void PText::MessageReceived(BMessage *msg)
 			case msg_ToggleFont:
 				ChangedInfo(msg);
 				break;
+
+			case B_MOUSE_WHEEL_CHANGED:
+			{
+				float y;
+				if (msg->FindFloat("be:wheel_delta_y", &y) == B_OK)
+				{
+					BMessage msg( y<0 
+									? kmsg_ScrollOneLineUp 
+									: kmsg_ScrollOneLineDown);
+					int numLines = gPrefs->GetPrefInt("scrollwheel lines", 3);
+					for( int i=0; i<numLines; ++i)
+						DoKeyCommand(&msg);
+				}
+				break;
+			}
+
 			case 'test':
 				ASSERT(false);
 				break;
