@@ -285,7 +285,18 @@ void CDoc::Save()
 					FailOSErr(e.Remove());
 			}
 
-			BNodeInfo(&file).SetType(fMimeType.c_str());
+			// Update MIME type info
+			e.SetTo(&dir, name);
+			BPath path(&e);
+			if (fMimeType == "" && path.InitCheck() == B_OK
+				&& update_mime_info(path.Path(), false, true, false) == B_OK) {
+				// takeover MIME type from file
+				char s[NAME_MAX];
+				if (BNodeInfo(&file).GetType(s) == B_OK)
+					fMimeType = s;
+			} else
+				BNodeInfo(&file).SetType(fMimeType.c_str());
+
 			SetDirty(false);
 
 			file.Unset();

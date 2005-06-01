@@ -85,7 +85,7 @@ int PDoc::sfNewCount = -1;
 PDoc::PDoc(const entry_ref *doc, bool show)
 	: BWindow(NextPosition(), "Untitled", B_DOCUMENT_WINDOW, 0,
 		1 << current_workspace())
-	, CDoc("text/plain", this, doc)
+	, CDoc("", this, doc)
 {
 	fShortcut = atomic_add(&sDocCount, 1);
 	fIsWorksheet = false;
@@ -635,7 +635,11 @@ void PDoc::DoSaveACopy(entry_ref& directory, const char *name)
 		FailOSErr(dir.CreateFile(name, &file, true));
 		WriteData(file);
 		FailOSErr(file.Sync());
-		BNodeInfo(&file).SetType("text/plain");
+
+		BPath path;
+		if (e.GetPath(&path) != B_OK
+			|| update_mime_info(path.Path(), false, true, false) != B_OK)
+			BNodeInfo(&file).SetType("text/plain");
 
 		if (fSavePanel)
 		{
