@@ -69,21 +69,24 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 	int i = 0;
 	while ((p = gPrefs->GetIxPrefString("mimetype", i++)) != NULL)
 		fTypes->AddItem(new BMenuItem(p, new BMessage(msg_FieldChanged)));
-	
+
 	if (i == 1)
 		fTypes->AddItem(new BMenuItem("text/plain", new BMessage(msg_FieldChanged)));
-	
+
 	const char *mime = fDoc->MimeType();
-	
-	if (mime)
+
+	if (mime && mime[0])
 	{
 		for (i = 0; i < fTypes->CountItems(); i++)
-			if (strcmp(fTypes->ItemAt(i)->Label(), mime) == 0)
+		{
+			BMenuItem *item = fTypes->ItemAt(i);
+			if (strcmp(item->Label(), mime) == 0)
 			{
-				fTypes->ItemAt(i)->SetMarked(true);
+				item->SetMarked(true);
 				break;
 			}
-		
+		}
+
 		if (i == fTypes->CountItems())
 		{
 			fTypes->AddSeparatorItem();
@@ -93,9 +96,10 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 	}
 	else
 	{
+		BMenuItem *item;
 		fTypes->AddSeparatorItem();
-		fTypes->AddItem(new BMenuItem("undefined", new BMessage(msg_FieldChanged)));
-		fTypes->ItemAt(fTypes->CountItems() - 1)->SetMarked(true);
+		fTypes->AddItem(item = new BMenuItem("<undefined>", new BMessage(msg_FieldChanged)));
+		item->SetMarked(true);
 	}
 
 	if (fDoc->File())
@@ -114,8 +118,7 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 	}
 	else
 	{
-		fTypes->ItemAt(0)->SetMarked(true);
-//		SetEnabled("mime", false);
+		//SetEnabled("mime", false);
 		SetText("time", "Not Saved");
 	}
 	

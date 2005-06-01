@@ -530,11 +530,14 @@ void PDoc::SaveRequested(entry_ref& directory, const char *name)
 		{
 			BMenu *m = static_cast<BMenuField*>(w->FindView("mime"))->Menu();
 			FailNil(m);
-			BMenuItem *i = m->FindMarked();
-			FailNil(i);
-			
-			gPrefs->SetPrefInt("LastSavedMimeType", m->IndexOf(i));
-			fMimeType = i->Label();
+			BMenuItem *item = m->FindMarked();
+			FailNil(item);
+
+			if (strcmp(item->Label(), "<undefined>"))
+			{
+				gPrefs->SetPrefInt("LastSavedMimeType", m->IndexOf(item));
+				fMimeType = item->Label();
+			}
 		}
 	}
 	
@@ -1119,7 +1122,7 @@ void PDoc::CreateFilePanel()
 			m, B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
 		FailNilMsg(mf, "Error building FilePanel");
 		vw->AddChild(mf);
-		mf->SetDivider(be_plain_font->StringWidth("Type:") + 2);
+		mf->SetDivider(be_plain_font->StringWidth("Type:") + 4);
 		
 		int i = 0;
 		const char *p;
@@ -1132,7 +1135,10 @@ void PDoc::CreateFilePanel()
 			item->SetMarked(true);
 		else
 		{
-			m->AddItem(item = new BMenuItem(fMimeType.c_str(), NULL));
+			p = fMimeType.c_str();
+			if (!p || !p[0])
+				p = "<undefined>";
+			m->AddItem(item = new BMenuItem(p, NULL));
 			item->SetMarked(true);
 		}
 	}
