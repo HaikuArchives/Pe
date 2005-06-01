@@ -86,6 +86,8 @@ resource rtyp_Cmnd (rid_Cmnd_Editing, "Editing commands") {
 		kmsg_MoveToBeginningOfFile,					"Move to Beginning of File",
 		kmsg_MoveToBottomOfPage,					"Move to Bottom of Page",
 		kmsg_MoveToTopOfPage,						"Move to Top of Page",
+		kmsg_MoveToNextPage,						"Move to Next Page",
+		kmsg_MoveToPreviousPage,					"Move to Previous Page",
 		kmsg_MoveToNextLine,						"Move to Next Line",
 		kmsg_MoveToPreviousLine,					"Move to Previous Line",
 		kmsg_MoveToEndOfLine,						"Move to End of Line",
