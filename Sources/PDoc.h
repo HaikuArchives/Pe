@@ -96,6 +96,7 @@ static		void LoadAddOns();
 static		void BuildExtensionsMenu(BMenu *addOnMenu);
 
 virtual		void SetDirty(bool dirty);
+virtual		void SetFile(entry_ref &ref);
 
 virtual 	BHandler* ResolveSpecifier(BMessage *msg, int32 index,
 						BMessage *specifier, int32 form, const char *property);

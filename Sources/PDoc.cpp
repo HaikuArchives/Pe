@@ -357,6 +357,13 @@ void PDoc::UpdateTitle()
 		SetTitle(fFile->name);
 } /* PDoc::UpdateTitle */
 
+void PDoc::SetFile(entry_ref &ref)
+{
+	CDoc::SetFile(ref);
+	UpdateTitle();		
+	fLastSaved = time(NULL);
+} /* PDoc::SetFile */
+
 void PDoc::SaveOnServer(URLData& url)
 {
 	if (fFile) delete fFile;
@@ -542,6 +549,10 @@ void PDoc::VerifyFile()
 					SetDirty(false);
 					fText->SetCaret(fText->Caret());
 						// this will make sure the cursor in within the file bounds
+
+					StopWatchingFile();
+					StartWatchingFile();
+						// restart watching, the file may have changed
 				}
 			}
 

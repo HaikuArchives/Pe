@@ -192,6 +192,16 @@ void CDoc::StopWatchingFile(bool stopDirectory)
 	}
 } /* CDoc::StopWatchingFile */
 
+void CDoc::SetFile(entry_ref &ref)
+{
+	StopWatchingFile();
+
+	delete fFile;
+	fFile = new entry_ref(ref);
+
+	StartWatchingFile();
+} /* CDoc::SetFile */
+
 void CDoc::Read(bool readAttributes)
 {
 	if (!fFile && !fURL) THROW(("No file available"));

@@ -48,50 +48,50 @@ class CDoc {
 public:
 			CDoc(const char* mimetype, BLooper *target, const entry_ref *doc = NULL);
 			CDoc(BLooper *target, URLData& url);
-virtual			~CDoc();
-	
+	virtual	~CDoc();
+
 			bool QuitRequested();
-			
+
 			void Read(bool readAttributes = true);
-virtual	void ReadData(BPositionIO& file) = 0;
-virtual	void ReadAttr(BFile& file) = 0;
+	virtual	void ReadData(BPositionIO& file) = 0;
+	virtual	void ReadAttr(BFile& file) = 0;
 
-status_t		  WriteState();
-virtual	void WriteData(BPositionIO& file) = 0;
-virtual	void WriteAttr(BFile& file) = 0;
+			status_t WriteState();
+	virtual	void WriteData(BPositionIO& file) = 0;
+	virtual	void WriteAttr(BFile& file) = 0;
 
-virtual	void Save();
-virtual	void SaveAs();
-virtual	void SaveRequested(entry_ref& directory, const char *name);
-virtual	void NameAFile(char *newName);
+	virtual	void Save();
+	virtual	void SaveAs();
+	virtual	void SaveRequested(entry_ref& directory, const char *name);
+	virtual	void NameAFile(char *newName);
 		
 			bool IsDirty();
-virtual	void SetDirty(bool dirty);
+	virtual	void SetDirty(bool dirty);
 		
 			bool IsReadOnly();
 			void SetReadOnly(bool readOnly);
 
-static		CDoc* FindDoc(const entry_ref& doc);
-static		CDoc* FirstDoc();
-static		int CountDocs();
-static		const doclist& DocList()		{ return sfDocList; }
-static		void InvalidateAll();
-static		void PostToAll(unsigned long msg, bool async);
+	static	CDoc* FindDoc(const entry_ref& doc);
+	static	CDoc* FirstDoc();
+	static	int CountDocs();
+	static	const doclist& DocList()		{ return sfDocList; }
+	static	void InvalidateAll();
+	static	void PostToAll(unsigned long msg, bool async);
 
-static		void AddRecent(const char *path);
-static		bool GetNextRecent(char *path, int& indx);
-		
+	static	void AddRecent(const char *path);
+	static	bool GetNextRecent(char *path, int& indx);
+
 			void SetMimeType(const char *type);
 			const char *MimeType() const;
-		
+
 			const entry_ref* File();
+	virtual	void SetFile(entry_ref &ref);
 
 protected:
+	static	doclist sfDocList;
+	static	vector<char*> sfTenLastDocs;
 
-static		doclist sfDocList;
-static		vector<char*> sfTenLastDocs;
-
-virtual	void CreateFilePanel();
+	virtual	void CreateFilePanel();
 			void CopyAttributes(BFile& from, BFile& to);
 
 			void StartWatchingFile(void);

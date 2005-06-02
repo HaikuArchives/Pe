@@ -602,7 +602,7 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 					
 					BEntry e;
 					FailOSErr(e.SetTo(&doc));
-					
+
 					if (e.Exists())
 						d = dynamic_cast<PDoc*>(OpenWindow(doc));
 					else
@@ -614,7 +614,7 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						{
 							BPath p;
 							if (BEntry(&doc).GetPath(&p) == B_OK)
-								d->SetTitle(p.Path());
+								d->SetFile(doc);
 							else
 								d->SetTitle(doc.name);
 						}
