@@ -121,9 +121,6 @@ virtual		void WindowActivated(bool active);
 					dlog->Show();
 				}
 			}
-			
-
-
 
 private:
 			void InitWindow(const char *name);
@@ -133,6 +130,7 @@ private:
 virtual		void CreateFilePanel();
 virtual		void SaveRequested(entry_ref& directory, const char *name);
 virtual		void NameAFile(char *name);
+			void VerifyFile();
 
 virtual		void ReadData(BPositionIO& file);
 virtual		void ReadAttr(BFile& file);

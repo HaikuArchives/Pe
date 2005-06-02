@@ -95,7 +95,7 @@ virtual	void CreateFilePanel();
 			void CopyAttributes(BFile& from, BFile& to);
 
 			void StartWatchingFile(void);
-			void StopWatchingFile(void);
+			void StopWatchingFile(bool stopDirectory = true);
 
 			BLooper *fTarget;
 			string fMimeType;

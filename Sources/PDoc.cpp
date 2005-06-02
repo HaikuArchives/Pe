@@ -519,6 +519,45 @@ void PDoc::WriteAttr(BFile& file)
 	if (p) free(p);
 } /* PDoc::WriteAttr */
 
+void PDoc::VerifyFile()
+{
+	try
+	{
+		if (gPrefs->GetPrefInt("verify", 1))
+		{
+			BFile file;
+			FailOSErr(file.SetTo(fFile, B_READ_ONLY));
+
+			time_t t;
+			FailOSErr(file.GetModificationTime(&t));
+			if (fLastSaved && t > fLastSaved + 1)
+			{
+				char s[PATH_MAX + 20];
+				sprintf(s, "File %s was modified by another application, reload it?", fFile->name);
+				MInfoAlert a(s, "Reload", "Cancel");
+
+				if (a.Go() == 1)
+				{
+					Read(false);
+					SetDirty(false);
+					fText->SetCaret(fText->Caret());
+						// this will make sure the cursor in within the file bounds
+				}
+			}
+
+			fLastSaved = time(NULL);
+				// if more than one update request was issued
+				// in the mean time, only the first one is
+				// considered
+		}
+	}
+	catch (HErr& e)
+	{
+		// file seems to be gone, but it doesn't really matter...
+		// (we could only run into problems if the directory is gone)
+	}
+} /* PDoc::VerifyFile */
+
 void PDoc::SaveRequested(entry_ref& directory, const char *name)
 {
 	if (fSavePanel)
@@ -1371,6 +1410,19 @@ void PDoc::MessageReceived(BMessage *msg)
 				if (fFile == NULL || msg->FindInt32("opcode", &opcode) != B_OK)
 					break;
 
+				const char *name;
+				if (opcode == B_ENTRY_CREATED
+					&& msg->FindString("name", &name) == B_OK
+					&& !strcmp(name, fFile->name))
+				{
+					VerifyFile();
+				}
+				else if (msg->FindInt64("node") != fNodeRef.node)
+				{
+					// filter out other stuff that comes from watching the directory
+					break;
+				}
+
 				switch (opcode)
 				{
 					case B_ENTRY_MOVED:
@@ -1388,55 +1440,15 @@ void PDoc::MessageReceived(BMessage *msg)
 					}
 					case B_ENTRY_REMOVED:
 					{
-						StopWatchingFile();
+						StopWatchingFile(false);
+							// We don't want to stop monitoring the directory; BTW, it
+							// will get automatically updated on next save, the monitoring
+							// slot is not lost
 						SetDirty(true);
-
-						// ToDo: this is annoying, as CVS seems to delete the
-						//	file on commit (probably because of the RCS line)
-						//	Maybe we want to wait a bit and then check if there
-						//	appears a file with the same name again (and compare 
-						//	them).
-						/*delete fFile;
-						fFile = NULL;
-
-						MWarningAlert a("This file has been deleted!");
-						a.Go();*/
 						break;
 					}
 					case B_STAT_CHANGED:
-						try
-						{
-							if (gPrefs->GetPrefInt("verify", 1))
-							{
-								BFile file;
-								FailOSErr(file.SetTo(fFile, B_READ_ONLY));
-
-								time_t t;
-								FailOSErr(file.GetModificationTime(&t));
-								if (fLastSaved && t > fLastSaved + 1)
-								{
-									char s[PATH_MAX + 20];
-									sprintf(s, "File %s was modified by another application, reload it?", fFile->name);
-									MInfoAlert a(s, "Reload", "Cancel");
-
-									if (a.Go() == 1)
-										Read(false);
-								}
-
-								fLastSaved = time(NULL);
-									// if more than one update request was issued
-									// in the mean time, only the first one is
-									// considered
-							}
-						}
-						catch (HErr& e)
-						{
-							delete fFile;
-							fFile = NULL;
-
-							MWarningAlert a("This file seems to have disappeared!");
-							a.Go();
-						}
+						VerifyFile();
 						break;
 				}
 				break;

@@ -163,9 +163,16 @@ void CDoc::StartWatchingFile()
 	BNode node(fFile);
 	if (node.GetNodeRef(&fNodeRef) == B_OK)
 		watch_node(&fNodeRef, B_WATCH_NAME | B_WATCH_STAT, window);
+
+	node_ref directoryNodeRef;
+	BEntry entry(fFile);
+	if (entry.GetParent(&entry) == B_OK
+		&& node.SetTo(&entry) == B_OK
+		&& node.GetNodeRef(&directoryNodeRef) == B_OK)
+		watch_node(&directoryNodeRef, B_WATCH_DIRECTORY, window);
 } /* CDoc::StartWatchingFile */
 
-void CDoc::StopWatchingFile()
+void CDoc::StopWatchingFile(bool stopDirectory)
 {
 	BWindow *window = dynamic_cast<BWindow *>(this);
 
@@ -173,6 +180,16 @@ void CDoc::StopWatchingFile()
 		return;
 
 	watch_node(&fNodeRef, B_STOP_WATCHING, window);
+
+	if (stopDirectory) {
+		node_ref directoryNodeRef;
+		BEntry entry(fFile);
+		BNode node;
+		if (entry.GetParent(&entry) == B_OK
+			&& node.SetTo(&entry) == B_OK
+			&& node.GetNodeRef(&directoryNodeRef) == B_OK)
+			watch_node(&directoryNodeRef, B_STOP_WATCHING, window);
+	}
 } /* CDoc::StopWatchingFile */
 
 void CDoc::Read(bool readAttributes)
