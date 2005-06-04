@@ -62,6 +62,7 @@ static char *rcsid = "$Id$";
 #include <be_apps/NetPositive/NetPositive.h>
 #include "HPreferences.h"
 #include "CProjectRoster.h"
+#include "Prefs.h"
 
 BDirectory gAppDir, gCWD, gPrefsDir;
 BFile gAppFile;
@@ -192,84 +193,84 @@ PApp::PApp()
 
 		InitUTFTables();
 
-		rgb_color c = { 0xFF, 0xFF, 0xFF, 0 };			gColor[kLowColor] = gPrefs->GetPrefColor("low color", c);
-		c.red = 0x00; c.green = 0x00; c.blue = 0x00;	gColor[kTextColor] = gPrefs->GetPrefColor("text color", c);
+		rgb_color c = { 0xFF, 0xFF, 0xFF, 0 };			gColor[kLowColor] = gPrefs->GetPrefColor(prf_C_Low, c);
+		c.red = 0x00; c.green = 0x00; c.blue = 0x00;	gColor[kTextColor] = gPrefs->GetPrefColor(prf_C_Text, c);
 
-		c.red = 0xff; c.green = 0xec; c.blue = 0x7c;	gColor[kSelectionColor] = gPrefs->GetPrefColor("selection color", c);
-		c.red = 0x00; c.green = 0x00; c.blue = 0xFF;	gColor[kMarkColor] = gPrefs->GetPrefColor("mark color", c);
+		c.red = 0xff; c.green = 0xec; c.blue = 0x7c;	gColor[kSelectionColor] = gPrefs->GetPrefColor(prf_C_Selection, c);
+		c.red = 0x00; c.green = 0x00; c.blue = 0xFF;	gColor[kMarkColor] = gPrefs->GetPrefColor(prf_C_Mark, c);
 
-		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kKeyWordColor] = gPrefs->GetPrefColor("keyword color", c);
-														gColor[kAltKeyWordColor] = gPrefs->GetPrefColor("alt keyword color", c);
-		c.red = 0xA1; c.green = 0x64; c.blue = 0x0E;	gColor[kCommentColor] = gPrefs->GetPrefColor("comment color", c);
-														gColor[kAltCommentColor] = gPrefs->GetPrefColor("alt comment color", c);
+		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kKeyWordColor] = gPrefs->GetPrefColor(prf_C_Keyword, c);
+														gColor[kAltKeyWordColor] = gPrefs->GetPrefColor(prf_C_AltKeyword, c);
+		c.red = 0xA1; c.green = 0x64; c.blue = 0x0E;	gColor[kCommentColor] = gPrefs->GetPrefColor(prf_C_Comment, c);
+														gColor[kAltCommentColor] = gPrefs->GetPrefColor(prf_C_AltComment, c);
 
-		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kStringColor] = gPrefs->GetPrefColor("string color", c);
-		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kAltStringColor] = gPrefs->GetPrefColor("tagstring color", c);
-		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kNumberColor] = gPrefs->GetPrefColor("number color", c);	
-														gColor[kAltNumberColor] = gPrefs->GetPrefColor("alt number color", c);
+		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kStringColor] = gPrefs->GetPrefColor(prf_C_String, c);
+		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kAltStringColor] = gPrefs->GetPrefColor(prf_C_Tagstring, c);
+		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kNumberColor] = gPrefs->GetPrefColor(prf_C_Number, c);	
+														gColor[kAltNumberColor] = gPrefs->GetPrefColor(prf_C_AltNumber, c);
 
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kOperatorColor] = gPrefs->GetPrefColor("operator color", c);	
-														gColor[kAltOperatorColor] = gPrefs->GetPrefColor("alt operator color", c);
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kSeparatorColor] = gPrefs->GetPrefColor("separator color", c);	
-														gColor[kAltSeparatorColor] = gPrefs->GetPrefColor("alt separator color", c);
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kOperatorColor] = gPrefs->GetPrefColor(prf_C_Operator, c);	
+														gColor[kAltOperatorColor] = gPrefs->GetPrefColor(prf_C_AltOperator, c);
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kSeparatorColor] = gPrefs->GetPrefColor(prf_C_Separator, c);	
+														gColor[kAltSeparatorColor] = gPrefs->GetPrefColor(prf_C_AltSeparator, c);
 
-		c.red = 0x00; c.green = 0x64; c.blue = 0x00;	gColor[kPreProcessorColor] = gPrefs->GetPrefColor("preprocessor color", c);	
-														gColor[kAltProcessorColor] = gPrefs->GetPrefColor("altprocessor color", c);
-		c.red = 0xFF; c.green = 0x00; c.blue = 0x00;	gColor[kErrorColor] = gPrefs->GetPrefColor("error color", c);	
-														gColor[kAltErrorColor] = gPrefs->GetPrefColor("alt error color", c);
+		c.red = 0x00; c.green = 0x64; c.blue = 0x00;	gColor[kPreProcessorColor] = gPrefs->GetPrefColor(prf_C_Preprocessor, c);	
+														gColor[kAltProcessorColor] = gPrefs->GetPrefColor(prf_C_AltProcessor, c);
+		c.red = 0xFF; c.green = 0x00; c.blue = 0x00;	gColor[kErrorColor] = gPrefs->GetPrefColor(prf_C_Error, c);	
+														gColor[kAltErrorColor] = gPrefs->GetPrefColor(prf_C_AltError, c);
 
-		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kSystemIdentifierColor] = gPrefs->GetPrefColor("system identifier color", c);
-		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kCharConstColor] = gPrefs->GetPrefColor("char constant color", c);
+		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kSystemIdentifierColor] = gPrefs->GetPrefColor(prf_C_SystemIdentifier, c);
+		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kCharConstColor] = gPrefs->GetPrefColor(prf_C_CharConstant, c);
 
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kUserIdentifierColor] = gPrefs->GetPrefColor("user identifier color", c);
-		c.red = 0x88; c.green = 0x88; c.blue = 0x88;	gColor[kTagColor] = gPrefs->GetPrefColor("tag color", c);
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kUserIdentifierColor] = gPrefs->GetPrefColor(prf_C_UserIdentifier, c);
+		c.red = 0x88; c.green = 0x88; c.blue = 0x88;	gColor[kTagColor] = gPrefs->GetPrefColor(prf_C_Tag, c);
 
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kUser1] = gPrefs->GetPrefColor("user1", c);
-														gColor[kUser2] = gPrefs->GetPrefColor("user2", c);
-														gColor[kUser3] = gPrefs->GetPrefColor("user3", c);
-														gColor[kUser4] = gPrefs->GetPrefColor("user4", c);
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kUser1] = gPrefs->GetPrefColor(prf_C_User1, c);
+														gColor[kUser2] = gPrefs->GetPrefColor(prf_C_User2, c);
+														gColor[kUser3] = gPrefs->GetPrefColor(prf_C_User3, c);
+														gColor[kUser4] = gPrefs->GetPrefColor(prf_C_User4, c);
 
-		c.red = 200; c.green = 100; c.blue = 100;		gColor[kInvisiblesColor] = gPrefs->GetPrefColor("invisibles color", c);
+		c.red = 200; c.green = 100; c.blue = 100;		gColor[kInvisiblesColor] = gPrefs->GetPrefColor(prf_C_Invisibles, c);
 		
 		DefineInvColors(gColor[kSelectionColor]);
 
-		gAutoIndent = gPrefs->GetPrefInt("auto indent", 1);
-		gSyntaxColoring = gPrefs->GetPrefInt("syntax coloring", 1);
-		gSpacesPerTab = gPrefs->GetPrefInt("spaces per tab", 4);
-		gBalance = gPrefs->GetPrefInt("balance", 1);
-		gBlockCursor = gPrefs->GetPrefInt("block cursor", 0);
-		gFlashCursor = gPrefs->GetPrefInt("flash cursor", 1);
-		gSmartBrace = gPrefs->GetPrefInt("smart braces", 1);
+		gAutoIndent = gPrefs->GetPrefInt(prf_I_AutoIndent, 1);
+		gSyntaxColoring = gPrefs->GetPrefInt(prf_I_SyntaxColoring, 1);
+		gSpacesPerTab = gPrefs->GetPrefInt(prf_I_SpacesPerTab, 4);
+		gBalance = gPrefs->GetPrefInt(prf_I_Balance, 1);
+		gBlockCursor = gPrefs->GetPrefInt(prf_I_BlockCursor, 0);
+		gFlashCursor = gPrefs->GetPrefInt(prf_I_FlashCursor, 1);
+		gSmartBrace = gPrefs->GetPrefInt(prf_I_SmartBraces, 1);
 		
-		gPopupIncludes = gPrefs->GetPrefInt("includes", 1);
-		gPopupProtos = gPrefs->GetPrefInt("protos", 1);
-		gPopupFuncs = gPrefs->GetPrefInt("types", 1);
+		gPopupIncludes = gPrefs->GetPrefInt(prf_I_Includes, 1);
+		gPopupProtos = gPrefs->GetPrefInt(prf_I_Protos, 1);
+		gPopupFuncs = gPrefs->GetPrefInt(prf_I_Types, 1);
 		
-		gRedirectStdErr = gPrefs->GetPrefInt("redirect stderr", 1);
-		gUseWorksheet = gPrefs->GetPrefInt("worksheet", 1);
+		gRedirectStdErr = gPrefs->GetPrefInt(prf_I_RedirectStdErr, 1);
+		gUseWorksheet = gPrefs->GetPrefInt(prf_I_Worksheet, 1);
 
-		gRestorePosition = gPrefs->GetPrefInt("restore position", 1);
-		gRestoreFont = gPrefs->GetPrefInt("restore font", 1);
-		gRestoreSelection = gPrefs->GetPrefInt("restore selection", 1);
-		gRestoreScrollbar = gPrefs->GetPrefInt("restore scrollbar", 1);
-		gRestoreCWD = gPrefs->GetPrefInt("restore cwd", 1);
-		gSavedState = gPrefs->GetPrefInt("saved state", 0);
+		gRestorePosition = gPrefs->GetPrefInt(prf_I_RestorePosition, 1);
+		gRestoreFont = gPrefs->GetPrefInt(prf_I_RestoreFont, 1);
+		gRestoreSelection = gPrefs->GetPrefInt(prf_I_RestoreSelection, 1);
+		gRestoreScrollbar = gPrefs->GetPrefInt(prf_I_RestoreScrollbar, 1);
+		gRestoreCWD = gPrefs->GetPrefInt(prf_I_RestoreCwd, 1);
+		gSavedState = gPrefs->GetPrefInt(prf_I_SavedState, 0);
 		
-		if (gPrefs->GetIxPrefString("mimetype", 0) == NULL) {
-			gPrefs->SetIxPrefString("mimetype", 0, "text/plain");
-			gPrefs->SetIxPrefString("mimetype", 1, "text/html");
-			gPrefs->SetIxPrefString("mimetype", 2, "text/x-source-code");
+		if (gPrefs->GetIxPrefString(prf_X_Mimetype, 0) == NULL) {
+			gPrefs->SetIxPrefString(prf_X_Mimetype, 0, "text/plain");
+			gPrefs->SetIxPrefString(prf_X_Mimetype, 1, "text/html");
+			gPrefs->SetIxPrefString(prf_X_Mimetype, 2, "text/x-source-code");
 		}
 		
-		strcpy(gTabChar, gPrefs->GetPrefString("tab char", "»"));
-		strcpy(gReturnChar, gPrefs->GetPrefString("return char", "¬"));
-		strcpy(gSpaceChar, gPrefs->GetPrefString("space char", "."));
-		strcpy(gControlChar, gPrefs->GetPrefString("control char", "¿"));
+		strcpy(gTabChar, gPrefs->GetPrefString(prf_S_TabChar, "»"));
+		strcpy(gReturnChar, gPrefs->GetPrefString(prf_S_ReturnChar, "¬"));
+		strcpy(gSpaceChar, gPrefs->GetPrefString(prf_S_SpaceChar, "."));
+		strcpy(gControlChar, gPrefs->GetPrefString(prf_S_ControlChar, "¿"));
 		
 		gUid = getuid();
 		gGid = getgid();
 
-		gRecentBufferSize = gPrefs->GetPrefInt("recent size", 10);
+		gRecentBufferSize = gPrefs->GetPrefInt(prf_I_RecentSize, 10);
 		RestoreRecentMenu();
 
 		gRxInstalled = true;
@@ -285,8 +286,8 @@ PApp::PApp()
 		CPrefOpener *prefOpener = new CPrefOpener;
 		fPrefOpener = prefOpener->Thread();
 		
-		if (gPrefs->GetPrefInt("show htmlpalette", 1)
-		&& !gPrefs->GetPrefInt("show htmlpalette for html", 1))
+		if (gPrefs->GetPrefInt(prf_I_ShowHtmlPalette, 1)
+		&& !gPrefs->GetPrefInt(prf_I_ShowHtmlpaletteForHtml, 1))
 			CHTMLBar::Instance()->Show();
 		
 		try
@@ -390,7 +391,7 @@ void PApp::ReadyToRun()
 	if (!doc || doc->IsWorksheet())
 	{
 		// what to do when pe is launched
-		switch (gPrefs->GetPrefInt("startup"))
+		switch (gPrefs->GetPrefInt(prf_I_Startup))
 		{
 			case 1: // Create New Document
 				if (CDoc::CountDocs() == 0 || (doc && doc->IsWorksheet() && CDoc::CountDocs() == 1))
@@ -412,7 +413,7 @@ void PApp::ReadyToRun()
 //	if (find_directory(B_USER_DIRECTORY, &p) == B_OK)
 //		gCWD.SetTo(p.Path());
 	
-	if (gPrefs->GetPrefInt("showglossary", 0))
+	if (gPrefs->GetPrefInt(prf_I_ShowGlossary, 0))
 		PostMessage(msg_ShowGlossary);
 } /* PApp::ReadyToRun */
 
@@ -455,7 +456,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 		if (ni.GetType(mime) != B_OK)
 			mime[0] = 0;
 
-		if (gPrefs->GetPrefInt("autodetect projects", 1)) {
+		if (gPrefs->GetPrefInt(prf_I_AutodetectProjects, 1)) {
 			if (!strcmp(doc.name, "Jamfile"))
 				ni.SetType("text/x-jamfile");
 			else if (!strcasecmp(doc.name, "Makefile"))
@@ -469,7 +470,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 			PGroupWindow *w = dynamic_cast<PGroupWindow*>(CDoc::FindDoc(doc));
 			if (w)
 			{
-				if (gPrefs->GetPrefInt("window to workspace", 1))
+				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 					w->SetWorkspaces(1 << current_workspace());
 				if (show)
 					w->Activate(true);
@@ -483,7 +484,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 			BWindow *w = dynamic_cast<BWindow*>(CDoc::FindDoc(doc));
 			if (w)
 			{
-				if (gPrefs->GetPrefInt("window to workspace", 1))
+				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 					w->SetWorkspaces(1 << current_workspace());
 				if (show)
 					w->Activate(true);
@@ -503,7 +504,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 			PDoc *d = dynamic_cast<PDoc*>(CDoc::FindDoc(doc));
 			if (d)
 			{
-				if (gPrefs->GetPrefInt("window to workspace", 1))
+				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 					d->SetWorkspaces(1 << current_workspace());
 				if (show)
 					d->Activate(true);
@@ -764,7 +765,7 @@ void PApp::MessageReceived(BMessage *msg)
 			{
 				int c = 1 << current_workspace();
 				
-				if (gPrefs->GetPrefInt("window to workspace", 1))
+				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 					FindDialog()->SetWorkspaces(c);
 				
 				FindDialog()->SetCaller(PDoc::TopWindow());
@@ -832,7 +833,7 @@ void PApp::MessageReceived(BMessage *msg)
 					fOpenPanel->SetPanelDirectory(&ref);
 					fOpenPanel->Window()->SetWorkspaces(1 << current_workspace());
 					
-					if (gPrefs->GetPrefInt("zoomopen", 0))
+					if (gPrefs->GetPrefInt(prf_I_ZoomOpen, 0))
 					{
 						BRect r = BScreen().Frame();
 						
@@ -955,7 +956,7 @@ void PApp::MessageReceived(BMessage *msg)
 
 					int c = 1 << current_workspace();
 					
-					if (gPrefs->GetPrefInt("window to workspace", 1))
+					if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 						fPrefsDialog->SetWorkspaces(c);
 
 					if (fPrefsDialog->IsHidden())
@@ -971,7 +972,7 @@ void PApp::MessageReceived(BMessage *msg)
 			case msg_ShowGlossary:
 				if (gGlossyWindow)
 				{
-					if (gPrefs->GetPrefInt("window to workspace", 1))
+					if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 						gGlossyWindow->SetWorkspaces(1 << current_workspace());
 					gGlossyWindow->Activate(true);
 				}
@@ -984,7 +985,7 @@ void PApp::MessageReceived(BMessage *msg)
 				BWindow *w = CHTMLBar::Instance();
 				BAutolock lock(w);
 
-				if (gPrefs->GetPrefInt("window to workspace", 1))
+				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 					w->SetWorkspaces(1 << current_workspace());
 
 				if (w->IsHidden())
@@ -1157,7 +1158,7 @@ void PApp::FindAndOpen(const char *file, const char* fromSource)
 			}
 		}
 
-		if (!found && gPrefs->GetPrefInt("beincludes"))
+		if (!found && gPrefs->GetPrefInt(prf_I_BeIncludes))
 		{
 			bi = strdup(getenv("BEINCLUDES"));
 			char *ip = bi;
@@ -1186,7 +1187,7 @@ void PApp::FindAndOpen(const char *file, const char* fromSource)
 			const char *p;
 			int i = 0;
 
-			while ((p = gPrefs->GetIxPrefString("includepath", i++))!= NULL && !found)
+			while ((p = gPrefs->GetIxPrefString(prf_X_IncludePath, i++))!= NULL && !found)
 			{
 				if (e.SetTo(p) != B_OK || !e.Exists())
 					continue;

@@ -44,6 +44,7 @@
 #include "PMessages.h"
 #include "MThread.h"
 #include "HPreferences.h"
+#include "Prefs.h"
 
 const unsigned long
 	msg_ReaderDone = 'Rdon',
@@ -301,7 +302,7 @@ PErrorWindow::PErrorWindow(int *fd, const char *cwd)
 	const char *pat;
 	int cookie = 0;
 	
-	while ((pat = gPrefs->GetIxPrefString("stderrpattern", cookie++)) != NULL)
+	while ((pat = gPrefs->GetIxPrefString(prf_X_StdErrPattern, cookie++)) != NULL)
 	{
 		int file, line, msg, warning, n;
 		

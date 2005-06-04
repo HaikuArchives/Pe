@@ -39,14 +39,11 @@
 
 #include "pe.h"
 #include "Utils.h"
-
-#include <cctype>
-
-#include <Entry.h>
-
 #include "CProjectMakeFile.h"
-
 #include "HPreferences.h"
+#include "Prefs.h"
+#include <cctype>
+#include <Entry.h>
 
 /*
  * CProjectMakeSerializer
@@ -252,7 +249,7 @@ const char *CProjectMakeFile::_AddGroup(const char *t)
 
 			if (s.Length())
 				group->AddItem(new CProjectItem(fParentPath.String(), s.String()),
-									gPrefs->GetPrefInt("sortproject", 1) != 0);
+									gPrefs->GetPrefInt(prf_I_SortProject, 1) != 0);
 			
 			t = skip_white(t);
 

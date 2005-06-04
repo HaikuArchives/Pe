@@ -36,6 +36,7 @@
 #include "pe.h"
 #include "HPreferences.h"
 #include "HError.h"
+#include "Prefs.h"
 
 #define BLOCK		BAutolock lock(fLock); if (! lock.IsLocked()) return
 
@@ -376,9 +377,9 @@ void HPreferences::InitTextFont(BFont* font) {
 	font_style fs;
 	be_fixed_font->GetFamilyAndStyle(&ff, &fs);
 	
-	strcpy(ff, GetPrefString("font family", ff));
-	strcpy(fs, GetPrefString("font style", fs));
+	strcpy(ff, GetPrefString(prf_S_FontFamily, ff));
+	strcpy(fs, GetPrefString(prf_S_FontStyle, fs));
 	
 	font->SetFamilyAndStyle(ff, fs);
-	font->SetSize(GetPrefDouble("font size", be_plain_font->Size()));
+	font->SetSize(GetPrefDouble(prf_D_FontSize, be_plain_font->Size()));
 }	

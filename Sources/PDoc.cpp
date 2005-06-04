@@ -71,6 +71,7 @@
 #include "PProjectWindow.h"
 #include "ResourcesToolbars.h"
 #include "ResourcesMenus.h"
+#include "Prefs.h"
 
 #include <NodeMonitor.h>
 #include <fs_attr.h>
@@ -174,7 +175,7 @@ PDoc::~PDoc()
 	{
 		// closing a new (unsaved) document (a.k.a. 'Untitled') defines
 		// the default document frame:
-		gPrefs->SetPrefRect("default document rect", Frame());
+		gPrefs->SetPrefRect(prf_R_DefaultDocumentRect, Frame());
 		sfNewCount = -1;
 	}
 } /* PDoc::~PDoc */
@@ -217,7 +218,7 @@ void PDoc::InitWindow(const char *name)
 	SetSizeLimits(100, 100000, 100, 100000);
 
 	BRect b(Bounds()), r;
-	bool showIde = gPrefs->GetPrefInt("ide menu", 1);
+	bool showIde = gPrefs->GetPrefInt(prf_I_IdeMenu, 1);
 	
 	r = b;
 	fMBar = HResources::GetMenuBar(r, rid_Mbar_DocumentWin);
@@ -351,7 +352,7 @@ void PDoc::UpdateTitle()
 	BPath path;
 	entry.GetPath(&path);
 
-	if (gPrefs->GetPrefInt("fullpath", 1))
+	if (gPrefs->GetPrefInt(prf_I_FullPath, 1))
 		SetTitle(path.Path());
 	else
 		SetTitle(fFile->name);
@@ -473,7 +474,7 @@ void PDoc::WriteData(BPositionIO& file)
 	}
 	
 	CheckedWrite(file, text, size);
-	if (gPrefs->GetPrefInt("nl at eof", 1) &&
+	if (gPrefs->GetPrefInt(prf_I_NlAtEof, 1) &&
 		text[size - 1] != '\n')
 	{
 		CheckedWrite(file, "\n", 1);
@@ -530,7 +531,7 @@ void PDoc::VerifyFile()
 {
 	try
 	{
-		if (gPrefs->GetPrefInt("verify", 1))
+		if (gPrefs->GetPrefInt(prf_I_Verify, 1))
 		{
 			BFile file;
 			FailOSErr(file.SetTo(fFile, B_READ_ONLY));
@@ -603,7 +604,7 @@ void PDoc::SaveRequested(entry_ref& directory, const char *name)
 	
 	if (fFile)
 	{
-		if (oldExists && gPrefs->GetPrefInt("save attr", 1))
+		if (oldExists && gPrefs->GetPrefInt(prf_I_SaveAttr, 1))
 		{
 			BFile file;
 			FailOSErr(file.SetTo(fFile, B_READ_WRITE));
@@ -624,7 +625,7 @@ void PDoc::SaveRequested(entry_ref& directory, const char *name)
 		FailOSErr(e.GetPath(&p));
 		fStatus->SetPath(p.Path());
 
-		if (gPrefs->GetPrefInt("fullpath", 1))
+		if (gPrefs->GetPrefInt(prf_I_FullPath, 1))
 			SetTitle(p.Path());
 		else
 			SetTitle(name);
@@ -722,7 +723,7 @@ void PDoc::Revert()
 		}
 		else if (fURL)
 		{
-			CFtpStream ftp(*fURL, true, gPrefs->GetPrefInt("passive ftp", 1));
+			CFtpStream ftp(*fURL, true, gPrefs->GetPrefInt(prf_I_PassiveFtp, 1));
 			ReadData(ftp);
 		}
 		else
@@ -741,8 +742,8 @@ void PDoc::WindowActivated(bool active)
 		sfDocList.push_front(this);
 	}
 
-	if (active && gPrefs->GetPrefInt("show htmlpalette", 1)
-		&& gPrefs->GetPrefInt("show htmlpalette for html", 1)) {
+	if (active && gPrefs->GetPrefInt(prf_I_ShowHtmlPalette, 1)
+		&& gPrefs->GetPrefInt(prf_I_ShowHtmlpaletteForHtml, 1)) {
 			BMessage msg(fMimeType == "text/html" 
 								? msg_ShowHtmlPalette 
 								: msg_HideHtmlPalette);
@@ -802,7 +803,7 @@ void PDoc::OpenInclude(const char *incl)
 			}
 		}
 
-		if (fURL && gPrefs->GetPrefInt("parent"))
+		if (fURL && gPrefs->GetPrefInt(prf_I_Parent))
 		{
 			URLData url(*fURL);
 			url += incl;
@@ -814,7 +815,7 @@ void PDoc::OpenInclude(const char *incl)
 			}
 		}
 		
-		if (fFile && gPrefs->GetPrefInt("parent"))
+		if (fFile && gPrefs->GetPrefInt(prf_I_Parent))
 		{
 			FailOSErr(e.SetTo(fFile));
 			FailOSErr(e.GetParent(&d));
@@ -829,7 +830,7 @@ void PDoc::OpenInclude(const char *incl)
 			}
 		}
 		
-		if (!found && gPrefs->GetPrefInt("beincludes"))
+		if (!found && gPrefs->GetPrefInt(prf_I_BeIncludes))
 		{
 			bi = strdup(getenv("BEINCLUDES"));
 			char *ip = bi;
@@ -858,7 +859,7 @@ void PDoc::OpenInclude(const char *incl)
 			const char *p;
 			int i = 0;
 
-			while ((p = gPrefs->GetIxPrefString("includepath", i++))!= NULL && !found)
+			while ((p = gPrefs->GetIxPrefString(prf_X_IncludePath, i++))!= NULL && !found)
 			{
 				if (e.SetTo(p) != B_OK || !e.Exists())
 					continue;
@@ -1016,7 +1017,7 @@ BRect PDoc::NextPosition(bool inc)
 		40 + 80*textFont.StringWidth("m") + B_V_SCROLL_BAR_WIDTH + 5, 
 		25 + 40*lh + B_H_SCROLL_BAR_HEIGHT
 	);
-	BRect defaultFrame = gPrefs->GetPrefRect("default document rect", 
+	BRect defaultFrame = gPrefs->GetPrefRect(prf_R_DefaultDocumentRect, 
 											 initialDefaultRect);
 
 	if (inc)
@@ -1177,7 +1178,7 @@ void PDoc::CreateFilePanel()
 		int i = 0;
 		const char *p;
 		
-		while ((p = gPrefs->GetIxPrefString("mimetype", i++)) != NULL)
+		while ((p = gPrefs->GetIxPrefString(prf_X_Mimetype, i++)) != NULL)
 			m->AddItem(new BMenuItem(p, NULL));
 		
 		BMenuItem *item = m->FindItem(fMimeType.c_str());
@@ -1254,7 +1255,7 @@ static int GetExtensionMenuIndexByHash(uint16 hash)
 	int idx = -1;
 	int skipped = 0;
 	for (uint16 i = 0; i < sExtensions.size(); i++) {
-		if (gPrefs->GetPrefInt("skiphtmlext", 1) 
+		if (gPrefs->GetPrefInt(prf_I_SkipHtmlExt, 1) 
 		&& strncasecmp(sExtensions[i].name, "HTML", 4) == 0) {
 			skipped++;
 		} else if (sExtensions[i].hash == hash) {
@@ -1326,7 +1327,7 @@ void PDoc::LoadAddOns()
 	LoadAddOnsFromPath(path);
 	
 	char *bt = getenv("BETOOLS");
-	if (gPrefs->GetPrefInt("mw plugins", 1) && bt)
+	if (gPrefs->GetPrefInt(prf_I_MwPlugins, 1) && bt)
 	{
 		strcpy(path, bt);
 		char *e = strrchr(path, '/');
@@ -1343,7 +1344,7 @@ void PDoc::BuildExtensionsMenu(BMenu *addOnMenu)
 {
 	for (uint16 i = 0; i < sExtensions.size(); i++)
 	{
-		if (!(gPrefs->GetPrefInt("skiphtmlext", 1) 
+		if (!(gPrefs->GetPrefInt(prf_I_SkipHtmlExt, 1) 
 			&& strncasecmp(sExtensions[i].name, "HTML", 4) == 0))
 			addOnMenu->AddItem(new BMenuItem(sExtensions[i].name, 
 														new BMessage(msg_PerformExtension)));
@@ -1533,7 +1534,7 @@ void PDoc::MessageReceived(BMessage *msg)
 				FailOSErr(msg->FindPointer("window", (void**)&w));
 				if (w) 
 				{
-					if (gPrefs->GetPrefInt("window to workspace", 1))
+					if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 						w->SetWorkspaces(1 << current_workspace());
 
 					w->Activate(true);
@@ -1571,7 +1572,7 @@ void PDoc::MessageReceived(BMessage *msg)
 			{
 				int c = 1 << current_workspace();
 				
-				if (gPrefs->GetPrefInt("window to workspace", 1))
+				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 					pa->FindDialog()->SetWorkspaces(c);
 				
 				pa->FindDialog()->SetCaller(this);
@@ -1590,7 +1591,7 @@ void PDoc::MessageReceived(BMessage *msg)
 			}
 			
 			case msg_PrefsChanged:
-				fText->SetViewColor(gPrefs->GetPrefColor("low color", ui_color(B_PANEL_BACKGROUND_COLOR)));
+				fText->SetViewColor(gPrefs->GetPrefColor(prf_C_Low, ui_color(B_PANEL_BACKGROUND_COLOR)));
 				fText->Invalidate();
 
 				fStatus->Draw(fStatus->Bounds());

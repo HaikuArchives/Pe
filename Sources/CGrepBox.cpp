@@ -39,6 +39,7 @@
 #include "Utils.h"
 #include "HPreferences.h"
 #include "HDialog.h"
+#include "Prefs.h"
 
 const unsigned long
 	msg_ChangedPattern = 'GCnm';
@@ -202,16 +203,16 @@ void CGrepBox::MessageReceived(BMessage *msg)
 
 void CGrepBox::DoOK()
 {
-	gPrefs->RemovePref("greppatname");
-	gPrefs->RemovePref("greppatfind");
-	gPrefs->RemovePref("greppatrepl");
+	gPrefs->RemovePref(prf_X_GrepPatName);
+	gPrefs->RemovePref(prf_X_GrepPatFind);
+	gPrefs->RemovePref(prf_X_GrepPatRepl);
 	
 	for (int i = 0; i < fList->CountItems(); i++)
 	{
 		CGrepItem *m = static_cast<CGrepItem*>(fList->ItemAt(i));
-		gPrefs->SetIxPrefString("greppatname", i, m->Text());
-		gPrefs->SetIxPrefString("greppatfind", i, m->fFind);
-		gPrefs->SetIxPrefString("greppatrepl", i, m->fRepl);
+		gPrefs->SetIxPrefString(prf_X_GrepPatName, i, m->Text());
+		gPrefs->SetIxPrefString(prf_X_GrepPatFind, i, m->fFind);
+		gPrefs->SetIxPrefString(prf_X_GrepPatRepl, i, m->fRepl);
 	}
 } /* CGrepBox::DoOK */
 
@@ -234,9 +235,9 @@ void CGrepBox::DoCancel()
 
 	do
 	{
-		name = gPrefs->GetIxPrefString("greppatname", i);
-		find = gPrefs->GetIxPrefString("greppatfind", i);
-		repl = gPrefs->GetIxPrefString("greppatrepl", i);
+		name = gPrefs->GetIxPrefString(prf_X_GrepPatName, i);
+		find = gPrefs->GetIxPrefString(prf_X_GrepPatFind, i);
+		repl = gPrefs->GetIxPrefString(prf_X_GrepPatRepl, i);
 
 		if (name && find && repl)
 			fList->AddItem(new CGrepItem(name, find, repl));

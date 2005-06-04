@@ -28,14 +28,11 @@
 
 #include "pe.h"
 #include "Utils.h"
-
-#include <cctype>
-
-#include <Entry.h>
-
 #include "CProjectJamFile.h"
-
 #include "HPreferences.h"
+#include "Prefs.h"
+#include <cctype>
+#include <Entry.h>
 
 /*
  * CProjectJamSerializer
@@ -269,7 +266,7 @@ CProjectGroupItem *CProjectJamFile::_AddGroup(const char* s, const char* e,
 			// what we have in groupName is in fact the first item, so we add it:
 			group->AddItem(new CProjectItem(fParentPath.String(), 
 													  groupName.String()),
-								gPrefs->GetPrefInt("sortproject", 1) != 0);
+								gPrefs->GetPrefInt(prf_I_SortProject, 1) != 0);
 		}
 		
 		group->GroupHeader(groupHeader);
@@ -291,7 +288,7 @@ CProjectGroupItem *CProjectJamFile::_AddGroup(const char* s, const char* e,
 			if (name.Length())
 				group->AddItem(new CProjectItem(fParentPath.String(), 
 														  name.String()),
-									gPrefs->GetPrefInt("sortproject", 1) != 0);
+									gPrefs->GetPrefInt(prf_I_SortProject, 1) != 0);
 			
 			t = skip_white(t, false);
 			if (*t == '\n')

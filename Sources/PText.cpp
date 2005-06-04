@@ -64,6 +64,7 @@
 #include "HDefines.h"
 #include "HColorUtils.h"
 #include "ResourcesMenus.h"
+#include "Prefs.h"
 
 #if defined(__BEOS__) && defined(__INTEL__)
 	// [zooey]: BeOS' glibs is messing up iscntrl, as it reports all values>127 as
@@ -189,7 +190,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fDragStart = -1;
 	fSyntaxColoring = gSyntaxColoring;
 	fCWD = NULL;
-	fShowInvisibles = gPrefs->GetPrefInt("show invisibles", 0);
+	fShowInvisibles = gPrefs->GetPrefInt(prf_I_ShowInvisibles, 0);
 	fLangIntf = NULL;
 	fLineEndType = leLF;
 	SetLanguage(ext);
@@ -200,9 +201,9 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fAppendNextCut = false;
 	fLastKillPoint = -1;
 	
-	fSoftWrap = gPrefs->GetPrefInt("softwrap", false);
-	fWrapType = gPrefs->GetPrefInt("wraptype", 3);
-	fWrapWidth = gPrefs->GetPrefInt("wrapcol", 80);
+	fSoftWrap = gPrefs->GetPrefInt(prf_I_SoftWrap, false);
+	fWrapType = gPrefs->GetPrefInt(prf_I_WrapType, 3);
+	fWrapWidth = gPrefs->GetPrefInt(prf_I_WrapCol, 80);
 	
 	fSplitAt = 0;
 	fActivePart = 2;
@@ -219,7 +220,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 
 	SetViewColor(gColor[kLowColor]);
 	
-	fTabStops = gPrefs->GetPrefInt("spaces per tab", 4);
+	fTabStops = gPrefs->GetPrefInt(prf_I_SpacesPerTab, 4);
 
 	fLineMap = NULL;
 	fLineView = NULL;
@@ -343,7 +344,7 @@ void PText::AttachedToWindow()
 	fMainPopUp->SetTargetForItems(this);
 	fBounds = Bounds();
 	Doc()->ButtonBar()->SetOn(msg_SoftWrap, fSoftWrap);
-	ShowTabStops(gPrefs->GetPrefInt("show tabs", false));
+	ShowTabStops(gPrefs->GetPrefInt(prf_I_ShowTabs, false));
 } /* PText::AttachedToWindow */
 
 const char* PText::Text()
@@ -458,7 +459,7 @@ void PText::SetSettings(BMessage& msg)
 		if (msg.FindBool("softwrap", &b) == B_OK)
 			fSoftWrap = b;
 		else
-			fSoftWrap = gPrefs->GetPrefInt("softwrap", 0);
+			fSoftWrap = gPrefs->GetPrefInt(prf_I_SoftWrap, 0);
 		Doc()->ButtonBar()->SetOn(msg_SoftWrap, fSoftWrap);
 
 		if (msg.FindInt32("wraptype", &i) == B_OK)			fWrapType = i;
@@ -2309,7 +2310,7 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 	FailOSErr(get_key_info(&ki));
 	
 	bool optionDown = (ki.modifiers & (B_OPTION_KEY | B_SHIFT_KEY | B_COMMAND_KEY)) != 0;
-	bool sorted = (optionDown != gPrefs->GetPrefInt("sortpopup"));
+	bool sorted = (optionDown != gPrefs->GetPrefInt(prf_I_SortPopup));
 
 	MenuFunctionScanHandler handler(sorted, which);
 
@@ -2381,12 +2382,12 @@ void PText::ShowContextualMenu(BPoint where)
 		fMainPopUp->FindItem(msg_SoftWrap)->SetMarked(fSoftWrap);
 	
 		BFont f;
-		f.SetFamilyAndStyle(gPrefs->GetPrefString("font family"), gPrefs->GetPrefString("font style"));
-		f.SetSize(gPrefs->GetPrefDouble("font size"));
+		f.SetFamilyAndStyle(gPrefs->GetPrefString(prf_S_FontFamily), gPrefs->GetPrefString(prf_S_FontStyle));
+		f.SetSize(gPrefs->GetPrefDouble(prf_D_FontSize));
 		
 		BFont af;
-		af.SetFamilyAndStyle(gPrefs->GetPrefString("alt font family"), gPrefs->GetPrefString("alt font style"));
-		af.SetSize(gPrefs->GetPrefDouble("alt font size"));
+		af.SetFamilyAndStyle(gPrefs->GetPrefString(prf_S_AltFontFamily), gPrefs->GetPrefString(prf_S_AltFontStyle));
+		af.SetSize(gPrefs->GetPrefDouble(prf_D_AltFontSize));
 
 		if (af == f)
 			fMainPopUp->FindItem(msg_ToggleFont)->SetEnabled(false);
@@ -3338,7 +3339,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 		{
 			int ls = LineStart(line);
 			
-			if (gPrefs->GetPrefInt("althome", 1))
+			if (gPrefs->GetPrefInt(prf_I_AltHome, 1))
 			{
 				int w = ls;
 
@@ -4015,7 +4016,7 @@ bool PText::FindNext(const unsigned char *what, int& offset, bool ignoreCase,
 				{
 					ChangeSelection(offset, offset + wl);
 
-					if (gPrefs->GetPrefInt("centerfound", 0))
+					if (gPrefs->GetPrefInt(prf_I_CenterFound, 0))
 						CenterSelection();
 					else
 						ScrollToCaret();
@@ -4214,7 +4215,7 @@ void PText::FindNextError(bool backward)
 
 void PText::DoIncSearch(bool forward)
 {
-	bool ignCase = gPrefs->GetPrefInt("isearch_igncase", 1);
+	bool ignCase = gPrefs->GetPrefInt(prf_I_IsearchIgncase, 1);
 
 	if (fIncSearch)
 	{
@@ -4253,7 +4254,7 @@ void PText::DoIncSearch(bool forward)
 void PText::IncSearchKey(const char *bytes, int numBytes)
 {
 	int ipl = strlen(fIncPat);
-	bool ignCase = gPrefs->GetPrefInt("isearch_igncase", 1);
+	bool ignCase = gPrefs->GetPrefInt(prf_I_IsearchIgncase, 1);
 	
 	if (bytes[0] == B_RETURN || bytes[0] == B_ESCAPE)
 		fIncSearch = 0;
@@ -5764,7 +5765,7 @@ void PText::MessageReceived(BMessage *msg)
 				line = RealLine2Line(line);
 				SelectLine(line);
 				
-				if (gPrefs->GetPrefInt("centerfound"))
+				if (gPrefs->GetPrefInt(prf_I_CenterFound))
 					CenterSelection();
 				break;
 			}
@@ -5810,7 +5811,7 @@ void PText::MessageReceived(BMessage *msg)
 					BMessage msg( y<0 
 									? kmsg_ScrollOneLineUp 
 									: kmsg_ScrollOneLineDown);
-					int numLines = gPrefs->GetPrefInt("scrollwheel lines", 3);
+					int numLines = gPrefs->GetPrefInt(prf_I_ScrollwheelLines, 3);
 					for( int i=0; i<numLines; ++i)
 						DoKeyCommand(&msg);
 				}

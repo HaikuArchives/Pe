@@ -33,6 +33,9 @@
 	Created: 09/10/97 13:20:21
 */
 
+#include <NodeMonitor.h>
+#include <fs_attr.h>
+
 #include "pe.h"
 #include "CDoc.h"
 #include "PApp.h"
@@ -41,9 +44,7 @@
 #include "MAlert.h"
 #include "HPreferences.h"
 #include "CMessages.h"
-
-#include <NodeMonitor.h>
-#include <fs_attr.h>
+#include "Prefs.h"
 
 doclist CDoc::sfDocList;
 vector<char*> CDoc::sfTenLastDocs;
@@ -217,7 +218,7 @@ void CDoc::Read(bool readAttributes)
 	}
 	else
 	{
-		CFtpStream ftp(*fURL, true, gPrefs->GetPrefInt("passive ftp", 1));
+		CFtpStream ftp(*fURL, true, gPrefs->GetPrefInt(prf_I_PassiveFtp, 1));
 		ReadData(ftp);
 	}
 } /* CDoc::Read */
@@ -251,7 +252,7 @@ void CDoc::Save()
 	{
 		try
 		{
-			CFtpStream ftp(*fURL, false, gPrefs->GetPrefInt("passive ftp", 1));
+			CFtpStream ftp(*fURL, false, gPrefs->GetPrefInt(prf_I_PassiveFtp, 1));
 			WriteData(ftp);
 			ftp.Flush();
 			
@@ -301,14 +302,14 @@ void CDoc::Save()
 			{
 				FailOSErr(file.SetCreationTime(created));
 				
-				if (gPrefs->GetPrefInt("save attr", 1))
+				if (gPrefs->GetPrefInt(prf_I_SaveAttr, 1))
 				{
 					BFile old;
 					FailOSErr(old.SetTo(&e, B_READ_ONLY));
 					CopyAttributes(old, file);
 				}
 				
-				if (!gPrefs->GetPrefInt("backup"))
+				if (!gPrefs->GetPrefInt(prf_I_Backup))
 					FailOSErr(e.Remove());
 			}
 
@@ -567,7 +568,7 @@ void CDoc::AddRecent(const char *path)
 		strlen(s) == 29 /*strlen("/config/settings/pe/Worksheet")*/)
 		return; // don't add the worksheet
 	
-	if (gPrefs->GetPrefInt("skiptmp", 1))
+	if (gPrefs->GetPrefInt(prf_I_SkipTmp, 1))
 	{
 		BPath tp;
 		try

@@ -41,6 +41,7 @@
 #include "HDialog.h"
 #include "HDefines.h"
 #include "HPreferences.h"
+#include "Prefs.h"
 
 const unsigned long
 	msg_MimeChanged = 'MChg',
@@ -314,12 +315,12 @@ void CMimeBox::MessageReceived(BMessage *msg)
 
 void CMimeBox::DoOK()
 {
-	gPrefs->RemovePref("mimetype");
+	gPrefs->RemovePref(prf_X_Mimetype);
 	
 	for (int i = 0; i < fList->CountItems(); i++)
 	{
 		CMimeItem *m = static_cast<CMimeItem*>(fList->ItemAt(i));
-		gPrefs->SetIxPrefString("mimetype", i, m->fMime.Type());
+		gPrefs->SetIxPrefString(prf_X_Mimetype, i, m->fMime.Type());
 	}
 } /* CMimeBox::DoOK */
 
@@ -341,7 +342,7 @@ void CMimeBox::DoCancel()
 
 	do
 	{
-		t = gPrefs->GetIxPrefString("mimetype", i++);
+		t = gPrefs->GetIxPrefString(prf_X_Mimetype, i++);
 		if (t) AddType(t);
 	}
 	while (t);

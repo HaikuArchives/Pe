@@ -42,6 +42,7 @@
 #include "PDoc.h"
 #include "HError.h"
 #include "HPreferences.h"
+#include "Prefs.h"
 #ifdef BONE_BUILD
 	#define closesocket(X)	close(X)
 	#include <arpa/inet.h>
@@ -151,7 +152,7 @@ void CFtpDialog::Create(void)
 	fPassword = new HTextControl(fLoginBox, "pass");
 	fPassword->TextView()->HideTyping(true);
 	fUsePassive = new HCheckBox(fLoginBox, "pssv");
-	fUsePassive->SetValue(gPrefs->GetPrefInt("passive ftp", 1));
+	fUsePassive->SetValue(gPrefs->GetPrefInt(prf_I_PassiveFtp, 1));
 	fConnectButton = new HButton(fLoginBox, "cnct", 'cnct');
 
 	fFileName = new HTextControl(fMainView, "name", 
@@ -178,8 +179,8 @@ void CFtpDialog::Create(void)
 
 	SetDefaultButton(fConnectButton);
 	
-	fServerName->SetText(gPrefs->GetPrefString("last ftp server"));
-	fUserName->SetText(gPrefs->GetPrefString("last ftp user"));
+	fServerName->SetText(gPrefs->GetPrefString(prf_S_LastFtpServer));
+	fUserName->SetText(gPrefs->GetPrefString(prf_S_LastFtpUser));
 
 	if (sfPassword.length())
 		fPassword->SetText(sfPassword.c_str());
@@ -539,8 +540,8 @@ void CFtpDialog::Connect()
 			}
 		}
 
-		gPrefs->SetPrefString("last ftp user", GetText("user"));
-		gPrefs->SetPrefString("last ftp server", GetText("srvr"));
+		gPrefs->SetPrefString(prf_S_LastFtpUser, GetText("user"));
+		gPrefs->SetPrefString(prf_S_LastFtpServer, GetText("srvr"));
 		sfPassword = GetText("pass");
 
 		GetPWD();

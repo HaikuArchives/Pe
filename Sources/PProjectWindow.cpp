@@ -53,6 +53,7 @@
 #include "CProjectMakeFile.h"
 #include "ResourcesToolbars.h"
 #include "ResourcesMenus.h"
+#include "Prefs.h"
 
 const unsigned long msg_Done = 'done';
 
@@ -114,7 +115,7 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype,
 	if (!doc) THROW(("No document defined!"));
 
 	BPath path(doc);
-	if (gPrefs->GetPrefInt("fullpath", 1))
+	if (gPrefs->GetPrefInt(prf_I_FullPath, 1))
 		SetTitle(path.Path());
 	else
 		SetTitle(doc->name);
@@ -393,7 +394,7 @@ void PProjectWindow::AddRef(const entry_ref& ref)
 	if (parentModelItem && parentItem) {
 		int32 pos 
 			= parentModelItem->AddItem(modelItem, 
-												gPrefs->GetPrefInt("sortproject", 1));
+												gPrefs->GetPrefInt(prf_I_SortProject, 1));
 		int32 parentIdx = fList->FullListIndexOf(parentItem);
 		fList->AddItem( item, parentIdx + pos + 1);
 	} else {

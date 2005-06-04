@@ -40,6 +40,7 @@
 #include "HDialog.h"
 #include "HDefines.h"
 #include "HPreferences.h"
+#include "Prefs.h"
 
 const unsigned long
 	msg_ChangedPattern = 'ECnm';
@@ -254,7 +255,7 @@ void CStdErrBox::MessageReceived(BMessage *msg)
 
 void CStdErrBox::DoOK()
 {
-	gPrefs->RemovePref("stderrpattern");
+	gPrefs->RemovePref(prf_X_StdErrPattern);
 	
 	for (int i = 0; i < fList->CountItems(); i++)
 	{
@@ -264,7 +265,7 @@ void CStdErrBox::DoOK()
 		sprintf(buf, "%d;%d;%d;%d;%s", m->fFile, m->fLine, m->fMsg,
 			m->fWarning, m->Text());
 		
-		gPrefs->SetIxPrefString("stderrpattern", i, buf);
+		gPrefs->SetIxPrefString(prf_X_StdErrPattern, i, buf);
 	}
 } /* CStdErrBox::DoOK */
 
@@ -282,11 +283,11 @@ void CStdErrBox::DoCancel()
 		delete m;
 	}
 
-	if (gPrefs->GetPrefInt("stderrinited", 0) == 0)
+	if (gPrefs->GetPrefInt(prf_I_StdErrInitEd, 0) == 0)
 	{
-		gPrefs->SetIxPrefString("stderrpattern", 0, "1;2;4;3;^([^:]+):([0-9]+): (warning: )?(.*)\\n");
-		gPrefs->SetIxPrefString("stderrpattern", 1, "4;5;2;1;^### [^ ]+ (.*)\\n(#[ \\t](.*\\n))+#-+\\n[ \\t]*File \"([^\"]+)\"; Line ([0-9]+)\\n(#.*\\n)*#-+\\n");
-		gPrefs->GetPrefInt("stderrinited", 1);
+		gPrefs->SetIxPrefString(prf_X_StdErrPattern, 0, "1;2;4;3;^([^:]+):([0-9]+): (warning: )?(.*)\\n");
+		gPrefs->SetIxPrefString(prf_X_StdErrPattern, 1, "4;5;2;1;^### [^ ]+ (.*)\\n(#[ \\t](.*\\n))+#-+\\n[ \\t]*File \"([^\"]+)\"; Line ([0-9]+)\\n(#.*\\n)*#-+\\n");
+		gPrefs->GetPrefInt(prf_I_StdErrInitEd, 1);
 	}
 
 	i = 0;
@@ -295,7 +296,7 @@ void CStdErrBox::DoCancel()
 
 	do
 	{
-		pattern = gPrefs->GetIxPrefString("stderrpattern", i);
+		pattern = gPrefs->GetIxPrefString(prf_X_StdErrPattern, i);
 
 		if (pattern && sscanf(pattern, "%d;%d;%d;%d;%n", &file, &line, &msg, &warning, &n) == 4)
 			fList->AddItem(new CStdErrItem(pattern + n, file, line, msg, warning));

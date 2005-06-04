@@ -45,8 +45,9 @@
 #include "HAppResFile.h"
 #include "HPreferences.h"
 #include "HColorUtils.h"
-#include <algorithm>
 #include "ResourcesMisc.h"
+#include "Prefs.h"
+#include <algorithm>
 
 unsigned char *CLangIntf::sfWordBreakTable = NULL;
 
@@ -587,7 +588,7 @@ void CLangIntf::SetExtensions(const char *ext)
 
 void CLangIntf::ChooseDefault()
 {
-	const char *d = gPrefs->GetPrefString("def lang", "None");
+	const char *d = gPrefs->GetPrefString(prf_S_DefLang, "None");
 	vector<CLangIntf*>::iterator i;
 	
 	for (i = fInterfaces.begin(); i != fInterfaces.end(); i++)

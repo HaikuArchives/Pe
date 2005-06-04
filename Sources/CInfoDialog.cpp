@@ -44,6 +44,7 @@
 #include "HPreferences.h"
 #include "HDefines.h"
 #include "MAlert.h"
+#include "Prefs.h"
 
 CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int flags,
 			BWindow *owner, BPositionIO* data)
@@ -67,7 +68,7 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 
 	const char *p;
 	int i = 0;
-	while ((p = gPrefs->GetIxPrefString("mimetype", i++)) != NULL)
+	while ((p = gPrefs->GetIxPrefString(prf_X_Mimetype, i++)) != NULL)
 		fTypes->AddItem(new BMenuItem(p, new BMessage(msg_FieldChanged)));
 
 	if (i == 1)

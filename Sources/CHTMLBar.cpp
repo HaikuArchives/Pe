@@ -44,6 +44,7 @@
 #include "HStream.h"
 #include "HDefines.h"
 #include "ResourcesMisc.h"
+#include "Prefs.h"
 
 CHTMLBar *CHTMLBar::sfInstance;
 
@@ -61,14 +62,14 @@ void CHTMLBar::Close()
 	{
 		sfInstance->Lock();
 	
-		gPrefs->SetPrefRect("HTMLPalettePos", sfInstance->Frame());
+		gPrefs->SetPrefRect(prf_R_HtmlPalettePos, sfInstance->Frame());
 
 		sfInstance->Quit();
 	}
 } /* CHTMLBar::Close */
 
 CHTMLBar::CHTMLBar()
-	: BWindow(gPrefs->GetPrefRect("HTMLPalettePos", BRect(20, 20, 120, 120)),
+	: BWindow(gPrefs->GetPrefRect(prf_R_HtmlPalettePos, BRect(20, 20, 120, 120)),
 		"HTML Palette",
 		B_FLOATING_WINDOW,
 		B_AVOID_FRONT | B_AVOID_FOCUS | B_WILL_ACCEPT_FIRST_CLICK | B_NOT_RESIZABLE | B_NOT_ZOOMABLE)

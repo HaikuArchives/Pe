@@ -38,12 +38,14 @@
 #include "PMessages.h"
 #include "PApp.h"
 #include "HPreferences.h"
+#include "ResourcesMisc.h"
+#include "Prefs.h"
 
 COpenSelection::COpenSelection(BRect frame, const char *name, window_type type, int flags,
 			BWindow *owner, BPositionIO* data)
 	: HDialog(frame, name, type, flags, owner, data)
 {
-	SetText("open", gPrefs->GetPrefString("last find&open", ""));
+	SetText("open", gPrefs->GetPrefString(prf_S_LastFindAndOpen, ""));
 	FindView("open")->MakeFocus();
 	Show();
 } /* COpenSelection::COpenSelection */
@@ -58,7 +60,7 @@ bool COpenSelection::OKClicked()
 	else
 		static_cast<PApp*>(be_app)->PostMessage(&m);
 	
-	gPrefs->SetPrefString("last find&open", GetText("open"));
+	gPrefs->SetPrefString(prf_S_LastFindAndOpen, GetText("open"));
 
 	return true;
 } /* COpenSelection::OKClicked */

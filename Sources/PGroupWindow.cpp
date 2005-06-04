@@ -39,7 +39,6 @@
 #include "PMessages.h"
 #include "PToolBar.h"
 #include "PKeyDownFilter.h"
-#include <fs_attr.h>
 #include "PTypeAHeadList.h"
 #include "HDefines.h"
 #include "HError.h"
@@ -49,6 +48,8 @@
 #include "HAppResFile.h"
 #include "ResourcesToolbars.h"
 #include "ResourcesMenus.h"
+#include "Prefs.h"
+#include <fs_attr.h>
 
 const unsigned long msg_Done = 'done';
 
@@ -321,7 +322,7 @@ void PGroupWindow::ReadData(BPositionIO&)
 		fIconFinder = new PIconFinder(this, lst);
 		fIconFinder->Run();
 		
-		if (gPrefs->GetPrefInt("sortgroup", 1))
+		if (gPrefs->GetPrefInt(prf_I_SortGroup, 1))
 			fList->SortItems(PEntryItem::Compare);
 		fclose(f);
 
@@ -388,7 +389,7 @@ void PGroupWindow::WriteData(BPositionIO& /*file*/)
 		{
 			PEntryItem *item = (PEntryItem *)fList->ItemAt(i);
 			
-			if (gPrefs->GetPrefInt("relative group paths", 0))
+			if (gPrefs->GetPrefInt(prf_I_RelativeGroupPaths, 0))
 			{
 				char path[PATH_MAX];
 				RelativePath(*fFile, item->Ref(), path);
@@ -499,7 +500,7 @@ void PGroupWindow::AddRefs(BMessage *msg)
 	while (msg->FindRef("refs", c++, &ref) == B_OK)
 		fNewItems->push_back(AddRef(ref));
 
-	if (gPrefs->GetPrefInt("sortgroup", 1))
+	if (gPrefs->GetPrefInt(prf_I_SortGroup, 1))
 		fList->SortItems(PEntryItem::Compare);
 
 	fList->Invalidate();

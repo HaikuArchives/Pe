@@ -50,6 +50,7 @@
 #include "MAlert.h"
 #include "HDialogViews.h"
 #include "HDefines.h"
+#include "Prefs.h"
 
 const unsigned long
 	msg_SelectDirectory	= 'SelO',
@@ -151,12 +152,12 @@ void CFindDialog::Create(void)
 	fChkWord = new HCheckBox(fMainView, "word", NULL, H_FOLLOW_LEFT_BOTTOM);
 	fChkGrep = new HCheckBox(fMainView, "grep", NULL, H_FOLLOW_LEFT_BOTTOM);
 	fChkBtch = new HCheckBox(fMainView, "btch", NULL, H_FOLLOW_LEFT_BOTTOM);
-	fChkCase->SetOn(gPrefs->GetPrefInt("Search Ignore Case", 1));
-	fChkWrap->SetOn(gPrefs->GetPrefInt("Search Wrap", 1));
-	fChkBack->SetOn(gPrefs->GetPrefInt("Search Backwards", 0));
-	fChkWord->SetOn(gPrefs->GetPrefInt("Search Entire Word", 0));
-	fChkBtch->SetOn(gPrefs->GetPrefInt("Search Batch", 0));
-	fChkGrep->SetOn(gRxInstalled ? gPrefs->GetPrefInt("Search with Grep", 0) : false);
+	fChkCase->SetOn(gPrefs->GetPrefInt(prf_I_SearchIgnoreCase, 1));
+	fChkWrap->SetOn(gPrefs->GetPrefInt(prf_I_SearchWrap, 1));
+	fChkBack->SetOn(gPrefs->GetPrefInt(prf_I_SearchBackwards, 0));
+	fChkWord->SetOn(gPrefs->GetPrefInt(prf_I_SearchEntireWord, 0));
+	fChkBtch->SetOn(gPrefs->GetPrefInt(prf_I_SearchBatch, 0));
+	fChkGrep->SetOn(gRxInstalled ? gPrefs->GetPrefInt(prf_I_SearchWithGrep, 0) : false);
 	if (!gRxInstalled)
 		fChkGrep->SetEnabled(false);
 
@@ -169,13 +170,13 @@ void CFindDialog::Create(void)
 	fMitMethDir = fMfdMeth->AddMenuItem(msg_ChangedMFKind, METHOD_IDX_DIR);
 	fMitMethWin = fMfdMeth->AddMenuItem(msg_ChangedMFKind, METHOD_IDX_WIN);
 	fMitMethInc = fMfdMeth->AddMenuItem(msg_ChangedMFKind, METHOD_IDX_INC);
-	BMenuItem *item = fMfdMeth->Menu()->ItemAt(gPrefs->GetPrefInt("Search Multikind", 0));
+	BMenuItem *item = fMfdMeth->Menu()->ItemAt(gPrefs->GetPrefInt(prf_I_SearchMultikind, 0));
 	(item ? item : fMfdMeth->Menu()->ItemAt(METHOD_IDX_DIR))->SetMarked(true);
 	//
 	fChkText = new HCheckBox(fMainView, "text", NULL, H_FOLLOW_LEFT_BOTTOM);
 	fChkRecu = new HCheckBox(fMainView, "recu", NULL, H_FOLLOW_LEFT_BOTTOM);
-	fChkRecu->SetOn(gPrefs->GetPrefInt("Search Recursive", 1));
-	fChkText->SetOn(gPrefs->GetPrefInt("Search Text Files Only", 1));
+	fChkRecu->SetOn(gPrefs->GetPrefInt(prf_I_SearchRecursive, 1));
+	fChkText->SetOn(gPrefs->GetPrefInt(prf_I_SearchTextFilesOnly, 1));
 	//
 	fMfdSdir = new HMenuField(fMainView, "sdir", H_FOLLOW_LEFT_BOTTOM, false, 1000);
 	fMfdSdir->Menu()->SetLabelFromMarked(true);
@@ -320,15 +321,15 @@ bool CFindDialog::QuitRequested()
 	while (!IsHidden())
 		Hide();
 
-	gPrefs->SetPrefInt("Search Backwards",			fChkBack->IsOn());
-	gPrefs->SetPrefInt("Search Entire Word",		fChkWord->IsOn());
-	gPrefs->SetPrefInt("Search Ignore Case",		fChkCase->IsOn());
-	gPrefs->SetPrefInt("Search Wrap",				fChkWrap->IsOn());
-	gPrefs->SetPrefInt("Search Text Files Only",	fChkText->IsOn());
-	gPrefs->SetPrefInt("Search with Grep",			fChkGrep->IsOn());
-	gPrefs->SetPrefInt("Search Batch",				fChkBtch->IsOn());
-	gPrefs->SetPrefInt("Search Recursive",			fChkRecu->IsOn());
-	gPrefs->SetPrefInt("Search Multikind",			fMfdMeth->FindMarkedIndex());
+	gPrefs->SetPrefInt(prf_I_SearchBackwards,		fChkBack->IsOn());
+	gPrefs->SetPrefInt(prf_I_SearchEntireWord,		fChkWord->IsOn());
+	gPrefs->SetPrefInt(prf_I_SearchIgnoreCase,		fChkCase->IsOn());
+	gPrefs->SetPrefInt(prf_I_SearchWrap,			fChkWrap->IsOn());
+	gPrefs->SetPrefInt(prf_I_SearchTextFilesOnly,	fChkText->IsOn());
+	gPrefs->SetPrefInt(prf_I_SearchWithGrep,		fChkGrep->IsOn());
+	gPrefs->SetPrefInt(prf_I_SearchBatch,			fChkBtch->IsOn());
+	gPrefs->SetPrefInt(prf_I_SearchRecursive,		fChkRecu->IsOn());
+	gPrefs->SetPrefInt(prf_I_SearchMultikind,		fMfdMeth->FindMarkedIndex());
 
 	return CDoc::CountDocs() == 0;
 } /* CFindDialog::QuitRequested */
@@ -592,7 +593,7 @@ void CFindDialog::MessageReceived(BMessage *msg)
 				break;
 			}
 			case msg_YASD:
-				gPrefs->SetPrefInt("Search Whichdir", fMfdSdir->FindMarkedIndex());
+				gPrefs->SetPrefInt(prf_I_SearchWhichDir, fMfdSdir->FindMarkedIndex());
 			case msg_ChangedMFKind:
 				fChkMult->SetOn(true);
 				UpdateFields();
@@ -604,8 +605,8 @@ void CFindDialog::MessageReceived(BMessage *msg)
 				FailOSErr(msg->FindInt32("index", &ix));
 				
 				ix -= 2;
-				fEdiFind->SetText(gPrefs->GetIxPrefString("greppatfind", ix));
-				fEdiRepl->SetText(gPrefs->GetIxPrefString("greppatrepl", ix));
+				fEdiFind->SetText(gPrefs->GetIxPrefString(prf_X_GrepPatFind, ix));
+				fEdiRepl->SetText(gPrefs->GetIxPrefString(prf_X_GrepPatRepl, ix));
 				fChkGrep->SetOn(true);
 				break;
 			}
@@ -621,9 +622,9 @@ void CFindDialog::MessageReceived(BMessage *msg)
 				char n[32];
 				sprintf(n, "Grep Pattern %d", ix);
 				ix--;
-				gPrefs->SetIxPrefString("greppatname", ix, n);
-				gPrefs->SetIxPrefString("greppatfind", ix, fEdiFind->GetText());
-				gPrefs->SetIxPrefString("greppatrepl", ix, fEdiRepl->GetText());
+				gPrefs->SetIxPrefString(prf_X_GrepPatName, ix, n);
+				gPrefs->SetIxPrefString(prf_X_GrepPatFind, ix, fEdiFind->GetText());
+				gPrefs->SetIxPrefString(prf_X_GrepPatRepl, ix, fEdiRepl->GetText());
 				FillGrepPopup();
 				
 				static_cast<PApp*>(be_app)->PostMessage(msg_AddGrepPattern);
@@ -667,12 +668,12 @@ void CFindDialog::UpdateSearchDirMenu()
 
 	const char *path;
 	int i = 0;
-	while ((path = gPrefs->GetIxPrefString("searchpath", i++)) != NULL)
+	while ((path = gPrefs->GetIxPrefString(prf_X_SearchPath, i++)) != NULL)
 		AddPathToDirMenu(path, false);
 
 	// ... and (re)select the current entry
 
-	BMenuItem *item = fMfdSdir->Menu()->ItemAt(gPrefs->GetPrefInt("Search Whichdir", 0));
+	BMenuItem *item = fMfdSdir->Menu()->ItemAt(gPrefs->GetPrefInt(prf_I_SearchWhichDir, 0));
 	if (item == NULL)
 		item = fMfdSdir->Menu()->ItemAt(0);
 
@@ -704,7 +705,7 @@ void CFindDialog::AddPathToDirMenu(const char *path, bool select, bool addToPref
 		fMfdSdir->Menu()->ItemAt(i)->SetMarked(true);
 
 	if (addToPrefs && i >= 2)
-		gPrefs->SetIxPrefString("searchpath", i - 2, path);
+		gPrefs->SetIxPrefString(prf_X_SearchPath, i - 2, path);
 } /* CFindDialog::AddPathToDirMenu */
 
 void CFindDialog::AddPathToDirMenu(entry_ref& ref, bool select, bool addToPrefs)
@@ -757,7 +758,7 @@ void CFindDialog::FillGrepPopup()
 	
 	do
 	{
-		name = gPrefs->GetIxPrefString("greppatname", i++);
+		name = gPrefs->GetIxPrefString(prf_X_GrepPatName, i++);
 		if (name)
 			fMfdPats->Menu()->AddItem(new BMenuItem(name, new BMessage(msg_GrepPopup)));
 	}

@@ -43,6 +43,7 @@
 #include "HError.h"
 #include "HDefines.h"
 #include "HPreferences.h"
+#include "Prefs.h"
 
 PGlossyWindow *gGlossyWindow = NULL;
 
@@ -115,7 +116,7 @@ inline int PGlossyItem::Modifiers() const
 #pragma mark -
 
 PGlossyWindow::PGlossyWindow()
-	: BWindow(gPrefs->GetPrefRect("GlossaryPosition", BRect(100, 100, 200, 300)),
+	: BWindow(gPrefs->GetPrefRect(prf_R_GlossaryPosition, BRect(100, 100, 200, 300)),
 		"Glossary", B_TITLED_WINDOW,
 		B_WILL_ACCEPT_FIRST_CLICK | B_NOT_ZOOMABLE)
 {
@@ -127,7 +128,7 @@ PGlossyWindow::PGlossyWindow()
 	AddChild(new BScrollView("glossyscroller", fList, B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER));
 	
 	fList->SetInvocationMessage(new BMessage(msg_DoGlossy));
-	if (gPrefs->GetPrefInt("singleclickglossary", 0))
+	if (gPrefs->GetPrefInt(prf_I_SingleClickGlossary, 0))
 		fList->SetSelectionMessage(new BMessage(msg_DoGlossy));
 	
 	ParseGlossaryFile();
@@ -156,7 +157,7 @@ PGlossyWindow::~PGlossyWindow()
 
 bool PGlossyWindow::QuitRequested()
 {
-	gPrefs->SetPrefRect("GlossaryPosition", Frame());
+	gPrefs->SetPrefRect(prf_R_GlossaryPosition, Frame());
 	gGlossyWindow = NULL;
 	
 	return true;
