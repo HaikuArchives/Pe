@@ -182,6 +182,10 @@ void CDoc::StopWatchingFile(bool stopDirectory)
 
 	watch_node(&fNodeRef, B_STOP_WATCHING, window);
 
+	// if we get late messages, we don't want to deal with them
+	fNodeRef.device = -1;
+	fNodeRef.node = -1;
+
 	if (stopDirectory) {
 		node_ref directoryNodeRef;
 		BEntry entry(fFile);
@@ -308,7 +312,7 @@ void CDoc::Save()
 					FailOSErr(old.SetTo(&e, B_READ_ONLY));
 					CopyAttributes(old, file);
 				}
-				
+
 				if (!gPrefs->GetPrefInt(prf_I_Backup))
 					FailOSErr(e.Remove());
 			}
