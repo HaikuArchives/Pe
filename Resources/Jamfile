@@ -7,7 +7,6 @@ RezObjects
 	Bindings.r
 	Cursor.r
 	Dialog-Colorpicker.r
-	Dialog-Find.r
 	Dialog-FontTabs.r
 	Dialog-Ftp.r
 	Dialog-Info.r

@@ -69,7 +69,6 @@ BRect dRect::ToBe()
 	return r;
 } /* BRect::operator */
 
-#pragma mark -
 #pragma mark --- HDialog ---
 
 int16 HDialog::sfDlgNr = 1;
@@ -96,7 +95,7 @@ HDialog::HDialog(BRect frame, const char *name, window_type type,
 		fOwner->PostMessage(&m);
 		
 		// [zooey]: let dialog float above owner:
-		SetFeel( B_FLOATING_SUBSET_WINDOW_FEEL);
+		SetFeel(B_FLOATING_SUBSET_WINDOW_FEEL);
 		AddToSubset(fOwner);
 	}
 } /* HDialog::HDialog */

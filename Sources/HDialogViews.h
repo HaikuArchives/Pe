@@ -38,6 +38,14 @@
 
 #include "HLibHekkel.h"
 
+#define H_FOLLOW_LEFT_TOP			(B_FOLLOW_LEFT | B_FOLLOW_TOP)
+#define H_FOLLOW_RIGHT_TOP			(B_FOLLOW_RIGHT | B_FOLLOW_TOP)
+#define H_FOLLOW_LEFT_BOTTOM		(B_FOLLOW_LEFT | B_FOLLOW_BOTTOM)
+#define H_FOLLOW_RIGHT_BOTTOM		(B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM)
+#define H_FOLLOW_LEFT_RIGHT_TOP		(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP)
+#define H_FOLLOW_LEFT_RIGHT_BOTTOM	(B_FOLLOW_LEFT_RIGHT|B_FOLLOW_BOTTOM)
+
+
 class IMPEXP_LIBHEKKEL HDlogView : public BView {
 public:
 		HDlogView(BRect frame, const char *name);
@@ -46,12 +54,12 @@ public:
 virtual	void Draw(BRect update);
 
 		void AddMyLine(BRect r);
-		float Left(void) { return Frame().left; }
-		float Right(void) { return Frame().right; }
-		float Top(void) { return Frame().top; }
-		float Bottom(void) { return Frame().bottom; }
-		float Width(void) { return Frame().Width(); }
-		float Height(void) { return Frame().Height(); }
+		float Left(void)									{ return Frame().left; }
+		float Right(void)									{ return Frame().right; }
+		float Top(void)										{ return Frame().top; }
+		float Bottom(void)									{ return Frame().bottom; }
+		float Width(void)									{ return Frame().Width(); }
+		float Height(void)									{ return Frame().Height(); }
 
 private:
 		vector<BRect> fLines;
@@ -60,113 +68,165 @@ private:
 class IMPEXP_LIBHEKKEL HButton : public BButton {
 public:
 	HButton(BView* view, const char* name, uint32 cmd, 
-			uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+			uint32 resizingMode = H_FOLLOW_LEFT_TOP);
 	void ResizeLocalized(const char* label);
-	float Left(void) { return Frame().left; }
-	float Right(void) { return Frame().right; }
-	float Top(void) { return Frame().top; }
-	float Bottom(void) { return Frame().bottom; }
-	float Width(void) { return Frame().Width(); }
-	float Height(void) { return Frame().Height(); }
-	void SetWidth(float Width) { ResizeTo(Width, Height()); }
-	void SetHeight(float Height) { ResizeTo(Width(), Height); }
+	//
+	float Left(void)									{ return Frame().left; }
+	float Right(void)									{ return Frame().right; }
+	float Top(void)										{ return Frame().top; }
+	float Bottom(void)									{ return Frame().bottom; }
+	float Width(void)									{ return Frame().Width(); }
+	float Height(void)									{ return Frame().Height(); }
+	//
+	void SetWidth(float width)							{ ResizeTo(width, Height()); }
+	void SetHeight(float height)						{ ResizeTo(Width(), height); }
+	void MoveAbove(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().top-Frame().Height()-dist-1); }
+	void MoveBelow(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().bottom+dist+1); }
+	void MoveRight(const BView* view, float dist = 0)	{ MoveTo(view->Frame().right+dist+1, view->Frame().top); }
+	void MoveLeft(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left-Frame().Width()-dist-1, view->Frame().top); }
 };
 
 class IMPEXP_LIBHEKKEL HStringView : public BStringView {
 public:
-	HStringView(BView* view, uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+	HStringView(BView* view, uint32 resizingMode = H_FOLLOW_LEFT_TOP);
+	//
 	void ResizeLocalized(const char* label);
-	float Left(void) { return Frame().left; }
-	float Right(void) { return Frame().right; }
-	float Top(void) { return Frame().top; }
-	float Bottom(void) { return Frame().bottom; }
-	float Width(void) { return Frame().Width(); }
-	float Height(void) { return Frame().Height(); }
-	void SetWidth(float Width) { ResizeTo(Width, Height()); }
-	void SetHeight(float Height) { ResizeTo(Width(), Height); }
+	float Left(void)									{ return Frame().left; }
+	float Right(void)									{ return Frame().right; }
+	float Top(void)										{ return Frame().top; }
+	float Bottom(void)									{ return Frame().bottom; }
+	float Width(void)									{ return Frame().Width(); }
+	float Height(void)									{ return Frame().Height(); }
+	//
+	void SetWidth(float width)							{ ResizeTo(width, Height()); }
+	void SetHeight(float height)						{ ResizeTo(Width(), height); }
+	void MoveAbove(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().top-Frame().Height()-dist-1); }
+	void MoveBelow(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().bottom+dist+1); }
+	void MoveRight(const BView* view, float dist = 0)	{ MoveTo(view->Frame().right+dist+1, view->Frame().top); }
+	void MoveLeft(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left-Frame().Width()-dist-1, view->Frame().top); }
 };
 
 class IMPEXP_LIBHEKKEL HTextControl : public BTextControl {
 public:
 	HTextControl(BView* view, const char* name, 
-				 uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+				 uint32 resizingMode = H_FOLLOW_LEFT_TOP);
 	void ResizeLocalized(const char* label=NULL);
-	float Left(void) { return Frame().left; }
-	float Right(void) { return Frame().right; }
-	float Top(void) { return Frame().top; }
-	float Bottom(void) { return Frame().bottom; }
-	float Width(void) { return Frame().Width(); }
-	float Height(void) { return Frame().Height(); }
-	void SetWidth(float Width) { ResizeTo(Width, Height()); }
-	void SetHeight(float Height) { ResizeTo(Width(), Height); }
+	//
+	float Left(void)									{ return Frame().left; }
+	float Right(void)									{ return Frame().right; }
+	float Top(void)										{ return Frame().top; }
+	float Bottom(void)									{ return Frame().bottom; }
+	float Width(void)									{ return Frame().Width(); }
+	float Height(void)									{ return Frame().Height(); }
+	//
+	void SetWidth(float width)							{ ResizeTo(width, Height()); }
+	void SetHeight(float height)						{ ResizeTo(Width(), height); }
+	void MoveAbove(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().top-Frame().Height()-dist-1); }
+	void MoveBelow(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().bottom+dist+1); }
+	void MoveRight(const BView* view, float dist = 0)	{ MoveTo(view->Frame().right+dist+1, view->Frame().top); }
+	void MoveLeft(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left-Frame().Width()-dist-1, view->Frame().top); }
+	//
+	const char* GetText(void) const;
+	void SetText(const char *text);
 };
 
 class IMPEXP_LIBHEKKEL HMenuField : public BMenuField {
 public:
 	HMenuField(BView* view, const char* name,
-			   uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+			   uint32 resizingMode = H_FOLLOW_LEFT_TOP, bool fixedSize = false, float width = 100);
 	HMenuField(BView* view, const char* name, BMenu* menu,
-			   uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
-	void ResizeLocalized(const char* label=NULL);
-	float Left(void) { return Frame().left; }
-	float Right(void) { return Frame().right; }
-	float Top(void) { return Frame().top; }
-	float Bottom(void) { return Frame().bottom; }
-	float Width(void) { return Frame().Width(); }
-	float Height(void) { return Frame().Height(); }
-	void SetWidth(float Width) { ResizeTo(Width, Height()); }
-	void SetHeight(float Height) { ResizeTo(Width(), Height); }
+			   uint32 resizingMode = H_FOLLOW_LEFT_TOP, bool fixedSize = false, float width = 100);
+	void ResizeLocalized(const char* label=NULL, float height = -1);
+	BMenuItem *AddMenuItem(uint32 cmd, int32 index = -1);
+	int32 HMenuField::FindMarkedIndex(void);
+	//
+	float Left(void)									{ return Frame().left; }
+	float Right(void)									{ return Frame().right; }
+	float Top(void)										{ return Frame().top; }
+	float Bottom(void)									{ return Frame().bottom; }
+	float Width(void)									{ return Frame().Width(); }
+	float Height(void)									{ return Frame().Height(); }
+	//
+	void SetWidth(float width)							{ ResizeTo(width, Height()); }
+	void SetHeight(float height)						{ ResizeTo(Width(), height); }
+	void MoveAbove(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().top-Frame().Height()-dist-1); }
+	void MoveBelow(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().bottom+dist+1); }
+	void MoveRight(const BView* view, float dist = 0)	{ MoveTo(view->Frame().right+dist+1, view->Frame().top); }
+	void MoveLeft(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left-Frame().Width()-dist-1, view->Frame().top); }
+	//
+	int GetValue(void) const;
+	void SetValue(int value);
 };
 
 class IMPEXP_LIBHEKKEL HCheckBox : public BCheckBox {
 public:
 	HCheckBox(BView* view, const char* name, BMessage* msg = NULL, 
-			  uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP);
+			  uint32 resizingMode = H_FOLLOW_LEFT_TOP);
 	void ResizeLocalized(const char* label=NULL);
-	float Left(void) { return Frame().left; }
-	float Right(void) { return Frame().right; }
-	float Top(void) { return Frame().top; }
-	float Bottom(void) { return Frame().bottom; }
-	float Width(void) { return Frame().Width(); }
-	float Height(void) { return Frame().Height(); }
-	void SetWidth(float Width) { ResizeTo(Width, Height()); }
-	void SetHeight(float Height) { ResizeTo(Width(), Height); }
+	//
+	float Left(void)									{ return Frame().left; }
+	float Right(void)									{ return Frame().right; }
+	float Top(void)										{ return Frame().top; }
+	float Bottom(void)									{ return Frame().bottom; }
+	float Width(void)									{ return Frame().Width(); }
+	float Height(void)									{ return Frame().Height(); }
+	//
+	void SetWidth(float width)							{ ResizeTo(width, Height()); }
+	void SetHeight(float height)						{ ResizeTo(Width(), height); }
+	void MoveAbove(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().top-Frame().Height()-dist-1); }
+	void MoveBelow(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().bottom+dist+1); }
+	void MoveRight(const BView* view, float dist = 0)	{ MoveTo(view->Frame().right+dist+1, view->Frame().top); }
+	void MoveLeft(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left-Frame().Width()-dist-1, view->Frame().top); }
+	//
+	bool IsOn(void) const;
+	void SetOn(bool on = true);
 };
 
 class IMPEXP_LIBHEKKEL HScrollView : public BScrollView {
 public:
 	HScrollView(BView* view, const char *name, BView *target,
-				uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP,
+				uint32 resizingMode = H_FOLLOW_LEFT_TOP,
 				uint32 flags = 0,
 				bool horizontal = false,
 				bool vertical = false,
 				border_style border = B_FANCY_BORDER);
-	float Left(void) { return Frame().left; }
-	float Right(void) { return Frame().right; }
-	float Top(void) { return Frame().top; }
-	float Bottom(void) { return Frame().bottom; }
-	float Width(void) { return Frame().Width(); }
-	float Height(void) { return Frame().Height(); }
-	void SetWidth(float Width) { ResizeTo(Width, Height()); }
-	void SetHeight(float Height) { ResizeTo(Width(), Height); }
+	float Left(void)									{ return Frame().left; }
+	float Right(void)									{ return Frame().right; }
+	float Top(void)										{ return Frame().top; }
+	float Bottom(void)									{ return Frame().bottom; }
+	float Width(void)									{ return Frame().Width(); }
+	float Height(void)									{ return Frame().Height(); }
+	//
+	void SetWidth(float width)							{ ResizeTo(width, Height()); }
+	void SetHeight(float height)						{ ResizeTo(Width(), height); }
+	void MoveAbove(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().top-Frame().Height()-dist-1); }
+	void MoveBelow(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().bottom+dist+1); }
+	void MoveRight(const BView* view, float dist = 0)	{ MoveTo(view->Frame().right+dist+1, view->Frame().top); }
+	void MoveLeft(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left-Frame().Width()-dist-1, view->Frame().top); }
 };
 
 class IMPEXP_LIBHEKKEL HBox : public BBox {
 public:
-		HBox(BView* view, const char *name = NULL,
-				uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP,
-				uint32 flags = B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP,
-				border_style border = B_FANCY_BORDER);
+	HBox(BView* view, const char *name = NULL,
+			uint32 resizingMode = H_FOLLOW_LEFT_TOP,
+			uint32 flags = B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP,
+			border_style border = B_FANCY_BORDER);
 		
 virtual	void Draw(BRect update);
-		float Left(void) { return Frame().left; }
-		float Right(void) { return Frame().right; }
-		float Top(void) { return Frame().top; }
-		float Bottom(void) { return Frame().bottom; }
-		float Width(void) { return Frame().Width(); }
-		float Height(void) { return Frame().Height(); }
-		void SetWidth(float Width) { ResizeTo(Width, Height()); }
-		void SetHeight(float Height) { ResizeTo(Width(), Height); }
+	//
+	float Left(void)									{ return Frame().left; }
+	float Right(void)									{ return Frame().right; }
+	float Top(void)										{ return Frame().top; }
+	float Bottom(void)									{ return Frame().bottom; }
+	float Width(void)									{ return Frame().Width(); }
+	float Height(void)									{ return Frame().Height(); }
+	//
+	void SetWidth(float width)							{ ResizeTo(width, Height()); }
+	void SetHeight(float height)						{ ResizeTo(Width(), height); }
+	void MoveAbove(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().top-Frame().Height()-dist-1); }
+	void MoveBelow(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().bottom+dist+1); }
+	void MoveRight(const BView* view, float dist = 0)	{ MoveTo(view->Frame().right+dist+1, view->Frame().top); }
+	void MoveLeft(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left-Frame().Width()-dist-1, view->Frame().top); }
 };
 
 #endif // HDLOGVIEW_H

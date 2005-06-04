@@ -274,8 +274,7 @@ PApp::PApp()
 
 		gRxInstalled = true;
 		fFindDialog 
-			= DialogCreator<CFindDialog>::CreateDialog(NULL, PDoc::TopWindow(),
-																	 H_PLACE_LAST_POS);
+			= DialogCreator<CFindDialog>::CreateDialog("Find", NULL, PDoc::TopWindow());
 		fFindDialog->Run();
 		
 		InitSelectedMap();

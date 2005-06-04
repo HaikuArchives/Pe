@@ -34,8 +34,12 @@
 */
 
 #include "pe.h"
-#include "HDialogViews.h"
 #include "HDefines.h"
+#include "HDialogViews.h"
+
+
+#pragma mark - HDlogView
+
 
 HDlogView::HDlogView(BRect frame, const char *name)
 	: BView(frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
@@ -80,10 +84,14 @@ void HDlogView::AddMyLine(BRect r)
 } /* HDlogView::AddMyLine */
 
 
+#pragma mark - HButton
+
+
 HButton::HButton(BView* view, const char* name, uint32 cmd, uint32 resizingMode)
 : BButton(BRect(0, 0, 100, 50), name, "", new BMessage(cmd), resizingMode)
 {
-	view->AddChild(this);
+	if (view != NULL)
+		view->AddChild(this);
 } /* HButton::HButton */
 
 void HButton::ResizeLocalized(const char* label)
@@ -93,10 +101,14 @@ void HButton::ResizeLocalized(const char* label)
 } /* HButton::ResizeLocalized */
 
 
+#pragma mark - HStringView
+
+
 HStringView::HStringView(BView* view, uint32 resizingMode)
 : BStringView(BRect(0, 0, 100, 50), "", "", resizingMode)
 {
-	view->AddChild(this);
+	if (view != NULL)
+		view->AddChild(this);
 } /* HStringView::HStringView */
 
 void HStringView::ResizeLocalized(const char* label)
@@ -106,44 +118,100 @@ void HStringView::ResizeLocalized(const char* label)
 } /* HStringView::ResizeLocalized */
 
 
+#pragma mark - HTextControl
+
+
 HTextControl::HTextControl(BView* view, const char* name, uint32 resizingMode)
-: BTextControl(BRect(0, 0, 100, 50), name, NULL, "", NULL, resizingMode)
+: BTextControl(BRect(0, 0, 100, 50), name, NULL, "", new BMessage(msg_FieldChanged), resizingMode)
 {
-	view->AddChild(this);
+	if (view != NULL)
+		view->AddChild(this);
+	SetDivider(-2);		// Hack if there's no Label
 } /* HTextControl::HTextControl */
 
 void HTextControl::ResizeLocalized(const char* label)
 {
 	SetLabel(label);
+	SetDivider(label == NULL ? -2 : StringWidth(label)+StringWidth("n"));
 	ResizeToPreferred();
 } /* HTextControl::ResizeLocalized */
 
-
-HMenuField::HMenuField(BView* view, const char* name, uint32 resizingMode)
-: BMenuField(BRect(0, 0, 100, 50), name, NULL, new BMenu(""), false, resizingMode)
+void HTextControl::SetText(const char *text)
 {
-	view->AddChild(this);
+	BTextControl::SetText(text);
+	if (IsFocus())
+		TextView()->SelectAll();
+} /* HTextControl::SetText */
+
+const char* HTextControl::GetText(void) const
+{
+	return Text();
+} /* HTextControl::SetText */
+
+
+#pragma mark - HMenuField
+
+
+HMenuField::HMenuField(BView* view, const char* name, uint32 resizingMode, bool fixedSize, float width)
+: BMenuField(BRect(0, 0, width, 50), name, NULL, new BMenu(""), fixedSize, resizingMode)
+{
+	if (view != NULL)
+		view->AddChild(this);
 } /* HMenuField::HMenuField */
 
 HMenuField::HMenuField(BView* view, const char* name, BMenu* menu,
-					   uint32 resizingMode)
-: BMenuField(BRect(0, 0, 100, 50), name, NULL, menu, false, resizingMode)
+					   uint32 resizingMode, bool fixedSize, float width)
+: BMenuField(BRect(0, 0, width, 50), name, NULL, menu, fixedSize, resizingMode)
 {
-	view->AddChild(this);
+	if (view != NULL)
+		view->AddChild(this);
 } /* HMenuField::HMenuField */
 
-void HMenuField::ResizeLocalized(const char* label)
+BMenuItem* HMenuField::AddMenuItem(uint32 cmd, int32 index)
+{
+	BMenuItem *item = new BMenuItem("", new BMessage(cmd));
+	if (index >= 0)
+		Menu()->AddItem(item);
+	else
+		Menu()->AddItem(item, index);
+	return item;
+} /* HMenuField::AddItem */
+
+int32 HMenuField::FindMarkedIndex(void)
+{
+	return Menu()->IndexOf(Menu()->FindMarked());
+} /* HMenuField::FIndMarkedIndex */
+
+void HMenuField::ResizeLocalized(const char* label, float height)
 {
 	SetLabel(label);
+	SetDivider(label == NULL ? 0 : StringWidth(label)+StringWidth("n"));
 	ResizeToPreferred();
 } /* HMenuField::ResizeLocalized */
+
+int HMenuField::GetValue(void) const
+{
+	return max_c(Menu()->IndexOf(Menu()->FindMarked()) + 1, 1L);
+} // HMenuField::GetValue
+
+void HMenuField::SetValue(int value)
+{
+	BMenuItem *item = Menu()->ItemAt(value - 1);
+	if (item)
+		item->SetMarked(true);
+} // HMenuField::SetValue
+
+
+#pragma mark - HCheckBox
 
 
 HCheckBox::HCheckBox(BView* view, const char* name, BMessage* msg, 
 					 uint32 resizingMode)
-: BCheckBox(BRect(0, 0, 100, 50), name, "", NULL, resizingMode)
+: BCheckBox(BRect(0, 0, 100, 50), name, "", msg, resizingMode)
 {
-	view->AddChild(this);
+	if (view != NULL)
+		view->AddChild(this);
+	if (msg == NULL)  SetMessage(new BMessage(msg_FieldChanged));
 } /* HCheckBox::HCheckBox */
 
 void HCheckBox::ResizeLocalized(const char* label)
@@ -151,6 +219,19 @@ void HCheckBox::ResizeLocalized(const char* label)
 	SetLabel(label);
 	ResizeToPreferred();
 } /* HCheckBox::ResizeLocalized */
+
+bool HCheckBox::IsOn(void) const
+{
+	return Value() == B_CONTROL_ON;
+} /* HCheckBox::IsOn */
+
+void HCheckBox::SetOn(bool on)
+{
+	SetValue(on ? B_CONTROL_ON : B_CONTROL_OFF);
+} /* HCheckBox::SetOn */
+
+
+#pragma mark - HScrollView
 
 
 HScrollView::HScrollView(BView* view, const char *name, BView *target,
@@ -161,8 +242,12 @@ HScrollView::HScrollView(BView* view, const char *name, BView *target,
 				border_style border = B_FANCY_BORDER)
 : BScrollView(name, target, resizingMode, flags, horizontal, vertical, border)
 {
-	view->AddChild(this);
+	if (view != NULL)
+		view->AddChild(this);
 } /* HScrollView::HScrollView */
+
+
+#pragma mark - HBox
 
 
 HBox::HBox(BView* view, const char *name = NULL,
@@ -171,7 +256,8 @@ HBox::HBox(BView* view, const char *name = NULL,
 			border_style border = B_FANCY_BORDER)
 : BBox(BRect(0, 0, 100, 50), name, resizingMode, flags, border)
 {
-	view->AddChild(this);
+	if (view != NULL)
+		view->AddChild(this);
 } /* HBox::HBox */
 
 void HBox::Draw(BRect update)

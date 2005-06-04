@@ -39,6 +39,7 @@
 #include <stack>
 #include <regex.h>
 #include "HDialog.h"
+#include "HDialogViews.h"
 
 class PMessageItem;
 class PDoc;
@@ -54,11 +55,15 @@ class CFindDialog : public HDialog
 	enum { sResID = 8 };
 		
 	CFindDialog(BRect frame, const char *name,
-		window_type type, int flags, BWindow *owner, BPositionIO* data);
+		window_type type, int flags, BWindow *owner);
 
 	virtual void DoFind(unsigned long cmd);
 	virtual void MessageReceived(BMessage *msg);
+	virtual void FrameResized(float width, float height);
 	virtual void UpdateFields();
+
+	void Create();
+	void Layout();
 
 	const char* FindString();
 	const char* ReplaceString();
@@ -91,7 +96,6 @@ class CFindDialog : public HDialog
 	
 	void FillGrepPopup();
 
-	BMenu *fKind, *fDirectory, *fName, *fGrepPopup;
 	char **fBeIncludes;
 	int fBeIncludeCount;
 	stack<char*> fDirNameStack;
@@ -104,6 +108,39 @@ class CFindDialog : public HDialog
 	int fCurrentIncludeIndex;
 	regex_t fPatternBuffer;
 	long padding[4];
+
+	// Interface
+	HButton			*fButFind;
+	HButton			*fButRepl;
+	HButton			*fButRepF;
+	HButton			*fButRepA;
+	HStringView		*fLabRepl;
+	HTextControl	*fEdiFind;
+	HTextControl	*fEdiRepl;
+	HCheckBox		*fChkCase;
+	HCheckBox		*fChkWrap;
+	HCheckBox		*fChkBack;
+	HCheckBox		*fChkWord;
+	HCheckBox		*fChkGrep;
+	HCheckBox		*fChkBtch;
+	HMenuField		*fMfdPats;
+	HCheckBox		*fChkMult;
+	HMenuField		*fMfdMeth;
+	BMenuItem		*fMitMethDir;
+	BMenuItem		*fMitMethWin;
+	BMenuItem		*fMitMethInc;
+	HCheckBox		*fChkText;
+	HCheckBox		*fChkRecu;
+	HMenuField		*fMfdSdir;
+	BMenuItem		*fMitSdirOth;
+	HMenuField		*fMfdNamp;
+	BMenuItem		*fMitNampAny;
+	BMenuItem		*fMitNampEnd;
+	BMenuItem		*fMitNampBeg;
+	BMenuItem		*fMitNampCon;
+	HTextControl	*fEdiName;
+	HBox			*fBoxMult;
+	BMenuBar		*fTest;
 };
 
 extern CFindDialog* gFindDialog;

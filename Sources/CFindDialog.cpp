@@ -48,21 +48,34 @@
 #include "HPreferences.h"
 #include "PLongAction.h"
 #include "MAlert.h"
+#include "HDialogViews.h"
+#include "HDefines.h"
 
 const unsigned long
-	msg_SelectDirectory = 'SelO',
-	msg_SelectedDir = 'SelD',
-	msg_YASD = 'SYAD',
-	msg_ChangedMFKind = 'MFKn',
-	msg_GrepPopup = 'GrPp',
-	msg_AddGrepPattern = 'addP',
-	msg_Collapse = 'clps';
+	msg_SelectDirectory	= 'SelO',
+	msg_SelectedDir		= 'SelD',
+	msg_YASD			= 'SYAD',
+	msg_ChangedMFKind	= 'MFKn',
+	msg_GrepPopup		= 'GrPp',
+	msg_AddGrepPattern	= 'addP',
+	msg_Collapse		= 'clps';
+
+enum {
+	METHOD_IDX_DIR	= 0,
+	METHOD_IDX_WIN	= 1,
+	METHOD_IDX_INC	= 2,
+	//
+	FNAME_IDX_ANY	= 0,
+	FNAME_IDX_END	= 1,
+	FNAME_IDX_BEG	= 2,
+	FNAME_IDX_CON	= 3
+};
 
 CFindDialog* gFindDialog;
 
 CFindDialog::CFindDialog(BRect frame, const char *name,
-		window_type type, int flags, BWindow *owner, BPositionIO* data)
-	: HDialog(frame, name, type, flags, owner, data)
+		window_type type, int flags, BWindow *owner)
+	: HDialog(frame, name, type, flags, owner, NULL)
 {
 	gFindDialog = this;
 	fCurrentDir = NULL;
@@ -97,77 +110,234 @@ CFindDialog::CFindDialog(BRect frame, const char *name,
 	fDirPanel = NULL;
 	
 	memset(&fPatternBuffer, 0, sizeof(regex_t));
-
-	SetOn("case", gPrefs->GetPrefInt("Search Ignore Case", 1));
-	SetOn("wrap", gPrefs->GetPrefInt("Search Wrap", 1));
-	SetOn("back", gPrefs->GetPrefInt("Search Backwards", 0));
-	SetOn("word", gPrefs->GetPrefInt("Search Entire Word", 0));
-	SetOn("text", gPrefs->GetPrefInt("Search Text Files Only", 1));
-	if (gRxInstalled)
-		SetOn("grep", gPrefs->GetPrefInt("Search with Grep", 0));
-	else
-	{
-		SetOn("grep", false);
-		SetEnabled("grep", false);
-	}
-
-	SetOn("btch", gPrefs->GetPrefInt("Search Batch", 0));
-	SetOn("recu", gPrefs->GetPrefInt("Search Recursive", 1));
 	
-	BMenuField *mf = dynamic_cast<BMenuField*>(FindView("meth"));
-	fKind = mf->Menu();
-	BMenuItem *item = fKind->ItemAt(gPrefs->GetPrefInt("Search Multikind", 0));
-	(item ? item : fKind->ItemAt(0))->SetMarked(true);
-	fKind->SetRadioMode(true);
-	
-	mf = dynamic_cast<BMenuField*>(FindView("sdir"));
-	fDirectory = mf->Menu();
-	fDirectory->SetRadioMode(true);
-	
-	fName = dynamic_cast<BMenuField*>(FindView("namp"))->Menu();
-	fName->SetRadioMode(true);
-	fName->ItemAt(0)->SetMarked(true);
+	Create();
+	Layout();
 
 	UpdateSearchDirMenu();
 
-	static_cast<BTextControl*>(FindView("find"))->TextView()->SetWordWrap(true);
-	static_cast<BTextControl*>(FindView("repl"))->TextView()->SetWordWrap(true);
-	
-	mf = dynamic_cast<BMenuField*>(FindView("pats"));
-	fGrepPopup = mf->Menu();
-	fGrepPopup->SetRadioMode(false);
-
-	SetDefaultButton(dynamic_cast<BButton*>(FindView("bfnd")));
-	
 	fOpenWindowIndex = -1;
 	
 	UpdateFields();
+
 //	FillGrepPopup();
 } /* CFindDialog::CFindDialog */
+
+void CFindDialog::Create(void)
+{
+	fMainView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	// Add Buttons
+	fButFind	= new HButton(fMainView, "bfnd", 'Find', H_FOLLOW_RIGHT_TOP);
+	fButRepl	= new HButton(fMainView, "brpl", 'Rplc', H_FOLLOW_RIGHT_TOP);
+	fButRepF	= new HButton(fMainView, "br&f", 'RpFn', H_FOLLOW_RIGHT_TOP);
+	fButRepA	= new HButton(fMainView, "ball", 'RpAl', H_FOLLOW_RIGHT_TOP);
+	fButFind->MakeDefault(true);
+
+	// Add Search and Replace fields
+	fMfdPats = new HMenuField(fMainView, "pats");
+	fLabRepl = new HStringView(fMainView);
+	fEdiFind = new HTextControl(fMainView, "find", B_FOLLOW_LEFT_RIGHT);
+	fEdiFind->TextView()->SetWordWrap(true);
+	fEdiFind->TextView()->SetResizingMode(B_FOLLOW_ALL);
+	fEdiRepl = new HTextControl(fMainView, "repl", B_FOLLOW_LEFT_RIGHT);
+	fEdiRepl->TextView()->SetWordWrap(true);
+	fEdiRepl->TextView()->SetResizingMode(B_FOLLOW_ALL);
+
+	// Add Settings
+	fChkCase = new HCheckBox(fMainView, "case", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkWrap = new HCheckBox(fMainView, "wrap", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkBack = new HCheckBox(fMainView, "back", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkWord = new HCheckBox(fMainView, "word", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkGrep = new HCheckBox(fMainView, "grep", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkBtch = new HCheckBox(fMainView, "btch", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkCase->SetOn(gPrefs->GetPrefInt("Search Ignore Case", 1));
+	fChkWrap->SetOn(gPrefs->GetPrefInt("Search Wrap", 1));
+	fChkBack->SetOn(gPrefs->GetPrefInt("Search Backwards", 0));
+	fChkWord->SetOn(gPrefs->GetPrefInt("Search Entire Word", 0));
+	fChkBtch->SetOn(gPrefs->GetPrefInt("Search Batch", 0));
+	fChkGrep->SetOn(gRxInstalled ? gPrefs->GetPrefInt("Search with Grep", 0) : false);
+	if (!gRxInstalled)
+		fChkGrep->SetEnabled(false);
+
+	// Add Multifile Search
+	fBoxMult = new HBox(fMainView, "", H_FOLLOW_LEFT_RIGHT_BOTTOM);
+	fChkMult = new HCheckBox(fMainView, "mult", NULL, H_FOLLOW_LEFT_BOTTOM);
+	//
+	fMfdMeth = new HMenuField(fMainView, "meth", H_FOLLOW_LEFT_BOTTOM, false, 1000);
+	fMfdMeth->Menu()->SetLabelFromMarked(true);
+	fMitMethDir = fMfdMeth->AddMenuItem(msg_ChangedMFKind, METHOD_IDX_DIR);
+	fMitMethWin = fMfdMeth->AddMenuItem(msg_ChangedMFKind, METHOD_IDX_WIN);
+	fMitMethInc = fMfdMeth->AddMenuItem(msg_ChangedMFKind, METHOD_IDX_INC);
+	BMenuItem *item = fMfdMeth->Menu()->ItemAt(gPrefs->GetPrefInt("Search Multikind", 0));
+	(item ? item : fMfdMeth->Menu()->ItemAt(METHOD_IDX_DIR))->SetMarked(true);
+	//
+	fChkText = new HCheckBox(fMainView, "text", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkRecu = new HCheckBox(fMainView, "recu", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkRecu->SetOn(gPrefs->GetPrefInt("Search Recursive", 1));
+	fChkText->SetOn(gPrefs->GetPrefInt("Search Text Files Only", 1));
+	//
+	fMfdSdir = new HMenuField(fMainView, "sdir", H_FOLLOW_LEFT_BOTTOM, false, 1000);
+	fMfdSdir->Menu()->SetLabelFromMarked(true);
+	fMfdSdir->Menu()->AddItem(fMitSdirOth = new BMenuItem("", new BMessage(msg_SelectDirectory)));
+	//
+	fMfdNamp = new HMenuField(fMainView, "namp", H_FOLLOW_LEFT_BOTTOM, false, 1000);
+	fMfdNamp->Menu()->SetLabelFromMarked(true);
+	fMitNampAny = fMfdNamp->AddMenuItem(msg_ChangedMFKind, FNAME_IDX_ANY);
+	fMitNampEnd = fMfdNamp->AddMenuItem(msg_ChangedMFKind, FNAME_IDX_END);
+	fMitNampBeg = fMfdNamp->AddMenuItem(msg_ChangedMFKind, FNAME_IDX_BEG);
+	fMitNampCon = fMfdNamp->AddMenuItem(msg_ChangedMFKind, FNAME_IDX_CON);
+	fMfdNamp->Menu()->ItemAt(FNAME_IDX_ANY)->SetMarked(true);
+
+	fEdiName = new HTextControl(fMainView, "name", H_FOLLOW_LEFT_BOTTOM);
+} // CFindDialog::Create
+
+void CFindDialog::Layout(void) {
+	// There is no way to set the Title?! -> Hack: we replace the whole popup!
+	BMenu *pop = fMfdPats->Menu();
+	fMfdPats->MenuBar()->RemoveItem(pop);
+	delete pop;
+	pop = new BMenu("Find:");
+	pop->AddItem(new BMenuItem("Add this pattern…", new BMessage(msg_AddGrepPattern)));
+	pop->AddSeparatorItem();
+	fMfdPats->MenuBar()->AddItem(pop);
+	FillGrepPopup();
+	//
+	fButFind	->ResizeLocalized("Find");
+	fButRepl	->ResizeLocalized("Replace");
+	fButRepF	->ResizeLocalized("Replace & Find");
+	fButRepA	->ResizeLocalized("Replace All");
+	fMfdPats	->ResizeLocalized();
+	fLabRepl	->ResizeLocalized("Replace:");
+	fChkCase	->ResizeLocalized("Ignore Case");
+	fChkWrap	->ResizeLocalized("Wrap Around");
+	fChkBack	->ResizeLocalized("Backwards");
+	fChkWord	->ResizeLocalized("Entire Word");
+	fChkGrep	->ResizeLocalized("Grep");
+	fChkBtch	->ResizeLocalized("Batch");
+	fChkMult	->ResizeLocalized("Multi-File:");
+	fMfdMeth	->ResizeLocalized();
+	fMitMethDir	->SetLabel("Directory Scan");
+	fMitMethWin	->SetLabel("Open Windows");
+	fMitMethInc	->SetLabel("$BEINCLUDES");
+	fChkText	->ResizeLocalized("Text Files Only");
+	fChkRecu	->ResizeLocalized("Recursive");
+	fMfdSdir	->ResizeLocalized("Search In:");
+	fMitSdirOth	->SetLabel("Other…");
+	fMfdNamp	->ResizeLocalized("File Name:");
+	fMitNampAny	->SetLabel("Any");
+	fMitNampEnd	->SetLabel("Ends with");
+	fMitNampBeg	->SetLabel("Begins with");
+	fMitNampCon	->SetLabel("Contains");
+	fEdiName	->ResizeLocalized();
+
+	// Hack: Somehow the Label isn't set (SetLabelFromMarked()) if we don't do this
+	fMfdNamp->Menu()->FindMarked()->SetMarked(true);
+	fMfdMeth->Menu()->FindMarked()->SetMarked(true);
+
+	// Widths
+	float w, h, wm, wd;
+	float dx = fMainView->StringWidth("m");
+	float dy = fMainView->StringWidth("n");
+	BRect r = fMainView->Bounds();
+
+	// Position Buttons
+	w = max(fButFind->Width(), fButRepl->Width());
+	w = max(w, fButRepF->Width());
+	w = max(w, fButRepA->Width());
+
+	fButFind->MoveTo(fMainView->Right()-w-dx, dy);
+	fButFind->SetWidth(w);
+	fButRepl->MoveTo(fButFind->Left(), fButFind->Bottom()+dy);
+	fButRepl->SetWidth(w);
+	fButRepF->MoveTo(fButRepl->Left(), fButRepl->Bottom()+dy);
+	fButRepF->SetWidth(w);
+	fButRepA->MoveTo(fButRepF->Left(), fButRepF->Bottom()+dy);
+	fButRepA->SetWidth(w);
+
+	// Position Inputs+Labels
+	w = fButFind->Left()-2*dx;
+
+	fMfdPats->MoveTo(dx, dy);
+	fLabRepl->MoveTo(dx, fButRepF->Top());
+
+	h = fLabRepl->Top()-31;
+	fEdiFind->MoveTo(dx, 31);
+	fEdiFind->ResizeTo(w, h);
+
+	h = fButRepA->Bottom()-fLabRepl->Bottom();
+	fEdiRepl->MoveTo(dx, fLabRepl->Bottom());
+	fEdiRepl->ResizeTo(w, h);
+
+	// Multi File Search
+	w = max(fChkText->Width(), fChkRecu->Width());
+	wd = max(fMfdNamp->Divider(), fMfdSdir->Divider());
+	fMfdSdir->SetDivider(wd);
+	fMfdNamp->SetDivider(wd);
+
+	fChkText->MoveTo(dx, r.bottom-fChkText->Height()-dy);
+	fChkRecu->MoveAbove(fChkText, 2);
+
+	wm = max(fMfdNamp->StringWidth(fMitNampAny->Label()), fMfdNamp->StringWidth(fMitNampEnd->Label()));
+	wm = max(wm, fMfdNamp->StringWidth(fMitNampBeg->Label()));
+	wm = max(wm, fMfdNamp->StringWidth(fMitNampCon->Label()));
+	wm += fMfdNamp->StringWidth("WW");
+
+	fMfdNamp->MoveTo(2*dx+w, fChkText->Top()-2);
+	fEdiName->MoveTo(fMfdNamp->Left()+wd+wm, fMfdNamp->Top()+2);
+
+	fMfdSdir->MoveTo(2*dx+w, fChkRecu->Top()-2);
+	fMfdSdir->MenuBar()->SetMaxContentWidth(r.right-fMfdSdir->Left()-fMfdSdir->Divider()-2*dx-30);
+
+	wm = max(fMfdMeth->StringWidth(fMitMethDir->Label()), fMfdMeth->StringWidth(fMitMethWin->Label()));
+	wm = max(wm, fMfdMeth->StringWidth(fMitMethInc->Label()));
+	wm += fMfdMeth->StringWidth("WW");
+
+	fChkMult->MoveAbove(fChkRecu, dy);
+	fMfdMeth->MoveTo(fChkMult->Right()+dy, fChkMult->Top()-2);
+	fBoxMult->MoveTo(fChkMult->Right()+dx+wm, fChkMult->Top()+fChkMult->Height()/2);
+	fBoxMult->ResizeTo(r.Width()-fChkMult->Right()-2*dx-wm, 1);
+
+	// Checkboxes
+	fChkWrap->MoveAbove(fChkMult, dy);
+	fChkCase->MoveAbove(fChkWrap);
+
+	fChkWord->MoveTo(max(fChkCase->Right(), fChkWrap->Right())+dx, fChkWrap->Top());
+	fChkBack->MoveAbove(fChkWord);
+
+	fChkBtch->MoveTo(max(fChkBack->Right(), fChkWord->Right())+dx, fChkWrap->Top());
+	fChkGrep->MoveAbove(fChkBtch);
+
+	// Window size
+	h = fButRepA->Bottom()+r.bottom-fChkWrap->Bottom();
+	w = 2*dx+max(fChkGrep->Right(), fChkBtch->Right())+fButRepA->Width();
+	ResizeToLimits(w, 99999, h, 99999);
+
+} // CFindDialog::Layout
 
 bool CFindDialog::QuitRequested()
 {
 	while (!IsHidden())
 		Hide();
 
-	gPrefs->SetPrefInt("Search Backwards", IsOn("back"));
-	gPrefs->SetPrefInt("Search Entire Word", IsOn("word"));
-	gPrefs->SetPrefInt("Search Ignore Case", IsOn("case"));
-	gPrefs->SetPrefInt("Search Wrap", IsOn("wrap"));
-	gPrefs->SetPrefInt("Search Text Files Only", IsOn("text"));
-	gPrefs->SetPrefInt("Search with Grep", IsOn("grep"));
-	gPrefs->SetPrefInt("Search Batch", IsOn("btch"));
-	gPrefs->SetPrefInt("Search Recursive", IsOn("recu"));
-	gPrefs->SetPrefInt("Search Multikind", fKind->IndexOf(fKind->FindMarked()));
+	gPrefs->SetPrefInt("Search Backwards",			fChkBack->IsOn());
+	gPrefs->SetPrefInt("Search Entire Word",		fChkWord->IsOn());
+	gPrefs->SetPrefInt("Search Ignore Case",		fChkCase->IsOn());
+	gPrefs->SetPrefInt("Search Wrap",				fChkWrap->IsOn());
+	gPrefs->SetPrefInt("Search Text Files Only",	fChkText->IsOn());
+	gPrefs->SetPrefInt("Search with Grep",			fChkGrep->IsOn());
+	gPrefs->SetPrefInt("Search Batch",				fChkBtch->IsOn());
+	gPrefs->SetPrefInt("Search Recursive",			fChkRecu->IsOn());
+	gPrefs->SetPrefInt("Search Multikind",			fMfdMeth->FindMarkedIndex());
 
 	return CDoc::CountDocs() == 0;
 } /* CFindDialog::QuitRequested */
 
 void CFindDialog::DoFind(unsigned long cmd)
 {
-	if (gRxInstalled && IsOn("grep"))
+	if (gRxInstalled && fChkGrep->IsOn())
 	{
-		int r = rx_regcomp(&fPatternBuffer, GetText("find"), IsOn("case"));
+		int r = rx_regcomp(&fPatternBuffer, fEdiFind->GetText(), fChkCase->IsOn());
 		
 		if (r)
 		{
@@ -179,11 +349,11 @@ void CFindDialog::DoFind(unsigned long cmd)
 		}
 	}
 	
-	if (IsOn("mult"))
+	if (fChkMult->IsOn())
 	{
-		switch (fKind->IndexOf(fKind->FindMarked()))
+		switch (fMfdMeth->FindMarkedIndex())
 		{
-			case 0:
+			case METHOD_IDX_DIR:
 			{
 				PDoc *w = NULL;
 				
@@ -199,26 +369,23 @@ void CFindDialog::DoFind(unsigned long cmd)
 					}
 				}
 				
-				if (!DoMultiFileFind(fDirectory->FindMarked()->Label(),
-					IsOn("recu"), true, all, &w))
+				if (!DoMultiFileFind(fMfdSdir->Menu()->FindMarked()->Label(),
+					fChkRecu->IsOn(), true, all, &w))
 					beep();
 				else if (w)
 					w->Show();
 				break;
 
 			}
-			
-			case 1:
+
+			case METHOD_IDX_WIN:
 				fOpenWindowIndex = -1;
 				DoOpenWindows(cmd == msg_ReplaceAll);
 				break;
-			
-			case 2:
+
+			case METHOD_IDX_INC:
 				fCurrentIncludeIndex = -1;
 				DoIncludesFind();
-				break;
-			
-			case 3:
 				break;
 		}
 	}
@@ -226,14 +393,13 @@ void CFindDialog::DoFind(unsigned long cmd)
 	{
 		BMessage msg(cmd);
 		
-		msg.AddString("what", GetText("find"));
-		msg.AddString("with", GetText("repl"));
-		
-		msg.AddBool("wrap", IsOn("wrap"));
-		msg.AddBool("case", IsOn("case"));
-		msg.AddBool("word", IsOn("word"));
-		msg.AddBool("back", IsOn("back"));
-		msg.AddBool("grep", IsOn("grep"));
+		msg.AddString("what", fEdiFind->GetText());
+		msg.AddString("with", fEdiRepl->GetText());
+		msg.AddBool  ("wrap", fChkWrap->IsOn());
+		msg.AddBool  ("case", fChkCase->IsOn());
+		msg.AddBool  ("word", fChkWord->IsOn());
+		msg.AddBool  ("back", fChkBack->IsOn());
+		msg.AddBool  ("grep", fChkGrep->IsOn());
 
 		PDoc *w = PDoc::TopWindow();
 
@@ -246,53 +412,52 @@ void CFindDialog::WindowActivated(bool active)
 {
 	HDialog::WindowActivated(active);
 	UpdateFields();
-	FindView("find")->MakeFocus();
+	fEdiFind->MakeFocus();
 } /* CFindDialog::WindowActivated */
 
 void CFindDialog::UpdateFields()
 {
 	PDoc *w = PDoc::TopWindow();
 
-	if (w && strlen(GetText("find")))
+	if (w && strlen(fEdiFind->GetText()))
 	{
 		BMessage query(msg_QueryCanReplace);
-		query.AddString("what", GetText("find"));
-		query.AddBool("case", IsOn("case"));
-		query.AddBool("grep", IsOn("grep"));
+		query.AddString("what", fEdiFind->GetText());
+		query.AddBool("case", fChkCase->IsOn());
+		query.AddBool("grep", fChkGrep->IsOn());
 		w->PostMessage(&query, w->TextView(), this);
 	}
 	else
 	{
-		SetEnabled("brpl", false);
-		SetEnabled("br&f", false);
+		fButRepl->SetEnabled(false);
+		fButRepF->SetEnabled(false);
 	}
 
-	if (IsOn("mult"))
+	if (fChkMult->IsOn())
 	{
-		int kind = GetValue("meth") - 1;
+		int meth = fMfdMeth->FindMarkedIndex();
 
-		SetEnabled("meth", true);
-		SetEnabled("sdir", kind == 0);
-		SetEnabled("name", kind == 0);
-		SetEnabled("namp", kind == 0);
-		SetEnabled("text", kind == 0);
-		SetEnabled("recu", kind == 0 || kind == 2);
+		fMfdMeth->SetEnabled(true);
+		fMfdSdir->SetEnabled(meth == METHOD_IDX_DIR);
+		fEdiName->SetEnabled(meth == METHOD_IDX_DIR);
+		fMfdNamp->SetEnabled(meth == METHOD_IDX_DIR);
+		fChkText->SetEnabled(meth == METHOD_IDX_DIR);
+		fChkRecu->SetEnabled(meth == METHOD_IDX_DIR || meth == METHOD_IDX_INC);
 		
-		if (kind == 2)
-			SetOn("text", true);
+		if (meth == METHOD_IDX_INC)
+			fChkText->SetOn(true);
 
-		int nmKind =
-			fName->IndexOf(fName->FindMarked());
-		SetEnabled("name", nmKind != 0);
+		int nmKind = fMfdNamp->FindMarkedIndex();
+		fEdiName->SetEnabled(nmKind != FNAME_IDX_ANY);
 	}
 	else
 	{
-		SetEnabled("meth", false);
-		SetEnabled("sdir", false);
-		SetEnabled("text", false);
-		SetEnabled("name", false);
-		SetEnabled("namp", false);
-		SetEnabled("recu", false);
+		fMfdMeth->SetEnabled(false);
+		fMfdSdir->SetEnabled(false);
+		fChkText->SetEnabled(false);
+		fEdiName->SetEnabled(false);
+		fMfdNamp->SetEnabled(false);
+		fChkRecu->SetEnabled(false);
 		
 		fCurrentDir = NULL;
 		while (fDirStack.size())
@@ -308,8 +473,8 @@ void CFindDialog::UpdateFields()
 		fCurrentIncludeIndex = -1;
 		fOpenWindowIndex = -1;
 	}
-	
-	SetEnabled("ball", !(IsOn("mult") && GetValue("meth") == 3));
+
+	fButRepA->SetEnabled(!(fChkMult->IsOn() && fMfdMeth->FindMarkedIndex() == METHOD_IDX_INC));
 } /* CFindDialog::UpdateFields */
 
 void CFindDialog::MessageReceived(BMessage *msg)
@@ -327,9 +492,9 @@ void CFindDialog::MessageReceived(BMessage *msg)
 			if (!e.IsDirectory())
 				BEntry(&ref).GetParent(&e); // nasty huh?
 
-			fKind->ItemAt(0)->SetMarked(true);
+			fMfdMeth->Menu()->ItemAt(METHOD_IDX_DIR)->SetMarked(true);
 
-			SetOn("mult", true);
+			fChkMult->SetOn(true);
 			BPath path;
 			e.GetPath(&path);
 			
@@ -350,8 +515,8 @@ void CFindDialog::MessageReceived(BMessage *msg)
 				bool canReplace;
 				if (msg->FindBool("canreplace", &canReplace) == B_NO_ERROR)
 				{
-					SetEnabled("brpl", canReplace);
-					SetEnabled("br&f", canReplace);
+					fButRepl->SetEnabled(canReplace);
+					fButRepF->SetEnabled(canReplace);
 				}
 				break;
 			}
@@ -360,12 +525,12 @@ void CFindDialog::MessageReceived(BMessage *msg)
 			case msg_FindSelection:
 			case msg_FindSelectionBackward:
 			{
-				SetOn("mult", false);
-				SetOn("grep", false);
+				fChkMult->SetOn(false);
+				fChkGrep->SetOn(false);
 				UpdateFields();
 				const char *s;
 				if (msg->FindString("string", &s) == B_NO_ERROR)
-					SetText("find", s);
+					fEdiFind->SetText(s);
 				if (what == msg_FindSelection)
 					DoFind(msg_Find);
 				else if (what == msg_FindSelectionBackward)
@@ -375,35 +540,35 @@ void CFindDialog::MessageReceived(BMessage *msg)
 				
 			case msg_EnterReplaceString:
 			{
-				SetOn("mult", false);
-				SetOn("grep", false);
+				fChkMult->SetOn(false);
+				fChkGrep->SetOn(false);
 				UpdateFields();
 				const char *s;
 				if (msg->FindString("string", &s) == B_NO_ERROR)
-					SetText("repl", s);
+					fEdiRepl->SetText(s);
 				break;
 			}
 			
 			case msg_FindInNextFile:
 			{
-				switch (fKind->IndexOf(fKind->FindMarked()))
+				switch (fMfdMeth->FindMarkedIndex())
 				{
-					case 0:
+					case METHOD_IDX_DIR:
 					{
 						PDoc *w = NULL;
-						if (!DoMultiFileFind(fDirectory->FindMarked()->Label(),
-							IsOn("recu"), false, mrNone, &w))
+						if (!DoMultiFileFind(fMfdSdir->Menu()->FindMarked()->Label(),
+							fChkRecu->IsOn(), false, mrNone, &w))
 							beep();
 						else if (w)
 							w->Show();
 						break;
 					}
 					
-					case 1:
+					case METHOD_IDX_WIN:
 						DoOpenWindows(false);
 						break;
 					
-					case 2:
+					case METHOD_IDX_INC:
 						DoIncludesFind();
 						break;
 				}
@@ -427,9 +592,9 @@ void CFindDialog::MessageReceived(BMessage *msg)
 				break;
 			}
 			case msg_YASD:
-				gPrefs->SetPrefInt("Search Whichdir", fDirectory->IndexOf(fDirectory->FindMarked()));
+				gPrefs->SetPrefInt("Search Whichdir", fMfdSdir->FindMarkedIndex());
 			case msg_ChangedMFKind:
-				SetOn("mult", true);
+				fChkMult->SetOn(true);
 				UpdateFields();
 				break;
 			
@@ -439,9 +604,9 @@ void CFindDialog::MessageReceived(BMessage *msg)
 				FailOSErr(msg->FindInt32("index", &ix));
 				
 				ix -= 2;
-				SetText("find", gPrefs->GetIxPrefString("greppatfind", ix));
-				SetText("repl", gPrefs->GetIxPrefString("greppatrepl", ix));
-				SetOn("grep", true);
+				fEdiFind->SetText(gPrefs->GetIxPrefString("greppatfind", ix));
+				fEdiRepl->SetText(gPrefs->GetIxPrefString("greppatrepl", ix));
+				fChkGrep->SetOn(true);
 				break;
 			}
 
@@ -452,13 +617,13 @@ void CFindDialog::MessageReceived(BMessage *msg)
 
 			case msg_AddGrepPattern:
 			{
-				int ix = fGrepPopup->CountItems() - 1;
+				int ix = fMfdPats->Menu()->CountItems() - 1;
 				char n[32];
 				sprintf(n, "Grep Pattern %d", ix);
 				ix--;
 				gPrefs->SetIxPrefString("greppatname", ix, n);
-				gPrefs->SetIxPrefString("greppatfind", ix, GetText("find"));
-				gPrefs->SetIxPrefString("greppatrepl", ix, GetText("repl"));
+				gPrefs->SetIxPrefString("greppatfind", ix, fEdiFind->GetText());
+				gPrefs->SetIxPrefString("greppatrepl", ix, fEdiRepl->GetText());
 				FillGrepPopup();
 				
 				static_cast<PApp*>(be_app)->PostMessage(msg_AddGrepPattern);
@@ -476,13 +641,26 @@ void CFindDialog::MessageReceived(BMessage *msg)
 	}
 } /* CFindDialog::MessageReceived */
 
+void CFindDialog::FrameResized(float width, float height)
+{
+	float h = (fChkCase->Top()-fMfdPats->Bottom()-fLabRepl->Height()-fMainView->StringWidth("n")-2)/2;
+
+	fEdiFind->SetHeight(h);
+	fEdiRepl->SetHeight(h);
+
+	fLabRepl->MoveBelow(fEdiFind, 1);
+	fEdiRepl->MoveBelow(fLabRepl, 1);
+
+	fMfdSdir->MenuBar()->SetMaxContentWidth(Bounds().right-fMfdSdir->Left()-fMfdSdir->Divider()-30);
+} /* CFindDialog::FrameResized */
+
 void CFindDialog::UpdateSearchDirMenu()
 {
 	// remove old directory entries
 
-	for (int i = fDirectory->CountItems(); i-- > 1; )
+	for (int i = fMfdSdir->Menu()->CountItems(); i-- > 1;)
 	{
-		delete fDirectory->RemoveItem(i);
+		delete fMfdSdir->Menu()->RemoveItem(i);
 	}
 
 	// add new ones...
@@ -494,35 +672,36 @@ void CFindDialog::UpdateSearchDirMenu()
 
 	// ... and (re)select the current entry
 
-	BMenuItem *item = fDirectory->ItemAt(gPrefs->GetPrefInt("Search Whichdir", 0));
+	BMenuItem *item = fMfdSdir->Menu()->ItemAt(gPrefs->GetPrefInt("Search Whichdir", 0));
 	if (item == NULL)
-		item = fDirectory->ItemAt(0);
+		item = fMfdSdir->Menu()->ItemAt(0);
 
 	item->SetMarked(true);
+
 } /* CFindDialog::UpdateSearchDirMenu */
 
 void CFindDialog::AddPathToDirMenu(const char *path, bool select, bool addToPrefs)
 {
 	int i;
 
-	for (i = 2; i < fDirectory->CountItems(); i++)
+	for (i = 2; i < fMfdSdir->Menu()->CountItems(); i++)
 	{
-		if (!strcmp(fDirectory->ItemAt(i)->Label(), path))
+		if (!strcmp(fMfdSdir->Menu()->ItemAt(i)->Label(), path))
 		{
-			if (select) fDirectory->ItemAt(i)->SetMarked(true);
+			if (select) fMfdSdir->Menu()->ItemAt(i)->SetMarked(true);
 			return;
 		}
 	}
 
-	if (fDirectory->CountItems() == 1)
-		fDirectory->AddSeparatorItem();
+	if (fMfdSdir->Menu()->CountItems() == 1)
+		fMfdSdir->Menu()->AddSeparatorItem();
 
-	fDirectory->AddItem(new BMenuItem(path, new BMessage(msg_YASD)));
+	fMfdSdir->Menu()->AddItem(new BMenuItem(path, new BMessage(msg_YASD)));
 
-	i = fDirectory->CountItems() - 1;
+	i = fMfdSdir->Menu()->CountItems() - 1;
 
 	if (select)
-		fDirectory->ItemAt(i)->SetMarked(true);
+		fMfdSdir->Menu()->ItemAt(i)->SetMarked(true);
 
 	if (addToPrefs && i >= 2)
 		gPrefs->SetIxPrefString("searchpath", i - 2, path);
@@ -541,20 +720,20 @@ void CFindDialog::AddPathToDirMenu(entry_ref& ref, bool select, bool addToPrefs)
 const char* CFindDialog::FindString()
 {
 	BAutolock lock(this);
-	return GetText("find");
+	return fEdiFind->GetText();
 } /* CFindDialog::FindString */
 
 const char* CFindDialog::ReplaceString()
 {
 	BAutolock lock(this);
-	return GetText("repl");
+	return fEdiRepl->GetText();
 } /* CFindDialog::FindString */
 
 const regex_t* CFindDialog::PatternBuffer()
 {
 	regfree(&fPatternBuffer);
 	
-	int r = rx_regcomp(&fPatternBuffer, GetText("find"), IsOn("case"));
+	int r = rx_regcomp(&fPatternBuffer, fEdiFind->GetText(), fChkCase->IsOn());
 	if (r != REG_NOERROR)
 	{
 		char err[100];
@@ -567,9 +746,9 @@ const regex_t* CFindDialog::PatternBuffer()
 
 void CFindDialog::FillGrepPopup()
 {
-	while (fGrepPopup->CountItems() > 2)
+	while (fMfdPats->Menu()->CountItems() > 2)
 	{
-		BMenuItem *mi = fGrepPopup->RemoveItem(2);
+		BMenuItem *mi = fMfdPats->Menu()->RemoveItem(2);
 		delete mi;
 	}
 	
@@ -580,7 +759,7 @@ void CFindDialog::FillGrepPopup()
 	{
 		name = gPrefs->GetIxPrefString("greppatname", i++);
 		if (name)
-			fGrepPopup->AddItem(new BMenuItem(name, new BMessage(msg_GrepPopup)));
+			fMfdPats->Menu()->AddItem(new BMenuItem(name, new BMessage(msg_GrepPopup)));
 	}
 	while (name);
 } /* CFindDialog::FillGrepPopup */
@@ -590,7 +769,7 @@ void CFindDialog::FillGrepPopup()
 bool CFindDialog::DoMultiFileFind(const char *dir, bool recursive, bool restart, MultiReplaceKind replace, PDoc **w)
 {
 	char path[PATH_MAX];
-	bool batch = IsOn("btch");
+	bool batch = fChkBtch->IsOn();
 	vector<PMessageItem*> *lst = NULL;
 	
 	if (batch && replace == mrNone)
@@ -677,8 +856,8 @@ bool CFindDialog::DoMultiFileFind(const char *dir, bool recursive, bool restart,
 		
 							int offset = 0;
 							
-							doc->TextView()->FindNext((unsigned char *)GetText("find"),
-								offset, IsOn("case"), false, false, false, IsOn("grep"), true);
+							doc->TextView()->FindNext((unsigned char *)fEdiFind->GetText(),
+								offset, fChkCase->IsOn(), false, false, false, fChkGrep->IsOn(), true);
 							return true;
 						}
 					}
@@ -725,7 +904,7 @@ bool CFindDialog::GetRefForPath(entry_ref& ref, const char *path)
 	bool result = true;
 	FailOSErr(get_ref_for_path(path, &ref));
 
-	if (IsOn("text"))
+	if (fChkText->IsOn())
 	{
 		BNode n;
 		
@@ -738,13 +917,13 @@ bool CFindDialog::GetRefForPath(entry_ref& ref, const char *path)
 			result = false;
 	}
 	
-	int name = fName->IndexOf(fName->FindMarked());
-	if (result && name)
+	int fnam = fMfdNamp->FindMarkedIndex();
+	if (result && fnam != FNAME_IDX_ANY)
 	{
-		const char *pat = GetText("name");
+		const char *pat = fEdiName->GetText();
 		char *file = strrchr(path, '/') + 1;
 	
-		switch (name)
+		switch (fnam)
 		{
 			case 1:	result = strcmp(file + strlen(file) - strlen(pat), pat) == 0; break;
 			case 2: result = strncmp(file, pat, strlen(pat)) == 0; break;
@@ -758,8 +937,8 @@ bool CFindDialog::GetRefForPath(entry_ref& ref, const char *path)
 bool CFindDialog::FindInFile(const entry_ref& ref, vector<PMessageItem*> *lst)
 {
 	bool found;
-	bool word = IsOn("word");
-	const char *what = GetText("find");
+	bool word = fChkWord->IsOn();
+	const char *what = fEdiFind->GetText();
 	PDoc *doc;
 
 	BEntry e;
@@ -775,16 +954,16 @@ bool CFindDialog::FindInFile(const entry_ref& ref, vector<PMessageItem*> *lst)
 		BAutolock lock(doc);
 
 		PText *txt = doc->TextView();
-		if (gRxInstalled && IsOn("grep"))
+		if (gRxInstalled && fChkGrep->IsOn())
 			found = BufferContainsEx(txt->Text(), txt->Size(), path,
 				&fPatternBuffer, word, lst);
 		else
-			found = BufferContains(txt->Text(), txt->Size(), path, what, IsOn("case"), word, lst);
+			found = BufferContains(txt->Text(), txt->Size(), path, what, fChkCase->IsOn(), word, lst);
 	}
-	else if (gRxInstalled && IsOn("grep"))
+	else if (gRxInstalled && fChkGrep->IsOn())
 		found = FileContainsEx(path, &fPatternBuffer, word, lst);
 	else
-		found = FileContains(path, what, IsOn("case"), word, lst);
+		found = FileContains(path, what, fChkCase->IsOn(), word, lst);
 	
 	return found;
 } /* CFindDialog::FindInFile */
@@ -819,7 +998,7 @@ void CFindDialog::DoIncludesFind()
 
 void CFindDialog::DoOpenWindows(bool replace)
 {
-//	if (IsOn("btch"))
+//	if (fChkBtch->IsOn())
 //	{
 //		int i = be_app->CountWindows();
 //		BList *lst = new BList;
@@ -870,8 +1049,8 @@ void CFindDialog::DoOpenWindows(bool replace)
 				else
 				{
 					int offset = 0;
-					doc->TextView()->FindNext((unsigned char *)GetText("find"), offset,
-						IsOn("case"), false, false, IsOn("word"), IsOn("grep"), true);
+					doc->TextView()->FindNext((unsigned char *)fEdiFind->GetText(), offset,
+						fChkCase->IsOn(), false, false, fChkWord->IsOn(), fChkGrep->IsOn(), true);
 					return;
 				}
 			}

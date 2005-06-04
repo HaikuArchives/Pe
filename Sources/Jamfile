@@ -118,7 +118,6 @@ XRes pe :
 	Bindings.rsrc
 	Cursor.rsrc
 	Dialog-Colorpicker.rsrc
-	Dialog-Find.rsrc
 	Dialog-FontTabs.rsrc
 	Dialog-Ftp.rsrc
 	Dialog-Info.rsrc

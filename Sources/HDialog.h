@@ -146,6 +146,7 @@ virtual		bool OKClicked();
 virtual		bool CancelClicked();
 virtual		void UpdateFields();
 
+
 			bool IsOn(const char *name) const;
 			void SetOn(const char *name, bool on = true);
 			
