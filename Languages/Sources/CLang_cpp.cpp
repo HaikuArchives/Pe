@@ -308,29 +308,27 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 							case 5:	proxy.SetColor(s, kLUser4); break;
 //							default:	ASSERT(false);
 						}
-						if (kwc == 1)
+
+						// check for "#if 0" or "elif 0"
+						bool ifZero = false;
+						int k = s + 1;
+						while (text[k] == ' ' || text[k] == '\t')
+							k++;
+						int len = i - 1 - k;
+						if (strings_equal(text + k, "if", len, 2)
+							|| strings_equal(text + k, "elif", len, 4))
 						{
-							// check for "#if 0" or "elif 0"
-							bool ifZero = false;
-							int k = s + 1;
+							k = i - 1;
 							while (text[k] == ' ' || text[k] == '\t')
 								k++;
-							int len = i - 1 - k;
-							if (strings_equal(text + k, "if", len, 2)
-								|| strings_equal(text + k, "elif", len, 4))
+							if (text[k] == '0'
+								&& (k + 1 == size || text[k + 1] == 0
+									|| isspace(text[k + 1])))
 							{
-								k = i - 1;
-								while (text[k] == ' ' || text[k] == '\t')
-									k++;
-								if (text[k] == '0'
-									&& (k + 1 == size || text[k + 1] == 0
-										|| isspace(text[k + 1])))
-								{
-									proxy.SetColor(s, kLCommentColor);
-									state = IF_ZERO;
-									ifZeroCounter = 1;
-									leave = true;
-								}
+								proxy.SetColor(s, kLCommentColor);
+								state = IF_ZERO;
+								ifZeroCounter = 1;
+								leave = true;
 							}
 						}
 					}
