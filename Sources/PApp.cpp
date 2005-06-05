@@ -273,7 +273,6 @@ PApp::PApp()
 		gRecentBufferSize = gPrefs->GetPrefInt(prf_I_RecentSize, 10);
 		RestoreRecentMenu();
 
-		gRxInstalled = true;
 		fFindDialog 
 			= DialogCreator<CFindDialog>::CreateDialog("Find", NULL, PDoc::TopWindow());
 		fFindDialog->Run();

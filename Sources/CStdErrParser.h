@@ -38,9 +38,8 @@
 
 #include <string>
 #include <vector>
-#include <regex.h>
 
-//using namespace std;
+#include "CRegex.h"
 
 class CStdErrParser
 {
@@ -63,7 +62,7 @@ class CStdErrParser
 	
 	struct CErrPatInfo
 	{
-		regex_t	fInfo;
+		CRegex* fInfo;
 		int fMsg;
 		int fFile;
 		int fLine;

@@ -231,9 +231,9 @@ virtual	void FrameResized(float w, float h);
 			void FlushUndo();
 			
 			void Find(unsigned long msg, void *args);
-			bool CanReplace(const char *s, bool ignoreCase, bool grep);
-			bool FindNext(const unsigned char *what, int& offset, bool ignoreCase,
-					bool wrap, bool backward, bool entireWord, bool grep,
+			bool CanReplace(const char *s, bool ignoreCase, bool regx);
+			bool FindNext(const char *what, int& offset, bool ignoreCase,
+					bool wrap, bool backward, bool entireWord, bool regx,
 					bool scroll = true);
 			bool IsIncSearching() const;
 			void DoIncSearch(bool forward);

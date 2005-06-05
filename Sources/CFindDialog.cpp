@@ -35,8 +35,6 @@
 
 #include "pe.h"
 
-#include <regex.h>
-
 #include "PText.h"
 #include "PDoc.h"
 #include "CFindDialog.h"
@@ -74,6 +72,17 @@ enum {
 
 CFindDialog* gFindDialog;
 
+bool FileContains(const char *path, const char *what, bool ignoreCase, 
+				  bool word, vector<PMessageItem*> *lst = NULL);
+bool BufferContains(const char *buf, int size, const char *path, 
+					const char *what, bool ignoreCase, bool word, 
+					vector<PMessageItem*> *lst = NULL);
+
+bool FileContainsEx(const char *path, CRegex* regex, 
+					vector<PMessageItem*> *lst = NULL);
+bool BufferContainsEx(const char *buf, int size, const char *path, 
+					  CRegex* regex, vector<PMessageItem*> *lst = NULL);
+
 CFindDialog::CFindDialog(BRect frame, const char *name,
 		window_type type, int flags, BWindow *owner)
 	: HDialog(frame, name, type, flags, owner, NULL)
@@ -109,8 +118,6 @@ CFindDialog::CFindDialog(BRect frame, const char *name,
 	fBeIncludeCount = i;
 	
 	fDirPanel = NULL;
-	
-	memset(&fPatternBuffer, 0, sizeof(regex_t));
 	
 	Create();
 	Layout();
@@ -150,16 +157,14 @@ void CFindDialog::Create(void)
 	fChkWrap = new HCheckBox(fMainView, "wrap", NULL, H_FOLLOW_LEFT_BOTTOM);
 	fChkBack = new HCheckBox(fMainView, "back", NULL, H_FOLLOW_LEFT_BOTTOM);
 	fChkWord = new HCheckBox(fMainView, "word", NULL, H_FOLLOW_LEFT_BOTTOM);
-	fChkGrep = new HCheckBox(fMainView, "grep", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkGrep = new HCheckBox(fMainView, "regx", NULL, H_FOLLOW_LEFT_BOTTOM);
 	fChkBtch = new HCheckBox(fMainView, "btch", NULL, H_FOLLOW_LEFT_BOTTOM);
 	fChkCase->SetOn(gPrefs->GetPrefInt(prf_I_SearchIgnoreCase, 1));
 	fChkWrap->SetOn(gPrefs->GetPrefInt(prf_I_SearchWrap, 1));
 	fChkBack->SetOn(gPrefs->GetPrefInt(prf_I_SearchBackwards, 0));
 	fChkWord->SetOn(gPrefs->GetPrefInt(prf_I_SearchEntireWord, 0));
 	fChkBtch->SetOn(gPrefs->GetPrefInt(prf_I_SearchBatch, 0));
-	fChkGrep->SetOn(gRxInstalled ? gPrefs->GetPrefInt(prf_I_SearchWithGrep, 0) : false);
-	if (!gRxInstalled)
-		fChkGrep->SetEnabled(false);
+	fChkGrep->SetOn(gPrefs->GetPrefInt(prf_I_SearchWithGrep, 0));
 
 	// Add Multifile Search
 	fBoxMult = new HBox(fMainView, "", H_FOLLOW_LEFT_RIGHT_BOTTOM);
@@ -214,7 +219,7 @@ void CFindDialog::Layout(void) {
 	fChkWrap	->ResizeLocalized("Wrap Around");
 	fChkBack	->ResizeLocalized("Backwards");
 	fChkWord	->ResizeLocalized("Entire Word");
-	fChkGrep	->ResizeLocalized("Grep");
+	fChkGrep	->ResizeLocalized("Regex");
 	fChkBtch	->ResizeLocalized("Batch");
 	fChkMult	->ResizeLocalized("Multi-File:");
 	fMfdMeth	->ResizeLocalized();
@@ -336,15 +341,15 @@ bool CFindDialog::QuitRequested()
 
 void CFindDialog::DoFind(unsigned long cmd)
 {
-	if (gRxInstalled && fChkGrep->IsOn())
+	if (!strlen(fEdiFind->GetText()))
+		return;
+	if (fChkGrep->IsOn())
 	{
-		int r = rx_regcomp(&fPatternBuffer, fEdiFind->GetText(), fChkCase->IsOn());
-		
-		if (r)
+		status_t res = fRegex.SetTo(fEdiFind->GetText(), fChkCase->IsOn(), 
+									fChkWord->IsOn());
+		if (res != B_OK)
 		{
-			char err[100];
-			regerror(r, &fPatternBuffer, err, 100);
-			MWarningAlert a(err);
+			MWarningAlert a(fRegex.ErrorStr().String());
 			a.Go();
 			return;
 		}
@@ -390,6 +395,18 @@ void CFindDialog::DoFind(unsigned long cmd)
 				break;
 		}
 	}
+	else if (fChkBtch->IsOn())
+	{
+		PDoc *doc = PDoc::TopWindow();
+		if (doc)
+		{
+			vector<PMessageItem*>* lst = new vector<PMessageItem*>;
+			FindInFile(*doc->File(), lst);
+			BWindow* w = NULL;
+			ShowBatch(lst, &w);
+			delete lst;
+		}
+	}
 	else
 	{
 		BMessage msg(cmd);
@@ -400,7 +417,7 @@ void CFindDialog::DoFind(unsigned long cmd)
 		msg.AddBool  ("case", fChkCase->IsOn());
 		msg.AddBool  ("word", fChkWord->IsOn());
 		msg.AddBool  ("back", fChkBack->IsOn());
-		msg.AddBool  ("grep", fChkGrep->IsOn());
+		msg.AddBool  ("regx", fChkGrep->IsOn());
 
 		PDoc *w = PDoc::TopWindow();
 
@@ -425,7 +442,7 @@ void CFindDialog::UpdateFields()
 		BMessage query(msg_QueryCanReplace);
 		query.AddString("what", fEdiFind->GetText());
 		query.AddBool("case", fChkCase->IsOn());
-		query.AddBool("grep", fChkGrep->IsOn());
+		query.AddBool("regx", fChkGrep->IsOn());
 		w->PostMessage(&query, w->TextView(), this);
 	}
 	else
@@ -730,19 +747,9 @@ const char* CFindDialog::ReplaceString()
 	return fEdiRepl->GetText();
 } /* CFindDialog::FindString */
 
-const regex_t* CFindDialog::PatternBuffer()
+char* CFindDialog::RxReplaceString(const char* what, int32 len)
 {
-	regfree(&fPatternBuffer);
-	
-	int r = rx_regcomp(&fPatternBuffer, fEdiFind->GetText(), fChkCase->IsOn());
-	if (r != REG_NOERROR)
-	{
-		char err[100];
-		regerror(r, &fPatternBuffer, err, 100);
-		THROW((err));
-	}
-	
-	return &fPatternBuffer;
+	return fRegex.ReplaceString(what, len, ReplaceString());
 }
 
 void CFindDialog::FillGrepPopup()
@@ -857,8 +864,9 @@ bool CFindDialog::DoMultiFileFind(const char *dir, bool recursive, bool restart,
 		
 							int offset = 0;
 							
-							doc->TextView()->FindNext((unsigned char *)fEdiFind->GetText(),
-								offset, fChkCase->IsOn(), false, false, false, fChkGrep->IsOn(), true);
+							doc->TextView()->FindNext(fEdiFind->GetText(),
+								offset, fChkCase->IsOn(), false, false, false, 
+								fChkGrep->IsOn(), true);
 							return true;
 						}
 					}
@@ -889,8 +897,7 @@ bool CFindDialog::DoMultiFileFind(const char *dir, bool recursive, bool restart,
 		}
 	}
 	
-// not found... or batch of course!
-
+	// not found... or batch of course!
 	if (lst)
 	{
 		ShowBatch(lst, (BWindow**)w);
@@ -955,17 +962,18 @@ bool CFindDialog::FindInFile(const entry_ref& ref, vector<PMessageItem*> *lst)
 		BAutolock lock(doc);
 
 		PText *txt = doc->TextView();
-		if (gRxInstalled && fChkGrep->IsOn())
+		if (fChkGrep->IsOn())
 			found = BufferContainsEx(txt->Text(), txt->Size(), path,
-				&fPatternBuffer, word, lst);
+									 &fRegex, lst);
 		else
-			found = BufferContains(txt->Text(), txt->Size(), path, what, fChkCase->IsOn(), word, lst);
+			found = BufferContains(txt->Text(), txt->Size(), path, what, 
+								   fChkCase->IsOn(), word, lst);
 	}
-	else if (gRxInstalled && fChkGrep->IsOn())
-		found = FileContainsEx(path, &fPatternBuffer, word, lst);
+	else if (fChkGrep->IsOn())
+		found = FileContainsEx(path, &fRegex, lst);
 	else
 		found = FileContains(path, what, fChkCase->IsOn(), word, lst);
-	
+
 	return found;
 } /* CFindDialog::FindInFile */
 
@@ -999,23 +1007,23 @@ void CFindDialog::DoIncludesFind()
 
 void CFindDialog::DoOpenWindows(bool replace)
 {
-//	if (fChkBtch->IsOn())
-//	{
-//		int i = be_app->CountWindows();
-//		BList *lst = new BList;
-//		
-//		while (i--)
-//		{
-//			PDoc *doc = dynamic_cast<PDoc*>(be_app->WindowAt(i));
-//			if (doc)
-//				FindInFile(*doc->File(), lst);
-//		}
-//
-//		BWindow *w = NULL;
-//		ShowBatch(lst, &w);
-//	}
-//	else
-//	{
+	if (fChkBtch->IsOn())
+	{
+		int i = be_app->CountWindows();
+		vector<PMessageItem*>* lst = new vector<PMessageItem*>;
+		while (i--)
+		{
+			PDoc *doc = dynamic_cast<PDoc*>(be_app->WindowAt(i));
+			if (doc)
+				FindInFile(*doc->File(), lst);
+		}
+
+		BWindow *w = NULL;
+		ShowBatch(lst, &w);
+		delete lst;
+	}
+	else
+	{
 		if (fOpenWindowIndex == -1)
 		{
 			fOpenWindows.clear();
@@ -1050,15 +1058,16 @@ void CFindDialog::DoOpenWindows(bool replace)
 				else
 				{
 					int offset = 0;
-					doc->TextView()->FindNext((unsigned char *)fEdiFind->GetText(), offset,
-						fChkCase->IsOn(), false, false, fChkWord->IsOn(), fChkGrep->IsOn(), true);
+					doc->TextView()->FindNext(fEdiFind->GetText(), offset,
+						fChkCase->IsOn(), false, false, fChkWord->IsOn(), 
+						fChkGrep->IsOn(), true);
 					return;
 				}
 			}
 		}
-//	}
+		beep();
+	}
 	
-	beep();
 } /* CFindDialog::DoOpenWindows */
 
 void CFindDialog::ShowBatch(vector<PMessageItem*> *lst, BWindow** w)
@@ -1090,9 +1099,7 @@ void CFindDialog::ShowBatch(vector<PMessageItem*> *lst, BWindow** w)
 #pragma mark - Find
 
 
-bool gRxInstalled = false;
-
-void initskip(const unsigned char *p, int skip[], bool ignoreCase)
+void initskip(const char *p, int skip[], bool ignoreCase)
 {
 	int M = strlen((char *)p), i;
 	
@@ -1111,12 +1118,12 @@ void initskip(const unsigned char *p, int skip[], bool ignoreCase)
 	}
 } /* initskip */
 
-int mismatchsearch(const unsigned char *p, const unsigned char *a, int N, int skip[], bool ignoreCase)
+int mismatchsearch(const char *p, const char *a, int N, int skip[], bool ignoreCase)
 {
 	ASSERT(p);
 	ASSERT(a);
 	ASSERT(skip);
-	int i, j, t, M = strlen((char *)p);
+	int i, j, t, M = strlen(p);
 
 	if (ignoreCase)
 	{
@@ -1149,7 +1156,7 @@ int mismatchsearch(const unsigned char *p, const unsigned char *a, int N, int sk
 	return i;
 } /* mismatchsearch */
 
-void initskip_b(const unsigned char *p, int skip[], bool ignoreCase)
+void initskip_b(const char*p, int skip[], bool ignoreCase)
 {
 	int M = strlen((char *)p), i;
 	
@@ -1168,7 +1175,7 @@ void initskip_b(const unsigned char *p, int skip[], bool ignoreCase)
 	}
 } /* initskip_b */
 
-int mismatchsearch_b(const unsigned char *p, const unsigned char *a, int N, int skip[], bool ignoreCase)
+int mismatchsearch_b(const char *p, const char *a, int N, int skip[], bool ignoreCase)
 {
 	ASSERT(p);
 	ASSERT(a);
@@ -1211,8 +1218,8 @@ int Find(const char *what, const char *buf, int bufSize, bool ignoreCase)
 	int skip[256];
 	int offset = 0;
 
-	initskip((unsigned char *)what, skip, ignoreCase);
-	offset = mismatchsearch((unsigned char *)what, (unsigned char *)buf, bufSize, skip, ignoreCase);
+	initskip(what, skip, ignoreCase);
+	offset = mismatchsearch(what, buf, bufSize, skip, ignoreCase);
 
 	return offset;
 } /* Find */
@@ -1291,11 +1298,11 @@ bool BufferContains(const char *buf, int size, const char *path, const char *wha
 	int skip[256];
 	int offset = 0;
 
-	initskip((unsigned char *)what, skip, ignoreCase);
+	initskip(what, skip, ignoreCase);
 	
 	do
 	{
-		offset += mismatchsearch((unsigned char *)what, (unsigned char *)buf + offset, size - offset, skip, ignoreCase);
+		offset += mismatchsearch(what, buf + offset, size - offset, skip, ignoreCase);
 		result = offset < size;
 		if (result && word)
 			result = IsWord(buf, size, offset + 1, strlen(what));
@@ -1328,7 +1335,7 @@ bool BufferContains(const char *buf, int size, const char *path, const char *wha
 			}
 			
 			offset += strlen(what);
-			offset += mismatchsearch((unsigned char *)what, (unsigned char *)buf + offset,
+			offset += mismatchsearch(what, buf + offset,
 				size - offset, skip, ignoreCase);
 		}
 		while (offset < size);
@@ -1337,7 +1344,7 @@ bool BufferContains(const char *buf, int size, const char *path, const char *wha
 	return result;
 } /* BufferContains */
 
-bool FileContainsEx(const char *path, const regex_t *preg, bool word, vector<PMessageItem*> *lst)
+bool FileContainsEx(const char *path, CRegex* regex, vector<PMessageItem*> *lst)
 {
 	bool result = false;
 
@@ -1353,7 +1360,7 @@ bool FileContainsEx(const char *path, const regex_t *preg, bool word, vector<PMe
 		{
 			fread(buf, 1, size, f);
 			buf[size] = 0;
-			result = BufferContainsEx(buf, size, path, preg, word, lst);
+			result = BufferContainsEx(buf, size, path, regex, lst);
 			free(buf);
 		}
 		
@@ -1363,209 +1370,44 @@ bool FileContainsEx(const char *path, const regex_t *preg, bool word, vector<PMe
 	return result;
 } /* FileContainsEx */
 
-bool BufferContainsEx(const char *buf, int size, const char *path, const regex_t *preg, bool word, vector<PMessageItem*> *lst)
+bool BufferContainsEx(const char *buf, int size, const char *path, 
+					  CRegex* regex, vector<PMessageItem*> *lst)
 {
 	int offset, e = 0, r;
 	
-	regmatch_t match[2];
-	
-	do
-	{
-		offset = e;
-		r = rx_regexec(preg, buf + offset, size - offset, 1, match, 0);
-		offset += match[0].rm_so;
-		e = offset + (match[0].rm_eo - match[0].rm_so);
-	}
-	while (r == 0 && word && !IsWord(buf, size, offset, e));
+	offset = e;
+	r = regex->Match(buf, size, offset);
+	offset = regex->MatchStart();
+	e = offset + regex->MatchLen();
 
 	if (r == 0 && lst)
 	{
 		do
 		{
-			if (!word || IsWord(buf, size, offset, e))
-			{
-				PMessageItem *i = new PMessageItem;
+			PMessageItem *i = new PMessageItem;
 				
-				char *l;
-				int line, start;
+			char *l;
+			int line, start;
 				
-				Offset2Line(buf, size, offset, line, start, &l);
+			Offset2Line(buf, size, offset, line, start, &l);
 				
-				i->SetError(l);
-				i->SetFile(path);
-				i->SetLine(line);
-				i->SetSel(start - 1, e - offset);
-				i->SetKind(3);
+			i->SetError(l);
+			i->SetFile(path);
+			i->SetLine(line);
+			i->SetSel(start - 1, e - offset);
+			i->SetKind(3);
 				
-				lst->push_back(i);
+			lst->push_back(i);
 				
-				free(l);
-			}
+			free(l);
 			
-			offset = e;
-			r = rx_regexec(preg, buf + offset, size - offset, 1, match, 0);
-			offset += match[0].rm_so;
-			e = offset + (match[0].rm_eo - match[0].rm_so);
+			offset = max(e, offset+1);
+			r = regex->Match(buf, size, offset);
+			offset = regex->MatchStart();
+			e = offset + regex->MatchLen();
 		}
 		while (r == 0);
 	}
 				
 	return (r == 0);
 } /* BufferContainsEx */
-
-char* rx_replace(regex_t *pb, const char *txt, int size, const char *repl)
-{
-	regmatch_t matches[10];
-	
-	int r = rx_regexec(pb, txt, size, 9, matches, 0);
-	if (r > 1)
-	{
-		char err[100];
-		regerror(r, pb, err, 100);
-		THROW((err));
-	}
-
-	vector<char> str;
-	int rl = strlen(repl);
-	int i = 0;
-	
-	while (i <= rl)
-	{
-		switch (repl[i])
-		{
-			case '&':
-			{
-				str.insert(str.end(), txt, txt + size);
-				break;
-			}
-			case '\\':
-			{
-				i++;
-				int start = 0, stop = 0;
-	
-				switch (repl[i])
-				{
-					case '1': start = matches[1].rm_so; stop = matches[1].rm_eo; break;
-					case '2': start = matches[2].rm_so; stop = matches[2].rm_eo; break;
-					case '3': start = matches[3].rm_so; stop = matches[3].rm_eo; break;
-					case '4': start = matches[4].rm_so; stop = matches[4].rm_eo; break;
-					case '5': start = matches[5].rm_so; stop = matches[5].rm_eo; break;
-					case '6': start = matches[6].rm_so; stop = matches[6].rm_eo; break;
-					case '7': start = matches[7].rm_so; stop = matches[7].rm_eo; break;
-					case '8': start = matches[8].rm_so; stop = matches[8].rm_eo; break;
-					case '9': start = matches[9].rm_so; stop = matches[9].rm_eo; break;
-					case 'n': str.push_back('\n'); break;
-					case 'r': str.push_back('\r'); break;
-					case '\\': str.push_back('\\'); break;
-					case 't': str.push_back('\t'); break;
-				}
-				
-				stop = min(stop, size);
-				start = max(0, start);
-
-				if (stop > start)
-					str.insert(str.end(), txt + start, txt + stop);
-				
-				break;
-			}
-			
-			default:
-				str.push_back(repl[i]);
-		}
-			
-		i++;
-	}
-	
-	char *b = (char *)malloc(str.size() + 1);
-	copy(str.begin(), str.end(), b);
-	b[str.size()] = 0;
-
-	return b;
-} /* rx_replace */
-
-int rx_regcomp(regex_t *preg, const char *pattern, bool ignoreCase)
-{
-	char *p = strdup(pattern), *sp = p, *dp = p;
-	
-	while (*sp)
-	{
-		if (*sp == '\\')
-		{
-			switch (sp[1])
-			{
-				case 'n':	*dp++ = '\n'; sp += 2;	continue;
-				case 'r':	*dp++ = '\r'; sp += 2;	continue;
-				case 't':	*dp++ = '\t'; sp += 2;	continue;
-				case '\\':	*dp++ = '\\'; *dp++ = '\\'; sp += 2; continue;
-			}
-		}
-
-		*dp++ = *sp++;
-	}
-	*dp = 0;
-
-	regfree(preg);
-	int r = regcomp(preg, p, REG_EXTENDED | REG_NEWLINE | (ignoreCase ? REG_ICASE : 0));
-	free(p);
-	return r;
-} /* int rx_regcomp */
-
-int rx_regexec (const regex_t *preg, const char *string, int len,
-	int nmatch, regmatch_t pmatch[], int eflags, bool backward)
-{
-	int ret;
-	struct re_registers regs;
-	regex_t private_preg;
-	bool want_reg_info = !preg->no_sub && nmatch > 0;
-	
-	private_preg = *preg;
-	  
-	private_preg.not_bol = !!(eflags & REG_NOTBOL);
-	private_preg.not_eol = !!(eflags & REG_NOTEOL);
-
-	/*	The user has told us exactly how many registers to return
-		information about, via `nmatch'.  We have to pass that on to the
-		matching routines.  */
-	private_preg.regs_allocated = REGS_FIXED;
-
-	if (want_reg_info)
-	{
-		regs.num_regs = nmatch;
-		regs.start = (regoff_t *)malloc(nmatch * sizeof(regoff_t));
-		FailNil(regs.start);
-		regs.end = (regoff_t *)malloc(nmatch * sizeof(regoff_t));
-		FailNil(regs.end);
-	}
-
-	/* Perform the searching operation.  */
-	if (backward)
-		ret = re_search_2 (&private_preg, NULL, 0, string, len,
-			len, -len - 1,
-			want_reg_info ? &regs : (struct re_registers *) 0, 0);
-	else
-		ret = re_search (&private_preg, string, len,
-			/* start: */ 0, /* range: */ len,
-			want_reg_info ? &regs : (struct re_registers *) 0);
-
-	/* Copy the register information to the POSIX structure.  */
-	if (want_reg_info)
-	{
-		if (ret >= 0)
-		{
-			unsigned r;
-			
-			for (r = 0; r < nmatch; r++)
-			{
-				pmatch[r].rm_so = regs.start[r];
-				pmatch[r].rm_eo = regs.end[r];
-			}
-		}
-
-	/* If we needed the temporary register info, free the space now.  */
-		free (regs.start);
-		free (regs.end);
-	}
-	
-	/* We want zero return to mean success, unlike `re_search'.  */
-	return ret >= 0 ? (int) REG_NOERROR : (int) REG_NOMATCH;
-} /* rx_regexec */

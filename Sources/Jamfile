@@ -42,6 +42,9 @@ MakeLocate libhekkel.so : $(DISTRO_DIR)/lib ;
 
 DEFINES = $(SAVED_DEFINES) ;
 
+SubDirSysHdrs /boot/home/config/include ;
+LINKFLAGS += -L/boot/home/config/lib ;
+
 #<pe-src>
 Application pe : 
 	Benaphore.cpp
@@ -78,6 +81,7 @@ Application pe :
 	CProjectJamFile.cpp
 	CProjectMakeFile.cpp
 	CProjectRoster.cpp
+	CRegex.cpp
 	CStdErrBox.cpp
 	CStdErrParser.cpp
 	CUrlOpener.cpp
@@ -106,7 +110,7 @@ Application pe :
 	Sstdio.cpp
 	utf-support.cpp
 	Utils.cpp
-	:	libhekkel.so $(RX_LIB) be net $(STDC++LIB) tracker mail textencoding 
+	:	libhekkel.so pcre be net $(STDC++LIB) tracker mail textencoding 
 	;
 #	</pe-src>
 if $(OSPLAT) = X86 {

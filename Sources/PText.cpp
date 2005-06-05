@@ -67,7 +67,7 @@
 #include "Prefs.h"
 
 #if defined(__BEOS__) && defined(__INTEL__)
-	// [zooey]: BeOS' glibs is messing up iscntrl, as it reports all values>127 as
+	// [zooey]: BeOS' glib is messing up iscntrl, as it reports all values>127 as
 	// being control-chars, too (but they are *not*). We fix that:
 	#undef iscntrl
 	#define iscntrl(c)	((((unsigned char)(c))<128) && __isctype((c), _IScntrl))
@@ -3812,7 +3812,7 @@ void PText::GlossaryButton(const char *glossy)
 void PText::Find(unsigned long msgWhat, void *args)
 {
 	const char *what, *with;
-	bool wrap, ignoreCase, backward, word, grep;
+	bool wrap, ignoreCase, backward, word, regx;
 	
 	if (args)
 	{
@@ -3825,7 +3825,7 @@ void PText::Find(unsigned long msgWhat, void *args)
 		msg->FindBool("case", &ignoreCase);
 		msg->FindBool("back", &backward);
 		msg->FindBool("word", &word);
-		msg->FindBool("grep", &grep);
+		msg->FindBool("regx", &regx);
 	
 		PDoc *w = (PDoc *)Window();
 		w->Activate(true);
@@ -3838,7 +3838,7 @@ void PText::Find(unsigned long msgWhat, void *args)
 		ignoreCase = gFindDialog->IgnoreCase();
 		backward = gFindDialog->Backward();
 		word = gFindDialog->Word();
-		grep = gFindDialog->Grep();
+		regx = gFindDialog->Grep();
 	}
 
 	if (*what != 0)
@@ -3849,27 +3849,27 @@ void PText::Find(unsigned long msgWhat, void *args)
 		{
 			case msg_Find:
 				offset = backward ? min(fCaret, fAnchor) : max(fCaret, fAnchor);
-				FindNext((unsigned char *)what, offset, ignoreCase, wrap, backward, word, grep, true);
+				FindNext(what, offset, ignoreCase, wrap, backward, word, regx, true);
 				break;
 	
 			case msg_FindAgain:
 				offset = backward ? min(fCaret, fAnchor) : max(fCaret, fAnchor);
 				if (gFindDialog->IsInMultiFileState())
 				{
-					if (!FindNext((unsigned char *)what, offset, ignoreCase, false, false, word, grep, true))
+					if (!FindNext(what, offset, ignoreCase, false, false, word, regx, true))
 						gFindDialog->PostMessage(msg_FindInNextFile);
 				}
 				else
-					FindNext((unsigned char *)what, offset, ignoreCase, wrap, backward, word, grep, true);
+					FindNext(what, offset, ignoreCase, wrap, backward, word, regx, true);
 				break;
 	
 			case msg_FindAgainBackward:
 				offset = backward ? max(fCaret, fAnchor) : min(fCaret, fAnchor);
-				FindNext((unsigned char *)what, offset, ignoreCase, wrap, !backward, word, grep, true);
+				FindNext(what, offset, ignoreCase, wrap, !backward, word, regx, true);
 				break;
 				
 			case msg_Replace:
-				if (CanReplace(what, ignoreCase, grep))
+				if (CanReplace(what, ignoreCase, regx))
 					RegisterCommand(new PReplaceCmd(this, min(fCaret, fAnchor), abs(fCaret - fAnchor),
 						false, gFindDialog->Backward()));
 				else
@@ -3877,13 +3877,13 @@ void PText::Find(unsigned long msgWhat, void *args)
 				break;
 			
 			case msg_ReplaceAndFind:
-				if (CanReplace(what, ignoreCase, grep))
+				if (CanReplace(what, ignoreCase, regx))
 					RegisterCommand(new PReplaceCmd(this, min(fCaret, fAnchor), abs(fCaret - fAnchor),
 						true, gFindDialog->Backward()));
 				break;
 			
 			case msg_ReplaceAndFindBackward:
-				if (CanReplace(what, ignoreCase, grep))
+				if (CanReplace(what, ignoreCase, regx))
 					RegisterCommand(new PReplaceCmd(this, min(fCaret, fAnchor), abs(fCaret - fAnchor),
 						true, !gFindDialog->Backward()));
 				break;
@@ -3895,7 +3895,7 @@ void PText::Find(unsigned long msgWhat, void *args)
 	}
 } /* PText::Find */
 
-bool PText::CanReplace(const char *what, bool ignoreCase, bool grep)
+bool PText::CanReplace(const char *what, bool ignoreCase, bool regx)
 {
 	bool result = false;
 	
@@ -3907,23 +3907,17 @@ bool PText::CanReplace(const char *what, bool ignoreCase, bool grep)
 	if (!t)
 		return result;
 	
-	if (gRxInstalled && grep)
+	if (regx)
 	{
-		regmatch_t m, *match = &m;
-		int a = min(fCaret, fAnchor), r;
+		int a = min(fCaret, fAnchor);
+		int options = (a == 0 || fText[a - 1] == '\n') ? 0 : krx_NotBOL;
 		
-		regex_t pb;
-		memset(&pb, 0, sizeof(pb));
-		
-		if (rx_regcomp(&pb, what, ignoreCase) == REG_NOERROR)
+		CRegex rx;
+		if (rx.SetTo(what, ignoreCase) == B_OK)
 		{
-			r = rx_regexec(&pb, t, strlen(t), 1, match,
-				(a == 0 || fText[a - 1] == '\n') ? 0 : REG_NOTBOL);
-	
-			result = (r == REG_NOERROR && m.rm_so == 0 && m.rm_eo == strlen(t));
+			int r = rx.Match(t, strlen(t), 0, options);
+			result = (r == 0 && rx.MatchStr(t) == t);
 		}
-
-		regfree(&pb);
 	}
 	else
 		 if (ignoreCase)
@@ -3936,12 +3930,11 @@ bool PText::CanReplace(const char *what, bool ignoreCase, bool grep)
 	return result;
 } /* CCellView::CanReplace */
 
-bool PText::FindNext(const unsigned char *what, int& offset, bool ignoreCase,
-	bool wrap, bool backward, bool entireWord, bool grep, bool scroll)
+bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
+	bool wrap, bool backward, bool entireWord, bool regx, bool scroll)
 {
 	int skip[256], wl = strlen((char *)what);
 	bool wrapped = false;
-	const regex_t *pb = NULL;
 	
 	ASSERT(what);
 	
@@ -3951,8 +3944,16 @@ bool PText::FindNext(const unsigned char *what, int& offset, bool ignoreCase,
 		return false;
 	}
 	
-	if (gRxInstalled && grep)
-		pb = gFindDialog->PatternBuffer();
+	CRegex rx;
+	if (regx)
+	{
+		if (rx.SetTo(what, ignoreCase, entireWord, backward) != B_OK)
+		{
+			MWarningAlert a(rx.ErrorStr().String());
+			a.Go();
+			return false;
+		}
+	}
 	else
 	{
 		if (backward)
@@ -3963,47 +3964,41 @@ bool PText::FindNext(const unsigned char *what, int& offset, bool ignoreCase,
 	
 	while (true)
 	{
-		if (gRxInstalled && grep)
+		if (regx)
 		{
-			int a = offset, r;
+			int r;
+			int options = (offset == 0 || fText[offset - 1] == '\n')
+							? 0
+							: krx_NotBOL;
  
-			if (backward) a--;
-			regmatch_t match[2];
-			
 			if (backward)
-			{
-				r = rx_regexec(pb, fText.Buffer(), a, 1, match,
-					(a == 0 || fText[a - 1] == '\n') ? 0 : REG_NOTBOL, true);
- 
-				offset = match[0].rm_so;
-				wl = match[0].rm_eo - match[0].rm_so;
-			}
+				r = rx.Match(fText.Buffer(), offset, 0, options);
 			else
-			{
-				r = rx_regexec(pb, fText.Buffer() + a, fText.Size() - a, 1, match,
-					(a == 0 || fText[a - 1] == '\n') ? 0 : REG_NOTBOL);
- 
-				offset += match[0].rm_so;
-				wl = match[0].rm_eo - match[0].rm_so;
-			}
+				r = rx.Match(fText.Buffer(), fText.Size(), offset, options);
 			
-			if (r == 1)
+			if (r == krx_NoMatch)
 			{
 				offset = (backward ? -1 : fText.Size());
 				wl = 1;
+			}
+			else 
+			{
+				offset = rx.MatchStart();
+				wl = rx.MatchLen();
 			}
 		}
 		else if (backward)
 		{
 			if (offset > 0)
-				offset = mismatchsearch_b(what, (unsigned char *)fText.Buffer(),
-					offset + wl - 1, skip, ignoreCase);
+				offset = mismatchsearch_b(what, fText.Buffer(),	offset + wl - 1,
+										  skip, ignoreCase);
 		}
 		else
 		{
 			if (offset < fText.Size())
-				offset += mismatchsearch(what, (unsigned char *)fText.Buffer() + offset,
-					fText.Size() - offset, skip, ignoreCase) + 1;
+				offset += mismatchsearch(what, fText.Buffer() + offset,
+										 fText.Size() - offset, skip, 
+										 ignoreCase) + 1;
 		}
 
 		if (!entireWord ||
@@ -4070,8 +4065,8 @@ void PText::JumpToFunction(const char *func, int offset)
 	else
 		bar = fVScrollBar2;
 	
-	if (FindNext((unsigned char *)func, offset, false, false, false, false, false, false) ||
-		FindNext((unsigned char *)func, offset, false, false, true, false, false, false))
+	if (FindNext(func, offset, false, false, false, false, false, false) ||
+		FindNext(func, offset, false, false, true, false, false, false))
 	{
 		swap(fAnchor, a);
 		swap(fCaret, c);
@@ -4088,98 +4083,64 @@ void PText::FindNextError(bool backward)
 {
 	try
 	{
-		regmatch_t matches[5];
-		regex_t rx;
-		char err[100];
 		entry_ref ref;
-		int line = 0, size;
+		int line = 0, size, offset;
 		const char *text;
 		bool found = false;
+		const int options = 0;
 
-		memset(&rx, 0, sizeof(rx));
-		
 		const char kErrLine[] =
 			"^([^:]+):([0-9]+): (warning: )?(.*)";
 		
-		int r = regcomp(&rx, kErrLine, REG_EXTENDED | REG_NEWLINE);
-		
-		if (r)
-		{
-			regerror(r, &rx, err, 100);
-			THROW((err));
-		}
+		CRegex rx;
+		int r = rx.SetTo(kErrLine, false, false, backward);
+		if (r != B_OK)
+			THROW((rx.ErrorStr().String()));
 		
 		text = fText.Buffer();
 		if (backward)
+		{
 			size = min(fCaret, fAnchor) - 1;
+			offset = 0;
+		}
 		else
 		{
 			size = fText.Size();
-			text += max(fCaret, fAnchor);
-			size = fText.Buffer() + size - text;
+			offset = max(fCaret, fAnchor);
 		}
-		
+
 		while (!found && size > 0)
 		{
+			r = rx.Match(text, size, offset, options);
 			if (backward)
-				r = rx_regexec(&rx, text, size, 5, matches, 0, true);
+				size = rx.MatchStart();
 			else
-				r = rx_regexec(&rx, text, size, 5, matches, 0, false);
+				offset = rx.MatchStart() + rx.MatchLen();
 			
 			if (r)
 			{
-				if (r == REG_NOMATCH)
+				if (r == krx_NoMatch)
 				{
 					beep();
 					return;
 				}
 				else
-				{
-					regerror(r, &rx, err, 100);
-					THROW((err));
-				}
+					THROW((rx.ErrorStr().String()));
 			}
 
-#ifndef PATH_MAX
-#define PATH_MAX 1024
-#endif
-			
-			char file[PATH_MAX], *t;
-			
-			if (text[matches[1].rm_so] != kDirectorySeparator && fCWD)
-			{
-				strcpy(file, fCWD);
+			BString file;
+			if (text[rx.MatchStart(1)] != kDirectorySeparator && fCWD)
+				file << fCWD << kDirectorySeparator;
+			file << rx.MatchStr(text, 1);
 
-				int len = strlen(file);
-				file[len++] = kDirectorySeparator;
-				file[len] = 0;
-				t = file + len;
-		
-				int fl = matches[1].rm_eo - matches[1].rm_so;
-				strncpy(t, text + matches[1].rm_so, fl);
-				t[fl] = 0;
-			}
-			else
+			if (get_ref_for_path(file.String(), &ref) == B_OK 
+				&& BEntry(&ref).Exists())
 			{
-				int fl = matches[1].rm_eo - matches[1].rm_so;
-				strncpy(file, text + matches[1].rm_so, fl);
-				file[fl] = 0;
-			}
-
-			if (get_ref_for_path(file, &ref) == B_OK && BEntry(&ref).Exists())
-			{
-				line = strtoul(text + matches[2].rm_so, &t, 10);
+				line = strtoul(text + rx.MatchStart(2), NULL, 10);
 				found = true;
 			}
 			else
 			{
-				if (backward)
-					size -= matches[0].rm_so;
-				else
-				{
-					text += matches[0].rm_eo;
-					size -= matches[0].rm_eo;
-				}
 			}
 		}
 
@@ -4191,20 +4152,14 @@ void PText::FindNextError(bool backward)
 			{
 				BMessage msg(msg_SelectError);
 
-				int infoLen = matches[4].rm_eo - matches[4].rm_so;
-				CAlloca info(infoLen + 1);
-				
-				strncpy(info, text + matches[4].rm_so, infoLen);
-				info[infoLen] = 0;
-
 				msg.AddInt32("line", line - 1);
-				msg.AddBool("warning", matches[3].rm_so > 0 && matches[3].rm_eo > matches[3].rm_so);
-				msg.AddString("info", info);
+				msg.AddBool("warning", rx.MatchLen(3) > 0);
+				msg.AddString("info", rx.MatchStr(text, 4));
 
 				BMessenger(doc->TextView()).SendMessage(&msg);
 			}
 			
-			SelectLine(Offset2Line(text + matches[0].rm_so - fText.Buffer()));
+			SelectLine(Offset2Line(text + rx.MatchStart() - fText.Buffer()));
 		}
 	}
 	catch (HErr& e)
@@ -4228,7 +4183,7 @@ void PText::DoIncSearch(bool forward)
 		else
 		{
 			int offset = fIncCaret = forward ? fCaret : fAnchor;
-			if (FindNext((unsigned char*)fIncPat, offset, ignCase, false, ! forward, false, false, true))
+			if (FindNext(fIncPat, offset, ignCase, false, ! forward, false, false, true))
 			{
 				BMessage msg(msg_EnterSearchString);
 				msg.AddString("string", fIncPat);
@@ -4279,7 +4234,7 @@ void PText::IncSearchKey(const char *bytes, int numBytes)
 	{
 		int offset = fIncCaret;
 
-		if (FindNext((unsigned char*)fIncPat, offset, ignCase, false, fIncSearch == 2, false, false, true))
+		if (FindNext(fIncPat, offset, ignCase, false, fIncSearch == 2, false, false, true))
 		{
 			BMessage msg(msg_EnterSearchString);
 			msg.AddString("string", fIncPat);
@@ -5379,7 +5334,7 @@ void PText::MessageReceived(BMessage *msg)
 			{
 				BMessage reply(msg_ReplyCanReplace);
 				reply.AddBool("canreplace", CanReplace(msg->FindString("what"),
-					msg->FindBool("case"), msg->FindBool("grep")));
+					msg->FindBool("case"), msg->FindBool("regx")));
 				msg->SendReply(&reply);
 				break;
 			}

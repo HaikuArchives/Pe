@@ -53,9 +53,10 @@ CStdErrParser::CStdErrParser(BListView *errList, const char *cwd)
 CStdErrParser::~CStdErrParser()
 {
 	free(fCWD);
-	
-	for (vector<CErrPatInfo>::iterator ri = fPatterns.begin(); ri != fPatterns.end(); ri++)
-		regfree(&(*ri).fInfo);
+
+	vector<CErrPatInfo>::iterator ri;
+	for (ri = fPatterns.begin(); ri != fPatterns.end(); ++ri)
+		delete ri->fInfo;
 } // CStdErrParser::~CStdErrParser
 
 void CStdErrParser::Add(const char *txt, int len)
@@ -85,41 +86,11 @@ void CStdErrParser::AddPattern(const char *pat, int msg, int file, int line, int
 {
 	CErrPatInfo info;
 
-	memset(&info.fInfo, 0, sizeof(regex_t));
-	
-	char *t = (char *)malloc(strlen(pat) + 1), *d;
-	const char *s;
-	s = pat;
-	d = t;
-	
-	do
+	info.fInfo = new CRegex(pat, false);
+	status_t res = info.fInfo->InitCheck();
+	if (res != B_OK)
 	{
-		if (*s == '\\')
-		{
-			switch (*++s)
-			{
-				case 'n':	*d++ = '\n'; break;
-				case 'r':	*d++ = '\r'; break;
-				case 't':	*d++ = '\t'; break;
-				case '\\':	*d++ = '\\'; break;
-				default:	*d++ = *s;
-			}
-			s++;
-		}
-		else
-			*d++ = *s++;
-	}
-	while (*s);
-	*d = 0;
-
-	int r = regcomp(&info.fInfo, t, REG_EXTENDED | REG_NEWLINE);
-	free(t);
-	
-	if (r)
-	{
-		char err[100];
-		regerror(r, &info.fInfo, err, 100);
-		THROW((err));
+		THROW((info.fInfo->ErrorStr().String()));
 	}
 	
 	info.fMsg = msg;
@@ -135,63 +106,47 @@ bool CStdErrParser::MatchOne(bool flush)
 	vector<CErrPatInfo>::iterator ri;
 	CMessageItem *item = NULL;
 	entry_ref ref;
-	regmatch_t matches[11];
-
-	for (ri = fPatterns.begin(); item == NULL && ri != fPatterns.end(); ri++)
+	int m = fErrBuffer.length();
+	for (ri = fPatterns.begin(); item == NULL && ri != fPatterns.end(); ++ri)
 	{
+		CRegex& rx = *ri->fInfo;
 		const char *text = fErrBuffer.c_str();
 		int size = fErrBuffer.length();
 	
-		int r = rx_regexec(&(*ri).fInfo, text, size, 11, matches, 0, false);
-	
+		int r = rx.Match(text, size, 0);
 		if (r)
 		{
-			if (r == REG_NOMATCH)
+			if (r == krx_NoMatch)
 				continue;
 			else
-			{
-				char err[100];
-				regerror(r, &(*ri).fInfo, err, 100);
-				THROW((err));
-			}
+				THROW((rx.ErrorStr().String()));
 		}
 	
-		char file[PATH_MAX], *t;
-		
-		if (text[matches[(*ri).fFile].rm_so] != kDirectorySeparator && fCWD)
-		{
-			strcpy(file, fCWD);
+		BString file;
+		if (text[rx.MatchStart(ri->fFile)] != kDirectorySeparator && fCWD)
+			file << fCWD << kDirectorySeparator;
+		file << rx.MatchStr(text, ri->fFile);
 
-			int len = strlen(file);
-			file[len++] = kDirectorySeparator;
-			file[len] = 0;
-			t = file + len;
-	
-			int fl = matches[(*ri).fFile].rm_eo - matches[(*ri).fFile].rm_so;
-			strncpy(t, text + matches[(*ri).fFile].rm_so, fl);
-			t[fl] = 0;
-		}
-		else
+		if (get_ref_for_path(file.String(), &ref) == B_OK 
+			&& BEntry(&ref).Exists())
 		{
-			int fl = matches[(*ri).fFile].rm_eo - matches[(*ri).fFile].rm_so;
-			strncpy(file, text + matches[(*ri).fFile].rm_so, fl);
-			file[fl] = 0;
-		}
-
-		if (get_ref_for_path(file, &ref) == B_OK && BEntry(&ref).Exists())
-		{
-			int line = strtoul(text + matches[(*ri).fLine].rm_so, &t, 10);
+			int line = strtoul(rx.MatchStr(text, ri->fLine).String(), NULL, 10);
 			bool warning = false;
 			
-			if ((*ri).fWarning)
-				warning = (strncasecmp(text + matches[(*ri).fWarning].rm_so, "warning", 7) == 0);
+			if (ri->fWarning)
+			{
+				BString wstr = rx.MatchStr(text, ri->fWarning);
+				warning = (wstr.ICompare("warning", 7) == 0);
+			}
 			
-			item = new CMessageItem(text + matches[(*ri).fMsg].rm_so,
-				matches[(*ri).fMsg].rm_eo - matches[(*ri).fMsg].rm_so,
-				warning ? CMessageItem::msgWarning : CMessageItem::msgError,
-				&ref, line);
-			
-			fErrBuffer.erase(matches[0].rm_so, matches[0].rm_eo - matches[0].rm_so);
+			item = new CMessageItem(rx.MatchStr(text, ri->fMsg).String(),
+									rx.MatchLen(ri->fMsg),
+									warning 
+										? CMessageItem::msgWarning 
+										: CMessageItem::msgError,
+									&ref, line);
+			fErrBuffer.erase(rx.MatchStart(), rx.MatchLen());
+			m = rx.MatchStart();
 		}
 	}
 	
@@ -203,8 +158,6 @@ bool CStdErrParser::MatchOne(bool flush)
 
 		if (lock.IsLocked())
 		{
-			int m = (item == NULL) ? fErrBuffer.length() : matches[0].rm_so;
-
 			font_height fi;
 			be_plain_font->GetHeight(&fi);
 			float h = fi.ascent + fi.descent + 2;

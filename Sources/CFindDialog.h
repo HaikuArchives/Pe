@@ -37,9 +37,11 @@
 #define CFINDDIALOG_H
 
 #include <stack>
-#include <regex.h>
+
 #include "HDialog.h"
 #include "HDialogViews.h"
+
+#include "CRegex.h"
 
 class PMessageItem;
 class PDoc;
@@ -51,7 +53,7 @@ const unsigned long
 class CFindDialog : public HDialog
 {
 	friend class CDirDropArea;
-  public:
+public:
 	enum { sResID = 8 };
 		
 	CFindDialog(BRect frame, const char *name,
@@ -67,15 +69,16 @@ class CFindDialog : public HDialog
 
 	const char* FindString();
 	const char* ReplaceString();
+	char* RxReplaceString(const char* what, int32 len);
+
 	bool Backward();
 	bool IgnoreCase();
 	bool Wrap();
 	bool Word();
 	bool Grep();
 	bool IsInMultiFileState() const;
-	const regex_t *PatternBuffer();
 		
-  private:
+private:
 	virtual bool QuitRequested();
 
 	virtual void WindowActivated(bool active);
@@ -106,7 +109,7 @@ class CFindDialog : public HDialog
 	vector<PDoc*> fOpenWindows;
 	int fOpenWindowIndex;
 	int fCurrentIncludeIndex;
-	regex_t fPatternBuffer;
+	CRegex fRegex;
 	long padding[4];
 
 	// Interface
@@ -172,7 +175,7 @@ inline bool CFindDialog::Word()
 inline bool CFindDialog::Grep()
 {
 	BAutolock lock(this);
-	return IsOn("grep");
+	return IsOn("regx");
 }
 
 inline bool CFindDialog::IsInMultiFileState() const
@@ -182,25 +185,12 @@ inline bool CFindDialog::IsInMultiFileState() const
 
 #pragma mark - Find
 
-extern bool gRxInstalled;
-
-void initskip(const unsigned char *p, int skip[], bool ignoreCase);
-void initskip_b(const unsigned char *p, int skip[], bool ignoreCase);
-int mismatchsearch(const unsigned char *p, const unsigned char *a, int N, int skip[], bool ignoreCase);
-int mismatchsearch_b(const unsigned char *p, const unsigned char *a, int N, int skip[], bool ignoreCase);
+void initskip(const char *p, int skip[], bool ignoreCase);
+void initskip_b(const char *p, int skip[], bool ignoreCase);
+int mismatchsearch(const char *p, const char *a, int N, int skip[], bool ignoreCase);
+int mismatchsearch_b(const char *p, const char *a, int N, int skip[], bool ignoreCase);
 
 int Find(const char *what, const char *buf, int bufSize, bool ignoreCase);
-bool FileContains(const char *path, const char *what, bool ignoreCase, bool word, vector<PMessageItem*> *lst = NULL);
 void Offset2Line(const char *buf, int size, int offset, int& line, int& selStart, char** l);
-
-bool BufferContains(const char *buf, int size, const char *path, const char *what, bool ignoreCase, bool word, vector<PMessageItem*> *lst = NULL);
-
-bool FileContainsEx(const char *path, const regex_t *preg, bool word, vector<PMessageItem*> *lst = NULL);
-bool BufferContainsEx(const char *buf, int size, const char *path, const regex_t *preg, bool word, vector<PMessageItem*> *lst = NULL);
-
-int rx_regcomp(regex_t *pb, const char *pattern, bool ignoreCase);
-char *rx_replace(regex_t *pb, const char *txt, int size, const char *repl);
-int rx_regexec(const regex_t *preg, const char *string, int len,
-	int nmatch, regmatch_t pmatch[], int eflags, bool backward = false);
 
 #endif // CFINDDIALOG_H

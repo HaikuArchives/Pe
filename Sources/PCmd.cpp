@@ -535,12 +535,10 @@ PReplaceCmd::PReplaceCmd(PText *txt, int offset, int size, bool findNext, bool b
 	fEntireWord = gFindDialog->Word();
 	fGrep = gFindDialog->Grep();
 	
-	if (gRxInstalled && fGrep)
+	if (fGrep)
 	{
-		const char *t = gFindDialog->FindString();
-		fWith = rx_replace(const_cast<regex_t*>(gFindDialog->PatternBuffer()),
-			fWhat, size, gFindDialog->ReplaceString());
-		fExpr = strdup(t);
+		fWith = gFindDialog->RxReplaceString(fWhat, size);
+		fExpr = strdup(gFindDialog->FindString());
 	}
 	else
 	{
@@ -573,12 +571,12 @@ void PReplaceCmd::Do()
 	{
 		if (gFindDialog->IsInMultiFileState())
 		{
-			if (!fText->FindNext((unsigned char *)(fGrep ? fExpr : fWhat), offset, fIgnoreCase,
+			if (!fText->FindNext((fGrep ? fExpr : fWhat), offset, fIgnoreCase,
 				false, false, fEntireWord, fGrep, true))
 				gFindDialog->PostMessage(msg_FindInNextFile);
 		}
 		else
-			fText->FindNext((unsigned char *)(fGrep ? fExpr : fWhat), offset, fIgnoreCase,
+			fText->FindNext((fGrep ? fExpr : fWhat), offset, fIgnoreCase,
 				fWrap, fBackward, fEntireWord, fGrep, true);
 	}
 } /* PReplaceCmd::Do */
@@ -625,66 +623,43 @@ void PReplaceAllCmd::Do()
 
 	int a, c;
 	
-	if (gRxInstalled && fGrep)
+	int fl, rl, offset = 0;
+	fl = strlen(fFind);
+	rl = strlen(fRepl);
+		
+	PLongAction la(fText);
+		
+	BString what;
+	while (fText->FindNext(fFind, offset, fIgnoreCase,	false, false, 
+		fEntireWord, fGrep, false))
 	{
-		regex_t pb;
-		memset(&pb, 0, sizeof(pb));
-
-		int r = rx_regcomp(&pb, fFind, fIgnoreCase);
-		if (r > 1)
+		what.SetTo(fText->Text() + offset, fl);
+		fText->Delete(offset, offset + fl);
+		if (fGrep)
 		{
-			char err[100];
-			regerror(r, &pb, err, 100);
-			THROW((err));
+			char* repStr 
+				= gFindDialog->RxReplaceString(what.String(), what.Length());
+			if (repStr)
+			{
+				rl = strlen(repStr);
+				fText->Insert(repStr, rl, offset);
+				offset += rl;
+				free(repStr);
+			}
 		}
-		
-		a = c = 0;
-		regmatch_t match[2];
-		
-		PLongAction la(fText);
-		
-		while (rx_regexec(&pb, fText->Text() + a, fText->Size() - a, 1, match, 0) == REG_NOERROR)
+		else
 		{
-			a += match[0].rm_so;
-			c = a + (match[0].rm_eo - match[0].rm_so);
-			
-			fText->Select(a, c, true, false);
-			
-			char *r = rx_replace(&pb, fText->Text() + a, c - a + 1, fRepl);
-			fText->Delete(a, c);
-			fText->Insert(r, strlen(r), a);
-
-			a += strlen(r);
-			free(r);
-			
-			if (la.Tick())
-				break;
-		}
-		
-		regfree(&pb);
-	}
-	else
-	{
-		int fl, rl, offset = 0;
-		fl = strlen(fFind);
-		rl = strlen(fRepl);
-		
-		PLongAction la(fText);
-		
-		while (fText->FindNext((unsigned char *)fFind, offset, fIgnoreCase,
-			false, false, fEntireWord, fGrep, false))
-		{
-			fText->Delete(offset, offset + fl);
-			if (rl) fText->Insert(fRepl, rl, offset);
+			if (rl) 
+				fText->Insert(fRepl, rl, offset);
 			offset += rl;
-			
-			if (la.Tick())
-				break;
 		}
-
-		a = offset;
-		c = a + rl;
+		
+		if (la.Tick())
+			break;
 	}
+
+	a = offset;
+	c = a + rl;
 	
 	Update();
 	fText->Select(a, c, true, false);

@@ -11,9 +11,9 @@
 #define PREFS_H
 
 
-const char* const prf_X_GrepPatFind				= "greppatfind";
-const char* const prf_X_GrepPatName				= "greppatname";
-const char* const prf_X_GrepPatRepl				= "greppatrepl";
+const char* const prf_X_GrepPatFind				= "regxpatfind";
+const char* const prf_X_GrepPatName				= "regxpatname";
+const char* const prf_X_GrepPatRepl				= "regxpatrepl";
 const char* const prf_X_IncludePath				= "includepath";
 const char* const prf_X_Mimetype				= "mimetype";
 const char* const prf_X_SearchPath				= "searchpath";
