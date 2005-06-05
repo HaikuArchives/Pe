@@ -1411,7 +1411,9 @@ void PText::SplitterMoved(g_unit_t dy)
 		//          scrollbar manually, otherwise dragging the splitter leaves
 		//			"dirt":
 		BRect sb1Invalid = fVScrollBar1->Bounds();
-		sb1Invalid.top = sb1Invalid.bottom - B_H_SCROLL_BAR_HEIGHT - dy - 5;
+		scroll_bar_info si;
+		if (get_scroll_bar_info(&si) == B_OK && !si.double_arrows)
+			sb1Invalid.top = sb1Invalid.bottom - B_H_SCROLL_BAR_HEIGHT - dy - 2;
 		fVScrollBar1->Invalidate(sb1Invalid);
 	}
 #endif
