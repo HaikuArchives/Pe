@@ -1404,15 +1404,17 @@ void PText::SplitterMoved(g_unit_t dy)
 	else if (fVScrollBar2->IsHidden())
 		fVScrollBar2->Show();
 
+#if B_BEOS_VERSION == B_BEOS_VERSION_5
 	if (!fVScrollBar1->IsHidden())
 	{
 		// [zooey]: I don't really know why, but we need to invalidate the upper
 		//          scrollbar manually, otherwise dragging the splitter leaves
 		//			"dirt":
 		BRect sb1Invalid = fVScrollBar1->Bounds();
-		sb1Invalid.top = sb1Invalid.bottom - B_H_SCROLL_BAR_HEIGHT - dy - 2;
+		sb1Invalid.top = sb1Invalid.bottom - B_H_SCROLL_BAR_HEIGHT - dy - 5;
 		fVScrollBar1->Invalidate(sb1Invalid);
 	}
+#endif
 
 	src.top = fSplitAt - kSplitterHeight;
 	dst = src;
