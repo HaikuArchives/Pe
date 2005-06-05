@@ -5805,16 +5805,19 @@ void PText::MessageReceived(BMessage *msg)
 
 			case B_MOUSE_WHEEL_CHANGED:
 			{
+				// the wheel that have changed may *not* be the vertical one so,
+				// if y == 0, let the view scroll horizontally.
 				float y;
-				if (msg->FindFloat("be:wheel_delta_y", &y) == B_OK)
+				if ((msg->FindFloat("be:wheel_delta_y", &y) == B_OK) &&
+					(y != 0))
 				{
-					BMessage msg( y<0 
-									? kmsg_ScrollOneLineUp 
-									: kmsg_ScrollOneLineDown);
+					BMessage msg(y < 0 ? kmsg_ScrollOneLineUp : kmsg_ScrollOneLineDown);
 					int numLines = gPrefs->GetPrefInt(prf_I_ScrollwheelLines, 3);
 					for( int i=0; i<numLines; ++i)
 						DoKeyCommand(&msg);
 				}
+				else
+					BView::MessageReceived(msg);
 				break;
 			}
 
