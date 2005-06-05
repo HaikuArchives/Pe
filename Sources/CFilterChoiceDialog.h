@@ -113,11 +113,11 @@ private:
 	CFilterChoiceModel	*fModel;
 	Listener			*fListener;
 	BString				fFilterString;
-	BView				*fRootView;
 	BTextControl		*fFilterStringControl;
 	BListView			*fChoicesList;
 	ChoiceGroupInfo		*fGroupInfos;
 	int					fGroupCount;
+	int					fDefaultSelectGroup;
 	ChoiceItemInfo		*fItemInfos;
 	int					fItemCount;
 	ChoiceItemInfo		*fChosenItem;
