@@ -1236,15 +1236,24 @@ void PDoc::SetError(const char *err, rgb_color c)
 	fError->SetHighColor(c);
 } // PDoc::SetError
 
-#pragma mark - Addons
+#pragma mark - Add-ons
+
+typedef void *(new_pe_add_on_func)(void);
 
 struct ExtensionInfo {
-	perform_edit_func extension;
-	char* name;
-	uint16 hash;
-	//
-	PText* currText;
-	//
+	enum mode {
+		E_HTML,
+		E_METROWERKS,
+		E_PE,
+	};
+
+	char*				name;
+	uint16				hash;
+	enum mode			mode;
+
+	perform_edit_func	extension;
+	new_pe_add_on_func	new_pe_add_on;
+
 	bool operator< (const ExtensionInfo& other) const {
 		return strcasecmp(name, other.name) < 0;
 	}
@@ -1355,8 +1364,12 @@ void PDoc::BuildExtensionsMenu(BMenu *addOnMenu)
 static int32 perform_extension(void* data)
 {
 	ExtensionInfo* extInfo = reinterpret_cast<ExtensionInfo*>(data);
-	if (extInfo) {
-		MTextAddOnImpl intf(*extInfo->currText, extInfo->name);
+	thread_id sender;
+	PText* text = (PText *)receive_data(&sender, NULL, 0);
+
+	if (extInfo != NULL && text != NULL)
+	{
+		MTextAddOnImpl intf(*text, extInfo->name);
 		(*extInfo->extension)(&intf);
 	}
 	return B_OK;
@@ -1367,11 +1380,14 @@ void PDoc::PerformExtension(int nr)
 	if (sExtensions[nr].extension != NULL)
 	{
 		UpdateIfNeeded();
-		sExtensions[nr].currText = fText;
+
 		thread_id tid = spawn_thread(perform_extension, sExtensions[nr].name, 
-											  B_NORMAL_PRIORITY, (void*)&sExtensions[nr]);
-		if (tid > 0)
+									 B_NORMAL_PRIORITY, (void*)&sExtensions[nr]);
+		if (tid >= B_OK)
+		{
 			resume_thread(tid);
+			send_data(tid, (int32)fText, NULL, 0);
+		}
 	}
 	else if (modifiers() & B_OPTION_KEY)
 	{
