@@ -361,7 +361,8 @@ void PDoc::UpdateTitle()
 void PDoc::SetFile(entry_ref &ref)
 {
 	CDoc::SetFile(ref);
-	UpdateTitle();		
+	UpdateTitle();
+	fText->SetLanguage(ref.name);
 	fLastSaved = time(NULL);
 } /* PDoc::SetFile */
 
@@ -616,7 +617,7 @@ void PDoc::SaveRequested(entry_ref& directory, const char *name)
 			
 			file.SetPermissions(perm);
 		}
-	
+
 		fText->SetLanguage(name);
 
 		BEntry e;
