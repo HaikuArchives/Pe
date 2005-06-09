@@ -88,6 +88,7 @@ Application pe :
 	FontStyle.cpp
 	MTextAddOnImpl.cpp
 	PAbout.cpp
+	PAddOn.cpp
 	PApp.cpp
 	PCmd.cpp
 	PDoc.cpp
