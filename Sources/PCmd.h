@@ -36,6 +36,11 @@
 #ifndef PCMD_H
 #define PCMD_H
 
+
+#include <Path.h>
+#include <vector>
+
+
 class PText;
 class PTextBuffer;
 

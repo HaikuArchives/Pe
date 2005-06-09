@@ -34,6 +34,7 @@
 #ifndef PTEXTBUFFER_H
 #define PTEXTBUFFER_H
 
+#include <Debug.h>
 #include "utf-support.h"
 
 enum {
