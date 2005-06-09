@@ -19,27 +19,33 @@ long perform_edit(MTextAddOn *addon)
 {
 	long result = B_OK;
 	entry_ref headerFile;
-	
-	result = addon->GetRef (headerFile);
-	
+
+	result = addon->GetRef(headerFile);
+
 	if (result == B_OK)
 	{
 		BString fileName(headerFile.name);
 
-		fileName.ReplaceAll (".", "_");
-		fileName.Prepend ("_");
-		fileName.Append ("_");
-		
-		addon->Select (0,0);
-		
-		BString ifdefString;
-		ifdefString << "#ifndef " << fileName << "\n#define " << fileName << "\n\n";
-	
-		addon->Insert (ifdefString.String());
-	
-		addon->Select(addon->TextLength (), addon->TextLength ());
-	
-		addon->Insert ("#endif\n");
+		fileName.ReplaceAll(".", "_");
+		fileName.Prepend("_");
+		fileName.Append("_");
+
+		// Do not change the case if a shift key was pressed
+		if ((modifiers() & B_SHIFT_KEY) == 0)
+			fileName.ToUpper();
+
+		addon->Select(0, 0);
+
+		BString insert;
+		insert << "#ifndef " << fileName << "\n#define " << fileName << "\n\n";
+		addon->Insert(insert.String());
+
+		addon->Select(addon->TextLength(), addon->TextLength());
+
+		insert = "\n#endif\t// ";
+		insert.Append(fileName);
+		insert.Append("\n");
+		addon->Insert(insert.String());
 	}
 	
 	return result;
