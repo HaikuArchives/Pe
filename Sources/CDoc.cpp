@@ -56,7 +56,6 @@ CDoc::CDoc(const char* mimetype, BLooper *target, const entry_ref *doc)
 	fTarget = target;
 	fDirty = false;
 	fURL = NULL;
-//	fSaveAttributes = true;
 	fMimeType = mimetype;
 	
 	if (doc)

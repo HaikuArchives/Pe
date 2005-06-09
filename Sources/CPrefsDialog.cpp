@@ -416,7 +416,6 @@ bool CPrefsDialog::OKClicked()
 	gPrefs->SetPrefInt(prf_I_Parent, IsOn("sepa"));
 	gPrefs->SetPrefInt(prf_I_BeIncludes, IsOn("incl"));
 
-	gPrefs->SetPrefInt(prf_I_SaveResources, IsOn("core"));
 	gPrefs->SetPrefInt(prf_I_Backup, IsOn("maba"));
 	gPrefs->SetPrefInt(prf_I_NlAtEof, IsOn("fonl"));
 	gPrefs->SetPrefInt(prf_I_Verify, IsOn("vofm"));
@@ -651,9 +650,6 @@ bool CPrefsDialog::CancelClicked()
 	
 	SetOn("sepa", gPrefs->GetPrefInt(prf_I_Parent, 1));
 	SetOn("incl", gPrefs->GetPrefInt(prf_I_BeIncludes, 1));
-
-	SetOn("core", gPrefs->GetPrefInt(prf_I_SaveResources, 1));
-	SetOn("coat", gPrefs->GetPrefInt(prf_I_SaveAttributes, 1));
 
 	SetOn("maba", gPrefs->GetPrefInt(prf_I_Backup, 0));
 	SetOn("fonl", gPrefs->GetPrefInt(prf_I_NlAtEof, 1));

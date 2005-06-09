@@ -94,10 +94,10 @@ const char* const prf_I_RestorePosition			= "restore position";
 const char* const prf_I_RestoreScrollbar		= "restore scrollbar";
 const char* const prf_I_RestoreSelection		= "restore selection";
 const char* const prf_I_SaveAttr				= "save attr";
-const char* const prf_I_SaveAttributes			= "save attributes";	// Todo: this one is only once there?!
-const char* const prf_I_SaveResources			= "save resources";
+const char* const prf_I_SaveAttributes			= "save attributes";
 const char* const prf_I_SavedState				= "saved state";
-const char* const prf_I_ScrollwheelLines		= "scrollwheel lines";	// Todo: this one is only once there?!
+const char* const prf_I_ScrollwheelLines		= "scrollwheel lines";	
+						// Currently not in GUI
 const char* const prf_I_ShowHtmlpaletteForHtml	= "show htmlpalette for html";
 const char* const prf_I_ShowHtmlPalette			= "show htmlpalette";
 const char* const prf_I_ShowInvisibles			= "show invisibles";

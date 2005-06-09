@@ -155,7 +155,6 @@ resource 'DLOG' (132, "Preferences") {
 			TabSheet			{ "Files", "Options for files on disk"														},
 				Caption			{{   0,   0, 120,  16 }, "sv",			"When saving a file"								},
 
-				CheckBox		{{ 140,   0, 290,  16 }, "coat",		"Restore attributes"								},
 				CheckBox		{{ 140,  20, 290,  36 }, "maba",		"Make backup (filename~)"							},
 				CheckBox		{{ 140,  40, 290,  56 }, "fonl",		"End with newline"									},
 				
