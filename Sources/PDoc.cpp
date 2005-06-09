@@ -1238,10 +1238,12 @@ void PDoc::SetError(const char *err, rgb_color c)
 
 #pragma mark - Add-ons
 
-typedef void *(new_pe_add_on_func)(void);
+typedef void (*new_pe_add_on_func)(void);
 
 struct ExtensionInfo {
-	enum mode {
+	enum type {
+		E_NONE,
+		E_SCRIPT,
 		E_HTML,
 		E_METROWERKS,
 		E_PE,
@@ -1249,12 +1251,13 @@ struct ExtensionInfo {
 
 	char*				name;
 	uint16				hash;
-	enum mode			mode;
+	enum type			type;
 
-	perform_edit_func	extension;
+	perform_edit_func	perform_edit;
 	new_pe_add_on_func	new_pe_add_on;
 
-	bool operator< (const ExtensionInfo& other) const {
+	bool operator< (const ExtensionInfo& other) const
+	{
 		return strcasecmp(name, other.name) < 0;
 	}
 };
@@ -1265,10 +1268,14 @@ static int GetExtensionMenuIndexByHash(uint16 hash)
 	int idx = -1;
 	int skipped = 0;
 	for (uint16 i = 0; i < sExtensions.size(); i++) {
-		if (gPrefs->GetPrefInt(prf_I_SkipHtmlExt, 1) 
-		&& strncasecmp(sExtensions[i].name, "HTML", 4) == 0) {
+		if ((gPrefs->GetPrefInt(prf_I_SkipHtmlExt, 1) 
+				&& sExtensions[i].type == ExtensionInfo::E_HTML)
+			|| sExtensions[i].type == ExtensionInfo::E_PE)
+		{
 			skipped++;
-		} else if (sExtensions[i].hash == hash) {
+		}
+		else if (sExtensions[i].hash == hash)
+		{
 			idx = i;
 			break;
 		}
@@ -1283,7 +1290,7 @@ static void LoadAddOnsFromPath(const char *path)
 
 	if (!dir)
 		return;
-	
+
 	struct dirent *dent;
 	struct stat stbuf;
 
@@ -1295,27 +1302,37 @@ static void LoadAddOnsFromPath(const char *path)
 		if (!err && S_ISREG(stbuf.st_mode) &&
 			strcmp(dent->d_name, ".") && strcmp(dent->d_name, ".."))
 		{
-			image_id next;
-			perform_edit_func f;
 			struct ExtensionInfo extInfo;
+			memset(&extInfo, 0, sizeof(ExtensionInfo));
+			extInfo.type = ExtensionInfo::E_NONE;
 
-			next = load_add_on(plug);
-			if (next > B_ERROR &&
-				get_image_symbol(next, "perform_edit", B_SYMBOL_TYPE_TEXT, (void**)&f) == B_NO_ERROR)
+			image_id image = load_add_on(plug);
+			if (image >= B_OK)
 			{
-				char *n = strdup(dent->d_name);
-
-				extInfo.extension = f;
-				extInfo.name = n;
-				extInfo.hash = HashString16(n);
-				sExtensions.push_back(extInfo);
+				if (get_image_symbol(image, "perform_edit", B_SYMBOL_TYPE_TEXT,
+						(void**)&extInfo.perform_edit) == B_OK)
+				{
+					if (!strcmp(dent->d_name, "HTML"))
+						extInfo.type = ExtensionInfo::E_HTML;
+					else
+						extInfo.type = ExtensionInfo::E_METROWERKS;
+				}
+				else if (get_image_symbol(image, "new_pe_add_on", B_SYMBOL_TYPE_TEXT,
+							(void**)&extInfo.new_pe_add_on) == B_OK)
+					extInfo.type = ExtensionInfo::E_PE;
 			}
 			else if (stbuf.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 			{
 				// an executable shell script perhaps...
-				extInfo.extension = NULL;
-				extInfo.name = strdup(dent->d_name);
-				extInfo.hash = HashString16(dent->d_name);
+				extInfo.type = ExtensionInfo::E_SCRIPT;
+			}
+
+			if (extInfo.type != ExtensionInfo::E_NONE)
+			{
+				char *name = strdup(dent->d_name);
+
+				extInfo.name = name;
+				extInfo.hash = HashString16(name);
 				sExtensions.push_back(extInfo);
 			}
 		}
@@ -1354,10 +1371,13 @@ void PDoc::BuildExtensionsMenu(BMenu *addOnMenu)
 {
 	for (uint16 i = 0; i < sExtensions.size(); i++)
 	{
-		if (!(gPrefs->GetPrefInt(prf_I_SkipHtmlExt, 1) 
-			&& strncasecmp(sExtensions[i].name, "HTML", 4) == 0))
-			addOnMenu->AddItem(new BMenuItem(sExtensions[i].name, 
-														new BMessage(msg_PerformExtension)));
+		if ((gPrefs->GetPrefInt(prf_I_SkipHtmlExt, 1)
+				&& sExtensions[i].type == ExtensionInfo::E_HTML)
+			|| sExtensions[i].type == ExtensionInfo::E_PE)
+			continue;
+
+		addOnMenu->AddItem(new BMenuItem(sExtensions[i].name,
+						   new BMessage(msg_PerformExtension)));
 	}
 } /* PDoc::BuildExtensionsMenu */
 
@@ -1370,14 +1390,14 @@ static int32 perform_extension(void* data)
 	if (extInfo != NULL && text != NULL)
 	{
 		MTextAddOnImpl intf(*text, extInfo->name);
-		(*extInfo->extension)(&intf);
+		(*extInfo->perform_edit)(&intf);
 	}
 	return B_OK;
 }
 
 void PDoc::PerformExtension(int nr)
 {
-	if (sExtensions[nr].extension != NULL)
+	if (sExtensions[nr].perform_edit != NULL)
 	{
 		UpdateIfNeeded();
 
@@ -1389,25 +1409,28 @@ void PDoc::PerformExtension(int nr)
 			send_data(tid, (int32)fText, NULL, 0);
 		}
 	}
-	else if (modifiers() & B_OPTION_KEY)
+	else if (sExtensions[nr].type == ExtensionInfo::E_SCRIPT)
 	{
-		char path[PATH_MAX];
+		if (modifiers() & B_OPTION_KEY)
+		{
+			char path[PATH_MAX];
+			
+			BPath p;
+			BEntry e;
+			gAppDir.GetEntry(&e);
+			e.GetPath(&p);
+			strcpy(path, p.Path());
 		
-		BPath p;
-		BEntry e;
-		gAppDir.GetEntry(&e);
-		e.GetPath(&p);
-		strcpy(path, p.Path());
-	
-		strcat(path, "/Extensions/");
-		strcat(path, sExtensions[nr].name);
-		
-		entry_ref ref;
-		if (get_ref_for_path(path, &ref) == B_OK)
-			gApp->OpenWindow(ref);
+			strcat(path, "/Extensions/");
+			strcat(path, sExtensions[nr].name);
+			
+			entry_ref ref;
+			if (get_ref_for_path(path, &ref) == B_OK)
+				gApp->OpenWindow(ref);
+		}
+		else
+			fText->RegisterCommand(new PScriptCmd(fText, sExtensions[nr].name));
 	}
-	else
-		fText->RegisterCommand(new PScriptCmd(fText, sExtensions[nr].name));
 } /* PDoc::PerformExtension */
 
 void PDoc::PerformExtension(const char *ext)
