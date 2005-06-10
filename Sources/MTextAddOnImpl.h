@@ -49,7 +49,7 @@ private:
 
 	MIDETextView&				fText;
 	PExtCmd						*fCmd;
-	bool							fDirty;
+	bool						fDirty;
 };
 
 #endif
