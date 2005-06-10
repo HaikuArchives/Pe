@@ -231,8 +231,6 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fMainPopUp->SetRadioMode(false);
 
 	ReInit();
-	
-	RecalculateLineBreaks();
 } /* PText::PText */
 
 void PText::ReInit()
@@ -245,7 +243,7 @@ void PText::ReInit()
 
 	fFont.GetHeight(&fFH);
 	fLineHeight = ceil(fFH.ascent + fFH.descent + fFH.leading);
-	fMetrics = CFontStyle::Locate(ff, fs, fFont.Size(), fFont.Encoding());
+	fMetrics = CFontStyle::Locate(ff, fs, fFont.Size(), B_UNICODE_UTF8);
 
 	fTabWidth = fTabStops * StringWidth(" ", 1);
 	
@@ -441,20 +439,26 @@ void PText::WindowActivated(bool active)
 
 void PText::SetSettings(BMessage& msg)
 {
-	int32 i, anchor = 0, caret = 0;
+	int32 i;
 	float f;
 	const char *s1, *s2;
 	bool b;
 	
 	if (gRestoreFont)
 	{
-		if (msg.FindInt32("tabstop", &i) == B_OK)			fTabStops = i;
-		if (msg.FindBool("show tabs", &b) == B_OK)		ShowTabStops(b);
-		if (msg.FindFloat("fontsize", &f) == B_OK)			fFont.SetSize(f);
-		if (msg.FindString("fontfamily", &s1) == B_OK && msg.FindString("fontstyle", &s2) == B_OK)
-																		fFont.SetFamilyAndStyle(s1, s2);
-		if (msg.FindBool("syntaxcoloring", &b) == B_OK)	fSyntaxColoring = b;
-		if (msg.FindInt32("encoding", &i) == B_OK)			SetEncoding(i);
+		if (msg.FindInt32("tabstop", &i) == B_OK)
+			fTabStops = i;
+		if (msg.FindBool("show tabs", &b) == B_OK)
+			ShowTabStops(b);
+		if (msg.FindFloat("fontsize", &f) == B_OK)
+			fFont.SetSize(f);
+		if (msg.FindString("fontfamily", &s1) == B_OK 
+			&& msg.FindString("fontstyle", &s2) == B_OK)
+			fFont.SetFamilyAndStyle(s1, s2);
+		if (msg.FindBool("syntaxcoloring", &b) == B_OK)
+			fSyntaxColoring = b;
+		if (msg.FindInt32("encoding", &i) == B_OK)
+			SetEncoding(i);
 
 		if (msg.FindBool("softwrap", &b) == B_OK)
 			fSoftWrap = b;
@@ -462,26 +466,32 @@ void PText::SetSettings(BMessage& msg)
 			fSoftWrap = gPrefs->GetPrefInt(prf_I_SoftWrap, 0);
 		Doc()->ButtonBar()->SetOn(msg_SoftWrap, fSoftWrap);
 
-		if (msg.FindInt32("wraptype", &i) == B_OK)			fWrapType = i;
-		if (msg.FindInt32("wrapwidth", &i) == B_OK)		fWrapWidth = i;
+		if (msg.FindInt32("wraptype", &i) == B_OK)
+			fWrapType = i;
+		if (msg.FindInt32("wrapwidth", &i) == B_OK)
+			fWrapWidth = i;
 	}
 
 	ReInit();
 
 	if (gRestoreSelection)
 	{
+		int32 anchor = 0, caret = 0;
 		bool block = false;
 		msg.FindInt32("anchor", &anchor);
 		msg.FindInt32("caret", &caret);
 		msg.FindBool("block", &block);
+		fStoredCaret = caret;
 		Select(anchor, caret, true, block);
 		fWalkOffset = Offset2Position(fCaret).x;
 	}
 	
 	if (gRestoreScrollbar)
 	{
-		if (msg.FindFloat("vscroll", &f) == B_OK)				fVScrollBar2->SetValue(f);
-		if (msg.FindFloat("hscroll", &f) == B_OK)				fHScrollBar->SetValue(f);
+		if (msg.FindFloat("vscroll", &f) == B_OK)
+			fVScrollBar2->SetValue(f);
+		if (msg.FindFloat("hscroll", &f) == B_OK)
+			fHScrollBar->SetValue(f);
 	}
 	
 	if (gRestoreCWD && msg.FindString("cwd", &s1) == B_OK)
@@ -491,11 +501,7 @@ void PText::SetSettings(BMessage& msg)
 	}
 	
 	if (msg.FindString("language", &s1) == B_OK)
-	{
-		fLangIntf = CLangIntf::FindByName(s1);
-		TouchLines(0);
-		RestyleDirtyLines(0);
-	}
+		SetLanguage(s1);
 } /* PText::SetSettings */
 
 void PText::GetSettings(BMessage& msg)
@@ -519,7 +525,8 @@ void PText::GetSettings(BMessage& msg)
 	FailOSErr(msg.AddFloat("hscroll", fHScrollBar->Value()));
 	FailOSErr(msg.AddBool("syntaxcoloring", fSyntaxColoring));
 	
-	if (fFont.Encoding()) FailOSErr(msg.AddInt32("encoding", fFont.Encoding()));
+	if (fText.Encoding()) 
+		FailOSErr(msg.AddInt32("encoding", fText.Encoding()));
 	
 	FailOSErr(msg.AddBool("softwrap", fSoftWrap));
 
@@ -625,18 +632,15 @@ void PText::SetSplitter(PSplitter *splitter)
 
 void PText::SetEncoding(int encoding)
 {
-	fFont.SetEncoding(encoding);
 	fText.SetEncoding(encoding);
 	
 	font_family fam;
 	font_style sty;
 	fFont.GetFamilyAndStyle(&fam, &sty);
 	
-	fMetrics = CFontStyle::Locate(fam, sty, fFont.Size(), encoding);
+	fMetrics = CFontStyle::Locate(fam, sty, fFont.Size(), B_UNICODE_UTF8);
 	
 	SetFont(&fFont);
-	
-	RecalculateLineBreaks();
 } /* PText::SetEncoding */
 
 void PText::ShowTabStops(bool show)
@@ -850,20 +854,19 @@ int PText::RewrapLines(int from, int to, bool hard)
 {
 	int offset, state, lb, fl, dy;
 	
-// first remove invalid linebreaks
+	// first remove invalid linebreaks
 	fl = min(Offset2Line(from), LineCount() - 1);
 
 	VLineInfo::iterator ls, le;
 
 	ls = fLineInfo.begin() + fl;
 	
-//	while (ls != fLineInfo.begin() && (*ls).nl == false)
-//		ls--;
-	if (ls != fLineInfo.begin() && (*ls).nl == false)
+	while (ls != fLineInfo.begin() && (*ls).nl == false)
 		ls--;
-	
+/*
 	if (ls == fLineInfo.begin())
 		(*ls).dirty = true;
+*/
 
 	le = ls + 1;
 	
@@ -888,21 +891,14 @@ int PText::RewrapLines(int from, int to, bool hard)
 
 	le = ls + 1;
 	
-// then determine the new ones
+	// then determine the new ones
 	state = (*ls).state;
 	lb = (*ls).start;
 	
 	offset = FindLineBreak(lb, hard);
 	while (offset < to)
 	{
-		int len = offset - lb;
-		CAlloca txt(len + 1);
-		
-		fText.Copy(txt, lb, len);
-		txt[len] = 0;
-		fLangIntf->ColorLine(txt, len, state, NULL, NULL);
-		
-		le = fLineInfo.insert(le, LineInfo(offset, state, fText[offset - 1] == '\n')) + 1;
+		le = fLineInfo.insert(le, LineInfo(offset, 0, fText[offset - 1] == '\n')) + 1;
 		dy++;
 		
 		lb = offset;
@@ -914,15 +910,7 @@ int PText::RewrapLines(int from, int to, bool hard)
 		fText[--offset] == '\n' &&
 		fLineInfo.back().start != offset + 1)
 	{
-		int len = offset - lb;
-
-		CAlloca txt(len + 1);
-
-		fText.Copy(txt, lb, len);
-		txt[len] = 0;
-		fLangIntf->ColorLine(txt, len, state, NULL, NULL);
-
-		fLineInfo.push_back(LineInfo(offset + 1, state, true));
+		fLineInfo.push_back(LineInfo(offset + 1, 0, true));
 		dy++;
 	}
 
@@ -937,6 +925,7 @@ void PText::RecalculateLineBreaks()
 	fLineInfo.push_back(LineInfo(0, 0));
 	
 	RewrapLines(0, fText.Size());
+	RestyleDirtyLines(0);
 } /* PText::RecalculateLineBreaks */
 
 #pragma mark - Undo
@@ -4220,7 +4209,7 @@ void PText::IncSearchKey(const char *bytes, int numBytes)
 	else if (bytes[0] == B_BACKSPACE)
 	{
 		if (ipl)
-			fIncPat[ipl - 1] = 0;
+			fIncPat[ipl - mprevcharlen(fIncPat+ipl)] = 0;
 		else
 			fIncSearch = 0;
 	}

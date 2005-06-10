@@ -47,6 +47,9 @@ bool isspace_uc(int unicode);
 int maptounicode(int charset, char ch);
 int mclass(int unicode);
 
+char* ConvertToUtf8(const char* text, int32 size, int encoding, int32& outSize);
+char* ConvertFromUtf8(const char* text, int32 size, int encoding, int32& outSize);
+
 void InitUTFTables();
 
 #endif // UTF_SUPPORT_H

@@ -363,3 +363,58 @@ int mclass(int unicode)
 
 	return r;
 } /* mclass */
+
+char* ConvertToUtf8(const char* text, int32 size, int encoding, int32& outSize)
+{
+	const float incFactor = 1.5;
+	int32 srcSize = size;
+	int32 srcLen = 0;
+	int32 srcOffset = 0;
+	int32 destSize = max(size, 128L);
+	int32 destLen;
+	int32 destOffset = 0;
+	char* utf8Text = NULL;
+	int32 state = 0;
+	while (srcOffset < srcSize)
+	{
+		destSize = (int32)(destSize * incFactor);
+		utf8Text = (char *)realloc(utf8Text, destSize);
+		FailNil(utf8Text);
+		srcLen = srcSize - srcOffset;
+		destLen = destSize - destOffset;
+		FailOSErr(convert_to_utf8(encoding, text+srcOffset, &srcLen, 
+								  utf8Text+destOffset, &destLen, &state));
+		srcOffset += srcLen;
+		destOffset += destLen;
+	}
+	outSize = destOffset;
+	return utf8Text;
+}
+
+char* ConvertFromUtf8(const char* utf8Text, int32 size, int encoding, 
+					  int32& outSize)
+{
+	const float incFactor = 1.5;
+	int32 srcSize = size;
+	int32 srcLen = 0;
+	int32 srcOffset = 0;
+	int32 destSize = max(size, 128L);
+	int32 destLen;
+	int32 destOffset = 0;
+	char* text = NULL;
+	int32 state = 0;
+	while (srcOffset < srcSize)
+	{
+		destSize = (int32)(destSize * incFactor);
+		text = (char *)realloc(text, destSize);
+		FailNil(text);
+		srcLen = srcSize - srcOffset;
+		destLen = destSize - destOffset;
+		FailOSErr(convert_from_utf8(encoding, utf8Text+srcOffset, &srcLen, 
+									text+destOffset, &destLen, &state));
+		srcOffset += srcLen;
+		destOffset += destLen;
+	}
+	outSize = destOffset;
+	return text;
+}

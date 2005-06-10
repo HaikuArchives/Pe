@@ -66,6 +66,7 @@ virtual	~PTextBuffer();
 		void ChangeToNL(int indx);
 		
 		void SetEncoding(int encoding);
+		int Encoding() const;
 		
 		void TranslateToLF(int fromLE);
 		void TranslateFromLF(int toLE, int lineCount);
@@ -88,7 +89,7 @@ protected:
 inline char PTextBuffer::operator[] (int indx) const
 {
 	ASSERT(indx >= 0);
-//	ASSERT(indx < fLogicalSize);
+	ASSERT(indx < fLogicalSize);
 	if (indx < 0 || indx >= fLogicalSize)
 		return 0;
 	else
@@ -99,4 +100,7 @@ inline int PTextBuffer::Size() const {
 	return fLogicalSize;
 }
 
+inline int PTextBuffer::Encoding() const {
+	return fEncoding;
+}
 #endif // PTEXTBUFFER_H

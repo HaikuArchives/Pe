@@ -394,6 +394,15 @@ void PDoc::ReadData(BPositionIO& file)
 	FailNil(t);
 	CheckedRead(file, t, s);
 	
+	int32 encoding = fText->Encoding();
+	if (encoding != B_UNICODE_UTF8)
+	{
+		int32 utf8Size;
+		char* utf8Text = ConvertToUtf8(t, s, encoding, utf8Size);
+		fText->SetText(utf8Text, utf8Size);
+		free(utf8Text);
+	}
+	else
 	fText->SetText(t, s);
 } /* PDoc::ReadData */
 
@@ -474,7 +483,15 @@ void PDoc::WriteData(BPositionIO& file)
 		text = buf.Buffer();
 	}
 	
-	CheckedWrite(file, text, size);
+	if (fText->Encoding() != B_UNICODE_UTF8)
+	{
+		int32 nativeSize;
+		char* nativeText = ConvertFromUtf8(text, size, fText->Encoding(), nativeSize);
+		CheckedWrite(file, nativeText, nativeSize);
+		free(nativeText);
+	}
+	else
+		CheckedWrite(file, text, size);
 	if (gPrefs->GetPrefInt(prf_I_NlAtEof, 1) &&
 		text[size - 1] != '\n')
 	{

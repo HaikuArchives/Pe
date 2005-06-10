@@ -47,7 +47,7 @@ PTextBuffer::PTextBuffer()
 	fPhysicalSize = 0;
 	fGap = 0;
 	fGapSize = 0;
-	fEncoding = 0;
+	fEncoding = B_UNICODE_UTF8;
 } /* PTextBuffer::PTextBuffer */
 
 PTextBuffer::~PTextBuffer()
@@ -225,11 +225,9 @@ void PTextBuffer::PrintToStream()
 int PTextBuffer::CharLen(int index) const
 {
 	ASSERT(index >= 0);
-//	ASSERT(index <= fLogicalSize);
+	ASSERT(index <= fLogicalSize);
 
-	if (fEncoding)
-		return 1;
-	else if (index < fLogicalSize && index >= 0)
+	if (index < fLogicalSize && index >= 0)
 	{
 		char b[8];
 		Copy(b, index, min(7, fLogicalSize - index));
@@ -246,9 +244,7 @@ int PTextBuffer::PrevCharLen(int index) const
 	ASSERT(index <= fLogicalSize);
 	ASSERT(index >= 0);
 
-	if (fEncoding)
-		return 1;
-	else if (index > 0 && index <= fLogicalSize)
+	if (index > 0 && index <= fLogicalSize)
 	{
 		char b[8];
 		int cnt = max(0, min(7, index));
@@ -421,7 +417,7 @@ void PTextBuffer::CharInfo(int offset, int& unicode, int& len) const
 		unicode = 0;
 		len = 1;
 	}
-	else if (fEncoding == 0)
+	else
 	{
 		char b[8];
 		Copy(b, offset, min(7, fLogicalSize - offset));
@@ -429,11 +425,6 @@ void PTextBuffer::CharInfo(int offset, int& unicode, int& len) const
 	
 		len = mcharlen(b);
 		unicode = municode(b);
-	}
-	else
-	{
-		unicode = maptounicode(fEncoding, operator[](offset));
-		len = 1;
 	}
 } /* PTextBuffer::CharInfo */
 

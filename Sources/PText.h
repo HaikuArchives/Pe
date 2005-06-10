@@ -36,6 +36,7 @@
 
 typedef float g_unit_t;
 
+#include <Messenger.h>
 #include <View.h>
 
 #include "PTextBuffer.h"
@@ -80,36 +81,36 @@ class PText
 //friend class PFontTabsCmd;	// lets keep life simple
 
 public:
-			PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext);
+			PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], 
+				  const char *ext);
 			~PText();
 
 			void ReInit();
 
 			void SetStatus(PStatus *status);
 		
-virtual	void AttachedToWindow();
+virtual		void AttachedToWindow();
 
-virtual	void Draw(BRect updateRect);
-virtual	void MouseDown(BPoint where);
+virtual		void Draw(BRect updateRect);
+virtual		void MouseDown(BPoint where);
 			void TrackDrag(BPoint where);
-virtual	void KeyDown(const char *bytes, int32 numBytes);
+virtual		void KeyDown(const char *bytes, int32 numBytes);
 			bool DoKeyCommand(BMessage *msg);
-virtual	void MouseMoved(BPoint where, uint32 code, const BMessage *a_message);
-virtual	void MessageReceived(BMessage *msg);
-virtual	void WindowActivated(bool active);
+virtual		void MouseMoved(BPoint where, uint32 code, const BMessage *a_message);
+virtual		void MessageReceived(BMessage *msg);
+virtual		void WindowActivated(bool active);
 			void MenusBeginning();
 
-virtual	void FrameMoved(BPoint newPosition);
-virtual	void FrameResized(float w, float h);
+virtual		void FrameMoved(BPoint newPosition);
+virtual		void FrameResized(float w, float h);
 
 			void Pulse();
 
 			void HandleDrop(BMessage *msg);
 			
-			void ProcessCommand(unsigned long what, void *param)
-				{	BMessage msg(what); msg.AddPointer("param", param); BMessenger(this).SendMessage(&msg);	}
+			void ProcessCommand(unsigned long what, void *param);
 
-			void SetText(char *text, size_t size);
+			void SetText(char *utf8Text, size_t size);
 			const char* Text();
 			int Size() const;
 			void SetLanguage(const char *ext);
@@ -294,7 +295,7 @@ private:
 			PTextBuffer& fText;
 			VLineInfo fLineInfo;
 			CFontStyle *fMetrics;
-			int fAnchor, fCaret;
+			int fAnchor, fCaret, fStoredCaret;
 			bool fBlockSelect;
 			bool fCaretVisible;
 			long fCaretShielded;
@@ -374,7 +375,7 @@ inline bool PText::ShowInvisibles() const {
 }
 
 inline int PText::Encoding() const {
-	return fFont.Encoding();
+	return fText.Encoding();
 }
 
 inline int PText::LineCount() const {
@@ -454,5 +455,12 @@ inline bool PText::IsFixedFont() const
 {
 	return fFont.IsFixed();
 } // PText::IsFixedFont
+
+inline void PText::ProcessCommand(unsigned long what, void *param)
+{
+	BMessage msg(what); 
+	msg.AddPointer("param", param); 
+	BMessenger(this).SendMessage(&msg);
+}
 
 #endif // PTEXT_H
