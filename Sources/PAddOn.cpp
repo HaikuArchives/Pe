@@ -36,6 +36,8 @@
 #include "PCmd.h"
 #include "PText.h"
 
+#include <String.h>
+
 //#include <string.h>
 #include <stdlib.h>
 
