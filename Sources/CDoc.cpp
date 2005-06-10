@@ -215,9 +215,9 @@ void CDoc::Read(bool readAttributes)
 		BFile file;
 		FailOSErr(file.SetTo(fFile, B_READ_ONLY));
 
-		ReadData(file);
 		if (readAttributes)
 			ReadAttr(file);
+		ReadData(file);
 	}
 	else
 	{
@@ -225,10 +225,6 @@ void CDoc::Read(bool readAttributes)
 		ReadData(ftp);
 	}
 } /* CDoc::Read */
-
-//void CDoc::ReadAttr(BFile& file)
-//{
-//} /* CDoc::ReadAttr */
 
 status_t CDoc::WriteState()
 {
