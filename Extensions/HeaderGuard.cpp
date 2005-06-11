@@ -26,7 +26,7 @@ long perform_edit(MTextAddOn *addon)
 	{
 		BString fileName(headerFile.name);
 
-		fileName.ReplaceAll(".", "_");
+		fileName.ReplaceSet(".+-", "_");
 		fileName.Prepend("_");
 		fileName.Append("_");
 
