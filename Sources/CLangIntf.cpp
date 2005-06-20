@@ -216,7 +216,7 @@ void CLangIntf::SetupLanguageInterfaces()
 	ChooseDefault();
 } /* CLangIntf::SetupLanguageInterfaces */
 
-CLangIntf* CLangIntf::FindIntf(const char *filename)
+CLangIntf* CLangIntf::FindByExtension(const char *filename)
 {
 	char *e;
 	

@@ -68,8 +68,8 @@ static	void ChooseDefault();
 		rgb_color *Colors() const;
 
 static	void SetupLanguageInterfaces();
-static	CLangIntf* FindIntf(const char *filename);
-static	CLangIntf* FindIntf(int indx)	{ return fInterfaces[indx]; }
+static	CLangIntf* FindIntf(int index)	{ return fInterfaces[index]; }
+static	CLangIntf* FindByExtension(const char *filename);
 static CLangIntf* FindByName(const char *language);
 
 static CLangIntf* NextIntf(int& cookie);

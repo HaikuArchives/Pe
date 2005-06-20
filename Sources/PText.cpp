@@ -275,24 +275,25 @@ PText::~PText()
 
 void PText::SetLanguage(const char *ext)
 {
-	CLangIntf *i = CLangIntf::FindIntf(ext);
-	if (i != fLangIntf)
+	CLangIntf *language = CLangIntf::FindByExtension(ext);
+
+	if (language != fLangIntf)
 	{
-		fLangIntf = i;
+		fLangIntf = language;
 		TouchLines(0);
 		RestyleDirtyLines(0);
 		Invalidate();
 	}
 } /* PText::SetLanguage */
 
-int PText::Language () const
+int PText::Language() const
 {
 	return CLangIntf::GetIndex(fLangIntf);
-} // PText::GetLanguage
+} // PText::Language
 
-void PText::SetLanguage(int indx)
+void PText::SetLanguage(int index)
 {
-	CLangIntf *i = (indx >= 0) ? CLangIntf::FindIntf(indx) : CLangIntf::FindIntf("");
+	CLangIntf *i = (index >= 0) ? CLangIntf::FindIntf(index) : CLangIntf::FindByExtension("");
 	if (i != fLangIntf)
 	{
 		fLangIntf = i;
@@ -443,7 +444,7 @@ void PText::SetSettings(BMessage& msg)
 	float f;
 	const char *s1, *s2;
 	bool b;
-	
+
 	if (gRestoreFont)
 	{
 		if (msg.FindInt32("tabstop", &i) == B_OK)
@@ -499,9 +500,12 @@ void PText::SetSettings(BMessage& msg)
 		if (fCWD) free(fCWD);
 		fCWD = strdup(s1);
 	}
-	
+
 	if (msg.FindString("language", &s1) == B_OK)
-		SetLanguage(s1);
+	{
+		CLangIntf *language = CLangIntf::FindByName(s1);
+		SetLanguage(CLangIntf::GetIndex(language));
+	}
 } /* PText::SetSettings */
 
 void PText::GetSettings(BMessage& msg)
