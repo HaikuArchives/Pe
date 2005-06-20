@@ -51,6 +51,7 @@
 #include "PKeyDownFilter.h"
 #include "HButtonBar.h"
 #include "HPreferences.h"
+#include "PAddOn.h"
 #include "MTextAddOnImpl.h"
 #include "PCmd.h"
 #include "CGoToLine.h"
@@ -210,6 +211,9 @@ bool PDoc::QuitRequested()
 	else
 		WriteState();
 
+	if (result)
+		DeleteAddOns();
+
 	return result;
 } /* PDoc::QuitRequested */
 
@@ -340,6 +344,7 @@ void PDoc::InitWindow(const char *name)
 	fText->AddFilter(new PKeyDownFilter());
 
 	ResetMenuShortcuts();
+	InstantiateAddOns();
 } /* PDoc::InitWindow */
 
 void PDoc::UpdateTitle()
@@ -1255,7 +1260,7 @@ void PDoc::SetError(const char *err, rgb_color c)
 
 #pragma mark - Add-ons
 
-typedef void (*new_pe_add_on_func)(void);
+typedef PAddOn* (*new_pe_add_on_func)(void);
 
 struct ExtensionInfo {
 	enum type {
@@ -1462,6 +1467,36 @@ void PDoc::PerformExtension(const char *ext)
 	}
 	THROW(("Extension %s not found!", ext));
 } /* PDoc::PerformExtension */
+
+void PDoc::InstantiateAddOns()
+{
+	for (uint32 i = 0; i < sExtensions.size(); i++)
+	{
+		if (sExtensions[i].type != ExtensionInfo::E_PE)
+			continue;
+
+		PAddOn *addOn = sExtensions[i].new_pe_add_on();
+		if (addOn != NULL) {
+			AddHandler(addOn);
+			addOn->SetContext(this, fText);
+			addOn->AttachedToDocument();
+		}
+	}
+} /* PDoc::InstantiateAddOns */
+
+void PDoc::DeleteAddOns()
+{
+	for (uint32 i = 0; i < CountHandlers(); i++)
+	{
+		PAddOn *addOn = dynamic_cast<PAddOn *>(HandlerAt(i));
+		if (addOn == NULL)
+			continue;
+
+		RemoveHandler(addOn);
+		addOn->DetachedFromDocument();
+		delete addOn;
+	}
+} /* PDoc::DeleteAddOns */
 
 #pragma mark - Commands
 

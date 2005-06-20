@@ -53,7 +53,7 @@ public:
 
 	/* own methods */
 	virtual void	AttachedToDocument();
-	virtual void	RemovedFromDocument();
+	virtual void	DetachedFromDocument();
 
 	virtual void	LanguageChanged(BMessage& message);
 
@@ -84,6 +84,11 @@ private:
 	PText*			fText;
 };
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern PAddOn* new_pe_add_on(void);
 extern BView* new_pe_prefs_view(void);
 
@@ -94,5 +99,9 @@ struct key_binding {
 };
 
 extern void get_pe_key_bindings(key_binding** _bindings);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	// PADDON_H

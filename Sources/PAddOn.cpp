@@ -38,12 +38,11 @@
 
 #include <String.h>
 
-//#include <string.h>
 #include <stdlib.h>
 
 
 PAddOn::PAddOn(const char *name)
-	:
+	: BHandler(name),
 	fDocument(NULL),
 	fText(NULL)
 {
@@ -61,6 +60,7 @@ PAddOn::~PAddOn()
 void PAddOn::MessageReceived(BMessage* message)
 {
 	// dispatch language changed messages to the LanguageChanged() hook
+	BHandler::MessageReceived(message);
 }
 
 
@@ -70,7 +70,7 @@ void PAddOn::AttachedToDocument()
 }
 
 
-void PAddOn::RemovedFromDocument()
+void PAddOn::DetachedFromDocument()
 {
 	// to be implemented by subclasses
 }
@@ -249,6 +249,7 @@ void PEditText::Insert(const char* text, int32 length)
 
 	fText.Insert(text, length, start);
 
+	fText.Select(start + length, start + length, true, false);
 	fIsDirty = true;
 }
 

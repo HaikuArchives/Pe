@@ -155,11 +155,14 @@ private:
 			void ResetMenuShortcuts();
 			void PerformExtension(int nr);
 			void PerformExtension(const char *ext);
-			
+
+			void InstantiateAddOns();
+			void DeleteAddOns();
+
 			void IDEAddFile();
 			void IDERemoveFile();
 //			bool IDEOpenSourceHeader(entry_ref& ref);
-			
+
 			void ShowRecentMenu(BPoint where, bool showalways);
 			void UpdateTitle();
 
