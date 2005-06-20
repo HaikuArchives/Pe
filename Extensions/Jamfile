@@ -45,6 +45,13 @@ PeExtension HeaderGuard
 # </pe-src>
 
 # <pe-src>
+PeExtension ImageToC
+	: ImageToC.cpp 
+	: libhekkel.so $(TOP)/generated/distro/pe be translation
+	;
+# </pe-src>
+
+# <pe-src>
 PeExtension Pipe
 	: Pipe.cpp 
 	: libhekkel.so be $(STDC++LIB) 
