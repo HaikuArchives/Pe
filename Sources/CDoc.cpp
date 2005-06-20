@@ -215,9 +215,10 @@ void CDoc::Read(bool readAttributes)
 		BFile file;
 		FailOSErr(file.SetTo(fFile, B_READ_ONLY));
 
+		ReadData(file);
+
 		if (readAttributes)
 			ReadAttr(file);
-		ReadData(file);
 	}
 	else
 	{
