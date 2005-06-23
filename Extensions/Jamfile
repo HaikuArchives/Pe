@@ -47,7 +47,7 @@ PeExtension HeaderGuard
 # <pe-src>
 PeExtension ImageToC
 	: ImageToC.cpp 
-	: libhekkel.so $(TOP)/generated/distro/pe be translation
+	: libhekkel.so <nogrist>pe be translation
 	;
 # </pe-src>
 
