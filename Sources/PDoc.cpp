@@ -57,6 +57,7 @@
 #include "MScripting.h"
 #include "MTextAddOnImpl.h"
 #include "PAbout.h"
+#include "PAddOn.h"
 #include "PApp.h"
 #include "PCmd.h"
 #include "PDoc.h"
