@@ -53,7 +53,7 @@ vector<char*> CDoc::sfTenLastDocs;
 CDoc::CDoc(const char* mimetype, BLooper *target, const entry_ref *doc)
 	: fDocIO(NULL)
 	, fSavePanel(NULL)
-	, fMimeType(mimetype)
+	, fMimeType(mimetype ? mimetype : "")
 	, fDirty(false)
 	, fReadOnly(false)
 	, fEncoding(B_UNICODE_UTF8)
