@@ -67,7 +67,7 @@ public:
 virtual		~PDoc();
 		
 virtual		void MessageReceived(BMessage *msg);
-virtual		void QuitRequested();
+virtual		bool QuitRequested();
 
 static		void Stack();
 static		void Tile();
