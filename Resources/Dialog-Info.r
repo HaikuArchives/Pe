@@ -50,17 +50,61 @@ resource rtyp_Popu (rid_Popu_InfEncoding, "Encoding Popup") {
 	"Encoding",
 	{
 		Item	{ "UTF-8",				'chng', none, noKey },
-		Item	{ "ISO 8859 1",			'chng', none, noKey },
-		Item	{ "ISO 8859 2",			'chng', none, noKey },
-		Item	{ "ISO 8859 3",			'chng', none, noKey },
-		Item	{ "ISO 8859 4",			'chng', none, noKey },
-		Item	{ "ISO 8859 5",			'chng', none, noKey },
-		Item	{ "ISO 8859 6",			'chng', none, noKey },
-		Item	{ "ISO 8859 7",			'chng', none, noKey },
-		Item	{ "ISO 8859 8",			'chng', none, noKey },
-		Item	{ "ISO 8859 9",			'chng', none, noKey },
-		Item	{ "ISO 8859 10",		'chng', none, noKey },
-		Item	{ "Macintosh Roman",	'chng', none, noKey }
+		Item	{ "ISO 8859-1",			'chng', none, noKey },
+		Item	{ "ISO 8859-2",			'chng', none, noKey },
+		Item	{ "ISO 8859-3",			'chng', none, noKey },
+		Item	{ "ISO 8859-4",			'chng', none, noKey },
+		Item	{ "ISO 8859-5",			'chng', none, noKey },
+		Item	{ "ISO 8859-6",			'chng', none, noKey },
+		Item	{ "ISO 8859-7",			'chng', none, noKey },
+		Item	{ "ISO 8859-8",			'chng', none, noKey },
+		Item	{ "ISO 8859-9",			'chng', none, noKey },
+		Item	{ "ISO 8859-10",		'chng', none, noKey },
+		Item	{ "Macintosh Roman",	'chng', none, noKey },
+		Item	{ "Shift-JIS",			'chng', none, noKey },
+		Item	{ "EUC Packed Japanese",'chng', none, noKey },
+		Item	{ "JIS",				'chng', none, noKey },
+		Item	{ "Windows 1252",		'chng', none, noKey },
+		Item	{ "Unicode",			'chng', none, noKey },
+		Item	{ "KOI8-R",				'chng', none, noKey },
+		Item	{ "Windows 1251",		'chng', none, noKey },
+		Item	{ "DOS 866",			'chng', none, noKey },
+		Item	{ "DOS 437",			'chng', none, noKey },
+		Item	{ "EUC Korean",			'chng', none, noKey },
+		Item	{ "ISO 8859-13",		'chng', none, noKey },
+		Item	{ "ISO 8859-14",		'chng', none, noKey },
+		Item	{ "ISO 8859-15",		'chng', none, noKey }
+	}
+};
+
+resource rtyp_Popu (rid_Popu_InfSrcEncoding, "Source Encoding Popup") {
+	"Source Encoding",
+	{
+		Item	{ "UTF-8",				'chng', none, noKey },
+		Item	{ "ISO 8859-1",			'chng', none, noKey },
+		Item	{ "ISO 8859-2",			'chng', none, noKey },
+		Item	{ "ISO 8859-3",			'chng', none, noKey },
+		Item	{ "ISO 8859-4",			'chng', none, noKey },
+		Item	{ "ISO 8859-5",			'chng', none, noKey },
+		Item	{ "ISO 8859-6",			'chng', none, noKey },
+		Item	{ "ISO 8859-7",			'chng', none, noKey },
+		Item	{ "ISO 8859-8",			'chng', none, noKey },
+		Item	{ "ISO 8859-9",			'chng', none, noKey },
+		Item	{ "ISO 8859-10",		'chng', none, noKey },
+		Item	{ "Macintosh Roman",	'chng', none, noKey },
+		Item	{ "Shift-JIS",			'chng', none, noKey },
+		Item	{ "EUC Packed Japanese",'chng', none, noKey },
+		Item	{ "JIS",				'chng', none, noKey },
+		Item	{ "Windows 1252",		'chng', none, noKey },
+		Item	{ "Unicode",			'chng', none, noKey },
+		Item	{ "KOI8-R",				'chng', none, noKey },
+		Item	{ "Windows 1251",		'chng', none, noKey },
+		Item	{ "DOS 866",			'chng', none, noKey },
+		Item	{ "DOS 437",			'chng', none, noKey },
+		Item	{ "EUC Korean",			'chng', none, noKey },
+		Item	{ "ISO 8859-13",		'chng', none, noKey },
+		Item	{ "ISO 8859-14",		'chng', none, noKey },
+		Item	{ "ISO 8859-15",		'chng', none, noKey }
 	}
 };
 
@@ -99,12 +143,13 @@ resource 'DLOG' (6, "Info") {
 				
 				Line			{{   0,  78, 275,  79 }																				},
 			
-				PopupMenu		{{  -1,  86, 275, 106 },	"encoding",			"Encoding:",		rid_Popu_InfEncoding, 80		},
-				PopupMenu		{{  -1, 106, 275, 126 },	"linebreaks",		"Linebreaks:",		rid_Popu_InfLinebreaks, 80		},
+				PopupMenu		{{  -1,  84, 275, 104 },	"source encoding",	"Input Encoding:",	rid_Popu_InfSrcEncoding, 110		},
+				PopupMenu		{{  -1, 104, 275, 124 },	"encoding",			"Output Encoding:",	rid_Popu_InfEncoding, 110		},
+				PopupMenu		{{  -1, 126, 275, 146 },	"linebreaks",		"Linebreaks:",		rid_Popu_InfLinebreaks, 110		},
 				
-				Line			{{   0, 133, 275, 134 }},
+				Line			{{   0, 151, 275, 152 }},
 				
-				PopupMenu		{{  -1, 141, 275, 161 },	"language",			"Language:",		rid_Popu_InfLanguage, 80		},
+				PopupMenu		{{  -1, 157, 275, 177 },	"language",			"Language:",		rid_Popu_InfLanguage, 80		},
 			
 			TabSheetEnd			{																									},
 			
