@@ -40,14 +40,13 @@ const int
 	kBlockSize = 2048;
 
 PTextBuffer::PTextBuffer()
+	: fText(strdup(""))
+	, fLogicalSize(0)
+	, fPhysicalSize(0)
+	, fGap(0)
+	, fGapSize(0)
 {
-	fText = strdup("");
 	FailNil(fText);
-	fLogicalSize = 0;
-	fPhysicalSize = 0;
-	fGap = 0;
-	fGapSize = 0;
-	fEncoding = B_UNICODE_UTF8;
 } /* PTextBuffer::PTextBuffer */
 
 PTextBuffer::~PTextBuffer()
@@ -269,127 +268,6 @@ void PTextBuffer::ChangeToNL(int index)
 	}
 } /* PTextBuffer::ChangeToNL */
 
-void PTextBuffer::SetEncoding(int encoding)
-{
-	fEncoding = encoding;
-} /* PTextBuffer::SetEncoding */
-
-void PTextBuffer::TranslateToLF(int fromLE)
-{
-	int i = 0;
-
-	MoveGap(fLogicalSize);
-
-	if (fromLE == leCRLF)
-	{
-		int ls = 0, nls = 0, cnt;
-		
-		while (i < fLogicalSize)
-		{
-			if (fText[i] == '\r' && fText[i + 1] == '\n')
-			{
-				cnt = i - ls;
-				memmove(fText + nls, fText + ls, cnt);
-				nls += cnt + 1;
-				fText[nls - 1] = '\n';
-				ls += cnt + 2;
-				i++;
-				fGapSize++;
-			}
-			i++;
-		}
-		
-		cnt = i - ls;
-		if (cnt)
-			memmove(fText + nls, fText + ls, cnt);
-		
-		fLogicalSize = fGap = fPhysicalSize - fGapSize;
-	}
-	else if (fromLE == leCR)
-	{
-		while (i < fLogicalSize)
-		{
-			if (fText[i] == '\r')
-				fText[i] = '\n';
-			i++;
-		}
-	}
-} /* PTextBuffer::TranslateToLF */
-
-void PTextBuffer::TranslateFromLF(int toLE, int lineCount)
-{
-	int i = 0;
-	
-	if (toLE == leCRLF)
-	{
-		MoveGap(0);
-//		if (fGapSize < lineCount + 1)
-			ResizeGap(lineCount + 1);
-		
-		int ls = fGapSize, nls = 0, cnt;
-		i = fGapSize;
-		
-		while (i < fPhysicalSize)
-		{
-			if (fText[i] == '\n')
-			{
-				cnt = i - ls;
-				memmove(fText + nls, fText + ls, cnt);
-				nls += cnt;
-				fText[nls++] = '\r';
-				fText[nls++] = '\n';
-				ls += cnt + 1;
-				fGapSize--;
-			}
-			i++;
-		}
-		
-		cnt = i - ls;
-		if (cnt)
-		{
-			memmove(fText + nls, fText + ls, cnt);
-			nls += cnt;
-		}
-
-		fLogicalSize = fPhysicalSize - fGapSize;
-		fGap = nls;
-	}
-	else if (toLE == leCR)
-	{
-		MoveGap(fLogicalSize);
-
-		while (i < fLogicalSize)
-		{
-			if (fText[i] == '\n')
-				fText[i] = '\r';
-			i++;
-		}
-	}
-} /* PTextBuffer::TranslateFromLF */
-
-int PTextBuffer::CurrentLE() const
-{
-	int i = 0;
-	
-	while (i < fLogicalSize)
-	{
-		char c = fText[i < fGap ? i : i + fGapSize];
-		if (c == '\n')
-			return leLF;
-		else if (c == '\r')
-		{
-			i++;
-			if (fText[i < fGap ? i : i + fGapSize] == '\n')
-				return leCRLF;
-			else
-				return leCR;
-		}
-		i++;
-	}
-	
-	return leLF;
-} /* PTextBuffer::CurrentLE */
-
 PTextBuffer& PTextBuffer::operator=(const PTextBuffer& b)
 {
 	if (fText) free(fText);
@@ -402,7 +280,6 @@ PTextBuffer& PTextBuffer::operator=(const PTextBuffer& b)
 	fPhysicalSize = b.fPhysicalSize;
 	fGap = b.fGap;
 	fGapSize = b.fGapSize;
-	fEncoding = b.fEncoding;
 	
 	return *this;
 } /* PTextBuffer::operator= */

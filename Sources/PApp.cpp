@@ -491,11 +491,17 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 			}
 			else
 			{
-				CProjectFile* prjFile = ProjectRoster->ParseProjectFile(&doc, mime);
-				if (prjFile && prjFile->HaveProjectInfo())
-					return PProjectWindow::Create(&doc, mime, prjFile);
+				PProjectWindow* prjWin = PProjectWindow::Create(&doc, mime);
+				if (prjWin && prjWin->InitCheck() == B_OK)
+				{
+					prjWin->Show();
+					return prjWin;
+				}
 				else
+				{
+					delete prjWin;
 					return gApp->NewWindow(&doc);
+				}
 			}
 		}
 		else
@@ -605,19 +611,7 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 					if (e.Exists())
 						d = dynamic_cast<PDoc*>(OpenWindow(doc));
 					else
-					{
-						d = NewWindow();
-						BAutolock lock(d);
-						
-						if (lock.IsLocked()) 
-						{
-							BPath p;
-							if (BEntry(&doc).GetPath(&p) == B_OK)
-								d->SetFile(doc);
-							else
-								d->SetTitle(doc.name);
-						}
-					}
+						d = NewWindow(&doc);
 					
 					if (d && lineNr >= 0)
 					{

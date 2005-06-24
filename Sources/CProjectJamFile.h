@@ -18,12 +18,14 @@ public:
 	CProjectJamFile(const char* path);
 	virtual ~CProjectJamFile();
 	
-	virtual status_t Parse();
+	virtual status_t Parse(const BString& contents);
 	virtual bool HasBeenParsed() const	{ return fHasBeenParsed; }
 	virtual bool HaveProjectInfo() const
 													{ return fHaveProjectInfo; }
-	virtual status_t SerializeToFile(BPositionIO* file) const;
 
+protected:
+	virtual void GetText(BString &docText) const;
+	virtual void SetText(const BString& docText);
 private:
 	void _ParseSources(const BString& contents);
 	bool _ParseIncludeStmt(const char*& t);

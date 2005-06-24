@@ -321,7 +321,11 @@ bool CFtpDialog::OKClicked()
 				BMessage msg(msg_DoFtpSave);
 				msg.AddPointer("url", new URLData(GetText("srvr"), GetText("user"),
 					GetText("pass"), fPath, GetText("name")));
-				fOwner->PostMessage(&msg);
+				if (fOwner)
+					fOwner->PostMessage(&msg);
+				else
+					fCaller.SendMessage(&msg);
+				return true;
 			}
 			catch (HErr& e)
 			{
@@ -341,8 +345,6 @@ bool CFtpDialog::OKClicked()
 			else
 				filCnt++;
 		}
-		printf("## dirs:  %li\n", dirCnt);
-		printf("## files: %li\n\n", filCnt);
 		if (dirCnt == 1  && filCnt == 0)
 		{
 			ChangeDirectory();
@@ -357,7 +359,6 @@ bool CFtpDialog::OKClicked()
 				try
 				{
 					URLData url(GetText("srvr"), GetText("user"), GetText("pass"), fPath, *i);
-					printf("LOAD: %s %s\n", fPath, GetText("user"));
 					gApp->NewWindow(url);
 				}
 				catch (HErr& e)
@@ -371,7 +372,6 @@ bool CFtpDialog::OKClicked()
 		else
 		{
 			beep();
-			printf("WRONG\n");
 		}
 	}
 	return false;

@@ -63,6 +63,7 @@
 #define rid_Popu_InfEncoding		401
 #define rid_Popu_InfLinebreaks		402
 #define rid_Popu_InfLanguage		403
+#define rid_Popu_InfSrcEncoding		404
 
 
 #endif // RESOURCESMENUS_H

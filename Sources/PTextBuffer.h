@@ -37,10 +37,6 @@
 #include <Debug.h>
 #include "utf-support.h"
 
-enum {
-	leLF, leCR, leCRLF
-};
-
 class PTextBuffer {
 public:
 		PTextBuffer();
@@ -65,13 +61,6 @@ virtual	~PTextBuffer();
 		
 		void ChangeToNL(int indx);
 		
-		void SetEncoding(int encoding);
-		int Encoding() const;
-		
-		void TranslateToLF(int fromLE);
-		void TranslateFromLF(int toLE, int lineCount);
-		int CurrentLE() const;
-		
 		PTextBuffer& operator=(const PTextBuffer& b);
 		
 protected:
@@ -83,7 +72,6 @@ protected:
 		int fPhysicalSize;
 		int fGap;
 		int fGapSize;
-		int fEncoding;
 };
 
 inline char PTextBuffer::operator[] (int indx) const
@@ -100,7 +88,4 @@ inline int PTextBuffer::Size() const {
 	return fLogicalSize;
 }
 
-inline int PTextBuffer::Encoding() const {
-	return fEncoding;
-}
 #endif // PTEXTBUFFER_H

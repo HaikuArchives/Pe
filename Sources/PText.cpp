@@ -192,7 +192,6 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fCWD = NULL;
 	fShowInvisibles = gPrefs->GetPrefInt(prf_I_ShowInvisibles, 0);
 	fLangIntf = NULL;
-	fLineEndType = leLF;
 	SetLanguage(ext);
 	fLastMouseTime = 0;
 	fIncSearch = 0;
@@ -243,7 +242,7 @@ void PText::ReInit()
 
 	fFont.GetHeight(&fFH);
 	fLineHeight = ceil(fFH.ascent + fFH.descent + fFH.leading);
-	fMetrics = CFontStyle::Locate(ff, fs, fFont.Size(), B_UNICODE_UTF8);
+	fMetrics = CFontStyle::Locate(ff, fs, fFont.Size());
 
 	fTabWidth = fTabStops * StringWidth(" ", 1);
 	
@@ -322,14 +321,10 @@ void PText::SetupBitmap()
 	}
 } /* PText::SetupBitmap */
 
-void PText::SetText(char *text, size_t size)
+void PText::SetText(const char *text, size_t size)
 {
 	if (fText.Size()) fText.Delete(0, fText.Size());
 	fText.Insert(text, size, 0);
-
-	fLineEndType = fText.CurrentLE();
-	if (fLineEndType != leLF)
-		fText.TranslateToLF(fLineEndType);
 
 	RecalculateLineBreaks();
 	Invalidate();
@@ -438,7 +433,7 @@ void PText::WindowActivated(bool active)
 		AdjustScrollBars();
 } /* PText::WindowActivated */
 
-void PText::SetSettings(BMessage& msg)
+void PText::ApplySettings(const BMessage& msg)
 {
 	int32 i;
 	float f;
@@ -458,8 +453,6 @@ void PText::SetSettings(BMessage& msg)
 			fFont.SetFamilyAndStyle(s1, s2);
 		if (msg.FindBool("syntaxcoloring", &b) == B_OK)
 			fSyntaxColoring = b;
-		if (msg.FindInt32("encoding", &i) == B_OK)
-			SetEncoding(i);
 
 		if (msg.FindBool("softwrap", &b) == B_OK)
 			fSoftWrap = b;
@@ -508,10 +501,8 @@ void PText::SetSettings(BMessage& msg)
 	}
 } /* PText::SetSettings */
 
-void PText::GetSettings(BMessage& msg)
+void PText::CollectSettings(BMessage& msg)
 {
-	FailOSErr(msg.MakeEmpty());
-	
 	FailOSErr(msg.AddInt32("tabstop", fTabStops));
 	FailOSErr(msg.AddBool("show tabs", Doc()->ToolBar()->ShowsTabs()));
 	FailOSErr(msg.AddFloat("fontsize", fFont.Size()));
@@ -529,8 +520,8 @@ void PText::GetSettings(BMessage& msg)
 	FailOSErr(msg.AddFloat("hscroll", fHScrollBar->Value()));
 	FailOSErr(msg.AddBool("syntaxcoloring", fSyntaxColoring));
 	
-	if (fText.Encoding()) 
-		FailOSErr(msg.AddInt32("encoding", fText.Encoding()));
+	FailOSErr(msg.AddInt32("encoding", Doc()->Encoding()));
+	FailOSErr(msg.AddInt32("line breaks", Doc()->LineEndType()));
 	
 	FailOSErr(msg.AddBool("softwrap", fSoftWrap));
 
@@ -633,19 +624,6 @@ void PText::SetSplitter(PSplitter *splitter)
 {
 	fSplitter = splitter;
 } /* PText::SetSplitter */
-
-void PText::SetEncoding(int encoding)
-{
-	fText.SetEncoding(encoding);
-	
-	font_family fam;
-	font_style sty;
-	fFont.GetFamilyAndStyle(&fam, &sty);
-	
-	fMetrics = CFontStyle::Locate(fam, sty, fFont.Size(), B_UNICODE_UTF8);
-	
-	SetFont(&fFont);
-} /* PText::SetEncoding */
 
 void PText::ShowTabStops(bool show)
 {
@@ -5986,14 +5964,18 @@ void PText::ChangedInfo(BMessage *msg)
 	if (msg->FindBool("show tabs", &b) == B_OK)
 		ShowTabStops(b);
 	
-	if (msg->FindInt32("encoding", &i) == B_OK)
-		SetEncoding(i);
+	if (msg->FindInt32("source encoding", &i) == B_OK && Doc()->Encoding() != i)
+		Doc()->ChangeSourceEncoding(i);
+	else if (msg->FindInt32("encoding", &i) == B_OK && Doc()->Encoding() != i)
+	{
+		Doc()->SetEncoding(i);
+		dirty = true;
+	}
 	
-	if (msg->FindInt32("line breaks", &i) == B_OK) {
-		if (fLineEndType != i) {
-			fLineEndType = i;
-			dirty = true;
-		}
+	if (msg->FindInt32("line breaks", &i) == B_OK && Doc()->LineEndType() != i)
+	{
+		Doc()->SetLineEndType(i);
+		dirty = true;
 	}
 	
 	if (msg->FindBool("softwrap", &b) == B_OK)
@@ -6021,6 +6003,7 @@ void PText::ChangedInfo(BMessage *msg)
 	
 	if (dirty)
 		SetDirty(dirty);
+
 	ReInit();
 	Invalidate();
 } /* PText::ChangedInfo */

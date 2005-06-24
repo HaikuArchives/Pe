@@ -47,31 +47,31 @@
 #include "HColorUtils.h"
 
 CLanguageProxy::CLanguageProxy(CLangIntf& intf, const char *text, int size,
-	int encoding, int *starts, rgb_color *colors)
-	: fInterface(intf)
+	int *starts, rgb_color *colors)
+	: fText(text)
+	, fSize(size)
+	, fDeprecated_was_Encoding(0)
+	, fInterface(intf)
+	, fCIndx(0)
+	, fStarts(starts)
+	, fColors(colors)
+	, fFunctionScanHandler(NULL)
+	, fNestLevel(0)
 {
-	fCIndx = 0;
-	fText = text;
-	fSize = size;
-	fEncoding = encoding;
-	fFunctionScanHandler = NULL;
-	fStarts = starts;
-	fColors = colors;
-	fNestLevel = 0;
 } /* CLanguageProxy::CLanguageProxy */
 
 CLanguageProxy::CLanguageProxy(CLangIntf& intf, PText& text,
 	CFunctionScanHandler* handler)
-	: fInterface(intf)
+	: fText(text.Text())
+	, fSize(text.Size())
+	, fDeprecated_was_Encoding(0)
+	, fInterface(intf)
+	, fCIndx(0)
+	, fStarts(NULL)
+	, fColors(NULL)
+	, fFunctionScanHandler(handler)
+	, fNestLevel(0)
 {
-	fCIndx = 0;
-	fText = text.Text();
-	fSize = text.Size();
-	fEncoding = text.Encoding();
-	fFunctionScanHandler = handler;
-	fStarts = NULL;
-	fColors = NULL;
-	fNestLevel = 0;
 } /* CLanguageProxy::CLanguageProxy */
 
 int CLanguageProxy::Move(int ch, int state)
@@ -161,16 +161,8 @@ bool CLanguageProxy::Types() const
 
 void CLanguageProxy::CharInfo(const char *txt, int& unicode, int& len) const
 {
-	if (fEncoding == 0)
-	{
-		len = mcharlen(txt);
-		unicode = municode(txt);
-	}
-	else
-	{
-		unicode = maptounicode(fEncoding, *txt);
-		len = 1;
-	}
+	len = mcharlen(txt);
+	unicode = municode(txt);
 } /* CharInfo */
 
 bool CLanguageProxy::isalpha_uc(int unicode) const

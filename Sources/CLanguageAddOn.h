@@ -92,7 +92,7 @@ class PText;
 
 class CLanguageProxy {
 public:
-		CLanguageProxy(CLangIntf& intf, const char *text, int size, int encoding, int *starts = NULL, rgb_color *colors = NULL);
+		CLanguageProxy(CLangIntf& intf, const char *text, int size, int *starts = NULL, rgb_color *colors = NULL);
 		CLanguageProxy(CLangIntf& intf, PText& text, CFunctionScanHandler* handler = NULL);
 		
 /*
@@ -164,7 +164,8 @@ virtual	void SetNestLevel(uint32 nestLevel);
 		
 private:
 		const char *fText;
-		int fSize, fEncoding;
+		int fSize;
+		int fDeprecated_was_Encoding;		// deprecated, is always set to 0
 		CLangIntf& fInterface;
 		int fCIndx;
 		int *fStarts;

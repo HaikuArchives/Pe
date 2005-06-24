@@ -14,6 +14,8 @@
 #include <Path.h>
 #include <String.h>
 
+#include "CDoc.h"
+
 class BPositionIO;
 class CProjectSerializer;
 
@@ -113,14 +115,14 @@ protected:
  *		Additionally, the notion of a list of include-paths is supported (which
  *		is taken from the Makefile/Jamfile, too).
  */
-class CProjectFile : public CProjectGroupItem
+class CProjectFile : public CProjectGroupItem, public CDoc
 {
 	typedef CProjectGroupItem inherited;
 public:
 	CProjectFile();
 	virtual ~CProjectFile();
 	
-	virtual status_t Parse() = 0;
+	virtual status_t Parse(const BString& contents) = 0;
 	virtual bool HasBeenParsed() const = 0;
 	virtual bool HaveProjectInfo() const = 0;
 	//
@@ -128,8 +130,7 @@ public:
 	virtual bool CanBeRemoved() const	{ return false; }
 	//
 	virtual bool IsDirty() const;
-	virtual void SerializeTo( CProjectSerializer* serializer) const;
-	virtual status_t SerializeToFile(BPositionIO* file) const = 0;
+	virtual void SerializeTo(CProjectSerializer* serializer) const;
 	status_t WriteToFile(BPositionIO* file, const BString& contents,
 								const char* mimetype) const;
 	//
@@ -141,6 +142,11 @@ public:
 	void GetIncludePaths(vector<BString>& inclPathVect) const;
 	virtual bool IsSubordinate() const	{ return false; }
 protected:
+	virtual void CollectSettings(BMessage& settingsMsg) const;
+	virtual void ApplySettings(const BMessage& settingsMsg);
+	virtual	void ReadAttr(BFile& file, BMessage& settingsMsg);
+	virtual	void WriteAttr(BFile& file, const BMessage& settingsMsg);
+
 	void _AddIncludePath(const BString& inclPath)
 													{ fIncludePaths.push_back(inclPath); }
 	BString fErrorMsg;

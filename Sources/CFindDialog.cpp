@@ -401,7 +401,7 @@ void CFindDialog::DoFind(unsigned long cmd)
 		if (doc)
 		{
 			vector<PMessageItem*>* lst = new vector<PMessageItem*>;
-			FindInFile(*doc->File(), lst);
+			FindInFile(*doc->EntryRef(), lst);
 			BWindow* w = NULL;
 			ShowBatch(lst, &w);
 			delete lst;
@@ -1015,7 +1015,7 @@ void CFindDialog::DoOpenWindows(bool replace)
 		{
 			PDoc *doc = dynamic_cast<PDoc*>(be_app->WindowAt(i));
 			if (doc)
-				FindInFile(*doc->File(), lst);
+				FindInFile(*doc->EntryRef(), lst);
 		}
 
 		BWindow *w = NULL;
@@ -1044,7 +1044,7 @@ void CFindDialog::DoOpenWindows(bool replace)
 		{
 			PDoc* doc = fOpenWindows[fOpenWindowIndex];
 
-			const entry_ref& file = *doc->File();
+			const entry_ref& file = *doc->EntryRef();
 
 			if (doc && FindInFile(file, NULL))
 			{

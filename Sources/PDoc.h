@@ -36,10 +36,11 @@
 #ifndef PDOC_H
 #define PDOC_H
 
-#include "PTextBuffer.h"
-#include "CDoc.h"
-
 #include <algorithm>
+
+#include "CDocWindow.h"
+
+#include "PTextBuffer.h"
 
 class PText;
 class PStatus;
@@ -57,16 +58,16 @@ class PDialog
 	  	{	return typeid(*d) == typeid(T);	}
 };
 
-class PDoc : public BWindow, public CDoc 
+class PDoc : public CDocWindow
 {
+			typedef CDocWindow inherited;
 public:
 			PDoc(const entry_ref *ref = NULL, bool show = true);
 			PDoc(URLData& url);
 virtual		~PDoc();
 		
-virtual		void Show();
-virtual		bool QuitRequested();
 virtual		void MessageReceived(BMessage *msg);
+virtual		void QuitRequested();
 
 static		void Stack();
 static		void Tile();
@@ -77,10 +78,6 @@ static 		void UpdateShortCuts();
 			HButtonBar* ButtonBar() const;
 			PToolBar* ToolBar() const;
 	
-			void AddDialog(HDialog *dlog, bool isModal);
-			void RemoveDialog(HDialog *dlog);
-			void MakeModal(HDialog *dlog);
-	
 			void MakeWorksheet();
 			bool IsWorksheet();
 static		PDoc* GetWorksheet();
@@ -89,14 +86,12 @@ static		PDoc* GetWorksheet();
 			bool IsHeaderFile();
 			void OpenPartner();
 
-static		BRect NextPosition(bool inc = true);
 static		PDoc* TopWindow();
 
 static		void LoadAddOns();
 static		void BuildExtensionsMenu(BMenu *addOnMenu);
 
 virtual		void SetDirty(bool dirty);
-virtual		void SetFile(entry_ref &ref);
 
 virtual 	BHandler* ResolveSpecifier(BMessage *msg, int32 index,
 						BMessage *specifier, int32 form, const char *property);
@@ -104,6 +99,8 @@ virtual 	status_t GetSupportedSuites(BMessage *data);
 			void SetError(const char *errtxt, rgb_color color);
 
 virtual		void WindowActivated(bool active);
+
+			void ChangeSourceEncoding(int encoding);
 
 			template <class T>
 			void GetDialog(T*& dlog)
@@ -123,20 +120,25 @@ virtual		void WindowActivated(bool active);
 				}
 			}
 
-private:
-			void InitWindow(const char *name);
+protected:
 
-			void SaveOnServer(URLData& url);
+virtual 	void GetText(BString &docText) const;
+virtual 	void SetText(const BString& docText);
+virtual 	void CollectSettings(BMessage& settingsMsg) const;
+virtual 	void ApplySettings(const BMessage& settingsMsg);
+
+virtual		void ReadAttr(BFile& file, BMessage& settingsMsg);
+virtual		void WriteAttr(BFile& file, const BMessage& settingsMsg);
 
 virtual		void CreateFilePanel();
 virtual		void SaveRequested(entry_ref& directory, const char *name);
-virtual		void NameAFile(char *name);
-			void VerifyFile();
 
-virtual		void ReadData(BPositionIO& file);
-virtual		void ReadAttr(BFile& file);
-virtual		void WriteData(BPositionIO& file);
-virtual		void WriteAttr(BFile& file);
+virtual 	void NameChanged();
+virtual 	void HasBeenSaved();
+virtual		void HighlightErrorPos(int errorPos);
+
+private:
+			void InitWindow(const char *name);
 
 virtual		void MenusBeginning();
 			
@@ -148,10 +150,6 @@ public:
 			static void IDEProject2Group();
 
 private:
-			void SaveACopy();
-			void Revert();
-			void DoSaveACopy(entry_ref& directory, const char *name);
-
 			void ResetMenuShortcuts();
 			void PerformExtension(int nr);
 			void PerformExtension(const char *ext);
@@ -164,11 +162,8 @@ private:
 //			bool IDEOpenSourceHeader(entry_ref& ref);
 
 			void ShowRecentMenu(BPoint where, bool showalways);
-			void UpdateTitle();
 
 			HButtonBar *fButtonBar;
-			vector<HDialog*> fDialogs;
-			HDialog *fWindowModal;
 			PText *fText;
 			PTextBuffer fTextBuffer;
 			PToolBar *fToolBar;
@@ -180,11 +175,6 @@ private:
 			PStatus *fStatus;
 			bool fIsWorksheet;
 			int fWindowMenuLength;
-			time_t fLastSaved;
-			BRect fLastStoredFrame;
-			BRect fInitialFrame;
-
-static		int sfNewCount;
 };
 
 inline PText* PDoc::TextView() const

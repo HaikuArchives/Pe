@@ -34,10 +34,13 @@
 */
 
 #include "pe.h"
-#include "utf-support.h"
+
+#include <String.h>
+
 #include "HAppResFile.h"
 #include "HError.h"
 #include "ResourcesUtf.h"
+#include "utf-support.h"
 
 unsigned char *alphaTable, *numTable, *alnumTable;
 
@@ -364,57 +367,295 @@ int mclass(int unicode)
 	return r;
 } /* mclass */
 
-char* ConvertToUtf8(const char* text, int32 size, int encoding, int32& outSize)
+static const char* gEncodings[] = {
+	"UTF-8",
+	"ISO 8859-1",
+	"ISO 8859-2",
+	"ISO 8859-3",
+	"ISO 8859-4",
+	"ISO 8859-5",
+	"ISO 8859-6",
+	"ISO 8859-7",
+	"ISO 8859-8",
+	"ISO 8859-9",
+	"ISO 8859-10",
+	"Macintosh Roman",
+	"Shift-JIS",
+	"EUC Packed Japanese",
+	"JIS",
+	"Windows 1252",
+	"Unicode",
+	"KOI8-R",
+	"Windows 1251",
+	"DOS 866",
+	"DOS 437",
+	"EUC Korean",
+	"ISO 8859-13",
+	"ISO 8859-14",
+	"ISO 8859-15"
+};
+
+const int CEncodingRoster::sfMaxSupportedEncoding 
+	= sizeof(gEncodings) / sizeof(const char*) - 1;
+
+bool CEncodingRoster::IsSupportedEncoding(int encoding)
 {
-	const float incFactor = 1.5;
-	int32 srcSize = size;
-	int32 srcLen = 0;
-	int32 srcOffset = 0;
-	int32 destSize = max(size, 128L);
-	int32 destLen;
-	int32 destOffset = 0;
-	char* utf8Text = NULL;
-	int32 state = 0;
-	while (srcOffset < srcSize)
-	{
-		destSize = (int32)(destSize * incFactor);
-		utf8Text = (char *)realloc(utf8Text, destSize);
-		FailNil(utf8Text);
-		srcLen = srcSize - srcOffset;
-		destLen = destSize - destOffset;
-		FailOSErr(convert_to_utf8(encoding, text+srcOffset, &srcLen, 
-								  utf8Text+destOffset, &destLen, &state));
-		srcOffset += srcLen;
-		destOffset += destLen;
-	}
-	outSize = destOffset;
-	return utf8Text;
+	return !(encoding < 0 || encoding > sfMaxSupportedEncoding);
+}	
+
+const char* CEncodingRoster::EncodingNameByIdx(int encoding)
+{
+	if (IsSupportedEncoding(encoding))
+		return gEncodings[encoding];
+	else
+		return "<unknown encoding>";
 }
 
-char* ConvertFromUtf8(const char* utf8Text, int32 size, int encoding, 
-					  int32& outSize)
+CTextEncodingConverter::CTextEncodingConverter()
+	: fStatus(B_NO_INIT)
+	, fEncoding(0)
+	, fConvertedText(NULL)
+	, fConvertedSize(0)
+	, fErrorPos(-1)
+{
+}
+
+CTextEncodingConverter::CTextEncodingConverter(int encoding)
+	: fStatus(B_NO_INIT)
+	, fEncoding(0)
+	, fConvertedText(NULL)
+	, fConvertedSize(0)
+	, fErrorPos(-1)
+{
+	_Init(encoding);
+}
+
+CTextEncodingConverter::~CTextEncodingConverter()
+{
+	_Cleanup();
+}
+
+status_t CTextEncodingConverter::SetTo(int encoding)
+{
+	_Cleanup();
+	_Init(encoding);
+	return fStatus;
+}
+
+status_t CTextEncodingConverter::ConvertToUtf8(BString& docText)
+{
+	if (!CEncodingRoster::IsSupportedEncoding(fEncoding))
+		return B_UNSUPPORTED;
+
+	fErrorPos = -1;
+	status_t res = B_OK;
+	if (fEncoding != B_UNICODE_UTF8)
+	{
+		int charset = fEncoding - 1;
+			// map from BFont-encoding to charset conversions
+		res = _DoConversion(docText.String(), docText.Length(), 
+							fConvertedText, fConvertedSize, charset, true);
+		if (res == B_OK)
+		{	// check if any substitutes are found:
+			const char* substPos = strchr(fConvertedText, B_SUBSTITUTE);
+			if (substPos)
+			{
+				char* nativeText;
+				int nativeSize;
+				res = _DoConversion(fConvertedText, fConvertedSize, nativeText, 
+									nativeSize, charset, false);
+				if (res == B_OK)
+				{
+					int sz = min((int)docText.Length(), nativeSize);
+					int i;
+					const char* t = docText.String();
+					char* ut = nativeText;
+					for(i=0; i<sz; ++i)
+						if (*t++ != *ut++)
+							break;
+					if (i < sz)
+						fErrorPos = i;
+					free(nativeText);
+				}
+			}
+			// export converted string
+			docText.SetTo(fConvertedText, fConvertedSize);
+		}
+		if (res != B_OK)
+			_Cleanup();
+	}
+	else
+		_CheckUtf8(docText);
+	return res;
+}
+
+status_t CTextEncodingConverter::ConvertFromUtf8(BString& docText)
+{
+	if (!CEncodingRoster::IsSupportedEncoding(fEncoding))
+		return B_UNSUPPORTED;
+
+	fErrorPos = -1;
+	status_t res = B_OK;
+	if (fEncoding != B_UNICODE_UTF8)
+	{
+		int charset = fEncoding - 1;
+			// map from BFont-encoding to charset conversions
+		res = _DoConversion(docText.String(), docText.Length(), 
+							fConvertedText, fConvertedSize, charset, false);
+		if (res == B_OK)
+		{	// check if any substitutes are found:
+			const char* substPos = strchr(fConvertedText, B_SUBSTITUTE);
+			if (substPos)
+			{
+				char* utf8Text;
+				int utf8Size;
+				res = _DoConversion(fConvertedText, fConvertedSize, utf8Text, 
+									utf8Size, charset, true);
+				if (res == B_OK)
+				{
+					int sz = min((int)docText.Length(), utf8Size);
+					int i;
+					const char* t = docText.String();
+					char* ut = utf8Text;
+					for(i=0; i<sz; ++i)
+						if (*t++ != *ut++)
+							break;
+					if (i < sz)
+						fErrorPos = i;
+					free(utf8Text);
+				}
+			}
+			// export converted string
+			docText.SetTo(fConvertedText, fConvertedSize);
+		}
+		if (res != B_OK)
+			_Cleanup();
+	}
+	else
+		_CheckUtf8(docText);
+	return res;
+}
+
+int CTextEncodingConverter::Encoding() const
+{
+	return fEncoding;
+}
+
+bool CTextEncodingConverter::HadToSubstitute() const
+{
+	return fErrorPos != -1;
+}
+
+int CTextEncodingConverter::ErrorPos() const
+{
+	return fErrorPos;
+}
+
+status_t CTextEncodingConverter::InitCheck() const
+{
+	return fStatus;
+}
+
+void CTextEncodingConverter::_Init(int encoding)
+{
+	fEncoding = encoding;
+	if (!CEncodingRoster::IsSupportedEncoding(fEncoding))
+		fStatus = B_UNSUPPORTED;
+	else
+		fStatus = B_OK;
+}
+
+status_t CTextEncodingConverter::_DoConversion(const char* text, int size,
+											   char*& outText, int& outSize,
+											   int charset, bool toUtf8)
 {
 	const float incFactor = 1.5;
 	int32 srcSize = size;
 	int32 srcLen = 0;
 	int32 srcOffset = 0;
-	int32 destSize = max(size, 128L);
+	int32 destSize = max(size, 128);
 	int32 destLen;
 	int32 destOffset = 0;
-	char* text = NULL;
+	outText = NULL;
 	int32 state = 0;
+	status_t res = B_OK;
 	while (srcOffset < srcSize)
 	{
 		destSize = (int32)(destSize * incFactor);
-		text = (char *)realloc(text, destSize);
-		FailNil(text);
+		outText = (char *)realloc(outText, destSize);
+		FailNil(outText);
 		srcLen = srcSize - srcOffset;
 		destLen = destSize - destOffset;
-		FailOSErr(convert_from_utf8(encoding, utf8Text+srcOffset, &srcLen, 
-									text+destOffset, &destLen, &state));
+		if (toUtf8)
+			res = convert_to_utf8(charset, text+srcOffset, &srcLen, 
+								  outText+destOffset, &destLen, &state);
+		else
+			res = convert_from_utf8(charset, text+srcOffset, &srcLen, 
+									outText+destOffset, &destLen, &state);
+		if (res != B_OK)
+			break;
 		srcOffset += srcLen;
 		destOffset += destLen;
 	}
-	outSize = destOffset;
-	return text;
+	if (res == B_OK)
+		outSize = destOffset;
+	else
+	{
+		free(outText);
+		outSize = 0;
+	}
+	return res;
 }
+
+void CTextEncodingConverter::_CheckUtf8(const BString& docText)
+{
+	// check validity of utf-8 string
+	bool ok = true;
+	int j, i, l;
+	unsigned char c;
+	for( i=0; i < docText.Length(); )
+	{
+		j = 1;
+		if ((docText[i] & 0xc0) == 0xc0)
+		{
+			// determine charlength manually...
+			while((docText[i+j] & 0xc0) == 0x80)
+				++j;
+			c = docText[i];
+			// ...and crosscheck with bit-encoded length:
+			if ((c & 0xE0) == 0xC0)
+				l = 2;
+			else if ((c & 0xF0) == 0xE0)
+				l = 3;
+			else if ((c & 0xF8) == 0xF0)
+				l = 4;
+			else if ((c & 0xFC) == 0xF8)
+				l = 5;
+			else if ((c & 0xFE) == 0xFC)
+				l = 6;
+			else
+				l = 0;	// clearly this is an error
+			if (j != l)
+				ok = false;
+		}
+		else if ((docText[i] & 0xc0) == 0x80)
+		{
+			// utf8-sub-char at start
+			ok = false;
+		}
+		if (!ok)
+			break;
+		i += j;
+	}
+	if (!ok)
+		fErrorPos = i;
+}
+
+void CTextEncodingConverter::_Cleanup()
+{
+	free(fConvertedText);
+	fConvertedText = NULL;
+	fConvertedSize = 0;
+	fErrorPos = -1;
+}
+

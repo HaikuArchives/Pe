@@ -97,7 +97,7 @@ void CProjectMakeSerializer::SerializeFile(const CProjectFile* item)
 	// each CProjectFile lives in a file of its own right, so we write
 	// this item to its own file:
 	if (item->HasBeenParsed())
-		item->SerializeToFile(NULL);
+		(const_cast<CProjectFile*>(item))->Save();
 }
 
 
@@ -275,29 +275,10 @@ const char *CProjectMakeFile::_AddGroup(const char *t)
 		return c; \
 } while(0)
 
-status_t CProjectMakeFile::Parse()
+status_t CProjectMakeFile::Parse(const BString& contents)
 {
-	BPath path( fParentPath.String(), fLeafName.String());
-	BFile prjFile;
-	status_t res = prjFile.SetTo(path.Path(), B_READ_ONLY);
-	if (res != B_OK)
-		RET_FAIL(res, "unable to open file");
-	
-	off_t size;
-	res = prjFile.GetSize(&size);
-	if (res != B_OK)
-		RET_FAIL(res, "unable to get file size");
-
-	BString contents;
-	char* t = contents.LockBuffer(size+1);
-	if (!t)
-		RET_FAIL(B_NO_MEMORY, strerror(B_NO_MEMORY));
-	
-	contents.UnlockBuffer(size);
-
-	if (prjFile.Read(t, size) != size)
-		RET_FAIL(B_IO_ERROR, strerror(B_IO_ERROR));
-
+	const char* t = contents.String();
+	int32 size = contents.Length();
 	const char *s, *e;
 	
 	s = strstr(t, "%{");
@@ -345,25 +326,21 @@ status_t CProjectMakeFile::Parse()
 	return B_OK;
 }
 
-status_t CProjectMakeFile::SerializeToFile(BPositionIO* file) const
+void CProjectMakeFile::GetText(BString& docText) const
 {
-	status_t res = B_OK;
-	BString contents(fHeader);
+	docText.SetTo(fHeader);
 
 	BPath path( fParentPath.String(), fLeafName.String());
-	CProjectMakeSerializer serializer(contents, path.Path());
-
-	// need to find out now if dirty, since serialization resets the info!
-	bool isDirty = IsDirty();
+	CProjectMakeSerializer serializer(docText, path.Path());
 
 	list<CProjectItem*>::const_iterator iter;
 	for( iter = fItems.begin(); iter != fItems.end(); ++iter)
 		(*iter)->SerializeTo(&serializer);
 
-	contents << fFooter;
-
-	if (file || isDirty)
-		res = WriteToFile(file, contents, "text/x-makefile");
-
-	return res;
+	docText << fFooter;
 }		
+
+void CProjectMakeFile::SetText(const BString& docText)
+{
+	FailOSErrMsg(Parse(docText), ErrorMsg().String());
+}

@@ -18,12 +18,14 @@ public:
 	CProjectMakeFile(const char* path);
 	virtual ~CProjectMakeFile();
 	
-	virtual status_t Parse();
+	virtual status_t Parse(const BString& contents);
 	virtual bool HasBeenParsed() const	{ return true; }
 	virtual bool HaveProjectInfo() const
 													{ return fHaveProjectInfo; }
-	virtual status_t SerializeToFile(BPositionIO* file) const;
 
+protected:
+	virtual void GetText(BString &docText) const;
+	virtual void SetText(const BString& docText);
 private:
 	const char* _AddGroup(const char* name);
 	

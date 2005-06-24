@@ -34,60 +34,55 @@
 */
 
 #include "pe.h"
-#include "PDoc.h"
-#include "PText.h"
-#include "PApp.h"
-#include "PMessages.h"
-#include "PStatus.h"
-#include "Utils.h"
-#include "PAbout.h"
-#include "PSplitter.h"
-#include "PScrollBar.h"
-#include "COpenSelection.h"
-#include "CMenuItem.h"
-#include "PToolBar.h"
+
+#include <fs_attr.h>
+
+#include "CCharObject.h"
+#include "CDiffWindow.h"
+#include "CDocIO.h"
+#include "CFtpDialog.h"
 #include "CFtpStream.h"
-#include "CUrlOpener.h"
-#include "PKeyDownFilter.h"
-#include "HButtonBar.h"
-#include "HPreferences.h"
-#include "PAddOn.h"
-#include "MTextAddOnImpl.h"
-#include "PCmd.h"
 #include "CGoToLine.h"
 #include "CInfoDialog.h"
-#include "CConvertDialog.h"
-#include "CDiffWindow.h"
-#include "CFtpDialog.h"
 #include "CKeyMapper.h"
-#include "Scripting.h"
-#include "MScripting.h"
-#include "PGroupWindow.h"
 #include "CLineObject.h"
-#include "CCharObject.h"
-#include "HDefines.h"
-#include "MAlert.h"
-#include "PFindFunctionDialog.h"
+#include "CMenuItem.h"
+#include "COpenSelection.h"
 #include "CProjectRoster.h"
+#include "CUrlOpener.h"
+#include "HButtonBar.h"
+#include "HDefines.h"
+#include "HPreferences.h"
+#include "MAlert.h"
+#include "MScripting.h"
+#include "MTextAddOnImpl.h"
+#include "PAbout.h"
+#include "PApp.h"
+#include "PCmd.h"
+#include "PDoc.h"
+#include "PFindFunctionDialog.h"
+#include "PGroupWindow.h"
+#include "PKeyDownFilter.h"
+#include "PMessages.h"
 #include "PProjectWindow.h"
-#include "ResourcesToolbars.h"
-#include "ResourcesMenus.h"
 #include "Prefs.h"
-
-#include <NodeMonitor.h>
-#include <fs_attr.h>
+#include "PScrollBar.h"
+#include "PSplitter.h"
+#include "PStatus.h"
+#include "PText.h"
+#include "PToolBar.h"
+#include "ResourcesMenus.h"
+#include "ResourcesToolbars.h"
+#include "Scripting.h"
+#include "Utils.h"
 
 static long sDocCount = 0;
 
 const float
 	kStatusWidth = 80;
 
-int PDoc::sfNewCount = -1;
-
 PDoc::PDoc(const entry_ref *doc, bool show)
-	: BWindow(NextPosition(), "Untitled", B_DOCUMENT_WINDOW, 0,
-		1 << current_workspace())
-	, CDoc("", this, doc)
+	: inherited(doc)
 {
 	fShortcut = atomic_add(&sDocCount, 1);
 	fIsWorksheet = false;
@@ -112,11 +107,8 @@ PDoc::PDoc(const entry_ref *doc, bool show)
 		if (show)
 			AddRecent(path.Path());
 
-		StartWatchingFile();
-		UpdateTitle();
+		NameChanged();
 	}
-	else
-		fLastSaved = 0;
 	
 	fButtonBar->SetEnabled(msg_Save, false);
 	
@@ -128,9 +120,7 @@ PDoc::PDoc(const entry_ref *doc, bool show)
 } /* PDoc::PDoc */
 
 PDoc::PDoc(URLData& url)
-	: BWindow(NextPosition(), "Untitled", B_DOCUMENT_WINDOW, 0,
-		1 << current_workspace())
-	, CDoc(this, url)
+	: inherited(url)
 {
 	fShortcut = atomic_add(&sDocCount, 1);
 	fIsWorksheet = false;
@@ -162,54 +152,11 @@ PDoc::PDoc(URLData& url)
 
 PDoc::~PDoc()
 {
-	vector<HDialog*>::iterator i;
-	for (i = fDialogs.begin(); i != fDialogs.end(); i++)
-	{
-		(*i)->Lock();
-		(*i)->Quit();
-	}
-
-	if (fFile != NULL)
-		StopWatchingFile();
-	
-	if (fLastSaved == 0)
-	{
-		// closing a new (unsaved) document (a.k.a. 'Untitled') defines
-		// the default document frame:
-		gPrefs->SetPrefRect(prf_R_DefaultDocumentRect, Frame());
-		sfNewCount = -1;
-	}
 } /* PDoc::~PDoc */
-
-void PDoc::Show()
-{
-	// try to avoid showing window-parts offscreen:
-	BRect newFrame = Frame();
-	BScreen screen(this);
-	BRect sr = screen.Frame();
-	newFrame.left = MAX(5.0, MIN(sr.Width()-newFrame.Width()-5, newFrame.left));
-	newFrame.top = MAX(20.0, MIN(sr.Height()-newFrame.Height()-5, newFrame.top));
-	MoveTo(newFrame.LeftTop());
-
-	BWindow::Show();
-	fInitialFrame = Frame();
-}
 
 bool PDoc::QuitRequested()
 {
-	bool result = true;
-
-	if (fIsWorksheet)
-	{
-		Save();
-	}
-	else if (fText->IsDirty())
-	{
-		SetDirty(true);
-		result = CDoc::QuitRequested();
-	}
-	else
-		WriteState();
+	bool result = inherited::QuitRequested();
 
 	if (result)
 		DeleteAddOns();
@@ -347,74 +294,52 @@ void PDoc::InitWindow(const char *name)
 	InstantiateAddOns();
 } /* PDoc::InitWindow */
 
-void PDoc::UpdateTitle()
+void PDoc::NameChanged()
 {
-	if (fFile == NULL)
-		return;
-
-	BEntry entry(fFile);
-
-	BPath path;
-	entry.GetPath(&path);
-
-	if (gPrefs->GetPrefInt(prf_I_FullPath, 1))
-		SetTitle(path.Path());
-	else
-		SetTitle(fFile->name);
-} /* PDoc::UpdateTitle */
-
-void PDoc::SetFile(entry_ref &ref)
-{
-	CDoc::SetFile(ref);
-	UpdateTitle();
-	fText->SetLanguage(ref.name);
-	fLastSaved = time(NULL);
-} /* PDoc::SetFile */
-
-void PDoc::SaveOnServer(URLData& url)
-{
-	if (fFile) delete fFile;
-	fFile = NULL;
-	fURL = new URLData(url);
-
-	Save();
-
-	char title[128];
-	if (strlen(url.Path()))
-		sprintf(title, "ftp://%s/%s/%s", url.Server(), url.Path(), url.File());
-	else
-		sprintf(title, "ftp://%s/%s", url.Server(), url.File());
-	SetTitle(title);
-} /* PDoc::SaveOnServer */
-
-void PDoc::ReadData(BPositionIO& file)
-{
-	size_t s;
-	char *t;
-	
-	s = file.Seek(0, SEEK_END);
-	file.Seek(0, SEEK_SET);
-	
-	t = (char *)malloc(s);
-	FailNil(t);
-	CheckedRead(file, t, s);
-	
-	int32 encoding = fText->Encoding();
-	if (encoding != B_UNICODE_UTF8)
+	inherited::NameChanged();
+	if (EntryRef())
 	{
-		int32 utf8Size;
-		char* utf8Text = ConvertToUtf8(t, s, encoding, utf8Size);
-		fText->SetText(utf8Text, utf8Size);
-		free(utf8Text);
+		BEntry e;
+		BPath p;
+		FailOSErr(e.SetTo(EntryRef()));
+		FailOSErr(e.GetPath(&p));
+		fStatus->SetPath(p.Path());
+//		fText->SetLanguageByName(Name);
 	}
-	else
-	fText->SetText(t, s);
-} /* PDoc::ReadData */
+}
 
-void PDoc::ReadAttr(BFile& file)
+void PDoc::HighlightErrorPos(int errorPos)
 {
-	FailOSErr(file.GetModificationTime(&fLastSaved));
-	
+	fText->Select(errorPos, errorPos+mcharlen(fText->Text()+errorPos), 
+				  true, false);
+}
+
+void PDoc::SetText(const BString& docText)
+{
+	fText->SetText(docText.String(), docText.Length());
+}
+
+void PDoc::ChangeSourceEncoding(int encoding)
+{
+	if (Encoding() == encoding)
+		return;
+	if (IsDirty())
+	{
+		MInfoAlert a(
+			"This will re-read the document's contents from disk,\n"
+			"so all changes will be lost!\n\n"
+			"Do you want to continue?", "OK", "Cancel");
+		if (a.Go() != 1)
+			return;
+	}
+	SetEncoding(encoding);
+	Read(false);
+	SetDirty(false);
+	fText->Select(0, 0, true, false);
+}
+
+void PDoc::ReadAttr(BFile& file, BMessage& settingsMsg)
+{
 	char *p = NULL;
 	try
 	{
@@ -426,11 +351,7 @@ void PDoc::ReadAttr(BFile& file)
 			
 			FailIOErr(file.ReadAttr("pe-info", ai.type, 0, p, ai.size));
 			
-			BMessage msg;
-			if (msg.Unflatten(p) != B_OK) return;
-
-			msg.FindRect("windowposition", &fLastStoredFrame);
-			fText->SetSettings(msg);
+			settingsMsg.Unflatten(p);
 		}
 		else if (file.GetAttrInfo("FontPrefs", &ai) == B_NO_ERROR)
 		{
@@ -440,158 +361,48 @@ void PDoc::ReadAttr(BFile& file)
 			FailIOErr(file.ReadAttr("FontPrefs", ai.type, 0, p, ai.size));
 			
 			BMemoryIO mem(p, ai.size);
-
-			mem >> fLastStoredFrame;
 			
 			fText->SetSettingsMW(mem);
 		}
-		else if (fText->LineEndType() == leCR)
-			// no settings data found, see if it is a Mac file and adjust encoding:
-			fText->SetEncoding(B_MACINTOSH_ROMAN);
-
-		if (gRestorePosition && fLastStoredFrame.IsValid())
-		{
-			MoveTo(fLastStoredFrame.left, fLastStoredFrame.top);
-			ResizeTo(fLastStoredFrame.Width(), fLastStoredFrame.Height());
-			fText->AdjustScrollBars();
-		}
 	}
 	catch (HErr& e) {}
-	if (p) free(p);
-} /* PDoc::ReadAttr */
+	free(p);
+}
 
-void PDoc::WriteData(BPositionIO& file)
+void PDoc::ApplySettings(const BMessage& settingsMsg)
 {
-	FailOSErr(file.Seek(0, SEEK_SET));
-	
-	size_t size;
-	const char *text;
-	PTextBuffer buf;
-	
-	if (fURL)
-	{
-		buf = fText->TextBuffer();
-		buf.TranslateFromLF(leCRLF, fText->LineCount());
-		size = buf.Size();
-		text = buf.Buffer();
-	}
-	else if (fText->LineEndType() == leLF)
-	{
-		size = fText->Size();
-		text = fText->Text();
-	}
-	else
-	{
-		buf = fText->TextBuffer();
-		buf.TranslateFromLF(fText->LineEndType(), fText->LineCount());
-		size = buf.Size();
-		text = buf.Buffer();
-	}
-	
-	if (fText->Encoding() != B_UNICODE_UTF8)
-	{
-		int32 nativeSize;
-		char* nativeText = ConvertFromUtf8(text, size, fText->Encoding(), nativeSize);
-		CheckedWrite(file, nativeText, nativeSize);
-		free(nativeText);
-	}
-	else
-		CheckedWrite(file, text, size);
-	if (gPrefs->GetPrefInt(prf_I_NlAtEof, 1) &&
-		text[size - 1] != '\n')
-	{
-		CheckedWrite(file, "\n", 1);
-	}
+	inherited::ApplySettings(settingsMsg);
+	fText->ApplySettings(settingsMsg);
+//	fText->AdjustScrollBars();
+}
 
-	time(&fLastSaved);
-} /* PDoc::WriteData */
+void PDoc::GetText(BString& docText) const
+{
+	docText.SetTo(fText->Text(), fText->Size());
+}
 
-void PDoc::WriteAttr(BFile& file)
+void PDoc::CollectSettings(BMessage& settingsMsg) const
+{
+	inherited::CollectSettings(settingsMsg);
+	fText->CollectSettings(settingsMsg);
+}
+
+void PDoc::WriteAttr(BFile& file, const BMessage& settingsMsg)
 {
 	char *p = NULL;
 
 	try
 	{
-		BRect frame = Frame();
-		if (frame == fInitialFrame && fLastStoredFrame.IsValid())
-			// return to last stored position if frame had only been
-			// moved automatically (in order to stay in screen-bounds)
-			frame = fLastStoredFrame;
-
-		switch (gSavedState)
-		{
-			case 0:
-			{
-				BMessage msg;
-				fText->GetSettings(msg);
-				msg.AddRect("windowposition", frame);
-		
-				ssize_t s = msg.FlattenedSize();
-				p = (char *)malloc(s);
-				FailNil(p);
-				FailOSErr(msg.Flatten(p, s));
-				FailIOErr(file.WriteAttr("pe-info", 'info', 0, p, s));
-				break;
-			}
-			case 1:
-			{
-				BMallocIO data;
-				
-				data << frame;
-				fText->GetSettingsMW(data);
-				
-				FailIOErr(file.WriteAttr("FontPrefs", 'type', 0, data.Buffer(), data.BufferLength()));
-				break;
-			}
-		}
+		ssize_t s = settingsMsg.FlattenedSize();
+		p = (char *)malloc(s);
+		FailNil(p);
+		FailOSErr(settingsMsg.Flatten(p, s));
+		FailIOErr(file.WriteAttr("pe-info", 'info', 0, p, s));
 	}
 	catch (...) {}
 	
-	if (p) free(p);
+	free(p);
 } /* PDoc::WriteAttr */
-
-void PDoc::VerifyFile()
-{
-	try
-	{
-		if (gPrefs->GetPrefInt(prf_I_Verify, 1))
-		{
-			BFile file;
-			FailOSErr(file.SetTo(fFile, B_READ_ONLY));
-
-			time_t t;
-			FailOSErr(file.GetModificationTime(&t));
-			if (fLastSaved && t > fLastSaved + 1)
-			{
-				char s[PATH_MAX + 20];
-				sprintf(s, "File %s was modified by another application, reload it?", fFile->name);
-				MInfoAlert a(s, "Reload", "Cancel");
-
-				if (a.Go() == 1)
-				{
-					Read(false);
-					SetDirty(false);
-					fText->SetCaret(fText->Caret());
-						// this will make sure the cursor in within the file bounds
-
-					StopWatchingFile();
-					StartWatchingFile();
-						// restart watching, the file may have changed
-				}
-			}
-
-			fLastSaved = time(NULL);
-				// if more than one update request was issued
-				// in the mean time, only the first one is
-				// considered
-		}
-	}
-	catch (HErr& e)
-	{
-		// file seems to be gone, but it doesn't really matter...
-		// (we could only run into problems if the directory is gone)
-	}
-} /* PDoc::VerifyFile */
 
 void PDoc::SaveRequested(entry_ref& directory, const char *name)
 {
@@ -610,154 +421,24 @@ void PDoc::SaveRequested(entry_ref& directory, const char *name)
 			if (strcmp(item->Label(), "<undefined>"))
 			{
 				gPrefs->SetPrefInt("LastSavedMimeType", m->IndexOf(item));
-				fMimeType = item->Label();
+				SetMimeType(item->Label(), false);
 			}
 		}
 	}
 	
-	BFile old;
-	bool oldExists;
+	inherited::SaveRequested(directory, name);
 
-	if (fFile)
-		oldExists = old.SetTo(fFile, B_READ_ONLY) == B_OK;	// could fail
-	else
-		oldExists = false;
-	
-	CDoc::SaveRequested(directory, name);
-	
-	if (fFile)
-	{
-		if (oldExists && gPrefs->GetPrefInt(prf_I_SaveAttr, 1))
-		{
-			BFile file;
-			FailOSErr(file.SetTo(fFile, B_READ_WRITE));
-
-			mode_t perm;
-			FailOSErr(file.GetPermissions(&perm));
-
-			CopyAttributes(old, file);
-			
-			file.SetPermissions(perm);
-		}
-
-		fText->SetLanguage(name);
-
-		BEntry e;
-		FailOSErr(e.SetTo(fFile));
-		BPath p;
-		FailOSErr(e.GetPath(&p));
-		fStatus->SetPath(p.Path());
-
-		if (gPrefs->GetPrefInt(prf_I_FullPath, 1))
-			SetTitle(p.Path());
-		else
-			SetTitle(name);
-	}
-	else
-	{
-		SetTitle("Untitled");
-		fStatus->SetPath("Not saved");
-	}	
 } /* PDoc::SaveRequested */
 
-void PDoc::SaveACopy()
+void PDoc::HasBeenSaved()
 {
-	if (!fSavePanel)
-		fSavePanel = new BFilePanel(B_SAVE_PANEL);
-	
-	FailNil(fSavePanel);
-
-	BWindow *w = fSavePanel->Window();
-	w->Lock();
-	
-	char s[256];
-	sprintf(s, "Save a copy of %s as:", fFile ? fFile->name : Title());
-	
-	w->SetTitle(s);
-	fSavePanel->SetSaveText(fFile ? fFile->name : Title());
-	
-	if (fFile)
-	{
-		BEntry e(fFile), p;
-		e.GetParent(&p);
-		fSavePanel->SetPanelDirectory(&p);
-	}
-	else
-		fSavePanel->SetPanelDirectory(&gCWD);
-
-	fSavePanel->SetMessage(new BMessage(msg_DoSaveCopy));
-	fSavePanel->SetTarget(this);
-
-	w->Unlock();
-
-	if (!fSavePanel->IsShowing())
-		fSavePanel->Show();
-	else
-		fSavePanel->Window()->Activate();
-} /* PDoc::SaveACopy */
-
-void PDoc::DoSaveACopy(entry_ref& directory, const char *name)
-{
-	try
-	{
-		BDirectory dir(&directory);
-
-		BEntry e(&dir, name);
-		FailOSErr(e.InitCheck());
-		if (e.Exists())
-			e.Remove();
-		
-		BFile file;
-		
-		FailOSErr(dir.CreateFile(name, &file, true));
-		WriteData(file);
-		FailOSErr(file.Sync());
-
-		BPath path;
-		if (e.GetPath(&path) != B_OK
-			|| update_mime_info(path.Path(), false, true, false) != B_OK)
-			BNodeInfo(&file).SetType("text/plain");
-
-		if (fSavePanel)
-		{
-			delete fSavePanel;
-			fSavePanel = NULL;
-		}
-	}
-	catch (HErr& e)
-	{
-		e.DoError();
-	}
-} /* PDoc::DoSaveACopy */
-
-void PDoc::Revert() 
-{
-	char title[256];
-	sprintf(title, "Revert to the last saved version of %s?", Title());
-	
-	MInfoAlert a(title, "Cancel", "OK");
-	if (a == 2)
-	{
-		if (fFile)
-		{
-			BFile file;
-			FailOSErr(file.SetTo(fFile, B_READ_ONLY));
-			ReadData(file);
-		}
-		else if (fURL)
-		{
-			CFtpStream ftp(*fURL, true, gPrefs->GetPrefInt(prf_I_PassiveFtp, 1));
-			ReadData(ftp);
-		}
-		else
-			THROW(("No file?!?!?!?"));
-		fText->SetDirty(false);
-	}
-} /* PDoc::Revert */
+	inherited::HasBeenSaved();
+	fText->ResetUndo();
+}
 
 void PDoc::WindowActivated(bool active)
 {
-	BWindow::WindowActivated(active);
+	inherited::WindowActivated(active);
 
 	if (active)
 	{
@@ -767,7 +448,7 @@ void PDoc::WindowActivated(bool active)
 
 	if (active && gPrefs->GetPrefInt(prf_I_ShowHtmlPalette, 1)
 		&& gPrefs->GetPrefInt(prf_I_ShowHtmlpaletteForHtml, 1)) {
-			BMessage msg(fMimeType == "text/html" 
+			BMessage msg(strcmp(MimeType(), "text/html") == 0
 								? msg_ShowHtmlPalette 
 								: msg_HideHtmlPalette);
 			be_app->PostMessage(&msg);
@@ -806,11 +487,11 @@ void PDoc::OpenInclude(const char *incl)
 			}
 		}
 		
-		if (!found && fFile)
+		if (!found && EntryRef())
 		{
 			BPath path;
 			vector<BString> inclPathVect;
-			if (!ProjectRoster->GetIncludePathsForFile(fFile, inclPathVect))
+			if (!ProjectRoster->GetIncludePathsForFile(EntryRef(), inclPathVect))
 				ProjectRoster->GetAllIncludePaths(inclPathVect);
 
 			for(uint32 i=0; !found && i<inclPathVect.size(); ++i)
@@ -826,9 +507,9 @@ void PDoc::OpenInclude(const char *incl)
 			}
 		}
 
-		if (fURL && gPrefs->GetPrefInt(prf_I_Parent))
+		if (URL() && gPrefs->GetPrefInt(prf_I_Parent))
 		{
-			URLData url(*fURL);
+			URLData url(*URL());
 			url += incl;
 			if (url.IsValid())
 			{
@@ -838,9 +519,9 @@ void PDoc::OpenInclude(const char *incl)
 			}
 		}
 		
-		if (fFile && gPrefs->GetPrefInt(prf_I_Parent))
+		if (EntryRef() && gPrefs->GetPrefInt(prf_I_Parent))
 		{
-			FailOSErr(e.SetTo(fFile));
+			FailOSErr(e.SetTo(EntryRef()));
 			FailOSErr(e.GetParent(&d));
 			
 			if (d.Contains(incl, B_FILE_NODE | B_SYMLINK_NODE))
@@ -1026,33 +707,6 @@ void PDoc::OpenSelection()
 	}
 } /* PDoc::OpenSelection */
 
-BRect PDoc::NextPosition(bool inc)
-{
-	BFont textFont;
-	gPrefs->InitTextFont(&textFont);
-	float lh;
-	font_height fh;
-	textFont.GetHeight(&fh);
-	lh = fh.ascent + fh.descent + fh.leading;
-
-	BRect initialDefaultRect(
-		40, 25,	
-		40 + 80*textFont.StringWidth("m") + B_V_SCROLL_BAR_WIDTH + 5, 
-		25 + 40*lh + B_H_SCROLL_BAR_HEIGHT
-	);
-	BRect defaultFrame = gPrefs->GetPrefRect(prf_R_DefaultDocumentRect, 
-											 initialDefaultRect);
-
-	if (inc)
-		sfNewCount++;
-	else if (sfNewCount < 0)
-		sfNewCount = 0;
-	defaultFrame.OffsetBy( -(sfNewCount % 8) * 4 + (sfNewCount / 8) * 8, 
-						   (sfNewCount % 8) * 20);
-	
-	return defaultFrame;
-} /* PDoc::NextPosition */
-
 void PDoc::MakeWorksheet()
 {
 	fIsWorksheet = true;
@@ -1090,15 +744,9 @@ void PDoc::OpenPartner()
 {
 	try
 	{
-		// [zooey]: why did Maarten chose to try open the partner file by BeIDE?
-		//				If it works, a BeIDE window pops up. Not quite what one 
-		//				expects, right? So let's disable that:
-//		if (IDEOpenSourceHeader(*fFile))
-//			return;
-	
 		BEntry e;
 		entry_ref doc;
-		FailOSErr(e.SetTo(fFile));
+		FailOSErr(e.SetTo(EntryRef()));
 		
 		BDirectory d;
 		FailOSErr(e.GetParent(&d));
@@ -1168,7 +816,7 @@ void PDoc::SetDirty(bool dirty)
 
 void PDoc::CreateFilePanel()
 {
-	CDoc::CreateFilePanel();
+	inherited::CreateFilePanel();
 	
 	BWindow *w = fSavePanel->Window();
 	BAutolock lock(w);
@@ -1204,12 +852,12 @@ void PDoc::CreateFilePanel()
 		while ((p = gPrefs->GetIxPrefString(prf_X_Mimetype, i++)) != NULL)
 			m->AddItem(new BMenuItem(p, NULL));
 		
-		BMenuItem *item = m->FindItem(fMimeType.c_str());
+		BMenuItem *item = m->FindItem(MimeType());
 		if (item)
 			item->SetMarked(true);
 		else
 		{
-			p = fMimeType.c_str();
+			p = MimeType();
 			if (!p || !p[0])
 				p = "<undefined>";
 			m->AddItem(item = new BMenuItem(p, NULL));
@@ -1217,12 +865,6 @@ void PDoc::CreateFilePanel()
 		}
 	}
 } /* PDoc::CreateFilePanel */
-
-void PDoc::NameAFile(char *name)
-{
-	strncpy(name, Title(), B_FILE_NAME_LENGTH - 1);
-	name[B_FILE_NAME_LENGTH - 1] = 0;
-} /* PDoc::NameAFile */
 
 PDoc* PDoc::TopWindow()
 {
@@ -1509,55 +1151,6 @@ void PDoc::MessageReceived(BMessage *msg)
 	{
 		switch (what)
 		{
-			case B_NODE_MONITOR:
-				int32 opcode;
-				if (fFile == NULL || msg->FindInt32("opcode", &opcode) != B_OK)
-					break;
-
-				const char *name;
-				if ((opcode == B_ENTRY_CREATED
-						|| opcode == B_ENTRY_MOVED && fNodeRef.node == -1)
-					&& msg->FindString("name", &name) == B_OK
-					&& !strcmp(name, fFile->name))
-				{
-					VerifyFile();
-				}
-				else if (msg->FindInt64("node") != fNodeRef.node)
-				{
-					// filter out other stuff that comes from watching the directory
-					break;
-				}
-
-				switch (opcode)
-				{
-					case B_ENTRY_MOVED:
-					{
-						int64 directory;
-						if (msg->FindInt64("to directory", &directory) == B_OK)
-							fFile->directory = directory;
-
-						const char *name;
-						if (msg->FindString("name", &name) == B_OK)
-							fFile->set_name(name);
-
-						UpdateTitle();
-						break;
-					}
-					case B_ENTRY_REMOVED:
-					{
-						StopWatchingFile(false);
-							// We don't want to stop monitoring the directory; BTW, it
-							// will get automatically updated on next save, the monitoring
-							// slot is not lost
-						SetDirty(true);
-						break;
-					}
-					case B_STAT_CHANGED:
-						VerifyFile();
-						break;
-				}
-				break;
-
 			case msg_CloseAll:
 			{
 				doclist lst = sfDocList;
@@ -1580,30 +1173,6 @@ void PDoc::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
-			
-			case msg_Close:
-				PostMessage(B_QUIT_REQUESTED);
-				break;
-
-			case msg_SaveAll:
-				PostToAll(msg_Save, false);
-				break;
-			
-			case msg_Save:
-				if (IsDirty())
-				{
-					Save();
-					fText->ResetUndo();
-				}
-				break;
-			
-			case msg_SaveAs:
-				CDoc::SaveAs();
-				break;
-			
-			case msg_Revert:
-				Revert();
-				break;
 			
 			case msg_OpenSelected:
 				OpenSelection();
@@ -1635,32 +1204,6 @@ void PDoc::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-			case B_SAVE_REQUESTED:
-			{
-				entry_ref dir;
-				const char *name;
-				
-				FailOSErr(msg->FindRef("directory", &dir));
-				FailOSErr(msg->FindString("name", &name));
-				SaveRequested(dir, name);
-				break;
-			}
-			
-			case msg_SaveCopy:
-				SaveACopy();
-				break;
-			
-			case msg_DoSaveCopy:
-			{
-				entry_ref dir;
-				const char *name;
-				
-				FailOSErr(msg->FindRef("directory", &dir));
-				FailOSErr(msg->FindString("name", &name));
-				DoSaveACopy(dir, name);
-				break;
-			}
-			
 			case msg_FindCmd:
 			{
 				int c = 1 << current_workspace();
@@ -1689,7 +1232,7 @@ void PDoc::MessageReceived(BMessage *msg)
 
 				fStatus->Draw(fStatus->Bounds());
 				ResetMenuShortcuts();
-				UpdateTitle();
+				NameChanged();
 				break;
 			
 			case msg_SwitchHeaderSource:
@@ -1724,11 +1267,11 @@ void PDoc::MessageReceived(BMessage *msg)
 			
 			case msg_ShowInBrowser:
 			{
-				if (fText->IsDirty() || File() == NULL)
+				if (fText->IsDirty() || EntryRef() == NULL)
 				{
 					MAlert *a;
 					
-					if (fURL)
+					if (URL())
 						a  = new MInfoAlert("In order to display this page in a browser you need to "
 						"save this document on a local disk first.\n\n"
 						"Save changes to this document first?", "Save", "Cancel");
@@ -1737,15 +1280,13 @@ void PDoc::MessageReceived(BMessage *msg)
 					
 					if (a->Go() == 1)
 					{
-						if (fURL)
-							delete fURL;
-						fURL = NULL;
+						SetDocIO(new CLocalDocIO(this, EntryRef(), NULL));
 						Save();
 					}
 				}
 				
-				if (!fText->IsDirty() && File())
-					gApp->DisplayInBrowser(*File());
+				if (!fText->IsDirty() && EntryRef())
+					gApp->DisplayInBrowser(*EntryRef());
 				break;
 			}
 			
@@ -1776,12 +1317,6 @@ void PDoc::MessageReceived(BMessage *msg)
 			{
 				CInfoDialog *d;
 				GetDialog(d);
-				break;
-			}
-			
-			case msg_ConvertEncoding:
-			{
-				DialogCreator<CConvertDialog>::CreateDialog("Conversion", this);
 				break;
 			}
 			
@@ -1856,11 +1391,10 @@ void PDoc::MessageReceived(BMessage *msg)
 					
 					if (lock2.IsLocked())
 					{
-						delete hDoc->fFile;
-						hDoc->fFile = NULL;
+						hDoc->SetEntryRef(NULL);
 	
 						hDoc->SetTitle("Untitled");
-						hDoc->fReadOnly = false;
+						hDoc->SetReadOnly(false);
 						hDoc->fButtonBar->SetOn(msg_ReadOnly, false);
 
 						BRect r = NextPosition(false);
@@ -1891,15 +1425,6 @@ void PDoc::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-			case msg_DoFtpSave:
-			{
-				URLData *url;
-				FailOSErr(msg->FindPointer("url", (void**)&url));
-				SaveOnServer(*url);
-				delete url;
-				break;
-			}
-			
 			case msg_FtpSave:
 			{
 				CFtpDialog *ftps 
@@ -1913,16 +1438,17 @@ void PDoc::MessageReceived(BMessage *msg)
 			{	
 				if (IsDirty() || fText->IsDirty())
 					Save();
-				CProjectFile* prjFile
-					= ProjectRoster->ParseProjectFile(fFile, MimeType());
-				if (prjFile) {
-					if (!prjFile->HaveProjectInfo()) {
-						MInfoAlert a(prjFile->ErrorMsg().String(), "Hmmm...");
-						a.Go();
-					} else {
-						PProjectWindow::Create(fFile, MimeType(), prjFile);
-						Quit();
-					}
+				PProjectWindow* prjWin 
+					= PProjectWindow::Create(EntryRef(), MimeType());
+				if (prjWin->InitCheck() == B_OK)
+				{
+					prjWin->Show();
+					Quit();
+				}
+				else
+				{
+					MInfoAlert a(prjWin->ErrorMsg(), "Hmmm...");
+					a.Go();
 				}
 				break;
 			}
@@ -1941,7 +1467,7 @@ void PDoc::MessageReceived(BMessage *msg)
 						PerformExtension(item->Label());
 				}
 				else
-					BWindow::MessageReceived(msg);
+					inherited::MessageReceived(msg);
 			}
 		}
 	}
@@ -2172,142 +1698,6 @@ void PDoc::ShowRecentMenu(BPoint where, bool showalways)
 	fButtonBar->SetDown(msg_BtnOpen, false);
 } /* PDoc::ShowRecentMenu */
 
-#pragma mark - Dialogs
-
-void PDoc::AddDialog(HDialog *inDialog, bool inWindowModal)
-{
-	fDialogs.push_back(inDialog);
-	if (inWindowModal)
-		fWindowModal = inDialog;
-} /* PDoc::AddDialog */
-
-void PDoc::RemoveDialog(HDialog *inDialog)
-{
-	vector<HDialog*>::iterator i = find(fDialogs.begin(), fDialogs.end(), inDialog);
-	if (i != fDialogs.end())
-	{
-		fDialogs.erase(i);
-		if (fWindowModal == inDialog)
-			fWindowModal = NULL;
-	}
-} /* PDoc::RemoveDialog */
-
-void PDoc::MakeModal(HDialog *inDialog)
-{
-	if (!fWindowModal)
-		fWindowModal = inDialog;
-} /* PDoc::MakeModal */
-//
-//HDialog* PDoc::GetOpenSelectionDialog()
-//{
-//	BWindow *d;
-//	int i;
-//	
-//	for (i = 0; i < fDialogs.CountItems(); i++)
-//	{
-//		d = (BWindow *)fDialogs.ItemAt(i);
-//		if (typeid(*d) == typeid(COpenSelection))
-//		{
-//			d->SetWorkspaces(1 << current_workspace());
-//			d->Activate();
-//			return static_cast<COpenSelection*>(d);
-//		}
-//	}
-//	
-//	COpenSelection *dlog = DialogCreator<COpenSelection>::CreateDialog(this);
-//	dlog->Show();
-//	
-//	return dlog;
-//} /* CCellWindow::GetOpenSelectionDialog */
-//
-//HDialog* PDoc::GetGoToLineDialog()
-//{
-//	BWindow *d;
-//	int i;
-//	
-//	for (i = 0; i < fDialogs.CountItems(); i++)
-//	{
-//		d = (BWindow *)fDialogs.ItemAt(i);
-//		if (typeid(*d) == typeid(CGoToLine))
-//		{
-//			d->SetWorkspaces(1 << current_workspace());
-//			d->Activate();
-//			return static_cast<CGoToLine*>(d);
-//		}
-//	}
-//	
-//	CGoToLine *dlog = DialogCreator<CGoToLine>::CreateDialog(this);
-//	dlog->Show();
-//	
-//	return dlog;
-//} /* CCellWindow::GetGoToLineDialog */
-//
-//HDialog* PDoc::GetInfoDialog()
-//{
-//	BWindow *d;
-//	int i;
-//	
-//	for (i = 0; i < fDialogs.CountItems(); i++)
-//	{
-//		d = (BWindow *)fDialogs.ItemAt(i);
-//		if (typeid(*d) == typeid(CInfoDialog))
-//		{
-//			d->SetWorkspaces(1 << current_workspace());
-//			d->Activate();
-//			return static_cast<CInfoDialog*>(d);
-//		}
-//	}
-//	
-//	CInfoDialog *dlog = DialogCreator<CInfoDialog>::CreateDialog(this);
-//	dlog->Show();
-//	
-//	return dlog;
-//} /* CCellWindow::GetInfoDialog */
-//
-//HDialog* PDoc::GetConvertDialog()
-//{
-//	BWindow *d;
-//	int i;
-//	
-//	for (i = 0; i < fDialogs.CountItems(); i++)
-//	{
-//		d = (BWindow *)fDialogs.ItemAt(i);
-//		if (typeid(*d) == typeid(CConvertDialog))
-//		{
-//			d->SetWorkspaces(1 << current_workspace());
-//			d->Activate();
-//			return static_cast<CConvertDialog*>(d);
-//		}
-//	}
-//	
-//	CConvertDialog *dlog = DialogCreator<CConvertDialog>::CreateDialog(this);
-//	dlog->Show();
-//	
-//	return dlog;
-//} /* CCellWindow::GetConvertDialog */
-//
-////HDialog* PDoc::GetDiffOptionsDialog()
-////{
-////	BWindow *d;
-////	int i;
-////	
-////	for (i = 0; i < fDialogs.CountItems(); i++)
-////	{
-////		d = (BWindow *)fDialogs.ItemAt(i);
-////		if (typeid(*d) == typeid(CDiffOptions))
-////		{
-////			d->Activate();
-////			return static_cast<CDiffOptions*>(d);
-////		}
-////	}
-////	
-////	CDiffOptions *dlog = DialogCreator<CDiffOptions>::CreateDialog(this);
-////	dlog->Show();
-////	
-////	return dlog;
-////} /* CCellWindow::GetDiffOptionsDialog */
-////
-
 #pragma mark - IDE
 
 void PDoc::IDEBringToFront()
@@ -2333,7 +1723,7 @@ void PDoc::IDEAddFile()
 	strcpy(item.property, "project");
 	msg.AddData("target", PROPERTY_TYPE, &item, sizeof(item));
 	
-	msg.AddRef("data", fFile);
+	msg.AddRef("data", EntryRef());
 	
 	IDEBringToFront();
 	SendToIDE(msg, &reply);
@@ -2352,7 +1742,7 @@ void PDoc::IDERemoveFile()
 	strcpy(item.property, "project");
 	msg.AddData("target", PROPERTY_TYPE, &item, sizeof(item));
 	
-	msg.AddRef("data", fFile);
+	msg.AddRef("data", EntryRef());
 	
 	IDEBringToFront();
 	SendToIDE(msg, &reply);
@@ -2593,7 +1983,7 @@ BHandler* PDoc::ResolveSpecifier(BMessage *msg, int32 index,
 			return NULL;
 	}
 	else
-		return BWindow::ResolveSpecifier(msg, index, specifier, form, property);
+		return inherited::ResolveSpecifier(msg, index, specifier, form, property);
 } /* PDoc::ResolveSpecifier */
 
 status_t PDoc::GetSupportedSuites(BMessage *data)
@@ -2601,6 +1991,6 @@ status_t PDoc::GetSupportedSuites(BMessage *data)
 	status_t err;
 	err = data->AddString("suites", "suite/x-vnd.Hekkel-textdoc");
 	if (err) return err;
-	return BWindow::GetSupportedSuites(data);
+	return inherited::GetSupportedSuites(data);
 } /* PDoc::GetSupportedSuites */
 

@@ -47,8 +47,42 @@ bool isspace_uc(int unicode);
 int maptounicode(int charset, char ch);
 int mclass(int unicode);
 
-char* ConvertToUtf8(const char* text, int32 size, int encoding, int32& outSize);
-char* ConvertFromUtf8(const char* text, int32 size, int encoding, int32& outSize);
+
+class CEncodingRoster {
+public:
+	static const char* EncodingNameByIdx(int encoding);
+	static bool IsSupportedEncoding(int encoding);
+private:
+	static const int sfMaxSupportedEncoding;
+};
+
+class CTextEncodingConverter {
+public:
+	CTextEncodingConverter();
+	CTextEncodingConverter(int encoding);
+	~CTextEncodingConverter();
+	//
+	status_t SetTo(int encoding);
+	status_t ConvertToUtf8(BString& docText);
+	status_t ConvertFromUtf8(BString& docText);
+	//
+	int Encoding() const;
+	bool HadToSubstitute() const;
+	int ErrorPos() const;
+	status_t InitCheck() const;
+private:
+	void _Init(int encoding);
+	void _Cleanup();
+	void _CheckUtf8(const BString& docText);
+	status_t _DoConversion(const char* text, int size, char*& outText, 
+						   int& outSize, int charset, bool toUtf8);
+
+	status_t fStatus;
+	int fEncoding;
+	char* fConvertedText;
+	int fConvertedSize;
+	int fErrorPos;
+};
 
 void InitUTFTables();
 

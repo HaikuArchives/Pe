@@ -103,10 +103,10 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 		item->SetMarked(true);
 	}
 
-	if (fDoc->File())
+	if (fDoc->EntryRef())
 	{
 		BNode node;
-		FailOSErr(node.SetTo(fDoc->File()));
+		FailOSErr(node.SetTo(fDoc->EntryRef()));
 		
 		time_t t;
 		node.GetModificationTime(&t);
@@ -156,8 +156,14 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 	mf = dynamic_cast<BMenuField*>(FindView("encoding"));
 	FailNil(mf);
 	fEncoding = mf->Menu();
-	FailNil(fMenu);
+	FailNil(fEncoding);
 	fEncoding->SetRadioMode(true);
+
+	mf = dynamic_cast<BMenuField*>(FindView("source encoding"));
+	FailNil(mf);
+	fSourceEncoding = mf->Menu();
+	FailNil(fSourceEncoding);
+	fSourceEncoding->SetRadioMode(true);
 
 	mf = dynamic_cast<BMenuField*>(FindView("linebreaks"));
 	FailNil(mf);
@@ -193,6 +199,7 @@ bool CInfoDialog::OKClicked()
 	msg.AddInt32("tabs", atoi(GetText("tabs")));
 	msg.AddBool("show tabs", IsOn("show tabs"));
 	msg.AddBool("syntaxcol", IsOn("syntaxcol"));
+	msg.AddInt32("source encoding", fSourceEncoding->IndexOf(fSourceEncoding->FindMarked()));
 	msg.AddInt32("encoding", fEncoding->IndexOf(fEncoding->FindMarked()));
 	msg.AddBool("show invisibles", IsOn("show invisibles"));
 	msg.AddInt32("line breaks", fLineBreaks->IndexOf(fLineBreaks->FindMarked()));
@@ -244,8 +251,9 @@ bool CInfoDialog::CancelClicked()
 		if (item) item->SetMarked(true);
 	}
 	
-	fEncoding->ItemAt(fDoc->TextView()->Encoding())->SetMarked(true);
-	fLineBreaks->ItemAt(fDoc->TextView()->LineEndType())->SetMarked(true);
+	fSourceEncoding->ItemAt(fDoc->Encoding())->SetMarked(true);
+	fEncoding->ItemAt(fDoc->Encoding())->SetMarked(true);
+	fLineBreaks->ItemAt(fDoc->LineEndType())->SetMarked(true);
 
 	SetOn("syntaxcol", fDoc->TextView()->SyntaxColoring());
 	SetOn("show tabs", fDoc->ToolBar()->ShowsTabs());

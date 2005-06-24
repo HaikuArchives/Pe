@@ -169,8 +169,8 @@ status_t MTextAddOnImpl::GetRef(entry_ref&	outRef)
 	status_t err = B_NO_ERROR;
 	
 	PDoc *doc = static_cast<PDoc*>(Window());
-	if (doc->File())
-		outRef = *doc->File();
+	if (doc->EntryRef())
+		outRef = *doc->EntryRef();
 	else
 		err = B_ERROR;
 	

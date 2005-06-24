@@ -210,7 +210,8 @@ void CProjectGroupItem::SerializeTo( CProjectSerializer* serializer) const
  * 
  */
 CProjectFile::CProjectFile()
-	:	fActivationTime(0)
+	: CDoc(NULL, NULL, NULL)
+	, fActivationTime(0)
 {
 	ProjectRoster->AddProject(this);
 }
@@ -253,10 +254,7 @@ void CProjectFile::SerializeTo( CProjectSerializer* serializer) const
 	serializer->SerializeFile(this); 
 }
 
-/*
- * 
- */
-status_t 
+/*status_t 
 CProjectFile::WriteToFile(BPositionIO* file, const BString& contents,
 								  const char* mimetype) const
 {
@@ -279,6 +277,20 @@ CProjectFile::WriteToFile(BPositionIO* file, const BString& contents,
 	else
 		return B_OK;
 }
+*/
 
+void CProjectFile::CollectSettings(BMessage& settingsMsg) const
+{
+}
 
+void CProjectFile::ApplySettings(const BMessage& settingsMsg)
+{
+}
 
+void CProjectFile::ReadAttr(BFile& file, BMessage& settingsMsg)
+{
+}
+
+void CProjectFile::WriteAttr(BFile& file, const BMessage& settingsMsg)
+{
+}

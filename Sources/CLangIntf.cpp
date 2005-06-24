@@ -429,7 +429,7 @@ void CLangIntf::ColorLine(const char *text, int size, int& state,
 	{
 		if (fColorLine)
 		{
-			CLanguageProxy proxy(*this, text, size, 0, starts, colors);
+			CLanguageProxy proxy(*this, text, size, starts, colors);
 			fColorLine(proxy, state);
 		}
 		else if (starts)
@@ -477,7 +477,7 @@ int CLangIntf::FindNextWord(PText& text, int offset, int& mlen)
 			text.TextBuffer().Copy(txt, offset, size);
 			txt[size] = 0;
 			
-			CLanguageProxy proxy(*this, txt, size, text.Encoding());
+			CLanguageProxy proxy(*this, txt, size);
 			int result = fFindNextWord(proxy);
 
 			txt[result + 1] = 0;

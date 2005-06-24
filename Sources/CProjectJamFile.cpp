@@ -89,7 +89,7 @@ void CProjectJamSerializer::SerializeFile(const CProjectFile* item)
 	// each CProjectFile lives in a file of its own right, so we write
 	// this item to its own file:
 	if (item->HasBeenParsed())
-		item->SerializeToFile(NULL);
+		(const_cast<CProjectFile*>(item))->Save();
 }
 
 
@@ -183,6 +183,10 @@ CProjectJamFile::CProjectJamFile(const char* path)
 	,	fHasBeenParsed(false)
 {
 	SetTo(path);
+	entry_ref eref;
+	if (get_ref_for_path(path, &eref) == B_OK)
+		SetEntryRef(&eref);
+	SetMimeType("text/x-jamfile", false);
 }
 
 CProjectJamFile::~CProjectJamFile()
@@ -462,30 +466,9 @@ void CProjectJamFile::_ParseSubJamfiles(const BString& contents)
 		return c; \
 } while(0)
 
-status_t CProjectJamFile::Parse()
+status_t CProjectJamFile::Parse(const BString& contents)
 {
 	fErrorMsg.Truncate(0);
-	BPath path( fParentPath.String(), fLeafName.String());
-	BFile prjFile;
-	status_t res = prjFile.SetTo(path.Path(), B_READ_ONLY);
-	if (res != B_OK)
-		RET_FAIL(res, "unable to open file");
-	
-	off_t size;
-	res = prjFile.GetSize(&size);
-	if (res != B_OK)
-		RET_FAIL(res, "unable to get file size");
-
-	BString contents;
-	char* buf = contents.LockBuffer(size+1);
-	if (!buf)
-		RET_FAIL(B_NO_MEMORY, strerror(B_NO_MEMORY));
-	
-	if (prjFile.Read(buf, size) != size)
-		RET_FAIL(B_IO_ERROR, strerror(B_IO_ERROR));
-
-	contents.UnlockBuffer(size);
-	
 	const char* t = contents.String();
 	const char* topStart = strstr(t, "SubDir ");
 	if (!topStart)
@@ -523,25 +506,21 @@ status_t CProjectJamFile::Parse()
 	return B_OK;
 }
 
-status_t CProjectJamFile::SerializeToFile(BPositionIO* file) const
+void CProjectJamFile::GetText(BString& docText) const
 {
-	status_t res = B_OK;
-	BString contents(fHeader);
+	docText.SetTo(fHeader);
 
 	BPath path( fParentPath.String(), fLeafName.String());
-	CProjectJamSerializer serializer(contents, path.Path());
-
-	// need to find out now if dirty, since serialization resets the info!
-	bool isDirty = IsDirty();
+	CProjectJamSerializer serializer(docText, path.Path());
 
 	list<CProjectItem*>::const_iterator iter;
 	for( iter = fItems.begin(); iter != fItems.end(); ++iter)
 		(*iter)->SerializeTo(&serializer);
 
-	contents << fFooter;
-
-	if (file || isDirty)
-		res = WriteToFile(file, contents, "text/x-jamfile");
-
-	return res;
+	docText << fFooter;
 }		
+
+void CProjectJamFile::SetText(const BString& docText)
+{
+	FailOSErrMsg(Parse(docText), ErrorMsg().String());
+}

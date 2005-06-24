@@ -33,315 +33,125 @@
 	Created: 09/10/97 13:20:21
 */
 
-#include <NodeMonitor.h>
-#include <fs_attr.h>
-
 #include "pe.h"
+
+#include <String.h>
+
 #include "CDoc.h"
-#include "PApp.h"
-#include "CFtpStream.h"
-#include "HError.h"
-#include "MAlert.h"
-#include "HPreferences.h"
+#include "CDocIO.h"
 #include "CMessages.h"
+#include "HError.h"
+#include "HPreferences.h"
+#include "MAlert.h"
+#include "PApp.h"
+#include "PMessages.h"
 #include "Prefs.h"
 
 doclist CDoc::sfDocList;
 vector<char*> CDoc::sfTenLastDocs;
 
 CDoc::CDoc(const char* mimetype, BLooper *target, const entry_ref *doc)
+	: fDocIO(NULL)
+	, fSavePanel(NULL)
+	, fMimeType(mimetype)
+	, fDirty(false)
+	, fReadOnly(false)
+	, fEncoding(B_UNICODE_UTF8)
+	, fLineEndType(kle_LF)
 {
-	ASSERT(strlen(mimetype) < 64);
-	fSavePanel = NULL;
-	fTarget = target;
-	fDirty = false;
-	fURL = NULL;
-	fMimeType = mimetype;
-	
+	fDocIO = new CLocalDocIO(this, doc, target);
+	FailNil(fDocIO);
 	if (doc)
 	{
-		entry_ref ref;
 		BEntry e;
-		FailOSErr(e.SetTo(doc, true));
-
-		fFile = new entry_ref;
-		FailOSErr(e.GetRef(fFile));
-
 		FailOSErr(e.SetTo(doc));
 		FailOSErr(e.GetParent(&gCWD));
 
 		BNode node;
-		FailOSErr(node.SetTo(fFile));
+		FailOSErr(node.SetTo(doc));
 
 		struct stat st;
 		FailOSErr(node.GetStat(&st));
 
-		fReadOnly = ! ((gUid == st.st_uid && (S_IWUSR & st.st_mode)) ||
-							(gGid == st.st_gid && (S_IWGRP & st.st_mode)) ||
-							(S_IWOTH & st.st_mode));
+		fReadOnly = !((gUid == st.st_uid && (S_IWUSR & st.st_mode)) 
+						||	(gGid == st.st_gid && (S_IWGRP & st.st_mode)) 
+						||	(S_IWOTH & st.st_mode));
 
 		char s[NAME_MAX];
 		if (BNodeInfo(&node).GetType(s) == B_OK)
 			fMimeType = s;
 	}
-	else
-	{
-		fFile = NULL;
-		fReadOnly = false;
-	}
-
 	sfDocList.push_back(this);
-} /* CDoc::CDoc */
+}
 
-CDoc::CDoc(BLooper *target, URLData& url)
+CDoc::CDoc(const URLData& url)
+	: fSavePanel(NULL)
+	, fDirty(false)
+	, fReadOnly(false)
+	, fEncoding(B_UNICODE_UTF8)
+	, fLineEndType(kle_LF)
 {
-	fSavePanel = NULL;
-	fTarget = target;
-	fDirty = false;
-	fURL = new URLData(url);
-	fFile = NULL;
-	fReadOnly = false;
-
+	fDocIO = new CFtpDocIO(this, url);
 	sfDocList.push_back(this);
-} /* CDoc::CDoc */
+}
 
 CDoc::~CDoc()
 {
+	StopWatchingFile();
+	
 	sfDocList.remove(this);
-
-	delete fSavePanel;
-	delete fFile;
-
 	be_app->PostMessage(msg_DocClosed);
-} /* CDoc::~CDoc */
+}
 
-bool CDoc::QuitRequested()
-{
-	bool result = true;
-	fWaitForSave = false;
-
-	if (fDirty)
-	{
-		char title[256];
-		sprintf(title, "Save changes to '%s' before closing?", fFile ? fFile->name : "Untitled");
-		
-		MInfoAlert alert(title, "Save", "Cancel", "Don't save");
-		
-		switch (alert.Go())
-		{
-			case 3:
-				break;
-				
-			case 2:
-				result = false;
-				break;
-				
-			default:
-				if (fFile)
-					Save();
-				else
-				{
-					result = false;
-					fWaitForSave = true;
-					SaveAs();
-				}
-				break;
-		}
-	}
-
-	return result;
-} /* CDoc::QuitRequested */
-
-void CDoc::StartWatchingFile()
-{
-	BWindow *window = dynamic_cast<BWindow *>(this);
-
-	if (fFile == NULL || window == NULL)
-		return;
-
-	// start monitoring this file for changes
-	BNode node(fFile);
-	if (node.GetNodeRef(&fNodeRef) == B_OK)
-		watch_node(&fNodeRef, B_WATCH_NAME | B_WATCH_STAT, window);
-
-	node_ref directoryNodeRef;
-	BEntry entry(fFile);
-	if (entry.GetParent(&entry) == B_OK
-		&& node.SetTo(&entry) == B_OK
-		&& node.GetNodeRef(&directoryNodeRef) == B_OK)
-		watch_node(&directoryNodeRef, B_WATCH_DIRECTORY, window);
-} /* CDoc::StartWatchingFile */
-
-void CDoc::StopWatchingFile(bool stopDirectory)
-{
-	BWindow *window = dynamic_cast<BWindow *>(this);
-
-	if (fFile == NULL || window == NULL)
-		return;
-
-	watch_node(&fNodeRef, B_STOP_WATCHING, window);
-
-	// if we get late messages, we don't want to deal with them
-	fNodeRef.device = -1;
-	fNodeRef.node = -1;
-
-	if (stopDirectory) {
-		node_ref directoryNodeRef;
-		BEntry entry(fFile);
-		BNode node;
-		if (entry.GetParent(&entry) == B_OK
-			&& node.SetTo(&entry) == B_OK
-			&& node.GetNodeRef(&directoryNodeRef) == B_OK)
-			watch_node(&directoryNodeRef, B_STOP_WATCHING, window);
-	}
-} /* CDoc::StopWatchingFile */
-
-void CDoc::SetFile(entry_ref &ref)
+void CDoc::SetEntryRef(const entry_ref *ref)
 {
 	StopWatchingFile();
-
-	delete fFile;
-	fFile = new entry_ref(ref);
-
+	if (fDocIO)
+		fDocIO->SetEntryRef(ref);
 	StartWatchingFile();
-} /* CDoc::SetFile */
+	NameChanged();
+}
+
+void CDoc::SetDocIO( CDocIO* docIO)
+{
+	StopWatchingFile();
+	delete fDocIO;
+	fDocIO = docIO;
+	StartWatchingFile();
+	NameChanged();
+}
+
+#pragma mark - i/o
 
 void CDoc::Read(bool readAttributes)
 {
-	if (!fFile && !fURL) THROW(("No file available"));
+	if (!fDocIO)
+		THROW(("No file available"));
 
-	if (fFile)
-	{
-		BFile file;
-		FailOSErr(file.SetTo(fFile, B_READ_ONLY));
-
-		ReadData(file);
-
-		if (readAttributes)
-			ReadAttr(file);
-	}
-	else
-	{
-		CFtpStream ftp(*fURL, true, gPrefs->GetPrefInt(prf_I_PassiveFtp, 1));
-		ReadData(ftp);
-	}
-} /* CDoc::Read */
-
-status_t CDoc::WriteState()
-{
-	if (fFile)
-	{
-		BFile file;
-		status_t res = file.SetTo(fFile, B_READ_WRITE);
-		if (res != B_OK)
-			return res;
-		WriteAttr(file);
-		return file.Sync();
-	}
-	else
-		return B_NO_INIT;
-} /* CDoc::WriteState */
-
-//void CDoc::WriteAttr(BFile& file)
-//{
-//} /* CDoc::WriteAttr */
+	fDocIO->ReadDoc(readAttributes);
+}
 
 void CDoc::Save()
 {
-	if (fURL)
+	try
 	{
-		try
+		if (!fDocIO)
+			THROW(("No file available"));
+		if (!fReadOnly)
 		{
-			CFtpStream ftp(*fURL, false, gPrefs->GetPrefInt(prf_I_PassiveFtp, 1));
-			WriteData(ftp);
-			ftp.Flush();
-			
-			SetDirty(false);
-		}
-		catch (HErr& e)
-		{
-			e.DoError();
-		}
-	}
-	else if (fFile && !fReadOnly)
-	{
-		char name[B_FILE_NAME_LENGTH];
-		BEntry e(fFile, true);
-		bool existed = e.Exists();
-		time_t created;
-
-		FailOSErr(e.GetName(name));
-
-		try
-		{
-			if (existed)
-			{
-				StopWatchingFile();
-
-				BFile file;
-				FailOSErr(file.SetTo(fFile, B_READ_ONLY));
-				FailOSErr(file.GetCreationTime(&created));
-
-				string bname(name);
-				bname += '~';
-				
-				FailOSErr(e.Rename(bname.c_str(), true));
-			}
-
-			BFile file;
-			BDirectory dir;
-			
-			FailOSErr(e.GetParent(&dir));
-			FailOSErr(dir.CreateFile(name, &file, true));
-			WriteData(file);
-			(void)file.Sync();	// might fail
-			WriteAttr(file);
-			(void)file.Sync();	// might also fail
-	
-			if (existed)
-			{
-				FailOSErr(file.SetCreationTime(created));
-				
-				if (gPrefs->GetPrefInt(prf_I_SaveAttr, 1))
-				{
-					BFile old;
-					FailOSErr(old.SetTo(&e, B_READ_ONLY));
-					CopyAttributes(old, file);
-				}
-
-				if (!gPrefs->GetPrefInt(prf_I_Backup))
-					FailOSErr(e.Remove());
-			}
-
-			// Update MIME type info
-			e.SetTo(&dir, name);
-			BPath path(&e);
-			if (fMimeType == "" && path.InitCheck() == B_OK
-				&& update_mime_info(path.Path(), false, true, false) == B_OK) {
-				// takeover MIME type from file
-				char s[NAME_MAX];
-				if (BNodeInfo(&file).GetType(s) == B_OK)
-					fMimeType = s;
-			} else
-				BNodeInfo(&file).SetType(fMimeType.c_str());
-
-			SetDirty(false);
-
-			file.Unset();
+			StopWatchingFile();
+			if (fDocIO->WriteDoc())
+				SetDirty(false);
 			StartWatchingFile();
 		}
-		catch (HErr& err)
-		{
-			err.DoError();
-// Now don't check error codes anymore... hope this is right
-			BEntry(fFile, true).Remove();
-			if (existed)
-				e.Rename(name);
-		}
+		else
+			SaveAs();
 	}
-	else
-		SaveAs();
-} /* CDoc::Save */
+	catch (HErr& err)
+	{
+		err.DoError();
+	}
+}
 
 void CDoc::SaveAs()
 {
@@ -352,41 +162,26 @@ void CDoc::SaveAs()
 	FailNil(w);
 	w->Lock();
 	
-	char newName[B_FILE_NAME_LENGTH];
-	if (!fFile) NameAFile(newName);
-	
-	char *f = strrchr(newName, '/');
-	if (! f) f = newName;
-	else f++;
-	
 	char s[256];
-	sprintf(s, "Save %s as:", fFile ? fFile->name : f);
+	sprintf(s, "Save %s as:", Name());
 	
 	w->SetTitle(s);
-	fSavePanel->SetSaveText(fFile ? fFile->name : f);
+	fSavePanel->SetSaveText(Name());
 	
-	if (fFile)
+	if (EntryRef())
 	{
-		BEntry e(fFile), p;
+		BEntry e(EntryRef()), p;
 		e.GetParent(&p);
 		fSavePanel->SetPanelDirectory(&p);
-	}
-	else if (newName[0] == '/')
-	{
-		BEntry e;
-		e.SetTo(newName);
-		e.GetParent(&e);
-		if (e.Exists())
-		{
-			BDirectory d(&e);
-			fSavePanel->SetPanelDirectory(&d);
-		}
 	}
 	else
 		fSavePanel->SetPanelDirectory(&gCWD);
 
 	fSavePanel->SetMessage(new BMessage(B_SAVE_REQUESTED));
-	fSavePanel->SetTarget(fTarget);
+	if (fDocIO)
+		fSavePanel->SetTarget(fDocIO->Target());
+	else
+		fSavePanel->SetTarget(dynamic_cast<BLooper*>(this));
 
 	w->Unlock();
 
@@ -394,20 +189,18 @@ void CDoc::SaveAs()
 		fSavePanel->Show();
 	else
 		fSavePanel->Window()->Activate();
-} /* CDoc::SaveAs */
+}
 
-void CDoc::NameAFile(char *name)
+void CDoc::CreateFilePanel()
 {
-	strcpy(name, "Untitled");
-} /* CDoc::NameAFile */
+	fSavePanel = new BFilePanel(B_SAVE_PANEL);
+	FailNil(fSavePanel);
+}
 
 void CDoc::SaveRequested(entry_ref& directory, const char *name)
 {
 	try
 	{
-		if (fURL) delete fURL;
-		fURL = NULL;
-
 		BDirectory dir(&directory);
 		gCWD = dir;
 
@@ -419,10 +212,10 @@ void CDoc::SaveRequested(entry_ref& directory, const char *name)
 			
 			e.GetRef(&xr);
 			
-			if (fFile && xr == *fFile)	// its me, help!!!
+			if (EntryRef() && xr == *EntryRef())	// its me, help!!!
 			{
 				BFile file;
-				FailOSErr(file.SetTo(fFile, B_READ_WRITE));
+				FailOSErr(file.SetTo(EntryRef(), B_READ_WRITE));
 				FailOSErr(file.SetSize(0));
 			}
 			else
@@ -431,15 +224,14 @@ void CDoc::SaveRequested(entry_ref& directory, const char *name)
 		
 		fReadOnly = false;
 		
-		if (!fFile)
-			fFile = new entry_ref;
-
-		FailNil(fFile);
-		FailOSErr(e.GetRef(fFile));
+		entry_ref eref;
+		FailOSErr(e.GetRef(&eref));
+		fDocIO->SetEntryRef(&eref);
 		
 		Save();
+		NameChanged();
 		
-		if (fFile)
+		if (EntryRef())
 		{
 			BPath p;
 			FailOSErr(e.GetPath(&p));
@@ -455,24 +247,112 @@ void CDoc::SaveRequested(entry_ref& directory, const char *name)
 	catch (HErr& e)
 	{
 		e.DoError();
-		delete fFile;
-		fFile = NULL;
 	}
-} /* CDoc::SaveRequested */
+}
 
-void CDoc::SetDirty(bool dirty)
+void CDoc::SaveACopy()
 {
-	fDirty = dirty;
-} /* CDoc::SetDirty */
+	if (!fSavePanel)
+		fSavePanel = new BFilePanel(B_SAVE_PANEL);
+	
+	FailNil(fSavePanel);
 
-bool CDoc::IsReadOnly()
+	BWindow *w = fSavePanel->Window();
+	w->Lock();
+	
+	char s[256];
+	sprintf(s, "Save a copy of %s as:", Name());
+	
+	w->SetTitle(s);
+	fSavePanel->SetSaveText(Name());
+	
+	if (EntryRef())
+	{
+		BEntry e(EntryRef()), p;
+		e.GetParent(&p);
+		fSavePanel->SetPanelDirectory(&p);
+	}
+	else
+		fSavePanel->SetPanelDirectory(&gCWD);
+
+	fSavePanel->SetMessage(new BMessage(msg_DoSaveCopy));
+	if (fDocIO)
+		fSavePanel->SetTarget(fDocIO->Target());
+	else
+		fSavePanel->SetTarget(dynamic_cast<BLooper*>(this));
+
+	w->Unlock();
+
+	if (!fSavePanel->IsShowing())
+		fSavePanel->Show();
+	else
+		fSavePanel->Window()->Activate();
+}
+
+void CDoc::DoSaveACopy(entry_ref& directory, const char *name)
 {
-	return fReadOnly;
-} /* CDoc::IsReadOnly */
+	try
+	{
+		BDirectory dir(&directory);
+		BEntry e(&dir, name);
+		FailOSErr(e.InitCheck());
+		if (e.Exists())
+			e.Remove();
+		
+		entry_ref eref;
+		FailOSErr(e.GetRef(&eref));
+		CLocalDocIO writer(this, &eref, NULL);
+		writer.WriteDoc();
+
+		if (fSavePanel)
+		{
+			delete fSavePanel;
+			fSavePanel = NULL;
+		}
+	}
+	catch (HErr& e)
+	{
+		e.DoError();
+	}
+}
+
+void CDoc::SaveOnServer(const URLData& url)
+{
+	delete fDocIO;
+	fDocIO = new CFtpDocIO(this, url);
+	Save();
+	NameChanged();
+}
+
+void CDoc::Revert()
+{
+	char title[256];
+	sprintf(title, "Revert to the last saved version of %s?", Name());
+	
+	MInfoAlert a(title, "Cancel", "OK");
+	if (a == 2)
+	{
+		Read();
+		SetDirty(false);
+	}
+}
+
+void CDoc::VerifyFile()
+{
+	if (fDocIO && !fDocIO->VerifyFile())
+	{
+		Read(false);
+		SetDirty(false);
+
+		StopWatchingFile();
+		StartWatchingFile();
+		// restart watching, the file may have changed
+	}
+}
 
 void CDoc::SetReadOnly(bool readOnly)
 {
-	if ((readOnly && fDirty) || !fFile)
+	if ((readOnly && fDirty) || !EntryRef())
 	{
 		MWarningAlert a("You have to save the file first before marking it read-only");
 		a.Go();
@@ -482,7 +362,7 @@ void CDoc::SetReadOnly(bool readOnly)
 		try
 		{
 			BEntry e;
-			FailOSErr(e.SetTo(fFile, true));
+			FailOSErr(e.SetTo(EntryRef(), true));
 			BPath p;
 			FailOSErr(e.GetPath(&p));
 			
@@ -508,58 +388,81 @@ void CDoc::SetReadOnly(bool readOnly)
 			e.DoError();
 		}
 	}
-} /* CDoc::SetReadOnly */
+}
 
-void CDoc::CreateFilePanel()
+void CDoc::SetMimeType(const char *type, bool updateOnDisk)
 {
-	fSavePanel = new BFilePanel(B_SAVE_PANEL);
-	FailNil(fSavePanel);
-} /* CDoc::CreateFilePanel */
-
-void CDoc::CopyAttributes(BFile& from, BFile& to)
-{
-	try
-	{
-		char name[NAME_MAX];
-		
-		while (from.GetNextAttrName(name) == B_OK)
-		{
-			attr_info ai;
-			
-			if (strcmp(name, "pe-info") == 0 ||
-				strcmp(name, "FontSettings") == 0 ||
-				strcmp(name, "BEOS:TYPE") == 0)
-				continue;
-			
-			FailOSErr(from.GetAttrInfo(name, &ai));
-			
-			char *buf = new char [ai.size];
-			from.ReadAttr(name, ai.type, 0, buf, ai.size);
-			to.WriteAttr(name, ai.type, 0, buf, ai.size);
-			delete [] buf;
-		}	
-		
-		mode_t perm;
-		from.GetPermissions(&perm);
-		to.SetPermissions(perm);
-	}
-	catch (HErr& e)
-	{
-		e.DoError();
-	}
-} /* CDoc::CopyAttributes */
-
-CDoc* CDoc::FindDoc(const entry_ref& doc)
-{
-	doclist::iterator di;
+	fMimeType = type;
 	
-	for (di = sfDocList.begin(); di != sfDocList.end(); di++)
+	if (updateOnDisk && EntryRef())
 	{
-		if ((*di)->fFile && *(*di)->fFile == doc)
-			return (*di);
+		BNode node;
+		FailOSErr(node.SetTo(EntryRef()));
+		FailOSErr(BNodeInfo(&node).SetType(type));
 	}
-	return NULL;
-} /* CDoc::FindDoc */
+}
+
+#pragma mark - default methods
+
+const char* CDoc::DefaultName() const
+{
+	return "Untitled";
+}
+
+const char* CDoc::Name() const
+{
+	if (fDocIO)
+		return fDocIO->Name();
+	return DefaultName();
+}
+
+void CDoc::NameChanged()
+{
+}
+
+void CDoc::HasBeenSaved()
+{
+}
+
+void CDoc::HighlightErrorPos(int errorPos)
+{
+}
+
+status_t CDoc::InitCheck() const
+{
+	return B_OK;
+}
+
+void CDoc::SetDirty(bool dirty)
+{
+	fDirty = dirty;
+}
+
+#pragma mark - double dispatchers
+
+const entry_ref* CDoc::EntryRef() const
+{
+	return fDocIO ? fDocIO->EntryRef() : NULL;
+} /* CDoc::EntryRef */
+
+const URLData* CDoc::URL() const
+{
+	return fDocIO ? fDocIO->URL() : NULL;
+}
+
+void CDoc::StartWatchingFile()
+{
+	if (fDocIO)
+		fDocIO->StartWatchingFile();
+}
+
+void CDoc::StopWatchingFile(bool stopDirectory)
+{
+	if (fDocIO)
+		fDocIO->StopWatchingFile(stopDirectory);
+}
+
+#pragma mark - recent docs
 
 void CDoc::AddRecent(const char *path)
 {
@@ -604,7 +507,7 @@ void CDoc::AddRecent(const char *path)
 	}
 	
 	sfTenLastDocs.insert(sfTenLastDocs.begin(), strdup(path));
-} /* CDoc::AddRecent */
+}
 
 bool CDoc::GetNextRecent(char *path, int& indx)
 {
@@ -619,7 +522,21 @@ bool CDoc::GetNextRecent(char *path, int& indx)
 		strcpy(path, *(li));
 		return true;
 	}
-} /* CDoc::GetNextRecent */
+}
+
+#pragma mark - meta
+
+CDoc* CDoc::FindDoc(const entry_ref& doc)
+{
+	doclist::iterator di;
+	
+	for (di = sfDocList.begin(); di != sfDocList.end(); di++)
+	{
+		if ((*di)->EntryRef() && *(*di)->EntryRef() == doc)
+			return (*di);
+	}
+	return NULL;
+}
 
 void CDoc::PostToAll(unsigned long msg, bool async)
 {
@@ -645,16 +562,4 @@ void CDoc::PostToAll(unsigned long msg, bool async)
 			}
 		}
 	}
-} /* CDoc::PostToAll */
-
-void CDoc::SetMimeType(const char *type)
-{
-	fMimeType = type;
-	
-	if (fFile)
-	{
-		BNode node;
-		FailOSErr(node.SetTo(fFile));
-		FailOSErr(BNodeInfo(&node).SetType(type));
-	}
-} /* CDoc::SetMimeType */
+}

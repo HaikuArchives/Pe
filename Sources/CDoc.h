@@ -44,89 +44,144 @@ class URLData;
 
 typedef list<CDoc*> doclist;
 
+// types of linebreaks
+enum {
+	kle_UNKNOWN = -1,
+	kle_LF, 
+	kle_CR, 
+	kle_CRLF
+};
+
+class CDocIO;
+
 class CDoc {
+
 public:
 			CDoc(const char* mimetype, BLooper *target, const entry_ref *doc = NULL);
-			CDoc(BLooper *target, URLData& url);
+			CDoc(const URLData& url);
 	virtual	~CDoc();
 
-			bool QuitRequested();
-
 			void Read(bool readAttributes = true);
-	virtual	void ReadData(BPositionIO& file) = 0;
-	virtual	void ReadAttr(BFile& file) = 0;
-
-			status_t WriteState();
-	virtual	void WriteData(BPositionIO& file) = 0;
-	virtual	void WriteAttr(BFile& file) = 0;
-
 	virtual	void Save();
 	virtual	void SaveAs();
-	virtual	void SaveRequested(entry_ref& directory, const char *name);
-	virtual	void NameAFile(char *newName);
+
+	virtual	const char* DefaultName() const;
+			const char* Name() const;
 		
-			bool IsDirty();
+			int  Encoding() const;
+			void SetEncoding(int encoding);
+			int  LineEndType() const;
+			void SetLineEndType(int lineEndType);
+
+			bool IsDirty() const;
 	virtual	void SetDirty(bool dirty);
 		
-			bool IsReadOnly();
+			bool IsReadOnly() const;
 			void SetReadOnly(bool readOnly);
+
+	virtual void GetText(BString &docText) const = 0;
+	virtual void SetText(const BString& docText) = 0;
+	virtual void CollectSettings(BMessage& settingsMsg) const = 0;
+	virtual void ApplySettings(const BMessage& settingsMsg) = 0;
+	virtual	void ReadAttr(BFile& file, BMessage& settingsMsg) = 0;
+	virtual	void WriteAttr(BFile& file, const BMessage& settingsMsg) = 0;
+
+	virtual void HighlightErrorPos(int errorPos);
 
 	static	CDoc* FindDoc(const entry_ref& doc);
 	static	CDoc* FirstDoc();
 	static	int CountDocs();
-	static	const doclist& DocList()		{ return sfDocList; }
+	static	const doclist& DocList();
 	static	void InvalidateAll();
 	static	void PostToAll(unsigned long msg, bool async);
 
 	static	void AddRecent(const char *path);
 	static	bool GetNextRecent(char *path, int& indx);
 
-			void SetMimeType(const char *type);
+			void SetMimeType(const char *type, bool updateOnDisk=true);
 			const char *MimeType() const;
 
-			const entry_ref* File();
-	virtual	void SetFile(entry_ref &ref);
+			const entry_ref* EntryRef() const;
+			void SetEntryRef(const entry_ref* ref);
+			
+			const URLData* URL() const;
+			
+			void SetDocIO( CDocIO* docIO);
+
+	virtual status_t InitCheck() const;
+
+	// hook methods
+	virtual void NameChanged();
+	virtual void HasBeenSaved();
 
 protected:
-	static	doclist sfDocList;
-	static	vector<char*> sfTenLastDocs;
 
 	virtual	void CreateFilePanel();
-			void CopyAttributes(BFile& from, BFile& to);
+	virtual	void SaveRequested(entry_ref& directory, const char *name);
+			void SaveACopy();
+			void DoSaveACopy(entry_ref& directory, const char *name);
+			void SaveOnServer(const URLData& url);
+			void Revert();
+			void VerifyFile();
+
+	static	doclist sfDocList;
+	static	vector<char*> sfTenLastDocs;
 
 			void StartWatchingFile(void);
 			void StopWatchingFile(bool stopDirectory = true);
 
-			BLooper *fTarget;
+protected:
+			CDocIO* fDocIO;
+			BFilePanel *fSavePanel;
+private:
+			CDoc();
+
 			string fMimeType;
 			bool fDirty;
-			bool fWaitForSave;
 			bool fReadOnly;
-			entry_ref *fFile;
-			node_ref fNodeRef;
-			URLData *fURL;
-			BFilePanel *fSavePanel;
+			int fEncoding;
+			int fLineEndType;
 };
 
-inline bool CDoc::IsDirty()
+inline bool CDoc::IsDirty() const
 {
 	return fDirty;
 } /* CDoc::IsDirty */
 
-inline const entry_ref* CDoc::File()
+inline bool CDoc::IsReadOnly() const
 {
-	return fFile;
-} /* CDoc::File */
+	return fReadOnly;
+} /* CDoc::IsReadOnly */
 
-inline int CDoc::CountDocs()
+inline int CDoc::Encoding() const
 {
-	return sfDocList.size();
-} /* CDoc::CountDocs */
+	return fEncoding;
+}
+
+inline void CDoc::SetEncoding(int encoding)
+{
+	fEncoding = encoding;
+}
+
+inline int CDoc::LineEndType() const
+{
+	return fLineEndType;
+}
+
+inline void CDoc::SetLineEndType(int lineEndType)
+{
+	fLineEndType = lineEndType;
+}
 
 inline const char *CDoc::MimeType() const
 {
 	return fMimeType.c_str();
 } /* CDoc::MimeType */
+
+inline int CDoc::CountDocs()
+{
+	return sfDocList.size();
+} /* CDoc::CountDocs */
 
 inline CDoc* CDoc::FirstDoc()
 {
@@ -135,5 +190,10 @@ inline CDoc* CDoc::FirstDoc()
 	else
 		return NULL;
 } /* CDoc::FirstDoc */
+
+inline const doclist& CDoc::DocList()
+{
+	return sfDocList; 
+}
 
 #endif // CDOC_H

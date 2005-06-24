@@ -32,24 +32,28 @@
 */
 
 #include "pe.h"
-#include "PGroupWindow.h"
-#include "PDoc.h"
-#include "Utils.h"
-#include "PApp.h"
-#include "PMessages.h"
-#include "PToolBar.h"
-#include "PKeyDownFilter.h"
-#include "PTypeAHeadList.h"
+
+#include <fs_attr.h>
+#include <String.h>
+
+#include "HAppResFile.h"
+#include "HButtonBar.h"
 #include "HDefines.h"
 #include "HError.h"
-#include "MThread.h"
-#include "HButtonBar.h"
 #include "HPreferences.h"
-#include "HAppResFile.h"
-#include "ResourcesToolbars.h"
-#include "ResourcesMenus.h"
+#include "MThread.h"
+#include "PApp.h"
+//#include "PDoc.h"
+#include "PGroupWindow.h"
+#include "PKeyDownFilter.h"
+#include "PMessages.h"
 #include "Prefs.h"
-#include <fs_attr.h>
+#include "PToolBar.h"
+#include "PTypeAHeadList.h"
+#include "ResourcesMenus.h"
+#include "ResourcesToolbars.h"
+#include "Utils.h"
+
 
 const unsigned long msg_Done = 'done';
 
@@ -109,15 +113,13 @@ long PIconFinder::Execute()
 } /* PIconFinder::Execute */
 
 PGroupWindow::PGroupWindow(const entry_ref *doc)
-	: BWindow(PDoc::NextPosition(), doc ? doc->name : "new group", B_DOCUMENT_WINDOW,
-		B_WILL_ACCEPT_FIRST_CLICK)
-	, CDoc("text/x-vnd.Hekkel-Pe-Group", this, doc)
+	: CDocWindow(doc)
+	, fPanel(NULL)
+	, fIconFinder(NULL)
+	, fNewItems(NULL)
 {
-	fPanel = NULL;
-	fIconFinder = NULL;
-	fNewItems = NULL;
-	fToolBar = NULL;
-	fButtonBar = NULL;
+	SetMimeType("text/x-vnd.Hekkel-Pe-Group", false);
+	SetFlags(Flags()|B_WILL_ACCEPT_FIRST_CLICK);
 	
 	ResizeTo(180, 400);
 	SetSizeLimits(100, 100000, 100, 100000);
@@ -185,25 +187,14 @@ PGroupWindow::~PGroupWindow()
 
 bool PGroupWindow::QuitRequested()
 {
-	fWaitForSave = false;
-
 	long l;
 	if (fIconFinder)
 	{
 		fIconFinder->Cancel();
 		wait_for_thread(fIconFinder->Thread(), &l);
 	}
-	
-	if (IsDirty() && (fSavePanel == NULL || fSavePanel->IsShowing()))
-	{
-		if (!fFile)
-			fWaitForSave = true;
-		Save();
-	}
-	else
-		WriteState();
-	
-	return !fWaitForSave;
+
+	return inherited::QuitRequested();	
 } /* PGroupWindow::QuitRequested */
 
 void PGroupWindow::MessageReceived(BMessage *msg)
@@ -223,14 +214,6 @@ void PGroupWindow::MessageReceived(BMessage *msg)
 				break;
 			}
 			
-			case msg_Save:
-				Save();
-				break;
-			
-			case msg_SaveAs:
-				SaveAs();
-				break;
-			
 			case msg_Add:
 				AddFiles();
 				break;
@@ -238,17 +221,6 @@ void PGroupWindow::MessageReceived(BMessage *msg)
 			case B_REFS_RECEIVED:
 				AddRefs(msg);
 				break;
-			
-			case B_SAVE_REQUESTED:
-			{
-				entry_ref dir;
-				const char *name;
-				
-				FailOSErr(msg->FindRef("directory", &dir));
-				FailOSErr(msg->FindString("name", &name));
-				SaveRequested(dir, name);
-				break;
-			}
 			
 			case msg_Done:
 				fIconFinder = NULL;
@@ -260,61 +232,57 @@ void PGroupWindow::MessageReceived(BMessage *msg)
 				}
 				break;
 			
-			case msg_Close:
-				PostMessage(B_QUIT_REQUESTED);
-				break;
-			
 			default:
 				BWindow::MessageReceived(msg);
 				break;
 		}
 } /* PGroupWindow::MessageReceived */
 
-void PGroupWindow::ReadData(BPositionIO&)
+void PGroupWindow::SetText(const BString& docText)
 {
-	if (!fFile)
-		THROW(("Can only read local group files"));
-
-	try
+	try 
 	{
-		BPath p;
-		BDirectory d;
-		BEntry e;
-		
-		FailOSErr(e.SetTo(fFile, true));
-		FailOSErr(e.GetPath(&p));
-		FailOSErr(e.GetParent(&d));
-		
-		FILE *f = fopen(p.Path(), "r");
-		char s[PATH_MAX];
-		
-		if (!fgets(s, 1023, f) || strcmp(s, "### pe Group File\n"))
+		if (docText.Compare("### pe Group File\n", 18) != 0)
 			THROW(("Not a group file!"));
 		
-		vector<PEntryItem*> *lst = new vector<PEntryItem*>;
+		if (EntryRef())
+			THROW(("Can only read local groups"));
 
-		while (fgets(s, 1023, f))
+		node_ref nref;
+		nref.device = EntryRef()->device;
+		nref.node = EntryRef()->directory;
+		BDirectory d(&nref);
+		BEntry e;
+		vector<PEntryItem*> *lst = new vector<PEntryItem*>;
+		const char* s = docText.String();
+		while (*s != '\0')
 		{
-			if (s[0] == ';' || s[0] == '#') continue;
-			
-			char *se = strchr(s, '\n');
-			if (se) *se = 0;
-			
-			PEntryItem *i;
-			entry_ref ref;
-			
-			try
+			const char *se = strchr(s, '\n');
+			if (!se)
+				se = s+strlen(s);
+						
+			if (s[0] != ';' && s[0] != '#')
 			{
-				FailOSErr(d.FindEntry(s, &e, true));
-				FailOSErr(e.GetRef(&ref));
-				fList->AddItem(i = new PEntryItem(ref));
-				lst->push_back(i);
-//				i->SetHeight(18);
+				BString str(s, se-s);
+				PEntryItem *i;
+				entry_ref ref;
+			
+				try
+				{
+					FailOSErr(d.FindEntry(str.String(), &e, true));
+					FailOSErr(e.GetRef(&ref));
+					fList->AddItem(i = new PEntryItem(ref));
+					lst->push_back(i);
+//					i->SetHeight(18);
+				}
+				catch (HErr& e)
+				{
+					e.DoError();
+				}
 			}
-			catch (HErr& e)
-			{
-				e.DoError();
-			}
+			s = se;
+			if (*s != '\0')
+				s++;
 		}
 	
 		long l;
@@ -324,7 +292,6 @@ void PGroupWindow::ReadData(BPositionIO&)
 		
 		if (gPrefs->GetPrefInt(prf_I_SortGroup, 1))
 			fList->SortItems(PEntryItem::Compare);
-		fclose(f);
 
 		fButtonBar->SetEnabled(msg_Save, false);
 	}
@@ -332,9 +299,9 @@ void PGroupWindow::ReadData(BPositionIO&)
 	{
 		e.DoError();
 	}	
-} /* PGroupWindow::ReadData */
+}
 
-void PGroupWindow::ReadAttr(BFile& file)
+void PGroupWindow::ReadAttr(BFile& file, BMessage& settingsMsg)
 {
 	char *fm = NULL;
 	try
@@ -347,105 +314,76 @@ void PGroupWindow::ReadAttr(BFile& file)
 			
 			FailIOErr(file.ReadAttr("pe-grp-info", ai.type, 0, fm, ai.size));
 			
-			BMessage msg;
-			FailOSErr(msg.Unflatten(fm));
-			
-			BRect f;
-			if (msg.FindRect("windowposition", &f) == B_NO_ERROR)
-			{
-				{
-					BScreen s;
-					f = f & s.Frame();
-				}
-				if (f.IsValid() && f.Width() > 50 && f.Height() > 50)
-				{
-					MoveTo(f.left, f.top);
-					ResizeTo(f.Width(), f.Height());
-				}
-			}
+			FailOSErr(settingsMsg.Unflatten(fm));
 		}
 	}
-	catch (HErr& e) {}
-	if (fm) free(fm);
-} /* PGroupWindow::ReadAttr */
-
-void PGroupWindow::WriteData(BPositionIO& /*file*/)
-{
-	if (! fFile)
-		THROW(("Can only write to a local file"));
-		
-	try
-	{
-		BEntry e;
-		FailOSErr(e.SetTo(fFile));
-		BPath p;
-		FailOSErr(e.GetPath(&p));
-		
-		FILE *f = fopen(p.Path(), "w");
-		if (!f) THROW(("Failed to open file %s", p.Path()));
-		
-		fputs("### pe Group File\n", f);
-		for (int i = 0; i < fList->CountItems(); i++)
-		{
-			PEntryItem *item = (PEntryItem *)fList->ItemAt(i);
-			
-			if (gPrefs->GetPrefInt(prf_I_RelativeGroupPaths, 0))
-			{
-				char path[PATH_MAX];
-				RelativePath(*fFile, item->Ref(), path);
-				fputs(path, f);
-				fputc('\n', f);
-			}
-			else
-			{
-				BEntry(&item->Ref()).GetPath(&p);
-				fputs(p.Path(), f);
-				fputc('\n', f);
-			}
-		}
-		
-		fclose(f);
-	}
-	catch (HErr& e)
+	catch (HErr& e) 
 	{
 		e.DoError();
 	}
-} /* PGroupWindow::WriteData */
+	if (fm)
+		free(fm);
+} /* PGroupWindow::ReadAttr */
 
-void PGroupWindow::WriteAttr(BFile& file)
+void PGroupWindow::GetText(BString& docText) const
+{
+	docText.Truncate(0);
+	docText << "### pe Group File\n";
+	BPath p;
+	for (int i = 0; i < fList->CountItems(); i++)
+	{
+		PEntryItem *item = (PEntryItem *)fList->ItemAt(i);
+		
+		if (gPrefs->GetPrefInt(prf_I_RelativeGroupPaths, 0))
+		{
+			char path[PATH_MAX];
+			RelativePath(*EntryRef(), item->Ref(), path);
+			docText << path << '\n';
+		}
+		else
+		{
+			BEntry(&item->Ref()).GetPath(&p);
+			docText << p.Path() << '\n';
+		}
+	}
+}
+
+void PGroupWindow::WriteAttr(BFile& file, const BMessage& settingsMsg)
 {
 	char *fm = NULL;
 	try
 	{
-		BMessage msg;
-		msg.AddRect("windowposition", Frame());
-
-		ssize_t s = msg.FlattenedSize();
+		ssize_t s = settingsMsg.FlattenedSize();
 		fm = (char *)malloc(s);
 		FailNil(fm);
-		FailOSErr(msg.Flatten(fm, s));
+		FailOSErr(settingsMsg.Flatten(fm, s));
 		FailIOErr(file.WriteAttr("pe-grp-info", 'info', 0, fm, s));
 	}
-	catch (HErr& e) {}
-	if (fm) free(fm);
+	catch (HErr& e) 
+	{
+		e.DoError();
+	}
+	if (fm)
+		free(fm);
 } /* PGroupWindow::WriteAttr */
 
-void PGroupWindow::SaveRequested(entry_ref& directory, const char *name)
+void PGroupWindow::NameChanged()
 {
-	CDoc::SaveRequested(directory, name);
-	
-	if (fFile)
+	inherited::NameChanged();
+	if (EntryRef())
 	{
-		SetTitle(name);
-		
 		BEntry e;
 		BPath p;
-		FailOSErr(e.SetTo(fFile));
+		FailOSErr(e.SetTo(EntryRef()));
 		FailOSErr(e.GetPath(&p));
-		
 		fStatus->SetPath(p.Path());
 	}
-} /* PGroupWindow::SaveRequested */
+}
+
+const char* PGroupWindow::DefaultName() const
+{
+	return "Untitled Group";
+}
 
 PEntryItem* PGroupWindow::AddRef(entry_ref& ref)
 {
@@ -475,10 +413,10 @@ void PGroupWindow::AddFiles()
 	{
 		entry_ref ref;
 		
-		if (fFile)
+		if (EntryRef())
 		{
 			BEntry e, p;
-			FailOSErr(e.SetTo(fFile));
+			FailOSErr(e.SetTo(EntryRef()));
 			FailOSErr(e.GetParent(&p));
 			FailOSErr(p.GetRef(&ref));
 		}
@@ -552,6 +490,6 @@ void PGroupWindow::OpenItem()
 
 void PGroupWindow::SetDirty(bool dirty)
 {
-	CDoc::SetDirty(dirty);
+	inherited::SetDirty(dirty);
 	fButtonBar->SetEnabled(msg_Save, dirty);
 } /* PGroupWindow::SetDirty */

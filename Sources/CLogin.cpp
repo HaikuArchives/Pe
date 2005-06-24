@@ -43,11 +43,12 @@ CLogin::CLogin(BRect frame, const char *name, window_type type, int flags,
 	: HDialog(frame, name, type, flags, owner, data)
 {
 	SetText("username", sfUsername.c_str());
+	dynamic_cast<BTextControl*>(FindView("password"))->TextView()->HideTyping(true);
 	SetText("password", sfPassword.c_str());
 	if (sfUsername.length())
 		FindView("password")->MakeFocus(true);
 	else
-		FindView("usename")->MakeFocus(true);
+		FindView("username")->MakeFocus(true);
 } /* CLogin::CLogin */
 
 CLogin::~CLogin()

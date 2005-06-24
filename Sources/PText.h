@@ -110,18 +110,15 @@ virtual		void FrameResized(float w, float h);
 			
 			void ProcessCommand(unsigned long what, void *param);
 
-			void SetText(char *utf8Text, size_t size);
+			void SetText(const char *utf8Text, size_t size);
 			const char* Text();
 			int Size() const;
 			void SetLanguage(const char *ext);
 			void SetLanguage(int indx);
 			int Language() const;
-			void SetEncoding(int encoding);
-			int Encoding() const;
-			int LineEndType() const;
 			
-			void GetSettings(BMessage& msg);
-			void SetSettings(BMessage& msg);
+			void CollectSettings(BMessage& msg);
+			void ApplySettings(const BMessage& msg);
 			void GetSettingsMW(BPositionIO& set);
 			void SetSettingsMW(BPositionIO& set);
 
@@ -308,7 +305,6 @@ private:
 			int fSavedCaret, fSavedAnchor;
 			int fDragStart;
 			int fDragButtons;
-			int fLineEndType;
 			PSplitter *fSplitter;
 			g_unit_t fSplitAt;
 			bool fSplitCursorShown;
@@ -374,10 +370,6 @@ inline bool PText::ShowInvisibles() const {
 	return fShowInvisibles;
 }
 
-inline int PText::Encoding() const {
-	return fText.Encoding();
-}
-
 inline int PText::LineCount() const {
 	return fLineInfo.size();
 }
@@ -405,11 +397,6 @@ inline int PText::LineState(int line) const {
 		return 0;
 	}
 }
-
-inline int PText::LineEndType() const
-{
-	return fLineEndType;
-} /* PText::LineEndType */
 
 inline g_unit_t PText::StringWidth(const char *buf, int len) const
 {

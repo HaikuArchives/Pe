@@ -54,7 +54,7 @@ class CFontStyle
 {
 public:
 static	CFontStyle* Locate(const char *name, const char *style,
-								f_unit_t size, int encoding);
+								f_unit_t size);
 static	void Cleanup();
 	
 	f_unit_t operator[](const char *s);

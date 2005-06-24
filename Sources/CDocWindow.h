@@ -30,30 +30,51 @@
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 
-	Created: 10/28/97 09:19:50
 */
 
-#ifndef CINFODIALOG_H
-#define CINFODIALOG_H
+#ifndef CDOC_WINDOW_H
+#define CDOC_WINDOW_H
 
-#include "HDialog.h"
+#include "CDoc.h"
 
-class PDoc;
+class HDialog;
 
-class CInfoDialog : public HDialog {
+class CDocWindow : public BWindow, public CDoc
+{
 public:
-		CInfoDialog(BRect frame, const char *name, window_type type, int flags,
-			BWindow *owner, BPositionIO* data);
+			CDocWindow(const entry_ref *ref = NULL);
+			CDocWindow(URLData& url);
+virtual		~CDocWindow();
 		
-		enum { sResID = 6 };
-		
-virtual	bool OKClicked();
-virtual	bool CancelClicked();
-virtual	void UpdateFields();
+virtual		void Show();
+virtual		bool QuitRequested();
+virtual		void Quit();
+virtual 	void MessageReceived(BMessage *msg);
+
+static		BRect NextPosition(bool inc = true);
+
+			void AddDialog(HDialog *dlog, bool isModal);
+			void RemoveDialog(HDialog *dlog);
+			void MakeModal(HDialog *dlog);
+	
+protected:
+
+virtual 	void CollectSettings(BMessage& settingsMsg) const;
+virtual 	void ApplySettings(const BMessage& settingsMsg);
+			status_t WriteState();
+
+virtual		void NameChanged();
+
+			vector<HDialog*> fDialogs;
+
+			bool fWaitForSave;
 
 private:
-		BMenu *fTypes, *fMenu, *fSourceEncoding, *fEncoding, *fLineBreaks;
-		PDoc *fDoc;
+			HDialog *fWindowModal;
+
+			BRect fLastStoredFrame;
+			BRect fInitialFrame;
+static		int sfNewCount;
 };
 
-#endif // CINFODIALOG_H
+#endif // CDOC_WINDOW_H

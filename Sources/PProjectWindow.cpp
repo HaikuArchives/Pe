@@ -34,49 +34,50 @@
 */
 
 #include "pe.h"
-#include "PProjectWindow.h"
-#include "PDoc.h"
-#include "Utils.h"
-#include "MAlert.h"
-#include "PApp.h"
-#include "PMessages.h"
-#include "PToolBar.h"
-#include "PKeyDownFilter.h"
-#include "PTypeAHeadList.h"
-#include <fs_attr.h>
+
 #include <stack>
+
+#include <fs_attr.h>
+
+#include "CProjectJamFile.h"
+#include "CProjectMakeFile.h"
+#include "CProjectRoster.h"
 #include "HAppResFile.h"
 #include "HButtonBar.h"
 #include "HError.h"
 #include "HPreferences.h"
-#include "CProjectJamFile.h"
-#include "CProjectMakeFile.h"
-#include "ResourcesToolbars.h"
-#include "ResourcesMenus.h"
+#include "MAlert.h"
+#include "PApp.h"
+#include "PDoc.h"
+#include "PKeyDownFilter.h"
+#include "PMessages.h"
 #include "Prefs.h"
+#include "PProjectWindow.h"
+#include "PToolBar.h"
+#include "PTypeAHeadList.h"
+#include "ResourcesMenus.h"
+#include "ResourcesToolbars.h"
+#include "Utils.h"
 
 const unsigned long msg_Done = 'done';
 
-CDoc* PProjectWindow::Create(const entry_ref *doc, const char* mimetype,
-									  CProjectFile* prjFile)
+PProjectWindow* 
+PProjectWindow::Create(const entry_ref *doc, const char* mimetype)
 {
-	PProjectWindow* pwin = new PProjectWindow(doc, mimetype, prjFile);
+	PProjectWindow* pwin = new PProjectWindow(doc, mimetype);
 	pwin->fList->AddFilter(new PKeyDownFilter());
 	pwin->fList->MakeFocus();
-	pwin->Show();
 	return pwin;
 }
 
-PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype,
-										 CProjectFile* prjFile)
-	: BWindow(PDoc::NextPosition(), "", B_DOCUMENT_WINDOW, 0)
-	, CDoc(mimetype, this, doc)
-	, fPrjFile(prjFile)
+PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
+	: inherited(doc)
+	, fPrjFile(NULL)
+	, fToolBar(NULL)
+	, fButtonBar(NULL)
+	, fPanel(NULL)
 {
-	fPanel = NULL;
-	fToolBar = NULL;
-	fButtonBar = NULL;
-	
+	SetMimeType(mimetype, false);
 	ResizeTo(180, 400);
 	SetSizeLimits(100, 100000, 100, 100000);
 	
@@ -112,24 +113,10 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype,
 	
 	AddChild(new BScrollView("scroller", fList, B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER));
 	
-	if (!doc) THROW(("No document defined!"));
-
-	BPath path(doc);
-	if (gPrefs->GetPrefInt(prf_I_FullPath, 1))
-		SetTitle(path.Path());
-	else
-		SetTitle(doc->name);
-	
-	BEntry e;
-	FailOSErr(e.SetTo(doc));
-	BPath p;
-	FailOSErr(e.GetPath(&p));
-	fStatus->SetPath(p.Path());
-	AddRecent(p.Path());
-	
 	Read();
+
+	NameChanged();
 	SelectionChanged();
-	
 } /* PProjectWindow::PProjectWindow */
 
 PProjectWindow::~PProjectWindow()
@@ -149,7 +136,7 @@ bool PProjectWindow::QuitRequested()
 
 	if (IsDirty() && (fSavePanel == NULL || fSavePanel->IsShowing()))
 	{
-		if (!fFile)
+		if (!EntryRef())
 			fWaitForSave = true;
 		Save();
 	}
@@ -174,18 +161,6 @@ void PProjectWindow::MessageReceived(BMessage *msg)
 				SelectionChanged();
 				break;
 			
-			case msg_Save:
-				Save();
-				break;
-			
-			case msg_SaveAs:
-				SaveAs();
-				break;
-			
-			case msg_Revert:
-				Revert();
-				break;
-			
 			case msg_PAdd:
 				AddFiles();
 				SetDirty(true);
@@ -199,28 +174,25 @@ void PProjectWindow::MessageReceived(BMessage *msg)
 				AddRefs(msg);
 				break;
 			
-			case msg_Close:
-				PostMessage(B_QUIT_REQUESTED);
-				break;
-			
 			case msg_EditAsText:
 				if (IsDirty())
 					Save();
-				gApp->NewWindow(fFile);
+				gApp->NewWindow(EntryRef());
 				Close();
 				break;
 			
 			default:
-				BWindow::MessageReceived(msg);
+				inherited::MessageReceived(msg);
 				break;
 		}
 } /* PProjectWindow::MessageReceived */
 
-void PProjectWindow::ReadData(BPositionIO&)
+void PProjectWindow::SetText(const BString& docText)
 {
-	if (!fFile)
-		THROW(("Can only read local projectfiles"));
-
+	fPrjFile = ProjectRoster->ParseProjectFile(EntryRef(), MimeType(), docText);
+	if (!fPrjFile || !fPrjFile->HaveProjectInfo())
+		return;
+	
 	try
 	{
 		fList->MakeEmpty();
@@ -271,7 +243,7 @@ void PProjectWindow::AddItemsToList(CProjectItem* item,
 	}
 }
 
-void PProjectWindow::ReadAttr(BFile& file)
+void PProjectWindow::ReadAttr(BFile& file, BMessage& settingsMsg)
 {
 	char *fm = NULL;
 	try
@@ -284,68 +256,83 @@ void PProjectWindow::ReadAttr(BFile& file)
 			
 			FailIOErr(file.ReadAttr("pe-prj-info", ai.type, 0, fm, ai.size));
 			
-			BMessage msg;
-			FailOSErr(msg.Unflatten(fm));
-			
-			BRect f;
-			if (msg.FindRect("windowposition", &f) == B_NO_ERROR)
-			{
-				{
-					BScreen s;
-					f = f & s.Frame();
-				}
-				if (f.IsValid() && f.Width() > 50 && f.Height() > 50)
-				{
-					MoveTo(f.left, f.top);
-					ResizeTo(f.Width(), f.Height());
-				}
-			}
+			FailOSErr(settingsMsg.Unflatten(fm));
 		}
 	}
 	catch (HErr& e) {}
-	if (fm) free(fm);
-} /* PProjectWindow::ReadAttr */
+	if (fm)
+		free(fm);
+}
 
-void PProjectWindow::WriteData(BPositionIO& file)
+void PProjectWindow::GetText(BString& docText) const
 {
-	if (! fFile)
-		THROW(("Can only write to a local file"));
-		
+}
+
+void PProjectWindow::Save()
+{
+	StopWatchingFile();
 	try
 	{
-		BPath p;
-		FailOSErr(BEntry(fFile).GetPath(&p));
+		if (!fPrjFile)
+			THROW(("No project available"));
 		
-		status_t res = B_OK;
-		if (fPrjFile)
-			res = fPrjFile->SerializeToFile(&file);
-		if (res != B_OK)
-			THROW(("Failed to open file %s (reason: %s)", p.Path(), strerror(res)));
-		
+		fPrjFile->Save();
+		SetDirty(false);
 	}
 	catch (HErr& e)
 	{
 		e.DoError();
 	}
-} /* PProjectWindow::WriteData */
+	StartWatchingFile();
+}
 
-void PProjectWindow::WriteAttr(BFile& file)
+void PProjectWindow::WriteAttr(BFile& file, const BMessage& settingsMsg)
 {
 	char *fm = NULL;
 	try
 	{
-		BMessage msg;
-		msg.AddRect("windowposition", Frame());
-
-		ssize_t s = msg.FlattenedSize();
+		ssize_t s = settingsMsg.FlattenedSize();
 		fm = (char *)malloc(s);
 		FailNil(fm);
-		FailOSErr(msg.Flatten(fm, s));
+		FailOSErr(settingsMsg.Flatten(fm, s));
 		FailIOErr(file.WriteAttr("pe-prj-info", 'info', 0, fm, s));
 	}
 	catch (HErr& e) {}
-	if (fm) free(fm);
-} /* PProjectWindow::WriteAttr */
+	if (fm) 
+		free(fm);
+}
+
+void PProjectWindow::NameChanged()
+{
+	inherited::NameChanged();
+	if (EntryRef())
+	{
+		BEntry e;
+		BPath p;
+		FailOSErr(e.SetTo(EntryRef()));
+		FailOSErr(e.GetPath(&p));
+		fStatus->SetPath(p.Path());
+		AddRecent(p.Path());
+	}
+}
+
+const char* PProjectWindow::DefaultName() const
+{
+	return "Untitled Project";
+}
+
+const char* PProjectWindow::ErrorMsg() const
+{
+	return fPrjFile ? fPrjFile->ErrorMsg().String() : "";
+}
+
+status_t PProjectWindow::InitCheck() const
+{
+	if (fPrjFile && fPrjFile->HaveProjectInfo())
+		return B_OK;
+	else
+		return B_NO_INIT;
+}
 
 void PProjectWindow::AddRef(const entry_ref& ref)
 {
@@ -403,7 +390,7 @@ void PProjectWindow::AddRef(const entry_ref& ref)
 	}
 				
 	SetDirty(true);
-} /* PProjectWindow::AddRef */
+}
 
 void PProjectWindow::AddFiles()
 {
@@ -413,10 +400,10 @@ void PProjectWindow::AddFiles()
 	{
 		entry_ref ref;
 		
-		if (fFile)
+		if (EntryRef())
 		{
 			BEntry e, p;
-			FailOSErr(e.SetTo(fFile));
+			FailOSErr(e.SetTo(EntryRef()));
 			FailOSErr(e.GetParent(&p));
 			FailOSErr(p.GetRef(&ref));
 		}
@@ -489,8 +476,8 @@ void PProjectWindow::OpenItem()
 				= dynamic_cast<CProjectFile*>(gi->ModelItem());
 			if (subProject) {
 				if (!subProject->HasBeenParsed()) {
-					status_t res = subProject->Parse();
-					if (res == B_OK) {
+					subProject->Read();
+					if (subProject->HasBeenParsed()) {
 						list<CProjectItem*>::const_iterator iter;
 						for( iter = subProject->begin(); 
 							  iter != subProject->end(); ++iter) {
@@ -511,25 +498,9 @@ void PProjectWindow::OpenItem()
 	}
 } /* PProjectWindow::OpenItem */
 
-void PProjectWindow::Revert() 
-{
-	char title[256];
-	sprintf(title, "Revert to the last saved version of\n\n%s?", Title());
-	
-	MInfoAlert a(title, "OK", "Cancel");
-	if (a == 1)
-	{
-		if (fFile) {
-			BFile dummyFile( fFile, B_READ_ONLY);
-			ReadData(dummyFile);
-		} else
-			THROW(("No file?!?!?!?"));
-	}
-} /* Revert */
-
 void PProjectWindow::SetDirty(bool dirty)
 {
-	CDoc::SetDirty(dirty);
+	inherited::SetDirty(dirty);
 	fButtonBar->SetEnabled(msg_Save, dirty);
 } /* PProjectWindow::SetDirty */
 

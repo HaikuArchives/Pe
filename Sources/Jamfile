@@ -49,10 +49,11 @@ LINKFLAGS += -L/boot/home/config/lib ;
 Application pe : 
 	Benaphore.cpp
 	CCharObject.cpp
-	CConvertDialog.cpp
 	CDiff.cpp
 	CDiffWindow.cpp
 	CDoc.cpp
+	CDocIO.cpp
+	CDocWindow.cpp
 	CFilterChoiceDialog.cpp
 	CFindDialog.cpp
 	CFtpDialog.cpp

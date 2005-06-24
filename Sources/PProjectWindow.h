@@ -36,7 +36,7 @@
 #ifndef PPROJECTWINDOW_H
 #define PPROJECTWINDOW_H
 
-#include "CDoc.h"
+#include "CDocWindow.h"
 
 const ulong
 	msg_PProjectItemInvoked = 'IvkP',
@@ -54,13 +54,11 @@ class CProjectItem;
 
 class BListItem;
 
-class PProjectWindow
-	: public BWindow
-	, public CDoc
+class PProjectWindow : public CDocWindow
 {
-  public:
-	static CDoc* Create(const entry_ref *doc, const char* mimetype,
-							  CProjectFile* prjFile);
+	typedef CDocWindow inherited;
+public:
+	static PProjectWindow* Create(const entry_ref *doc, const char* mimetype);
 	~PProjectWindow();
 
 	virtual bool QuitRequested();
@@ -68,19 +66,27 @@ class PProjectWindow
 	virtual void MessageReceived(BMessage *msg);
 	virtual void SetDirty(bool dirty);
 	virtual void WindowActivated(bool active);
-	
+
+	virtual status_t InitCheck() const;
+	virtual	const char* ErrorMsg() const;
+
+protected:	
+	virtual	void GetText(BString &docText) const;
+	virtual	void SetText(const BString& docText);
+	virtual	const char* DefaultName() const;
+	virtual	void NameChanged();
+
+	virtual void Save();
+	virtual	void ReadAttr(BFile& file, BMessage& settingsMsg);
+	virtual	void WriteAttr(BFile& file, const BMessage& settingsMsg);
+		
 private:
-	PProjectWindow(const entry_ref *doc, const char* mimetype, 
-						CProjectFile* prjFile);
-	virtual void ReadData(BPositionIO& file);
-	virtual void ReadAttr(BFile& file);
-	virtual void WriteData(BPositionIO& file);
-	virtual void WriteAttr(BFile& file);
+	PProjectWindow(const entry_ref *doc, const char* mimetype);
+
 	void SelectionChanged(void);
 	void AddItemsToList(CProjectItem* item, BListItem* parentListItem);
 	
 	void OpenItem();
-	void Revert();
 	void AddRefs(BMessage *msg);
 	void AddRef(const entry_ref& ref);
 	void AddFiles();

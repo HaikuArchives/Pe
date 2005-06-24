@@ -56,7 +56,8 @@ bool CProjectRoster::IsProjectType(const char* mimetype) const
  * 
  */
 CProjectFile* CProjectRoster::ParseProjectFile(const entry_ref* eref, 
-															  const char* mt)
+															  const char* mt,
+															  const BString& contents)
 {
 	BPath path;
 	if (BEntry(eref, true).GetPath(&path) != B_OK)
@@ -67,7 +68,7 @@ CProjectFile* CProjectRoster::ParseProjectFile(const entry_ref* eref,
 	else if (!strcmp(mt,"text/x-jamfile"))
 		prjFile = new CProjectJamFile(path.Path());
 	if (prjFile)
-		prjFile->Parse();
+		prjFile->Parse(contents);
 	return prjFile;
 }
 

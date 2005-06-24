@@ -739,7 +739,7 @@ void PScriptCmd::Do()
 	char e[PATH_MAX + 10], *cwd;
 	
 	BPath p;
-	BEntry(fText->Doc()->File()).GetPath(&p);
+	BEntry(fText->Doc()->EntryRef()).GetPath(&p);
 	cwd = strdup(p.Path());
 	sprintf(e, "PE_CUR_FILE=%s", cwd);
 	char *t = strrchr(cwd, '/');
@@ -1607,7 +1607,7 @@ PEncodingCmd::PEncodingCmd(PText *txt, int from, int to)
 	FailNil(fSaved);
 	txt->TextBuffer().Copy(fSaved, fAnchor, fSrcLen);
 	
-	fPrevEncoding = txt->Encoding();
+	fPrevEncoding = txt->Doc()->Encoding();
 } /* PEncodingCmd::PEncodingCmd */
 
 PEncodingCmd::~PEncodingCmd()
@@ -1617,86 +1617,11 @@ PEncodingCmd::~PEncodingCmd()
 
 void PEncodingCmd::Do()
 {
-	if (fSourceEncoding >= 0 && fDestEncoding >= 0)
-	{
-		long tl = 3 * fSrcLen;
-		char *p1 = (char *)malloc(tl);
-		FailNil(p1);
-		int32 state = 0;
-		
-		FailOSErr(convert_to_utf8(fSourceEncoding, fSaved, &fSrcLen, p1, &tl, &state));
-		
-		fDstLen = 2 * tl;
-		char *p2 = (char *)malloc(fDstLen);
-		FailNil(p2);
-		
-		FailOSErr(convert_from_utf8(fDestEncoding, p1, &tl, p2, &fDstLen, &state));
-		
-		free(p1);
-		
-		fCaret = fAnchor + fSrcLen;
-		fText->Delete(fAnchor, fCaret);
-		fText->Insert(p2, fDstLen, fAnchor);
-		
-		free(p2);
-		
-		fText->SetEncoding(fDestEncoding + 1);
-		if (fText->Caret() != fText->Anchor())
-			fText->SetCaret(fAnchor + fDstLen);
-	}
-	else if (fSourceEncoding >= 0)
-	{
-		fDstLen = 3 * fSrcLen;
-		
-		char *p = (char *)malloc(fDstLen);
-		FailNil(p);
-		
-		int32 state = 0;
-
-		FailOSErr(convert_to_utf8(fSourceEncoding, fSaved, &fSrcLen,
-			p, &fDstLen, &state));
-
-		fCaret = fAnchor + fSrcLen;
-		fText->Delete(fAnchor, fCaret);
-		fText->Insert(p, fDstLen, fAnchor);
-		free(p);
-		
-		fText->SetEncoding(0);
-		if (fText->Caret() != fText->Anchor())
-			fText->SetCaret(fAnchor + fDstLen);
-	}
-	else if (fDestEncoding >= 0)
-	{
-		fDstLen = fSrcLen * 2;
-		
-		char *p = (char *)malloc(fDstLen);
-		FailNil(p);
-		
-		int32 state = 0;
-		
-		FailOSErr(convert_from_utf8(fDestEncoding, fSaved, &fSrcLen,
-			p, &fDstLen, &state));
-
-		fCaret = fAnchor + fSrcLen;
-		fText->Delete(fAnchor, fCaret);
-		fText->Insert(p, fDstLen, fAnchor);
-		free(p);
-		
-		fText->SetEncoding(fDestEncoding + 1);
-		if (fText->Caret() != fText->Anchor())
-			fText->SetCaret(fAnchor + fDstLen);
-	}
-
-	Update();
+	fText->Doc()->SetEncoding(fDestEncoding);
 } /* PEncodingCmd::Do */
 
 void PEncodingCmd::Undo()
 {
-	fText->Delete(fAnchor, fAnchor + fDstLen);
-	fText->Insert(fSaved, fSrcLen, fAnchor);
-	fText->SetEncoding(fSourceEncoding + 1);
-	fText->Select(fAnchor, fCaret, true, false);
-	
-	Update();
+	fText->Doc()->SetEncoding(fSourceEncoding);
 } /* PEncodingCmd::Undo */
 

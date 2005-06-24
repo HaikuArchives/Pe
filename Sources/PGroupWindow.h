@@ -34,7 +34,7 @@
 #ifndef PGROUPWINDOW_H
 #define PGROUPWINDOW_H
 
-#include "CDoc.h"
+#include "CDocWindow.h"
 
 const ulong
 	msg_GroupItemInvoked = 'IvkG',
@@ -48,8 +48,9 @@ class HButtonBar;
 class PGroupStatus;
 class PEntryItem;
 
-class PGroupWindow : public BWindow, public CDoc {
-friend class PIconFinder;
+class PGroupWindow : public CDocWindow {
+			typedef CDocWindow inherited;
+			friend class PIconFinder;
 public:
 			PGroupWindow(const entry_ref *doc = NULL);
 			~PGroupWindow();
@@ -57,24 +58,27 @@ public:
 virtual	bool QuitRequested();
 
 virtual	void MessageReceived(BMessage *msg);
-virtual	void SaveRequested(entry_ref& directory, const char *name);
 		
 			PEntryItem* AddRef(entry_ref& ref);
 			
 			int CountItems() const;
 
-private:
-virtual	void ReadData(BPositionIO& file);
-virtual	void ReadAttr(BFile& file);
-virtual	void WriteData(BPositionIO& file);
-virtual	void WriteAttr(BFile& file);
+protected:
+virtual	void SetDirty(bool dirty);
+			
+virtual	void GetText(BString &docText) const;
+virtual	void SetText(const BString& docText);
+virtual	const char* DefaultName() const;
+virtual	void NameChanged();
+
+virtual	void ReadAttr(BFile& file, BMessage& settingsMsg);
+virtual	void WriteAttr(BFile& file, const BMessage& settingsMsg);
 		
+private:
 			void OpenItem();
 			void AddRefs(BMessage *msg);
 			void AddFiles();
 			void RemoveSelected();
-			
-virtual	void SetDirty(bool dirty);
 			
 			BListView *fList;
 			PGroupStatus *fStatus;

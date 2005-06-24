@@ -44,12 +44,11 @@ const char kDefChars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01
 vector<CFontStyle*> CFontStyle::fgFontStyleList;
 
 CFontStyle* CFontStyle::Locate(const char *name, const char *style,
-	f_unit_t size, int encoding)
+	f_unit_t size)
 {
 	BFont font;
 	font.SetFamilyAndStyle(name, style);
 	font.SetSize(size);
-	font.SetEncoding(encoding);
 	
 	vector<CFontStyle*>::iterator i;
 	

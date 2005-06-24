@@ -28,7 +28,8 @@ public:
 	void RemoveProject(CProjectFile* pf);
 	//
 	bool IsProjectType(const char* mimetype) const;
-	CProjectFile* ParseProjectFile(const entry_ref* eref, const char* mt);
+	CProjectFile* ParseProjectFile(const entry_ref* eref, const char* mt,
+											 const BString& contents);
 	//
 	bool GetIncludePathsForFile(const entry_ref* fileRef, 
 										 vector<BString>& inclPathVect) const;

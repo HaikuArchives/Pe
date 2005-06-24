@@ -56,7 +56,6 @@ public:
 		
 		const char *Text() const;
 		int Size() const;
-		int Encoding() const;
 		
 		const char *Name() const;
 		const char *Extensions() const;
