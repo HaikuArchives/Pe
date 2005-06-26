@@ -243,7 +243,7 @@ void ImageToC::DumpBitmap(BBitmap* bitmap, const char *name)
 		}
 	}
 
-	strlcat(line, "\n};\n", sizeof(line));
+	strcat(line, "\n};\n");
 	text.Insert(line);
 }
 
