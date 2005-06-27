@@ -1502,6 +1502,8 @@ void PDoc::MenusBeginning()
 			continue;
 
 		BWindow *w = dynamic_cast<BWindow*>(*di);
+		if (!w)
+			continue;
 		BMessage *msg = new BMessage(msg_SelectWindow);
 		msg->AddPointer("window", w);
 		fWindows->AddItem(new BMenuItem(w->Title(), msg,
