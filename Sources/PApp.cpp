@@ -601,7 +601,7 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 					}
 					FailOSErr (path.InitCheck());
 					entry_ref doc;
-					PDoc *d;
+					CDocWindow *d;
 	
 					FailOSErr (get_ref_for_path(path.Path(), &doc));
 					
@@ -609,9 +609,12 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 					FailOSErr(e.SetTo(&doc));
 
 					if (e.Exists())
-						d = dynamic_cast<PDoc*>(OpenWindow(doc));
+						d = dynamic_cast<CDocWindow*>(OpenWindow(doc));
 					else
-						d = NewWindow(&doc);
+					{
+						d = NewWindow(NULL);
+						d->SetEntryRef(&doc);
+					}
 					
 					if (d && lineNr >= 0)
 					{
@@ -844,24 +847,15 @@ void PApp::MessageReceived(BMessage *msg)
 				entry_ref doc;
 				FailOSErr (msg->FindRef("refs", &doc));
 				
-				BWindow *w;
+				CDocWindow *w;
 				BEntry e;
 				
 				if (e.SetTo(&doc) == B_OK && e.Exists())
-					w = dynamic_cast<BWindow*>(OpenWindow(doc));
+					w = dynamic_cast<CDocWindow*>(OpenWindow(doc));
 				else
 				{
-					w = NewWindow();
-					BAutolock lock(w);
-					
-					if (lock.IsLocked()) 
-					{
-						BPath p;
-						if (BEntry(&doc).GetPath(&p) == B_OK)
-							w->SetTitle(p.Path());
-						else
-							w->SetTitle(doc.name);
-					}
+					w = NewWindow(NULL);
+					w->SetEntryRef(&doc);
 				}
 				
 				long lineNr;
