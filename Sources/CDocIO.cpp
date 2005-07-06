@@ -457,7 +457,8 @@ void CLocalDocIO::HandleNodeMonitorMsg(BMessage* msg)
 		&& msg->FindString("name", &name) == B_OK
 		&& !strcmp(name, fEntryRef->name))
 	{
-		VerifyFile();
+		if (!VerifyFile())
+			ReadDoc(false);
 	}
 	else if (msg->FindInt64("node") != fNodeRef.node)
 	{
@@ -490,7 +491,8 @@ void CLocalDocIO::HandleNodeMonitorMsg(BMessage* msg)
 			break;
 		}
 		case B_STAT_CHANGED:
-			VerifyFile();
+			if (!VerifyFile())
+				ReadDoc(false);
 			break;
 	}
 }
