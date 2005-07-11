@@ -1124,6 +1124,7 @@ int mismatchsearch(const char *p, const char *a, int N, int skip[], bool ignoreC
 	ASSERT(a);
 	ASSERT(skip);
 	int i, j, t, M = strlen(p);
+	unsigned char c;
 
 	if (ignoreCase)
 	{
@@ -1131,7 +1132,8 @@ int mismatchsearch(const char *p, const char *a, int N, int skip[], bool ignoreC
 		{
 			while (toupper(a[i]) != toupper(p[j]))
 			{
-				t = skip[toupper(a[i])];
+				c = toupper(a[i]);
+				t = skip[c];
 				i += (M - j > t) ? M - j : t;
 				if (i >= N)
 					return N;
@@ -1145,7 +1147,8 @@ int mismatchsearch(const char *p, const char *a, int N, int skip[], bool ignoreC
 		{
 			while (a[i] != p[j])
 			{
-				t = skip[a[i]];
+				c = a[i];
+				t = skip[c];
 				i += (M - j > t) ? M - j : t;
 				if (i >= N)
 					return N;
@@ -1181,6 +1184,7 @@ int mismatchsearch_b(const char *p, const char *a, int N, int skip[], bool ignor
 	ASSERT(a);
 	ASSERT(skip);
 	int i, j, t, M = strlen((char *)p);
+	unsigned char c;
 
 	if (ignoreCase)
 	{
@@ -1188,7 +1192,8 @@ int mismatchsearch_b(const char *p, const char *a, int N, int skip[], bool ignor
 		{
 			while (toupper(a[i]) != toupper(p[j]))
 			{
-				t = skip[toupper(a[i])];
+				c = toupper(a[i]);
+				t = skip[c];
 				i -= (j + 1 > t) ? j + 1 : t;
 				if (i < 0)
 					return -1;
@@ -1202,7 +1207,8 @@ int mismatchsearch_b(const char *p, const char *a, int N, int skip[], bool ignor
 		{
 			while (a[i] != p[j])
 			{
-				t = skip[a[i]];
+				c = a[i];
+				t = skip[c];
 				i -= (j + 1 > t) ? j + 1 : t;
 				if (i < 0)
 					return -1;
