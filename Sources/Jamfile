@@ -35,7 +35,7 @@ SharedLibrary libhekkel.so :
 	MAlert.cpp
 	MTextAddOn.cpp
 	MThread.cpp
-	:	$(RX_LIB) be net $(STDC++LIB)
+	:	$(RX_LIB) be $(STDC++LIB)
 	;
 # </pe-src>
 MakeLocate libhekkel.so : $(DISTRO_DIR)/lib ;
@@ -112,7 +112,7 @@ Application pe :
 	Sstdio.cpp
 	utf-support.cpp
 	Utils.cpp
-	:	libhekkel.so pcre be net $(STDC++LIB) tracker mail textencoding 
+	:	libhekkel.so pcre be $(STDC++LIB) tracker mail textencoding 
 	;
 #	</pe-src>
 if $(OSPLAT) = X86 {

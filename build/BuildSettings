@@ -21,6 +21,8 @@ if $(OSPLAT) = X86 {
 		C++FLAGS += -DBONE_BUILD ;
 		SYSHDRS += /boot/develop/headers/be/bone /boot/develop/headers/be/bone/sys ;
 		LINKLIBS += -lsocket -lbind ;
+	} else {
+		LINKLIBS += -lnet ;
 	}
 	# check for Zeta...
 	local haveZeta = [ GLOB /boot/beos/system/lib : libzeta.so ] ;
