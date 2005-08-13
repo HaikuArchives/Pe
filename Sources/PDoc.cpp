@@ -141,7 +141,7 @@ PDoc::PDoc(URLData& url)
 	
 	AddRecent(title);
 
-	fText->SetLanguage(url.File());
+	fText->SetDefaultLanguageByExtension(url.File());
 	
 	fButtonBar->SetEnabled(msg_Save, false);
 	
@@ -305,7 +305,10 @@ void PDoc::NameChanged()
 		FailOSErr(e.SetTo(EntryRef()));
 		FailOSErr(e.GetPath(&p));
 		fStatus->SetPath(p.Path());
-//		fText->SetLanguageByName(Name);
+
+		LockLooper();
+		fText->SetDefaultLanguageByExtension(CDoc::Name());
+		UnlockLooper();
 	}
 }
 

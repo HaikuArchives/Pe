@@ -191,8 +191,8 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fSyntaxColoring = gSyntaxColoring;
 	fCWD = NULL;
 	fShowInvisibles = gPrefs->GetPrefInt(prf_I_ShowInvisibles, 0);
+	fUsingDefaultLanguage = true;
 	fLangIntf = NULL;
-	SetLanguage(ext);
 	fLastMouseTime = 0;
 	fIncSearch = 0;
 	fMark = -1;
@@ -223,6 +223,8 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 
 	fLineMap = NULL;
 	fLineView = NULL;
+
+	SetDefaultLanguageByExtension(ext);
 	
 	fMainPopUp = static_cast<BPopUpMenu*>(HResources::GetMenu(rid_Popu_CtxText, true));
 	FailNil(fMainPopUp);
@@ -264,17 +266,17 @@ PText::~PText()
 	
 	if (fExec)
 		fExec->Cancel();
-	
-	if (fCWD)
-		free(fCWD);
-	
-	if (fMainPopUp)
-		delete fMainPopUp;
+
+	free(fCWD);
+	delete fMainPopUp;
 } /* PText::~PText */
 
-void PText::SetLanguage(const char *ext)
+void PText::SetDefaultLanguageByExtension(const char *extension)
 {
-	CLangIntf *language = CLangIntf::FindByExtension(ext);
+	if (!fUsingDefaultLanguage)
+		return;
+
+	CLangIntf *language = CLangIntf::FindByExtension(extension);
 
 	if (language != fLangIntf)
 	{
@@ -283,7 +285,7 @@ void PText::SetLanguage(const char *ext)
 		RestyleDirtyLines(0);
 		Invalidate();
 	}
-} /* PText::SetLanguage */
+} /* PText::SetDefaultLanguageByExtension */
 
 int PText::Language() const
 {
@@ -299,6 +301,7 @@ void PText::SetLanguage(int index)
 		TouchLines(0);
 		RestyleDirtyLines(0);
 		Invalidate();
+		fUsingDefaultLanguage = false;
 	}
 } /* PText::SetLanguage */
 
@@ -497,6 +500,8 @@ void PText::ApplySettings(const BMessage& msg)
 	if (msg.FindString("language", &s1) == B_OK)
 	{
 		CLangIntf *language = CLangIntf::FindByName(s1);
+		if (language != NULL)
+			fUsingDefaultLanguage = false;
 		SetLanguage(CLangIntf::GetIndex(language));
 	}
 } /* PText::SetSettings */
@@ -510,7 +515,7 @@ void PText::CollectSettings(BMessage& msg)
 	font_family ff;
 	font_style fs;
 	fFont.GetFamilyAndStyle(&ff, &fs);
-	
+
 	FailOSErr(msg.AddString("fontfamily", ff));
 	FailOSErr(msg.AddString("fontstyle", fs));
 
@@ -519,10 +524,10 @@ void PText::CollectSettings(BMessage& msg)
 	FailOSErr(msg.AddFloat("vscroll", fVScrollBar2->Value()));
 	FailOSErr(msg.AddFloat("hscroll", fHScrollBar->Value()));
 	FailOSErr(msg.AddBool("syntaxcoloring", fSyntaxColoring));
-	
+
 	FailOSErr(msg.AddInt32("encoding", Doc()->Encoding()));
 	FailOSErr(msg.AddInt32("line breaks", Doc()->LineEndType()));
-	
+
 	FailOSErr(msg.AddBool("softwrap", fSoftWrap));
 
 	if (fSoftWrap)
@@ -530,8 +535,8 @@ void PText::CollectSettings(BMessage& msg)
 		FailOSErr(msg.AddInt32("wraptype", fWrapType));
 		FailOSErr(msg.AddInt32("wrapwidth", fWrapWidth));
 	}
-	
-	if (Language())
+
+	if (Language() /*&& !fUsingDefaultLanguage*/)
 		FailOSErr(msg.AddString("language", fLangIntf->Name()));
 	
 	if (fCWD) FailOSErr(msg.AddString("cwd", fCWD));

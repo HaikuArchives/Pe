@@ -113,10 +113,10 @@ virtual		void FrameResized(float w, float h);
 			void SetText(const char *utf8Text, size_t size);
 			const char* Text();
 			int Size() const;
-			void SetLanguage(const char *ext);
+			void SetDefaultLanguageByExtension(const char *ext);
 			void SetLanguage(int indx);
 			int Language() const;
-			
+
 			void CollectSettings(BMessage& msg);
 			void ApplySettings(const BMessage& msg);
 			void GetSettingsMW(BPositionIO& set);
@@ -287,6 +287,7 @@ private:
 			g_unit_t fLineHeight, fTabWidth;
 			g_unit_t fWalkOffset;
 
+			bool fUsingDefaultLanguage;
 			CLangIntf *fLangIntf;
 			BRect fBounds;
 			PTextBuffer& fText;
