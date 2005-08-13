@@ -418,7 +418,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (c == '\'' && !esc)
 				{
-					if (cc_cnt != 1 && cc_cnt != 2 && cc_cnt != 4)
+					if (cc_cnt != 1 && cc_cnt != 3 && cc_cnt != 5)
 					{
 						proxy.SetColor(s, kLTextColor);
 						i--;
