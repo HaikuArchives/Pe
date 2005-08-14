@@ -42,19 +42,19 @@ cp lpe ~/config/bin
 #include <cstdarg>
 #include <Message.h>
 #include <Roster.h>
+#include <String.h>
 
 const long msg_CommandLineOpen = 'Cmdl';
 
-static int lineNr = -1;
 static vector<int> threads;
 
 void DoError(const char *e, ...);
 void Usage();
-void OpenInPe(entry_ref& ref);
+void OpenInPe(entry_ref& ref, int lineNr);
 
 void Usage()
 {
-	puts("usage: lpe [+linenr] file1 file2 ...");
+	puts("usage: lpe [file:linenr | +linenr file | file] ...");
 	exit(1);
 } /* Usage */
 
@@ -73,7 +73,7 @@ void DoError(const char *e, ...)
 	exit(1);
 } /* error */
 
-void OpenInPe(entry_ref& doc)
+void OpenInPe(entry_ref& doc, int lineNr)
 {
 	BMessage msg(msg_CommandLineOpen), reply;
 	msg.AddRef("refs", &doc);
@@ -133,10 +133,16 @@ void OpenInPe(entry_ref& doc)
 
 int main(int argc, char *argv[])
 {
+	int			i = 0;
+	char	 	*p;
+	char		*dpPtr;
+	int			lineNr = -1;
+	status_t	err;
+	BEntry		e;
+	BString		path;
+	int			nr;
+
 	if (argc < 2) Usage();
-	
-	int i = 0;
-	char *p;
 
 	while (++i < argc)
 	{
@@ -149,18 +155,28 @@ int main(int argc, char *argv[])
 			
 			default:
 			{
-				status_t err;
-				BEntry e;
+				path = argv[i];
+				dpPtr = strrchr(argv[i], ':');
+				if (dpPtr != NULL)
+				{
+					nr = strtoul(dpPtr + 1, &p, 10);
+					if (strlen(p) == 0)
+					{
+						path.SetTo(argv[i], dpPtr-argv[i]);
+						lineNr = nr;
+					}
+				}
 
-				err = e.SetTo(argv[i], true);
-				if (err) DoError("Error trying to access file %s, (%s)", argv[i], strerror(err));
-//				if (! e.Exists()) DoError("File %s does not exist", argv[i]);
-				if (e.Exists() && ! e.IsFile()) DoError("%s is not a regular file", argv[i]);
+				err = e.SetTo(path.String(), true);
+				if (err) DoError("Error trying to access file %s, (%s)", path.String(), strerror(err));
+//				if (! e.Exists()) DoError("File %s does not exist", path.String());
+				if (e.Exists() && ! e.IsFile()) DoError("%s is not a regular file", path.String());
 				
 				entry_ref ref;
 				err = e.GetRef(&ref);
-				if (err) DoError("Error trying to access file %s, (%s)", argv[i], strerror(err));
-				OpenInPe(ref);
+				if (err) DoError("Error trying to access file %s, (%s)", path.String(), strerror(err));
+				OpenInPe(ref, lineNr);
+				lineNr = -1;
 			}
 		}
 	}
