@@ -83,6 +83,42 @@ bool FileContainsEx(const char *path, CRegex* regex,
 bool BufferContainsEx(const char *buf, int size, const char *path, 
 					  CRegex* regex, vector<PMessageItem*> *lst = NULL);
 
+class CEnterKeyFilter : public BMessageFilter
+{
+  public:
+	CEnterKeyFilter();
+
+	virtual filter_result Filter(BMessage *msg, BHandler **target);
+};
+
+CEnterKeyFilter::CEnterKeyFilter()
+	: BMessageFilter(B_KEY_DOWN)
+{
+}
+
+filter_result CEnterKeyFilter::Filter(BMessage *msg, BHandler **target)
+{
+	int32 keychar, modifiers;
+	if (*target && msg->FindInt32("modifiers", &modifiers) == B_OK 
+		&& msg->FindInt32("raw_char", &keychar) == B_OK)
+	{
+		// if the user pressed return the given target will already be
+		// set to the default button, so we have to find out the focus
+		// view by accessing the preferred handler: 
+		BHandler* focusHandler = (*target)->Looper()->PreferredHandler();
+		BTextView* textview = dynamic_cast<BTextView*>(focusHandler);
+		if (textview && keychar == B_RETURN 
+			&& (modifiers & (B_SHIFT_KEY|B_OPTION_KEY))) {
+			// insert a newline into the focused textview:
+			char newline = '\n';
+			textview->Insert(&newline, 1);
+			textview->ScrollToSelection();
+			return B_SKIP_MESSAGE;
+		}
+	}
+	return B_DISPATCH_MESSAGE;
+}
+
 CFindDialog::CFindDialog(BRect frame, const char *name,
 		window_type type, int flags, BWindow *owner)
 	: HDialog(frame, name, type, flags, owner, NULL)
@@ -144,13 +180,14 @@ void CFindDialog::Create(void)
 
 	// Add Search and Replace fields
 	fMfdPats = new HMenuField(fMainView, "pats");
+	fEdiFind = new HTextView(NULL, "find", B_FOLLOW_ALL);
+	fEdiFind->SetWordWrap(false);
+	fScrFind = new HScrollView(fMainView, "findScr", fEdiFind);
+
 	fLabRepl = new HStringView(fMainView);
-	fEdiFind = new HTextControl(fMainView, "find", B_FOLLOW_LEFT_RIGHT);
-	fEdiFind->TextView()->SetWordWrap(true);
-	fEdiFind->TextView()->SetResizingMode(B_FOLLOW_ALL);
-	fEdiRepl = new HTextControl(fMainView, "repl", B_FOLLOW_LEFT_RIGHT);
-	fEdiRepl->TextView()->SetWordWrap(true);
-	fEdiRepl->TextView()->SetResizingMode(B_FOLLOW_ALL);
+	fEdiRepl = new HTextView(NULL, "repl", B_FOLLOW_ALL);
+	fEdiRepl->SetWordWrap(false);
+	fScrRepl = new HScrollView(fMainView, "replScr", fEdiRepl);
 
 	// Add Settings
 	fChkCase = new HCheckBox(fMainView, "case", NULL, H_FOLLOW_LEFT_BOTTOM);
@@ -196,24 +233,21 @@ void CFindDialog::Create(void)
 	fMfdNamp->Menu()->ItemAt(FNAME_IDX_ANY)->SetMarked(true);
 
 	fEdiName = new HTextControl(fMainView, "name", H_FOLLOW_LEFT_BOTTOM);
+
+	AddCommonFilter(new CEnterKeyFilter());
 } // CFindDialog::Create
 
 void CFindDialog::Layout(void) {
-	// There is no way to set the Title?! -> Hack: we replace the whole popup!
 	BMenu *pop = fMfdPats->Menu();
-	fMfdPats->MenuBar()->RemoveItem(pop);
-	delete pop;
-	pop = new BMenu("Find:");
 	pop->AddItem(new BMenuItem("Add this pattern…", new BMessage(msg_AddGrepPattern)));
 	pop->AddSeparatorItem();
-	fMfdPats->MenuBar()->AddItem(pop);
 	FillGrepPopup();
 	//
 	fButFind	->ResizeLocalized("Find");
 	fButRepl	->ResizeLocalized("Replace");
 	fButRepF	->ResizeLocalized("Replace & Find");
 	fButRepA	->ResizeLocalized("Replace All");
-	fMfdPats	->ResizeLocalized();
+	fMfdPats	->ResizeLocalized(NULL, "Find:");
 	fLabRepl	->ResizeLocalized("Replace:");
 	fChkCase	->ResizeLocalized("Ignore Case");
 	fChkWrap	->ResizeLocalized("Wrap Around");
@@ -265,15 +299,16 @@ void CFindDialog::Layout(void) {
 	w = fButFind->Left()-2*dx;
 
 	fMfdPats->MoveTo(dx, dy);
-	fLabRepl->MoveTo(dx, fButRepF->Top());
 
-	h = fLabRepl->Top()-31;
-	fEdiFind->MoveTo(dx, 31);
-	fEdiFind->ResizeTo(w, h);
+	float lineHeight = fEdiFind->LineHeight();
 
-	h = fButRepA->Bottom()-fLabRepl->Bottom();
-	fEdiRepl->MoveTo(dx, fLabRepl->Bottom());
-	fEdiRepl->ResizeTo(w, h);
+	fScrFind->MoveTo(dx, fMfdPats->Bottom()+1);
+	fScrFind->ResizeTo(w, lineHeight*2+6);
+
+	fLabRepl->MoveTo(dx, fScrFind->Bottom()+dy);
+
+	fScrRepl->MoveTo(dx, fLabRepl->Bottom()+1);
+	fScrRepl->ResizeTo(w, lineHeight*2+6);
 
 	// Multi File Search
 	w = max(fChkText->Width(), fChkRecu->Width());
@@ -314,11 +349,12 @@ void CFindDialog::Layout(void) {
 	fChkBtch->MoveTo(max(fChkBack->Right(), fChkWord->Right())+dx, fChkWrap->Top());
 	fChkGrep->MoveAbove(fChkBtch);
 
-	// Window size
-	h = fButRepA->Bottom()+r.bottom-fChkWrap->Bottom();
+	// set minimum height to fit one line in textviews...
+	h = fScrRepl->Bottom()+r.bottom-fChkCase->Top()+2;
 	w = 2*dx+max(fChkGrep->Right(), fChkBtch->Right())+fButRepA->Width();
-	ResizeToLimits(w, 99999, h, 99999);
-
+	ResizeToLimits(w, 99999, h-2*lineHeight, 99999);
+	// ...but default to two lines in textviews:
+	ResizeTo(w, h);
 } // CFindDialog::Layout
 
 bool CFindDialog::QuitRequested()
@@ -341,11 +377,11 @@ bool CFindDialog::QuitRequested()
 
 void CFindDialog::DoFind(unsigned long cmd)
 {
-	if (!strlen(fEdiFind->GetText()))
+	if (!strlen(fEdiFind->Text()))
 		return;
 	if (fChkGrep->IsOn())
 	{
-		status_t res = fRegex.SetTo(fEdiFind->GetText(), fChkCase->IsOn(), 
+		status_t res = fRegex.SetTo(fEdiFind->Text(), fChkCase->IsOn(), 
 									fChkWord->IsOn());
 		if (res != B_OK)
 		{
@@ -411,8 +447,8 @@ void CFindDialog::DoFind(unsigned long cmd)
 	{
 		BMessage msg(cmd);
 		
-		msg.AddString("what", fEdiFind->GetText());
-		msg.AddString("with", fEdiRepl->GetText());
+		msg.AddString("what", fEdiFind->Text());
+		msg.AddString("with", fEdiRepl->Text());
 		msg.AddBool  ("wrap", fChkWrap->IsOn());
 		msg.AddBool  ("case", fChkCase->IsOn());
 		msg.AddBool  ("word", fChkWord->IsOn());
@@ -437,10 +473,10 @@ void CFindDialog::UpdateFields()
 {
 	PDoc *w = PDoc::TopWindow();
 
-	if (w && strlen(fEdiFind->GetText()))
+	if (w && strlen(fEdiFind->Text()))
 	{
 		BMessage query(msg_QueryCanReplace);
-		query.AddString("what", fEdiFind->GetText());
+		query.AddString("what", fEdiFind->Text());
 		query.AddBool("case", fChkCase->IsOn());
 		query.AddBool("regx", fChkGrep->IsOn());
 		w->PostMessage(&query, w->TextView(), this);
@@ -640,8 +676,8 @@ void CFindDialog::MessageReceived(BMessage *msg)
 				sprintf(n, "Grep Pattern %d", ix);
 				ix--;
 				gPrefs->SetIxPrefString(prf_X_GrepPatName, ix, n);
-				gPrefs->SetIxPrefString(prf_X_GrepPatFind, ix, fEdiFind->GetText());
-				gPrefs->SetIxPrefString(prf_X_GrepPatRepl, ix, fEdiRepl->GetText());
+				gPrefs->SetIxPrefString(prf_X_GrepPatFind, ix, fEdiFind->Text());
+				gPrefs->SetIxPrefString(prf_X_GrepPatRepl, ix, fEdiRepl->Text());
 				FillGrepPopup();
 				
 				static_cast<PApp*>(be_app)->PostMessage(msg_AddGrepPattern);
@@ -661,13 +697,17 @@ void CFindDialog::MessageReceived(BMessage *msg)
 
 void CFindDialog::FrameResized(float width, float height)
 {
-	float h = (fChkCase->Top()-fMfdPats->Bottom()-fLabRepl->Height()-fMainView->StringWidth("n")-2)/2;
+	HDialog::FrameResized(width, height);
+	float dx = fMainView->StringWidth("m");
+	float dy = fMainView->StringWidth("n");
+	float h = (fChkCase->Top()-fMfdPats->Bottom()-fLabRepl->Height()-dy-4)/2;
+	float w = fButFind->Left()-dx-fScrFind->Left();
 
-	fEdiFind->SetHeight(h);
-	fEdiRepl->SetHeight(h);
+	fScrFind->ResizeTo(w,h);
+	fScrRepl->ResizeTo(w,h);
 
-	fLabRepl->MoveBelow(fEdiFind, 1);
-	fEdiRepl->MoveBelow(fLabRepl, 1);
+	fLabRepl->MoveBelow(fScrFind, dy);
+	fScrRepl->MoveBelow(fLabRepl, 1);
 
 	fMfdSdir->MenuBar()->SetMaxContentWidth(Bounds().right-fMfdSdir->Left()-fMfdSdir->Divider()-30);
 } /* CFindDialog::FrameResized */
@@ -738,13 +778,13 @@ void CFindDialog::AddPathToDirMenu(entry_ref& ref, bool select, bool addToPrefs)
 const char* CFindDialog::FindString()
 {
 	BAutolock lock(this);
-	return fEdiFind->GetText();
+	return fEdiFind->Text();
 } /* CFindDialog::FindString */
 
 const char* CFindDialog::ReplaceString()
 {
 	BAutolock lock(this);
-	return fEdiRepl->GetText();
+	return fEdiRepl->Text();
 } /* CFindDialog::FindString */
 
 char* CFindDialog::RxReplaceString(const char* what, int32 len)
@@ -864,7 +904,7 @@ bool CFindDialog::DoMultiFileFind(const char *dir, bool recursive, bool restart,
 		
 							int offset = 0;
 							
-							doc->TextView()->FindNext(fEdiFind->GetText(),
+							doc->TextView()->FindNext(fEdiFind->Text(),
 								offset, fChkCase->IsOn(), false, false, false, 
 								fChkGrep->IsOn(), true);
 							return true;
@@ -928,7 +968,7 @@ bool CFindDialog::GetRefForPath(entry_ref& ref, const char *path)
 	int fnam = fMfdNamp->FindMarkedIndex();
 	if (result && fnam != FNAME_IDX_ANY)
 	{
-		const char *pat = fEdiName->GetText();
+		const char *pat = fEdiName->Text();
 		char *file = strrchr(path, '/') + 1;
 	
 		switch (fnam)
@@ -946,7 +986,7 @@ bool CFindDialog::FindInFile(const entry_ref& ref, vector<PMessageItem*> *lst)
 {
 	bool found;
 	bool word = fChkWord->IsOn();
-	const char *what = fEdiFind->GetText();
+	const char *what = fEdiFind->Text();
 	PDoc *doc;
 
 	BEntry e;
@@ -1058,7 +1098,7 @@ void CFindDialog::DoOpenWindows(bool replace)
 				else
 				{
 					int offset = 0;
-					doc->TextView()->FindNext(fEdiFind->GetText(), offset,
+					doc->TextView()->FindNext(fEdiFind->Text(), offset,
 						fChkCase->IsOn(), false, false, fChkWord->IsOn(), 
 						fChkGrep->IsOn(), true);
 					return;

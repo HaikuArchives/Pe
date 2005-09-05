@@ -118,8 +118,10 @@ private:
 	HButton			*fButRepF;
 	HButton			*fButRepA;
 	HStringView		*fLabRepl;
-	HTextControl	*fEdiFind;
-	HTextControl	*fEdiRepl;
+	HTextView		*fEdiFind;
+	HScrollView		*fScrFind;
+	HTextView		*fEdiRepl;
+	HScrollView		*fScrRepl;
 	HCheckBox		*fChkCase;
 	HCheckBox		*fChkWrap;
 	HCheckBox		*fChkBack;
