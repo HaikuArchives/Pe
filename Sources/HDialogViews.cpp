@@ -149,6 +149,38 @@ const char* HTextControl::GetText(void) const
 } /* HTextControl::SetText */
 
 
+#pragma mark - HTextView
+
+
+HTextView::HTextView(BView* view, const char* name, uint32 resizingMode)
+: BTextView(BRect(0, 0, 100, 50), name, BRect(0, 0, 9998, 50), resizingMode, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE)
+{
+	if (view != NULL)
+		view->AddChild(this);
+} /* HTextView::HTextView */
+
+void HTextView::ResizeLocalized()
+{
+	ResizeToPreferred();
+} /* HTextView::ResizeLocalized */
+
+void HTextView::KeyDown(const char* bytes, int32 num_bytes)
+{
+	if (num_bytes == 1 && bytes[0] == B_TAB)
+		// pass B_TAB on to BView, which will interpret it to change focus.
+		BView::KeyDown(bytes, num_bytes);
+	else
+		BTextView::KeyDown(bytes, num_bytes);
+}
+
+void HTextView::MakeFocus(bool focused)
+{
+	BScrollView* scrollView = dynamic_cast<BScrollView*>(Parent());
+	if (scrollView)
+		scrollView->SetBorderHighlighted(focused);
+	BTextView::MakeFocus(focused);
+} /* HTextView::MakeFocus */
+
 #pragma mark - HMenuField
 
 
@@ -182,9 +214,12 @@ int32 HMenuField::FindMarkedIndex(void)
 	return Menu()->IndexOf(Menu()->FindMarked());
 } /* HMenuField::FIndMarkedIndex */
 
-void HMenuField::ResizeLocalized(const char* label, float height)
+void HMenuField::ResizeLocalized(const char* label, const char* itemLabel)
 {
 	SetLabel(label);
+	BMenuItem* item = MenuItem();
+	if (item && itemLabel)
+		item->SetLabel(itemLabel);
 	SetDivider(label == NULL ? 0 : StringWidth(label)+StringWidth("n"));
 	ResizeToPreferred();
 } /* HMenuField::ResizeLocalized */
@@ -246,14 +281,13 @@ HScrollView::HScrollView(BView* view, const char *name, BView *target,
 		view->AddChild(this);
 } /* HScrollView::HScrollView */
 
-
 #pragma mark - HBox
 
 
 HBox::HBox(BView* view, const char *name = NULL,
-			uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP,
-			uint32 flags = B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP,
-			border_style border = B_FANCY_BORDER)
+			uint32 resizingMode,
+			uint32 flags,
+			border_style border)
 : BBox(BRect(0, 0, 100, 50), name, resizingMode, flags, border)
 {
 	if (view != NULL)

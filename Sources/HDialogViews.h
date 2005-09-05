@@ -130,13 +130,36 @@ public:
 	void SetText(const char *text);
 };
 
+class IMPEXP_LIBHEKKEL HTextView : public BTextView {
+public:
+	HTextView(BView* view, const char* name, 
+			  uint32 resizingMode = H_FOLLOW_LEFT_TOP);
+	void ResizeLocalized();
+	void KeyDown(const char* bytes, int32 num_bytes);
+	void MakeFocus(bool focused = true);
+	//
+	float Left(void)									{ return Frame().left; }
+	float Right(void)									{ return Frame().right; }
+	float Top(void)										{ return Frame().top; }
+	float Bottom(void)									{ return Frame().bottom; }
+	float Width(void)									{ return Frame().Width(); }
+	float Height(void)									{ return Frame().Height(); }
+	//
+	void SetWidth(float width)							{ ResizeTo(width, Height()); }
+	void SetHeight(float height)						{ ResizeTo(Width(), height); }
+	void MoveAbove(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().top-Frame().Height()-dist-1); }
+	void MoveBelow(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left, view->Frame().bottom+dist+1); }
+	void MoveRight(const BView* view, float dist = 0)	{ MoveTo(view->Frame().right+dist+1, view->Frame().top); }
+	void MoveLeft(const BView* view, float dist = 0)	{ MoveTo(view->Frame().left-Frame().Width()-dist-1, view->Frame().top); }
+};
+
 class IMPEXP_LIBHEKKEL HMenuField : public BMenuField {
 public:
 	HMenuField(BView* view, const char* name,
 			   uint32 resizingMode = H_FOLLOW_LEFT_TOP, bool fixedSize = false, float width = 100);
 	HMenuField(BView* view, const char* name, BMenu* menu,
 			   uint32 resizingMode = H_FOLLOW_LEFT_TOP, bool fixedSize = false, float width = 100);
-	void ResizeLocalized(const char* label=NULL, float height = -1);
+	void ResizeLocalized(const char* label=NULL, const char* itemLabel=NULL);
 	BMenuItem *AddMenuItem(uint32 cmd, int32 index = -1);
 	int32 HMenuField::FindMarkedIndex(void);
 	//
@@ -209,7 +232,7 @@ class IMPEXP_LIBHEKKEL HBox : public BBox {
 public:
 	HBox(BView* view, const char *name = NULL,
 			uint32 resizingMode = H_FOLLOW_LEFT_TOP,
-			uint32 flags = B_WILL_DRAW|B_FRAME_EVENTS|B_NAVIGABLE_JUMP,
+			uint32 flags = B_WILL_DRAW|B_FRAME_EVENTS,
 			border_style border = B_FANCY_BORDER);
 		
 virtual	void Draw(BRect update);
