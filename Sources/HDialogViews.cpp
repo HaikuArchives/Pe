@@ -178,6 +178,8 @@ void HTextView::MakeFocus(bool focused)
 	BScrollView* scrollView = dynamic_cast<BScrollView*>(Parent());
 	if (scrollView)
 		scrollView->SetBorderHighlighted(focused);
+	if (focused)
+		SelectAll();
 	BTextView::MakeFocus(focused);
 } /* HTextView::MakeFocus */
 
