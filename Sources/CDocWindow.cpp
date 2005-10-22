@@ -101,6 +101,20 @@ void CDocWindow::ApplySettings(const BMessage& settingsMsg)
 	settingsMsg.FindRect("windowposition", &fLastStoredFrame);
 	if (gRestorePosition && fLastStoredFrame.IsValid())
 	{
+		// try to avoid showing window-parts offscreen:
+		BScreen screen(this);
+		BRect sf = screen.Frame();
+		float sw = sf.Width();
+		float sh = sf.Height();
+		float w = fLastStoredFrame.Width();
+		float h = fLastStoredFrame.Height();
+		float newLeft = MAX(5.0, MIN(sw-w-5, fLastStoredFrame.left));
+		float newTop = MAX(20.0, MIN(sh-h-5, fLastStoredFrame.top));
+		fLastStoredFrame.OffsetTo(newLeft, newTop);
+		float newWidth = MIN(sw-newLeft-5, fLastStoredFrame.Width());
+		float newHeight = MIN(sh-newTop-5, fLastStoredFrame.Height());
+		fLastStoredFrame.right = fLastStoredFrame.left + newWidth - 1;
+		fLastStoredFrame.bottom = fLastStoredFrame.top + newHeight - 1;
 		MoveTo(fLastStoredFrame.left, fLastStoredFrame.top);
 		ResizeTo(fLastStoredFrame.Width(), fLastStoredFrame.Height());
 	}
