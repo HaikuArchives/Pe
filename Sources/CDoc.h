@@ -122,7 +122,6 @@ protected:
 			void DoSaveACopy(entry_ref& directory, const char *name);
 			void SaveOnServer(const URLData& url);
 			void Revert();
-			void VerifyFile();
 
 	static	doclist sfDocList;
 	static	vector<char*> sfTenLastDocs;
