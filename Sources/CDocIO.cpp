@@ -306,6 +306,7 @@ bool CLocalDocIO::ReadDoc(bool readAttributes)
 	bool result = DoPreEditTextConversions(docText);
 
 	fDoc->SetText(docText);
+	fDoc->SetDirty(false);
 	
 	if (readAttributes)
 		fDoc->ApplySettings(settingsMsg);
@@ -515,8 +516,13 @@ bool CLocalDocIO::VerifyFile()
 				sprintf(s, "File %s was modified by another application, reload it?", fEntryRef->name);
 				MInfoAlert a(s, "Reload", "Cancel");
 
-				if (a.Go() == 1)
+				if (a.Go() == 1) 
+				{
 					result = false;
+					// restart watching, the file may have changed:
+					StopWatchingFile();
+					StartWatchingFile();
+				}
 			}
 
 			fLastSaved = time(NULL);
