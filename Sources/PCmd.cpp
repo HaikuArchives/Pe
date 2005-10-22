@@ -47,7 +47,6 @@ PCmd::PCmd(const char *str, PText *txt)
 {
 	fStr = strdup(str);
 	fText = txt;
-	fTextDirty = fText->IsDirty();
 	fUndoable = true;
 } /* PCmd::PCmd */
 
@@ -69,11 +68,6 @@ void PCmd::Redraw()
 {
 	fText->Draw(fText->Bounds());
 } /* PCmd::Redraw */
-
-void PCmd::SetDirty(bool dirty)
-{
-	fTextDirty = dirty;
-} /* PCmd::SetDirty */
 
 #pragma mark - Copy
 

@@ -92,7 +92,6 @@ enum {
 	flSyntaxColoring
 };
 
-
 class WordState {
 	public:
 		WordState(int key, bool subWord = false, bool mouseSelect = false)
@@ -199,6 +198,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fNrArgument = 0;
 	fAppendNextCut = false;
 	fLastKillPoint = -1;
+	fLastSavedStateCmd = NULL;
 	
 	fSoftWrap = gPrefs->GetPrefInt(prf_I_SoftWrap, false);
 	fWrapType = gPrefs->GetPrefInt(prf_I_WrapType, 3);
@@ -938,8 +938,8 @@ void PText::Undo()
 			fUndoneCmds.push(cmd);
 			ScrollToCaret();
 		}
-		
-		if (cmd && ! cmd->WasDirty())
+		cmd = fDoneCmds.size() ? fDoneCmds.top() : NULL;
+		if (fLastSavedStateCmd == cmd)
 			SetDirty(false);
 	}
 	catch (HErr& e)
@@ -970,9 +970,8 @@ void PText::Redo()
 			ScrollToCaret();
 		}
 		
-		cmd = fUndoneCmds.size() ? fUndoneCmds.top() : NULL;
-		if (cmd && ! cmd->WasDirty())
-			SetDirty(true);
+		if (fLastSavedStateCmd == cmd)
+			SetDirty(false);
 	}
 	catch (HErr& e)
 	{
@@ -1006,17 +1005,7 @@ void PText::RegisterCommand(PCmd *cmd)
 
 void PText::ResetUndo()
 {
-	stack<PCmd*> t;
-	
-	while (! fDoneCmds.empty())
-		t.push(fDoneCmds.top()), fDoneCmds.pop(), t.top()->SetDirty(true);
-	while (! t.empty())
-		fDoneCmds.push(t.top()), t.pop();
-	
-	while (! fUndoneCmds.empty())
-		t.push(fUndoneCmds.top()), fUndoneCmds.pop(), t.top()->SetDirty(true);
-	while (! t.empty())
-		fUndoneCmds.push(t.top()), t.pop();
+	fLastSavedStateCmd = fDoneCmds.size() ? fDoneCmds.top() : NULL;
 } /* PText::ResetUndo */
 	
 void PText::FlushUndo()
@@ -1032,6 +1021,7 @@ void PText::FlushUndo()
 		delete fUndoneCmds.top();
 		fUndoneCmds.pop();
 	}
+	fLastSavedStateCmd = NULL;
 } // PText::FlushUndo
 
 #pragma mark - Text

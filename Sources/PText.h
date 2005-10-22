@@ -319,6 +319,7 @@ private:
 			int fShift;
 			int fLastKillPoint;
 			bool fAppendNextCut;
+			PCmd* fLastSavedStateCmd;
 		
 static		PText *sfDragSource;
 

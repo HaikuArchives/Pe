@@ -59,13 +59,10 @@ virtual void Redo();
 		const char* Desc() const;
 		bool IsUndoable() const;
 		
-		bool WasDirty() const;
-		void SetDirty(bool dirty);
-
 protected:
 		char		*fStr;
 		PText		*fText;
-		bool		fUndoable, fTextDirty;
+		bool		fUndoable;
 };
 
 inline const char* PCmd::Desc() const
@@ -76,11 +73,6 @@ inline const char* PCmd::Desc() const
 inline bool PCmd::IsUndoable() const
 {
 	return fUndoable;
-}
-
-inline bool PCmd::WasDirty() const
-{
-	return fTextDirty;
 }
 
 class PCutCmd : public PCmd {
