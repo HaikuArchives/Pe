@@ -276,13 +276,18 @@ bool CLocalDocIO::ReadDoc(bool readAttributes)
 
 	off_t size;
 	FailOSErr(file.GetSize(&size));
+	
 	BString docText;
-	char* buf = docText.LockBuffer(size);
-	FailNil(buf);
-	int sz = file.Read(buf, size);
-	docText.UnlockBuffer(size);
-	if (sz < size)
-		THROW(("A read error occurred: %s", strerror(errno)));
+
+	if (size > 0)
+	{
+		char* buf = docText.LockBuffer(size);
+		FailNil(buf);
+		int bytesRead = file.Read(buf, size);
+		docText.UnlockBuffer(size);
+		if (bytesRead < size)
+			THROW(("A read error occurred: %s", strerror(errno)));
+	}
 
 	if (readAttributes)
 	{
