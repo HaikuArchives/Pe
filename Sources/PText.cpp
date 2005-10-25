@@ -5736,10 +5736,20 @@ void PText::MessageReceived(BMessage *msg)
 				if ((msg->FindFloat("be:wheel_delta_y", &y) == B_OK) &&
 					(y != 0))
 				{
+					BPoint pos;
+					uint32 buttons;
+					GetMouse(&pos, &buttons, false);
+//					pos = ConvertFromScreen(pos);
+					int toBeScrolledPart = (pos.y < fSplitAt && fSplitAt > 0) ? 1 : 2;
+					int savedActivePart = fActivePart;
+					if (toBeScrolledPart != savedActivePart)
+						fActivePart = toBeScrolledPart;
 					BMessage msg(y < 0 ? kmsg_ScrollOneLineUp : kmsg_ScrollOneLineDown);
 					int numLines = gPrefs->GetPrefInt(prf_I_ScrollwheelLines, 3);
 					for( int i=0; i<numLines; ++i)
 						DoKeyCommand(&msg);
+					if (toBeScrolledPart != savedActivePart)
+						fActivePart = savedActivePart;
 				}
 				else
 					BView::MessageReceived(msg);
