@@ -77,6 +77,10 @@ public:
 	bool Word();
 	bool Grep();
 	bool IsInMultiFileState() const;
+	
+	void GetPatternInfo(BMessage* patternMsg);
+	void SetPatternInfo(const BMessage* patternMsg);
+	bool PatternInfoDiffersFrom(const BMessage* patternMsg);
 		
 private:
 	virtual bool QuitRequested();
@@ -94,10 +98,10 @@ private:
 	bool GetRefForPath(entry_ref& ref, const char *path);
 	void DoIncludesFind();
 	void DoOpenWindows(bool replace);
-
+	
 	void ShowBatch(vector<PMessageItem*> *lst, BWindow **w);
 	
-	void FillGrepPopup();
+	void AddCurrentPatternToFindPopup(bool showReplaceText);
 
 	char **fBeIncludes;
 	int fBeIncludeCount;
@@ -111,7 +115,7 @@ private:
 	int fCurrentIncludeIndex;
 	CRegex fRegex;
 	long padding[4];
-
+	
 	// Interface
 	HButton			*fButFind;
 	HButton			*fButRepl;

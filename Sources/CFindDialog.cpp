@@ -35,6 +35,8 @@
 
 #include "pe.h"
 
+#include <vector>
+
 #include "PText.h"
 #include "PDoc.h"
 #include "CFindDialog.h"
@@ -55,8 +57,7 @@ const unsigned long
 	msg_SelectedDir		= 'SelD',
 	msg_YASD			= 'SYAD',
 	msg_ChangedMFKind	= 'MFKn',
-	msg_GrepPopup		= 'GrPp',
-	msg_AddGrepPattern	= 'addP',
+	msg_FindPopup		= 'FnPp',
 	msg_Collapse		= 'clps';
 
 enum {
@@ -83,41 +84,164 @@ bool FileContainsEx(const char *path, CRegex* regex,
 bool BufferContainsEx(const char *buf, int size, const char *path, 
 					  CRegex* regex, vector<PMessageItem*> *lst = NULL);
 
-class CEnterKeyFilter : public BMessageFilter
+#pragma mark - CRecentPatternController
+
+class CRecentPatternController
+{
+public:
+	CRecentPatternController();
+	~CRecentPatternController();
+	bool AddCurrentPattern();
+	void Next();
+	void Previous();
+	void GoToIndex(uint32 index);
+	static CRecentPatternController* ActiveController();
+private:
+	vector<BMessage*> fPatternVect;
+	uint32 fCurrIdx;
+	BMessage fSavedPattern;
+};
+
+static CRecentPatternController sgRecentPatternController;
+
+CRecentPatternController::CRecentPatternController()
+{
+	fCurrIdx = 0;
+}
+
+CRecentPatternController::~CRecentPatternController()
+{
+	for(uint32 i=0; i<fPatternVect.size(); ++i) 
+		delete fPatternVect[i];
+	fPatternVect.clear();
+}
+
+CRecentPatternController* CRecentPatternController::ActiveController()
+{
+	// TODO: later, we should double-dispatch this to the project roster,
+	// such that each project could have its own set of recent patterns.
+	return &sgRecentPatternController;
+}
+
+bool CRecentPatternController::AddCurrentPattern()
+{
+	BMessage* lastPatternMsg 
+		= fPatternVect.empty() ? NULL : fPatternVect.back();
+	if (!lastPatternMsg || gFindDialog->PatternInfoDiffersFrom(lastPatternMsg))
+	{	// current pattern is different than last, we add it:
+		BMessage* patternMsg = new BMessage();
+		gFindDialog->GetPatternInfo(patternMsg);
+		fPatternVect.push_back(patternMsg);
+		fCurrIdx = fPatternVect.size()-1;
+			// let index point to the pattern added just now
+		return true;
+	}
+	return false;
+}
+
+void CRecentPatternController::Next()
+{
+	if (fCurrIdx == fPatternVect.size()-1 && !fSavedPattern.IsEmpty())
+	{	// restore the saved pattern edited by user:
+		gFindDialog->SetPatternInfo(&fSavedPattern);
+	} 
+	else if (fCurrIdx < fPatternVect.size()-1)
+	{	// navigate downwards:
+		fCurrIdx++;
+		gFindDialog->SetPatternInfo(fPatternVect[fCurrIdx]);
+	}
+}
+
+void CRecentPatternController::Previous()
+{
+	if (fCurrIdx == fPatternVect.size()-1 
+	&& gFindDialog->PatternInfoDiffersFrom(fPatternVect.back()))
+	{	// save pattern edited by user before navigating upwards, such
+		// that the user can get back to this pattern when navigating 
+		// back downwards:
+		fSavedPattern.MakeEmpty();
+		gFindDialog->GetPatternInfo(&fSavedPattern);
+		gFindDialog->SetPatternInfo(fPatternVect[fCurrIdx]);
+	}
+	else if (fCurrIdx > 0)
+	{
+		// navigate upwards:
+		fCurrIdx--;
+		gFindDialog->SetPatternInfo(fPatternVect[fCurrIdx]);
+	}
+}
+
+void CRecentPatternController::GoToIndex(uint32 index)
+{
+	if (index < 0 || index >= fPatternVect.size())
+		return;
+	fCurrIdx = index;
+	gFindDialog->SetPatternInfo(fPatternVect[fCurrIdx]);
+}
+
+#pragma mark - CFindDialogKeyFilter
+
+class CFindDialogKeyFilter : public BMessageFilter
 {
   public:
-	CEnterKeyFilter();
+	CFindDialogKeyFilter();
 
 	virtual filter_result Filter(BMessage *msg, BHandler **target);
 };
 
-CEnterKeyFilter::CEnterKeyFilter()
+CFindDialogKeyFilter::CFindDialogKeyFilter()
 	: BMessageFilter(B_KEY_DOWN)
 {
 }
 
-filter_result CEnterKeyFilter::Filter(BMessage *msg, BHandler **target)
+filter_result CFindDialogKeyFilter::Filter(BMessage *msg, BHandler **target)
 {
 	int32 keychar, modifiers;
 	if (*target && msg->FindInt32("modifiers", &modifiers) == B_OK 
 		&& msg->FindInt32("raw_char", &keychar) == B_OK)
 	{
-		// if the user pressed return the given target will already be
-		// set to the default button, so we have to find out the focus
-		// view by accessing the preferred handler: 
-		BHandler* focusHandler = (*target)->Looper()->PreferredHandler();
-		BTextView* textview = dynamic_cast<BTextView*>(focusHandler);
-		if (textview && keychar == B_RETURN 
-			&& (modifiers & (B_SHIFT_KEY|B_OPTION_KEY))) {
-			// insert a newline into the focused textview:
-			char newline = '\n';
-			textview->Insert(&newline, 1);
-			textview->ScrollToSelection();
-			return B_SKIP_MESSAGE;
+		// if the user pressed return the given target will already
+		// be set to the default button, so we have to find out the
+		// focus view by accessing the preferred handler: 
+		BHandler* focusHandler 
+			= (*target)->Looper()->PreferredHandler();
+		BTextView* textview 
+			= dynamic_cast<BTextView*>(focusHandler);
+		if (!textview)
+			// we only want to filter keys pressed in a textview
+			return B_DISPATCH_MESSAGE;
+		switch(keychar)
+		{
+			case B_RETURN: 
+				if (modifiers & (B_CONTROL_KEY | B_OPTION_KEY))
+				{
+					// insert a newline into the focused textview:
+					char newline = '\n';
+					textview->Insert(&newline, 1);
+					textview->ScrollToSelection();
+					return B_SKIP_MESSAGE;
+				}
+				break;
+			case B_UP_ARROW:
+				if (modifiers & (B_CONTROL_KEY | B_OPTION_KEY)) 
+				{
+					CRecentPatternController::ActiveController()->Previous();
+					return B_SKIP_MESSAGE;
+				}
+				break;
+			case B_DOWN_ARROW:
+				if (modifiers & (B_CONTROL_KEY | B_OPTION_KEY))
+				{
+					CRecentPatternController::ActiveController()->Next();
+					return B_SKIP_MESSAGE;
+				}
+				break;
 		}
 	}
 	return B_DISPATCH_MESSAGE;
 }
+
+#pragma mark - CFindDialog
 
 CFindDialog::CFindDialog(BRect frame, const char *name,
 		window_type type, int flags, BWindow *owner)
@@ -163,8 +287,6 @@ CFindDialog::CFindDialog(BRect frame, const char *name,
 	fOpenWindowIndex = -1;
 	
 	UpdateFields();
-
-//	FillGrepPopup();
 } /* CFindDialog::CFindDialog */
 
 void CFindDialog::Create(void)
@@ -234,15 +356,10 @@ void CFindDialog::Create(void)
 
 	fEdiName = new HTextControl(fMainView, "name", H_FOLLOW_LEFT_BOTTOM);
 
-	AddCommonFilter(new CEnterKeyFilter());
+	AddCommonFilter(new CFindDialogKeyFilter());
 } // CFindDialog::Create
 
 void CFindDialog::Layout(void) {
-	BMenu *pop = fMfdPats->Menu();
-	pop->AddItem(new BMenuItem("Add this pattern…", new BMessage(msg_AddGrepPattern)));
-	pop->AddSeparatorItem();
-	FillGrepPopup();
-	//
 	fButFind	->ResizeLocalized("Find");
 	fButRepl	->ResizeLocalized("Replace");
 	fButRepF	->ResizeLocalized("Replace & Find");
@@ -379,6 +496,11 @@ void CFindDialog::DoFind(unsigned long cmd)
 {
 	if (!strlen(fEdiFind->Text()))
 		return;
+
+	// add this pattern to the list of recently used patterns:
+	if (CRecentPatternController::ActiveController()->AddCurrentPattern())
+		AddCurrentPatternToFindPopup(cmd != msg_Find);
+
 	if (fChkGrep->IsOn())
 	{
 		status_t res = fRegex.SetTo(fEdiFind->Text(), fChkCase->IsOn(), 
@@ -652,38 +774,19 @@ void CFindDialog::MessageReceived(BMessage *msg)
 				UpdateFields();
 				break;
 			
-			case msg_GrepPopup:
+			case msg_FindPopup:
 			{
 				long ix;
 				FailOSErr(msg->FindInt32("index", &ix));
 				
-				ix -= 2;
-				fEdiFind->SetText(gPrefs->GetIxPrefString(prf_X_GrepPatFind, ix));
-				fEdiRepl->SetText(gPrefs->GetIxPrefString(prf_X_GrepPatRepl, ix));
-				fChkGrep->SetOn(true);
+				CRecentPatternController::ActiveController()->GoToIndex(ix);
 				break;
 			}
 
 			case msg_PrefsChanged:
-				FillGrepPopup();
 				UpdateSearchDirMenu();
 				break;
 
-			case msg_AddGrepPattern:
-			{
-				int ix = fMfdPats->Menu()->CountItems() - 1;
-				char n[32];
-				sprintf(n, "Grep Pattern %d", ix);
-				ix--;
-				gPrefs->SetIxPrefString(prf_X_GrepPatName, ix, n);
-				gPrefs->SetIxPrefString(prf_X_GrepPatFind, ix, fEdiFind->Text());
-				gPrefs->SetIxPrefString(prf_X_GrepPatRepl, ix, fEdiRepl->Text());
-				FillGrepPopup();
-				
-				static_cast<PApp*>(be_app)->PostMessage(msg_AddGrepPattern);
-				break;
-			}
-			
 			default:
 				HDialog::MessageReceived(msg);
 				break;
@@ -792,25 +895,86 @@ char* CFindDialog::RxReplaceString(const char* what, int32 len)
 	return fRegex.ReplaceString(what, len, ReplaceString());
 }
 
-void CFindDialog::FillGrepPopup()
+#pragma mark - Pattern Info
+
+static const char* patternFlags[] = {
+	"back",
+	"btch",
+	"case",
+	"mult",
+	"recu",
+	"regx",
+	"text",
+	"word",
+	"wrap",
+	NULL
+};
+
+void CFindDialog::GetPatternInfo(BMessage* patternMsg)
 {
-	while (fMfdPats->Menu()->CountItems() > 2)
-	{
-		BMenuItem *mi = fMfdPats->Menu()->RemoveItem(2);
-		delete mi;
+	patternMsg->AddString("find", fEdiFind->Text());
+	patternMsg->AddString("repl", fEdiRepl->Text());
+	for( int f=0; patternFlags[f]; ++f)
+		patternMsg->AddBool(patternFlags[f], IsOn( patternFlags[f]));
+	patternMsg->AddInt32("meth", fMfdMeth->FindMarkedIndex());
+	patternMsg->AddString("sdir", fMfdSdir->Menu()->FindMarked()->Label());
+	patternMsg->AddInt32("namp", fMfdNamp->FindMarkedIndex());
+	patternMsg->AddString("name", fEdiName->Text());
+}
+
+void CFindDialog::SetPatternInfo(const BMessage* patternMsg)
+{
+	fEdiFind->SetText(patternMsg->FindString( "find"));
+	fEdiRepl->SetText(patternMsg->FindString( "repl"));
+	for( int f=0; patternFlags[f]; ++f)
+		SetOn(patternFlags[f], patternMsg->FindBool(patternFlags[f]));
+	BMenuItem* item = fMfdMeth->Menu()->ItemAt(patternMsg->FindInt32("meth"));
+	if (item)
+		item->SetMarked(true);
+	item = fMfdSdir->Menu()->FindItem(patternMsg->FindString( "sdir"));
+	if (item)
+		item->SetMarked(true);
+	item = fMfdNamp->Menu()->ItemAt(patternMsg->FindInt32( "namp"));
+	if (item)
+		item->SetMarked(true);
+	fEdiName->SetText(patternMsg->FindString( "name"));
+	UpdateFields();
+}
+
+bool CFindDialog::PatternInfoDiffersFrom(const BMessage* patternMsg)
+{
+	bool res = false;
+	if (strcmp(fEdiFind->Text(), patternMsg->FindString( "find")) != 0
+	|| strcmp(fEdiRepl->Text(), patternMsg->FindString( "repl")) != 0)
+		res = true;
+	for( int f=0; !res && patternFlags[f]; ++f)
+		if (IsOn(patternFlags[f]) != patternMsg->FindBool(patternFlags[f]))
+			res = true;
+	return res;
+}
+
+void CFindDialog::AddCurrentPatternToFindPopup(bool showReplaceText)
+{
+	BString label = fEdiFind->Text();
+	label.ReplaceAll("\n", "\\n");
+	if (label.Length() > 60) {
+		label.Truncate(60);
+		label << B_UTF8_ELLIPSIS;
 	}
-	
-	int i = 0;
-	const char *name;
-	
-	do
+	if (showReplaceText)
 	{
-		name = gPrefs->GetIxPrefString(prf_X_GrepPatName, i++);
-		if (name)
-			fMfdPats->Menu()->AddItem(new BMenuItem(name, new BMessage(msg_GrepPopup)));
+		BString repl = fEdiRepl->Text();
+		repl.ReplaceAll("\n", "\\n");
+		label << " ---> " << repl;
+		if (label.Length() > 80) {
+			label.Truncate(80);
+			label << B_UTF8_ELLIPSIS;
+		}
 	}
-	while (name);
-} /* CFindDialog::FillGrepPopup */
+	BMenuItem* item 
+		= new BMenuItem(label.String(), new BMessage(msg_FindPopup));
+	fMfdPats->Menu()->AddItem(item);
+}
 
 #pragma mark - Multi file
 
