@@ -316,7 +316,7 @@ void PDoc::HighlightErrorPos(int errorPos)
 {
 	fText->Select(errorPos, errorPos+mcharlen(fText->Text()+errorPos), 
 				  true, false);
-	fText->CenterSelection();
+	fText->ScrollToSelection(false);
 }
 
 void PDoc::SetText(const BString& docText)
