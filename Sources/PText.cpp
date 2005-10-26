@@ -936,7 +936,7 @@ void PText::Undo()
 			cmd->Undo();
 			fDoneCmds.pop();
 			fUndoneCmds.push(cmd);
-			ScrollToCaret();
+			ScrollToSelection(false);
 		}
 		cmd = fDoneCmds.size() ? fDoneCmds.top() : NULL;
 		if (fLastSavedStateCmd == cmd)
@@ -967,7 +967,7 @@ void PText::Redo()
 			cmd->Redo();
 			fUndoneCmds.pop();
 			fDoneCmds.push(cmd);
-			ScrollToCaret();
+			ScrollToSelection(false);
 		}
 		
 		if (fLastSavedStateCmd == cmd)
@@ -1552,55 +1552,131 @@ void PText::ScrollToCaret()
 	ScrollToOffset(fCaret, fActivePart);
 } /* PText::ScrollToCaret */
 
-void PText::ScrollToOffset(int offset, int part)
+BRect PText::PartBounds(int part)
 {
 	BRect b(fBounds);
-	BPoint p = Offset2Position(offset);
-	int line = Offset2Line(offset);
-	g_unit_t y = -1, x = -1;
-	
 	if (part == 1)
 		b.bottom = fSplitAt - kSplitterHeight;
 	else
 		b.top = fSplitAt;
+	return b;
+}
 
-	if (fAnchor < offset && line < LineCount() - 1 && LineStart(line) == offset)
-	{
+void PText::ScrollToOffset(int offset, int part)
+{
+	BRect b(PartBounds(part));
+	BPoint p = Offset2Position(offset);
+	int line = Offset2Line(offset);
+	g_unit_t y = -1;
+	
+	if (fAnchor < offset && line < LineCount() - 1 && LineStart(line) == offset)	{
 		line--;
 		p.y -= fLineHeight;
 	}
 	
 	if (p.y < b.top)
-	{
 		y = line * fLineHeight;
-	}
 	else if (p.y + fLineHeight > b.bottom)
-	{
 		y = (line + 1) * fLineHeight - b.Height() + 2;
-	}
 	
-	if (p.x < b.left + 3)
-		x = max((g_unit_t)0, p.x - 3);
-	else if (p.x > b.right - 3)
-		x = p.x - b.Width() + 3;
-	
-	if (y >= 0 || x >= -1)
+	if (y >= 0)
 	{
-		if (y >= 0)
-		{
-			Window()->UpdateIfNeeded();
-			if (part == 1)
-				fVScrollBar1->SetValue(y);
-			else
-				fVScrollBar2->SetValue(y);
-		}
-		
-		if (x >= 0)
-			fHScrollBar->SetValue(x);
-
-		Window()->UpdateIfNeeded();
+		if (part == 2)
+			fVScrollBar2->SetValue(y);
+		else
+			fVScrollBar1->SetValue(y);
 	}
+
+	HorizontallyScrollToSelection(p.x, p.x, false);
 } /* PText::ScrollToOffset */
+
+void PText::ScrollToSelection(bool centerVertically)
+{
+	BRect b(PartBounds(fActivePart));
+	g_unit_t y = -1;
+	int top = Offset2Line(min(fAnchor, fCaret));
+	int bottom = Offset2Line(max(fAnchor, fCaret));
+
+	if (centerVertically) 
+	{
+		g_unit_t h = (fSplitAt == 0 || fActivePart == 2) 
+							? Bounds().bottom - fSplitAt
+							: fSplitAt;
+		int cnt = bottom - top + 1;
+		if (cnt * fLineHeight < h)
+		{
+			cnt = (int)((h / fLineHeight) - cnt) / 2;
+			top -= cnt;
+		}
+		y = top * fLineHeight;
+	} 
+	else
+	{
+		const int contextLines = 3;
+			// number of context lines visible at bottom or top edge
+		BPoint startPos = Offset2Position(LineStart(top));
+		BPoint endPos = Offset2Position(LineStart(bottom));
+		if (endPos.y + (1+contextLines)*fLineHeight > b.bottom)
+		{
+			y = MIN(LineCount(), bottom + 1 + contextLines) 
+					* fLineHeight - b.Height() + 2;
+		}
+		if (startPos.y < b.top + contextLines*fLineHeight)
+		{
+			y = MAX(0, top - contextLines) * fLineHeight;
+		}
+	}
+
+	if (y >= 0)
+	{
+		if (fSplitAt == 0 || fActivePart == 2)
+			fVScrollBar2->SetValue(y);
+		else
+			fVScrollBar1->SetValue(y);
+	}
+
+	HorizontallyScrollToSelection(Offset2Position(min(fAnchor, fCaret)).x,
+											Offset2Position(max(fAnchor, fCaret)).x,
+											true);
+} /* PText::ScrollToSelection */
+
+void PText::HorizontallyScrollToSelection(g_unit_t startPos,
+														g_unit_t endPos,
+														bool keepContext)
+{
+	BRect b(fBounds);
+	g_unit_t x = -1;
+
+	if (keepContext && endPos < b.Width() - 3)
+	{
+		// move offset to left edge if possible
+		x = 0;
+	} 
+	else
+	{
+		const int contextPixels = keepContext ? 20 : 0;
+			// number of context pixels visible at left or right edge
+		if (endPos + contextPixels > b.right - 3)
+			x = endPos + contextPixels - b.Width() + 3;
+		if (startPos - contextPixels < b.left + 3)
+			x = max((g_unit_t)0, MAX(0, startPos - contextPixels - 3));
+	}
+	
+	/*
+	 * [zooey]: actually, the way pe implements the split-view is not only
+	 *				cumbersome but also buggy: when one part of the splitview 
+	 *			   is scrolled horizontally in order to make the selection 
+	 *          visible, the other part is scrolled, too, as there is of
+	 *				course only one scrollbar/-view! This kind of suxors...
+	 *				It think it'd be much nicer and more versatile to implement
+	 *				each splitview as a view of its own right (just like Eddie
+	 *				seems to do it).
+	 */
+	if (x >= 0)
+		fHScrollBar->SetValue(x);
+
+	Window()->UpdateIfNeeded();
+} /* PText::MakeSelectionVisible */
 
 void PText::FrameResized(float /*w*/, float /*h*/)
 {
@@ -1699,37 +1775,6 @@ void PText::ScrollTo(BPoint p)
 
 	Doc()->ToolBar()->SetHOffset(-p.x + 3);
 } /* PText::ScrollBy */
-
-void PText::CenterSelection()
-{
-	int top, cnt;
-	
-	top = Offset2Line(min(fAnchor, fCaret));
-	cnt = Offset2Line(max(fAnchor, fCaret)) - top + 1;
-	
-	if (fSplitAt == 0 || fActivePart == 2)
-	{
-		float h = Bounds().bottom - fSplitAt;
-
-		if (cnt * fLineHeight < h)
-		{
-			cnt = (int)((h / fLineHeight) - cnt) / 2;
-			top -= cnt;
-		}
-		
-		fVScrollBar2->SetValue(top * fLineHeight);
-	}
-	else
-	{
-		if (cnt * fLineHeight < fSplitAt)
-		{
-			cnt = (int)((fSplitAt / fLineHeight) - cnt) / 2;
-			top -= cnt;
-		}
-		
-		fVScrollBar1->SetValue(top * fLineHeight);
-	}
-} /* PText::CenterSelection */
 
 #pragma mark - Mouse
 
@@ -2154,47 +2199,64 @@ bool PText::WaitMouseMoved(BPoint where)
 	return true;
 } /* PText::WaitMouseMoved */
 
-class CSeparatorItem : public BSeparatorItem
+#pragma mark - Function Popup
+
+class CSeparatorItem : public BMenuItem
 {
 public:
 	CSeparatorItem(const char* label) 
-		: fLabel(label) 						{}
-	bool IsUnnamed() const 					{ return fLabel.Length()==0; }
+		: BMenuItem(label, NULL)			{ SetEnabled(false); }
+	bool IsUnnamed() const;
 protected:
 	virtual void Draw();
 	virtual void DrawContent();
-	BString fLabel;
 };
+
+bool CSeparatorItem::IsUnnamed() const
+{
+	return Label()==NULL || *Label()=='\0'; 
+}
 
 void CSeparatorItem::Draw()
 {
-	BSeparatorItem::Draw();
 	DrawContent();
 }
 
 void CSeparatorItem::DrawContent()
 {
-	if (!fLabel.Length())
-		return;
 	BRect frame = Menu()->Frame();
-	float labelWidth = Menu()->StringWidth(fLabel.String());
+	float labelWidth = Menu()->StringWidth(Label());
 	const int rightOffset = 15;
-	const int lineDist = 2;
-	BPoint labelPT(frame.right - rightOffset - labelWidth - 2*lineDist, 
+	const int lineDist = labelWidth==0 ? 0 : 2;
+	BPoint labelPT(frame.right - rightOffset - labelWidth - lineDist, 
 						ContentLocation().y);
+	float width, height;
+	GetContentSize(&width, &height);
+	float topY = labelPT.y+height/2;
+	float bottomY = labelPT.y+height/2+1;
+	const rgb_color lightCol = { 245, 245, 245, 255 };
+	Menu()->BeginLineArray(4);
+	Menu()->AddLine(BPoint(0, topY), 
+						 BPoint(labelPT.x-lineDist, topY),
+						 gColor[kCommentColor]);
+	Menu()->AddLine(BPoint(labelPT.x+labelWidth+2*lineDist, topY), 
+						 BPoint(frame.right, topY),
+						 gColor[kCommentColor]);
+	Menu()->AddLine(BPoint(0, bottomY), 
+						 BPoint(labelPT.x-lineDist, bottomY),
+						 lightCol);
+	Menu()->AddLine(BPoint(labelPT.x+labelWidth+2*lineDist, bottomY), 
+						 BPoint(frame.right, bottomY),
+						 lightCol);
+	Menu()->EndLineArray();
 	BFont font;
 	font_height fontHeight;
 	Menu()->GetFont(&font);
 	font.GetHeight(&fontHeight);
-	float labelHeight = fontHeight.ascent + fontHeight.descent;
-	Menu()->FillRect(BRect(labelPT.x, labelPT.y, 
-								  labelPT.x+labelWidth+2*lineDist, 
-								  labelPT.y+labelHeight-1),
-						  B_SOLID_LOW);
-	Menu()->MovePenTo(labelPT.x+lineDist, labelPT.y+fontHeight.ascent-3);
+	Menu()->MovePenTo(labelPT.x+lineDist, labelPT.y+fontHeight.ascent);
 	rgb_color highCol = Menu()->HighColor();
 	Menu()->SetHighColor(gColor[kCommentColor]);
-	Menu()->DrawString(fLabel.String());
+	Menu()->DrawString(Label());
 	Menu()->SetHighColor(highCol);
 }
 
@@ -3982,9 +4044,9 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 					ChangeSelection(offset, offset + wl);
 
 					if (gPrefs->GetPrefInt(prf_I_CenterFound, 0))
-						CenterSelection();
+						ScrollToSelection(true);
 					else
-						ScrollToCaret();
+						ScrollToSelection(false);
 				}
 				else
 				{
@@ -5489,7 +5551,7 @@ void PText::MessageReceived(BMessage *msg)
 				if (line > 0 && line < LineCount())
 				{
 					ChangeSelection(LineStart(line), LineStart(line - 1));
-					CenterSelection();
+					ScrollToSelection(true);
 				}
 				else
 					beep();
@@ -5679,7 +5741,7 @@ void PText::MessageReceived(BMessage *msg)
 				to = to < LineCount() - 1 ? LineStart(to) : fText.Size();
 					
 				ChangeSelection(from, to);
-				CenterSelection();
+				ScrollToSelection(true);
 				break;
 			}
 			
@@ -5689,9 +5751,7 @@ void PText::MessageReceived(BMessage *msg)
 				FailOSErr(msg->FindInt32("line", &line));
 				line = RealLine2Line(line);
 				SelectLine(line);
-				
-				if (gPrefs->GetPrefInt(prf_I_CenterFound))
-					CenterSelection();
+				ScrollToSelection(true);
 				break;
 			}
 			
@@ -5715,7 +5775,7 @@ void PText::MessageReceived(BMessage *msg)
 					Window()->Activate();
 				
 				ChangeSelection(a, c);
-				CenterSelection();
+				ScrollToSelection(true);
 				break;
 			}
 			

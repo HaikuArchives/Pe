@@ -138,6 +138,7 @@ virtual		void FrameResized(float w, float h);
 			void ScrollBarChanged(BScrollBar *bar, g_unit_t newValue);
 			void ScrollToCaret();
 			void ScrollToOffset(int offset, int part);
+			void ScrollToSelection(bool centerVertically);
 	virtual	void ScrollTo(BPoint p);
 
 			void ShowTabStops(bool show);
@@ -269,8 +270,12 @@ virtual		void FrameResized(float w, float h);
 			PDoc* Doc() const;
 
 private:
+			void HorizontallyScrollToSelection(g_unit_t startPos,
+														  g_unit_t endPos,
+														  bool keepContext);
 			BRect CursorFrame(int caret);
 			void SetupBitmap();
+			BRect PartBounds(int part);
 			
 			BBitmap *fLineMap;
 			BView	*fLineView;
