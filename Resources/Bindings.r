@@ -71,6 +71,8 @@ resource rtyp_Cmnd (rid_Cmnd_Editing, "Editing commands") {
 		kmsg_ExtendSelectionToBeginningOfFile,		"Extend Selection to Beginning of File",
 		kmsg_ExtendSelectionToEndOfPage,			"Extend Selection to End of Page",
 		kmsg_ExtendSelectionToBeginningOfPage,		"Extend Selection to Beginning of Page",
+		kmsg_ExtendSelectionToNextPage,				"Extend Selection to Next Page",
+		kmsg_ExtendSelectionToPreviousPage,			"Extend Selection to Previous Page",
 //		kmsg_ExtendSelectionToCurrentLine,			"Extend Selection to Current Line",
 		kmsg_ExtendSelectionToNextLine,				"Extend Selection to Next Line",
 		kmsg_ExtendSelectionToPreviousLine,			"Extend Selection to Previous Line",

@@ -70,6 +70,8 @@
 #define kmsg_ExtendSelectionToNextLine					'Snxl'
 #define kmsg_ExtendSelectionToBeginningOfLine			'Sbol'
 #define kmsg_ExtendSelectionToEndOfLine					'Seol'
+#define kmsg_ExtendSelectionToPreviousPage				'Sprp'
+#define kmsg_ExtendSelectionToNextPage					'Snxp'
 #define kmsg_ExtendSelectionToBeginningOfPage			'Sbop'
 #define kmsg_ExtendSelectionToEndOfPage					'Seop'
 #define kmsg_ExtendSelectionToBeginningOfFile			'Sbof'
