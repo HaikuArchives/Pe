@@ -247,6 +247,7 @@ void PText::ReInit()
 	fMetrics = CFontStyle::Locate(ff, fs, fFont.Size());
 
 	fTabWidth = fTabStops * StringWidth(" ", 1);
+	fDefaultCharWidth = StringWidth("m", 1);
 	
 	if (Window())
 	{
@@ -602,7 +603,7 @@ void PText::SelectLine(int lineNr)
 	int f = LineStart(lineNr);
 	int t = lineNr < LineCount() - 1 ? LineStart(lineNr + 1) : fText.Size();
 	ChangeSelection(f, t);
-	ScrollToCaret();
+	ScrollToCaret(true);
 	fStatus->SetOffset(fCaret);
 } /* PText::SelectLine */
 
@@ -610,7 +611,7 @@ void PText::SetCaret(int newCaret)
 {
 	HideCaret();
 	fStatus->SetOffset(fAnchor = fCaret = max(0, min(newCaret, fText.Size())));
-	ScrollToCaret();
+	ScrollToCaret(false);
 	ShowCaret();
 } /* PText::SetCaret */
 
@@ -936,7 +937,7 @@ void PText::Undo()
 			cmd->Undo();
 			fDoneCmds.pop();
 			fUndoneCmds.push(cmd);
-			ScrollToSelection(false);
+			ScrollToCaret(true);
 		}
 		cmd = fDoneCmds.size() ? fDoneCmds.top() : NULL;
 		if (fLastSavedStateCmd == cmd)
@@ -967,7 +968,7 @@ void PText::Redo()
 			cmd->Redo();
 			fUndoneCmds.pop();
 			fDoneCmds.push(cmd);
-			ScrollToSelection(false);
+			ScrollToCaret(true);
 		}
 		
 		if (fLastSavedStateCmd == cmd)
@@ -1222,7 +1223,7 @@ void PText::CharKeyDown(const char *bytes, int numBytes)
 	
 	fWalkOffset = Offset2Position(fCaret).x;
 	RedrawDirtyLines();
-	ScrollToCaret();
+	ScrollToCaret(true);
 } /* PText::CharKeyDown */
 
 void PText::TextChanged(int from, int to)
@@ -1547,9 +1548,9 @@ void PText::AdjustScrollBars()
 	fHScrollBar->SetSteps(fTabWidth/fTabStops, fBounds.Width() / 2);
 } /* PText::AdjustScrollBars */
 
-void PText::ScrollToCaret()
+void PText::ScrollToCaret(bool keepContext)
 {
-	ScrollToOffset(fCaret, fActivePart);
+	ScrollToOffset(fCaret, fActivePart, keepContext);
 } /* PText::ScrollToCaret */
 
 BRect PText::PartBounds(int part)
@@ -1562,42 +1563,39 @@ BRect PText::PartBounds(int part)
 	return b;
 }
 
-void PText::ScrollToOffset(int offset, int part)
+void PText::ScrollToOffset(int offset, int part, bool keepContext)
 {
-	BRect b(PartBounds(part));
-	BPoint p = Offset2Position(offset);
-	int line = Offset2Line(offset);
-	g_unit_t y = -1;
-	
-	if (fAnchor < offset && line < LineCount() - 1 && LineStart(line) == offset)	{
-		line--;
-		p.y -= fLineHeight;
-	}
-	
-	if (p.y < b.top)
-		y = line * fLineHeight;
-	else if (p.y + fLineHeight > b.bottom)
-		y = (line + 1) * fLineHeight - b.Height() + 2;
-	
-	if (y >= 0)
-	{
-		if (part == 2)
-			fVScrollBar2->SetValue(y);
-		else
-			fVScrollBar1->SetValue(y);
-	}
-
-	HorizontallyScrollToSelection(p.x, p.x, false);
+	HideCaret();
+	VerticallyScrollToSelection(offset, offset, keepContext, false, part);
+	HorizontallyScrollToSelection(offset, offset, keepContext);
+	ShowCaret();
+	Window()->UpdateIfNeeded();
 } /* PText::ScrollToOffset */
 
-void PText::ScrollToSelection(bool centerVertically)
+void PText::ScrollToSelection(bool keepContext, bool centerVertically)
 {
-	BRect b(PartBounds(fActivePart));
-	g_unit_t y = -1;
-	int top = Offset2Line(min(fAnchor, fCaret));
-	int bottom = Offset2Line(max(fAnchor, fCaret));
+	int startOffset = min(fAnchor, fCaret);
+	int endOffset = max(fAnchor, fCaret);
+	VerticallyScrollToSelection(startOffset, endOffset, keepContext, 
+								centerVertically);
+	HorizontallyScrollToSelection(startOffset, endOffset, keepContext);
+	Window()->UpdateIfNeeded();
+} /* PText::ScrollToSelection */
 
-	if (centerVertically) 
+void PText::VerticallyScrollToSelection(int startOffset,
+										int endOffset,
+										bool keepContext,
+										bool centered,
+										int part)
+{
+	if (part < 0)
+		part = fActivePart;
+	BRect b(PartBounds(part));
+	g_unit_t y = -1;
+	int top = Offset2Line(startOffset);
+	int bottom = Offset2Line(endOffset);
+
+	if (centered) 
 	{
 		g_unit_t h = (fSplitAt == 0 || fActivePart == 2) 
 							? Bounds().bottom - fSplitAt
@@ -1612,16 +1610,19 @@ void PText::ScrollToSelection(bool centerVertically)
 	} 
 	else
 	{
-		const int contextLines = 3;
+		const int contextLines 
+			= keepContext 
+				? gPrefs->GetPrefInt(prf_I_ContextLines, 3)
+				: 0;
 			// number of context lines visible at bottom or top edge
-		BPoint startPos = Offset2Position(LineStart(top));
-		BPoint endPos = Offset2Position(LineStart(bottom));
-		if (endPos.y + (1+contextLines)*fLineHeight > b.bottom)
+		g_unit_t startPos = Offset2Position(LineStart(top)).y;
+		g_unit_t endPos = Offset2Position(LineStart(bottom)).y;
+		if (endPos + (1+contextLines)*fLineHeight > b.bottom)
 		{
 			y = MIN(LineCount(), bottom + 1 + contextLines) 
 					* fLineHeight - b.Height() + 2;
 		}
-		if (startPos.y < b.top + contextLines*fLineHeight)
+		if (startPos < b.top + contextLines*fLineHeight)
 		{
 			y = MAX(0, top - contextLines) * fLineHeight;
 		}
@@ -1629,53 +1630,49 @@ void PText::ScrollToSelection(bool centerVertically)
 
 	if (y >= 0)
 	{
-		if (fSplitAt == 0 || fActivePart == 2)
+		if (fSplitAt == 0 || part == 2)
 			fVScrollBar2->SetValue(y);
 		else
 			fVScrollBar1->SetValue(y);
 	}
+} /* PText::MakeSelectionVisible */
 
-	HorizontallyScrollToSelection(Offset2Position(min(fAnchor, fCaret)).x,
-											Offset2Position(max(fAnchor, fCaret)).x,
-											true);
-} /* PText::ScrollToSelection */
-
-void PText::HorizontallyScrollToSelection(g_unit_t startPos,
-														g_unit_t endPos,
-														bool keepContext)
+void PText::HorizontallyScrollToSelection(int startOffset, 
+										  int endOffset,
+										  bool keepContext)
 {
+	g_unit_t startPos = Offset2Position(startOffset).x;
+	g_unit_t endPos = Offset2Position(endOffset).x;
+	if (endPos < startPos)
+		swap(startPos, endPos);
+
 	BRect b(fBounds);
 	g_unit_t x = -1;
 
-	if (keepContext && endPos < b.Width() - 3)
-	{
-		// move offset to left edge if possible
-		x = 0;
-	} 
-	else
-	{
-		const int contextPixels = keepContext ? 20 : 0;
-			// number of context pixels visible at left or right edge
-		if (endPos + contextPixels > b.right - 3)
-			x = endPos + contextPixels - b.Width() + 3;
-		if (startPos - contextPixels < b.left + 3)
-			x = max((g_unit_t)0, MAX(0, startPos - contextPixels - 3));
-	}
+	float contextPixels 
+		= keepContext
+			? gPrefs->GetPrefInt(prf_I_ContextChars, 5) 
+				* fDefaultCharWidth
+			: 0.0;
+		// number of context pixels visible at left or right edge
+
+	if (endPos + contextPixels > b.right - 3)
+		x = endPos + contextPixels - b.Width() + 3;
+	if (startPos - contextPixels < b.left + 3)
+		x = MAX(0, startPos - contextPixels - 3);
 	
 	/*
 	 * [zooey]: actually, the way pe implements the split-view is not only
-	 *				cumbersome but also buggy: when one part of the splitview 
-	 *			   is scrolled horizontally in order to make the selection 
+	 *			cumbersome but also buggy: when one part of the splitview
+	 *			is scrolled horizontally in order to make the selection
 	 *          visible, the other part is scrolled, too, as there is of
-	 *				course only one scrollbar/-view! This kind of suxors...
-	 *				It think it'd be much nicer and more versatile to implement
-	 *				each splitview as a view of its own right (just like Eddie
-	 *				seems to do it).
+	 *			course only one scrollbar/-view! This kind of suxors...
+	 *			I think it'd be much nicer and more versatile to implement
+	 *			each splitview as a view of its own right (just like Eddie
+	 *			seems to do it).
 	 */
 	if (x >= 0)
 		fHScrollBar->SetValue(x);
-
-	Window()->UpdateIfNeeded();
 } /* PText::MakeSelectionVisible */
 
 void PText::FrameResized(float /*w*/, float /*h*/)
@@ -1697,11 +1694,8 @@ void PText::FrameResized(float /*w*/, float /*h*/)
 
 void PText::ScrollBarChanged(BScrollBar *bar, g_unit_t dy)
 {
-	BRect src, dst;
-	
-	do {
-		src = fBounds & ConvertFromScreen(BScreen().Frame());
-	} while (false);
+	BRect src = fBounds & ConvertFromScreen(BScreen().Frame());
+	BRect dst;
 	
 	if (fCaretVisible && ((fActivePart == 1) == (fVScrollBar1 == bar)))
 	{
@@ -1764,8 +1758,8 @@ void PText::ScrollBarChanged(BScrollBar *bar, g_unit_t dy)
 
 	BRect dirty(src & fBounds);
 	
-		Invalidate(dirty);
-		Window()->UpdateIfNeeded();
+	Invalidate(dirty);
+	Window()->UpdateIfNeeded();
 
 } /* PText::ScrollBarChanged */
 
@@ -1974,7 +1968,7 @@ void PText::MouseDown(BPoint where)
 				
 				v = fActivePart == 1 ? fVScrollBar1->Value() : fVScrollBar2->Value();
 
-				ScrollToCaret();
+				ScrollToCaret(false);
 				fStatus->SetOffset(fCaret);
 				
 				where = cur;
@@ -2075,7 +2069,7 @@ void PText::TrackDrag(BPoint where)
 		fAnchor = fSavedAnchor;
 		fCaret = fSavedCaret;
 		
-		ScrollToOffset(offset, part);
+		ScrollToOffset(offset, part, false);
 	}
 	else if (offset != fCaret)
 		SetCaret(offset);
@@ -3096,22 +3090,13 @@ void PText::Kiss(int ch)
 		beep();
 	else
 	{
-		int a, c;
-
-		a = fAnchor;
-		c = fCaret;
-	
-		float curPos = fActivePart == 1 ? fVScrollBar1->Value() : fVScrollBar2->Value();
-
+		int a = fAnchor;
+		int	c = fCaret;
 		ChangeSelection(pp - 1, pp);
-		ScrollToCaret();
+		ScrollToSelection(true, false);
 		snooze(150000);
 		ChangeSelection(a, c);
-
-		if (fActivePart == 1)
-			fVScrollBar1->SetValue(curPos);
-		else
-			fVScrollBar2->SetValue(curPos);
+		ScrollToSelection(true, false);
 	}
 } /* PText::Kiss */
 
@@ -3261,18 +3246,18 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 				if (gGlossary->IsGlossaryShortcut(key, modifiers))
 				{
 					GlossaryKey(key, modifiers);
-					ScrollToCaret();
+					ScrollToCaret(true);
 				}
 				break;
 			
 			case B_BACKSPACE:
 				BackspaceKeyDown();
-				ScrollToCaret();
+				ScrollToCaret(true);
 				break;
 			
 			case B_DELETE:
 				DeleteKeyDown();
-				ScrollToCaret();
+				ScrollToCaret(true);
 				break;
 			
 			case B_ESCAPE:
@@ -3300,7 +3285,7 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 					CharKeyDown(bytes, numBytes);
 				}
 				
-				ScrollToCaret();
+				ScrollToCaret(true);
 				break;
 			}
 		}
@@ -3336,6 +3321,8 @@ bool PText::DoKeyCommand(BMessage *msg)
 	int linesPerPage = (int)floor((fActivePart == 1 ? fSplitAt : h - fSplitAt) / fLineHeight) - 1;
 	int topline = (int)floor(barValue / fLineHeight);
 	int lastMark = fMark;
+	
+	int contextLines = gPrefs->GetPrefInt(prf_I_ContextLines, 3);
 	
 	bool scroll = true, handled = true, extend = fCaret != fAnchor, catchOffset = true;
 	bool clearLastCommand = true;
@@ -3424,28 +3411,26 @@ bool PText::DoKeyCommand(BMessage *msg)
 			line = max(0, line - linesPerPage);
 			newAnchor = newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
-			scroll = false;
 			break;
 		case kmsg_MoveToNextPage:
 			bar->SetValue(barValue + linesPerPage * fLineHeight);
 			line = min(LineCount() - 1, line + linesPerPage);
 			newAnchor = newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
-			scroll = false;
 			break;
 		case kmsg_MoveToTopOfPage:
-			if (line > topline + 1)
-				line = topline;
+			if (line > topline + contextLines)
+				line = topline + contextLines;
 			else
-				line = max(0, line - linesPerPage);
+				line = max(0, line - MAX(1,linesPerPage - 2*contextLines));
 			newAnchor = newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
 			break;
 		case kmsg_MoveToBottomOfPage:
-			if (line + 1 < topline + linesPerPage)
-				line = min(LineCount() - 1, topline + linesPerPage);
+			if (line + 1 < topline + linesPerPage - contextLines)
+				line = min(LineCount() - 1, topline + linesPerPage - contextLines);
 			else
-				line = min(LineCount() - 1, line + linesPerPage);
+				line = min(LineCount() - 1, line + MAX(1,linesPerPage - 2*contextLines));
 			newAnchor = newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
 			break;
@@ -3519,16 +3504,12 @@ bool PText::DoKeyCommand(BMessage *msg)
 			if (line > 0) 
 			{
 				if (fAnchor != fCaret) 
-				{
 					// extend selection
 					newCaret = LineStart(line - 1)
 								+ LinePosition2Offset(line - 1, fWalkOffset);
-				} 
 				else 
-				{
 					// start selection
 					newCaret = Column2Offset(line - 1, Offset2Column(fCaret));
-				}
 			} 
 			else
 				newCaret = 0;
@@ -3541,14 +3522,12 @@ bool PText::DoKeyCommand(BMessage *msg)
 			if (line < LineCount() - 1) 
 			{
 				if (fAnchor != fCaret) 
-				{
 					// extend selection
 					newCaret = LineStart(line + 1)
 								+ LinePosition2Offset(line + 1, fWalkOffset);
-				} else {
+				else 
 					// start selection
 					newCaret = Column2Offset(line + 1, Offset2Column(fCaret));
-				}
 			} 
 			else
 				newCaret = fText.Size();
@@ -3562,34 +3541,35 @@ bool PText::DoKeyCommand(BMessage *msg)
 			else	
 				newCaret = fText.Size();
 			break;
+		case kmsg_ExtendSelectionToPreviousPage:
+			extend = true;
+			bar->SetValue(barValue - linesPerPage * fLineHeight);
+			line = max(0, line - linesPerPage);
+			newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
+			catchOffset = false;
+			break;
+		case kmsg_ExtendSelectionToNextPage:
+			extend = true;
+			bar->SetValue(barValue + linesPerPage * fLineHeight);
+			line = min(LineCount() - 1, line + linesPerPage);
+			newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
+			catchOffset = false;
+			break;
 		case kmsg_ExtendSelectionToBeginningOfPage:
 			extend = true;
-			if (line > topline)
-			{
-				// Move caret to the top of the page, unless the current
-				// selection extends beyond the top and the caret is located
-				// at the beginning of the second visible line. We do this
-				// to work around a feature of ScrollToOffset() -- when the
-				// caret is at the beginning of the line, it scrolls such
-				// that the last line of the selection is visible.
-				if (line == topline + 1 && fCaret > fAnchor
-					&& fCaret == LineStart(line)
-					&& Offset2Line(fAnchor) < topline)
-					line = max(0, line - linesPerPage);
-				else
-					line = topline;
-			}
+			if (line > topline + contextLines)
+				line = topline + contextLines;
 			else
-				line = max(0, line - linesPerPage);
+				line = max(0, line - MAX(1,linesPerPage - 2*contextLines));
 			newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
 			break;
 		case kmsg_ExtendSelectionToEndOfPage:
 			extend = true;
-			if (line + 1 < topline + linesPerPage)
-				line = min(LineCount() - 1, topline + linesPerPage);
+			if (line + 1 < topline + linesPerPage - contextLines)
+				line = min(LineCount() - 1, topline + linesPerPage - contextLines);
 			else
-				line = min(LineCount() - 1, line + linesPerPage);
+				line = min(LineCount() - 1, line + MAX(1,linesPerPage - 2*contextLines));
 			newCaret = LineStart(line) + LinePosition2Offset(line, fWalkOffset);
 			catchOffset = false;
 			break;
@@ -3764,7 +3744,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 		fWalkOffset = Offset2Position(fCaret).x;
 
 	if (scroll)
-		ScrollToCaret();
+		ScrollToCaret(true);
 	
 	if (lastMark != fMark)
 		RedrawDirtyLines();
@@ -4044,9 +4024,9 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 					ChangeSelection(offset, offset + wl);
 
 					if (gPrefs->GetPrefInt(prf_I_CenterFound, 0))
-						ScrollToSelection(true);
+						ScrollToSelection(true, true);
 					else
-						ScrollToSelection(false);
+						ScrollToSelection(true, false);
 				}
 				else
 				{
@@ -4090,22 +4070,13 @@ void PText::JumpToFunction(const char *func, int offset)
 	a = fAnchor;
 	c = fCaret;
 
-	BScrollBar *bar;
-
-	if (fActivePart == 1)
-		bar = fVScrollBar1;
-	else
-		bar = fVScrollBar2;
-	
 	if (FindNext(func, offset, false, false, false, false, false, false) ||
 		FindNext(func, offset, false, false, true, false, false, false))
 	{
 		swap(fAnchor, a);
 		swap(fCaret, c);
-
-		int line = Offset2Line(a);
-		bar->SetValue(line * fLineHeight);
 		ChangeSelection(a, c);
+		ScrollToSelection(true, true);
 	}
 	else
 		ChangeSelection(ls, ls);
@@ -4741,29 +4712,21 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 		}
 		else
 		{
+			if (a > s)
+				r.left = Offset2Position(a).x - hv;
+			else
+				r.left = hv ? 0 : 3;
+
+			if (c < e || (lineNr == LineCount() - 1 && c == fText.Size()))
+				r.right = Offset2Position(c).x - hv;
+
 			if (fWindowActive)
 			{
-				if (a > s)
-					r.left = Offset2Position(a).x - hv;
-				else
-					r.left = 3;
-	
-				if (c < e || (lineNr == LineCount() - 1 && c == fText.Size()))
-					r.right = Offset2Position(c).x - hv;
-	
 				vw->SetLowColor(gColor[kSelectionColor]);
 				vw->FillRect(r, B_SOLID_LOW);
 			}
 			else if (a <= e && c > s)
 			{
-				if (a > s)
-					r.left = Offset2Position(a).x - hv;
-				else
-					r.left = 3;
-	
-				if (c < e || (lineNr == LineCount() - 1 && c == fText.Size()))
-					r.right = Offset2Position(c).x - hv;
-	
 				vw->SetHighColor(gColor[kSelectionColor]);
 				
 				vw->StrokeLine(r.LeftBottom(), r.LeftTop());
@@ -4786,7 +4749,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 					}
 					else
 					{
-						x1 = 3;
+						x1 = hv ? 0 : 3;
 						x2 = r.left;
 					}
 						
@@ -4799,7 +4762,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 	
 					if (Offset2Line(a) == lineNr - 1)
 					{
-						x1 = 3;
+						x1 = hv ? 0 : 3;
 						x2 = min(r.right, Offset2Position(a).x - hv);
 					}
 					else
@@ -5419,9 +5382,8 @@ void PText::MessageReceived(BMessage *msg)
 			{
 				long l;
 				FailOSErr(msg->FindInt32("linenr", &l));
-				Window()->UpdateIfNeeded();
-				fVScrollBar2->SetValue(l * fLineHeight);
 				SetCaret(LineStart(l));
+				ScrollToCaret(true);
 				break;
 			}
 
@@ -5551,7 +5513,7 @@ void PText::MessageReceived(BMessage *msg)
 				if (line > 0 && line < LineCount())
 				{
 					ChangeSelection(LineStart(line), LineStart(line - 1));
-					ScrollToSelection(true);
+					ScrollToSelection(true, true);
 				}
 				else
 					beep();
@@ -5697,8 +5659,6 @@ void PText::MessageReceived(BMessage *msg)
 					fOPAnchor = fAnchor;
 					fOPCaret = fCaret;
 					fOPMark = fMark;
- 
- //					Window()->PostMessage(kmsg_Recenter, this);
 					BMessage m(kmsg_Recenter);
 					MessageReceived(&m);
 					fVScrollBar1->SetValue(fVScrollBar2->Value());
@@ -5741,7 +5701,7 @@ void PText::MessageReceived(BMessage *msg)
 				to = to < LineCount() - 1 ? LineStart(to) : fText.Size();
 					
 				ChangeSelection(from, to);
-				ScrollToSelection(true);
+				ScrollToSelection(true, false);
 				break;
 			}
 			
@@ -5751,7 +5711,7 @@ void PText::MessageReceived(BMessage *msg)
 				FailOSErr(msg->FindInt32("line", &line));
 				line = RealLine2Line(line);
 				SelectLine(line);
-				ScrollToSelection(true);
+				ScrollToSelection(true, false);
 				break;
 			}
 			
@@ -5775,7 +5735,7 @@ void PText::MessageReceived(BMessage *msg)
 					Window()->Activate();
 				
 				ChangeSelection(a, c);
-				ScrollToSelection(true);
+				ScrollToSelection(true, false);
 				break;
 			}
 			

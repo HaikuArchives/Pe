@@ -136,9 +136,9 @@ virtual		void FrameResized(float w, float h);
 		
 			void AdjustScrollBars();
 			void ScrollBarChanged(BScrollBar *bar, g_unit_t newValue);
-			void ScrollToCaret();
-			void ScrollToOffset(int offset, int part);
-			void ScrollToSelection(bool centerVertically);
+			void ScrollToCaret(bool keepContext);
+			void ScrollToOffset(int offset, int part, bool keepContext);
+			void ScrollToSelection(bool keepContext, bool centerVertically);
 	virtual	void ScrollTo(BPoint p);
 
 			void ShowTabStops(bool show);
@@ -270,9 +270,14 @@ virtual		void FrameResized(float w, float h);
 			PDoc* Doc() const;
 
 private:
-			void HorizontallyScrollToSelection(g_unit_t startPos,
-														  g_unit_t endPos,
-														  bool keepContext);
+			void VerticallyScrollToSelection(int startOffset,
+											 int endOffset,
+											 bool keepContext,
+											 bool centered,
+											 int part = -1);
+			void HorizontallyScrollToSelection(int startOffset,
+											   int endOffset,
+											   bool keepContext);
 			BRect CursorFrame(int caret);
 			void SetupBitmap();
 			BRect PartBounds(int part);
@@ -325,6 +330,7 @@ private:
 			int fLastKillPoint;
 			bool fAppendNextCut;
 			PCmd* fLastSavedStateCmd;
+			float fDefaultCharWidth;
 		
 static		PText *sfDragSource;
 
