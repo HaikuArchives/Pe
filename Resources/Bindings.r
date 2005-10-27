@@ -177,7 +177,9 @@ resource rtyp_Cmnd (rid_Cmnd_SearchMenu, "Search Menu") {
 		msg_FindAgainBackward,						"Find Again Backwards",
 		msg_FindAgain,								"Find Again",
 		msg_FindCmd,								"Find…",
-		msg_FindFunction,							"Find Function…"
+		msg_FindFunction,							"Find Function…",
+		msg_PreviousFunction,						"Previous Function",
+		msg_NextFunction,							"Next Function"
 	}
 };
 

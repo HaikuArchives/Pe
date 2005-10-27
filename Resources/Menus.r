@@ -120,6 +120,8 @@ resource rtyp_Menu (rid_Menu_DwSearch, "Search Menu") {
 		Item		{ "Jump to Next Error",		msg_FindNextError,				none,	noKey	},
 		Item		{ "Go To Line…",			msg_GoToLine,					none,	','		},
 		Item		{ "Find Function…",			msg_FindFunction,				shift,	'F'		},
+		Item		{ "Previous Function",		msg_PreviousFunction,			none,	noKey	},
+		Item		{ "Next Function",			msg_NextFunction,				none,	noKey   },
  		Separator	{																			},
 		Item		{ "Find Differences…",		msg_FindDifferences,			none,	noKey	}
 	}

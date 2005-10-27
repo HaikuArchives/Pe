@@ -2390,6 +2390,44 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 	popup->Go(where, true, true, r, true);
 } /* PText::ShowFunctionMenu */
  
+
+void PText::NavigateOverFunctions(char direction)
+{
+	typedef map<int32, BString> NavMap;
+	struct SimpleFunctionScanHandler : public CFunctionScanHandler {
+		void AddFunction(const char *name, const char *match, int offset,
+			bool italic, uint32 nestLevel, const char *params)
+		{
+			navMap[offset] = match;
+		}
+		
+		NavMap navMap;
+	};
+	
+	SimpleFunctionScanHandler handler;
+	ScanForFunctions(handler);
+	
+	NavMap::iterator pos = handler.navMap.end();
+	if (direction == B_UP_ARROW)
+	{
+		pos = handler.navMap.lower_bound(min(fCaret,fAnchor));
+		if (pos != handler.navMap.begin())
+			--pos;
+	}
+	else if (direction == B_DOWN_ARROW)
+	{
+		pos = handler.navMap.upper_bound(max(fCaret,fAnchor));
+	}
+
+	if (pos != handler.navMap.end())
+	{
+		int32 a = pos->first;
+		int32 c = a + pos->second.Length();
+		ChangeSelection(a, c);
+		ScrollToSelection(true, true);
+	}
+}	
+
 void PText::ShowContextualMenu(BPoint where)
 {
 	BRect r;
@@ -5453,6 +5491,13 @@ void PText::MessageReceived(BMessage *msg)
 					if (doc)
 						doc->TextView()->ProcessCommand(msg_FindPreviousError, NULL);
 				}
+				break;
+
+			case msg_PreviousFunction:
+				NavigateOverFunctions(B_UP_ARROW);
+				break;
+			case msg_NextFunction:
+				NavigateOverFunctions(B_DOWN_ARROW);
 				break;
 
 			case msg_Comment:
