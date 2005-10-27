@@ -3326,7 +3326,18 @@ bool PText::DoKeyCommand(BMessage *msg)
 	
 	bool scroll = true, handled = true, extend = fCaret != fAnchor, catchOffset = true;
 	bool clearLastCommand = true;
-	
+
+	// [zooey]:
+	// only keep a context if the cursor is actually outside of the
+	// vertical context area. This avoids unexpected scroll-jumps when the
+	// user clicks into the context area and then navigates via keys.
+	// Of course, this could be done horizontally, too, but it seems to
+	// be less of a problem there (and the code would be a bit more 
+	// complicated), so we only respect vertical contexts here:
+	bool keepContext
+		= line >= topline + contextLines 
+			&& line <= topline + 1 + linesPerPage - contextLines;
+
 	switch (what)
 	{
 		case kmsg_MoveCharacterLeft:
@@ -3744,7 +3755,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 		fWalkOffset = Offset2Position(fCaret).x;
 
 	if (scroll)
-		ScrollToCaret(true);
+		ScrollToCaret(keepContext);
 	
 	if (lastMark != fMark)
 		RedrawDirtyLines();
