@@ -1189,6 +1189,8 @@ void PText::CharKeyDown(const char *bytes, int numBytes)
 {
 	if (Doc()->IsReadOnly()) THROW(("Document is read-only"));
 
+	bool keepContext = OffsetIsOutsideOfContextArea(fCaret);
+
 	PTypingCmd *tc = dynamic_cast<PTypingCmd*>(fLastCommand);
 	if (!tc)
 		RegisterCommand(tc = new PTypingCmd(this));
@@ -1223,7 +1225,7 @@ void PText::CharKeyDown(const char *bytes, int numBytes)
 	
 	fWalkOffset = Offset2Position(fCaret).x;
 	RedrawDirtyLines();
-	ScrollToCaret(true);
+	ScrollToCaret(keepContext);
 } /* PText::CharKeyDown */
 
 void PText::TextChanged(int from, int to)
@@ -1581,6 +1583,27 @@ void PText::ScrollToSelection(bool keepContext, bool centerVertically)
 	HorizontallyScrollToSelection(startOffset, endOffset, keepContext);
 	Window()->UpdateIfNeeded();
 } /* PText::ScrollToSelection */
+
+bool PText::OffsetIsOutsideOfContextArea(int32 offset)
+{
+	float h = Bounds().Height();
+	BScrollBar *bar = fActivePart == 1 ? fVScrollBar1 : fVScrollBar2;
+	float barValue = bar->Value();
+	int line = Offset2Line(offset);
+	int linesPerPage = (int)floor((fActivePart == 1 ? fSplitAt : h - fSplitAt) / fLineHeight) - 1;
+	int topline = (int)floor(barValue / fLineHeight);
+	int contextLines = gPrefs->GetPrefInt(prf_I_ContextLines, 3);
+	
+	// [zooey]:
+	// only keep a context if the cursor is actually outside of the
+	// vertical context area. This avoids unexpected scroll-jumps when the
+	// user clicks into the context area and then navigates via keys.
+	// Of course, this could be done horizontally, too, but it seems to
+	// be less of a problem there (and the code would be a bit more 
+	// complicated), so we only respect vertical contexts here:
+	return line >= topline + contextLines 
+			&& line <= topline + 1 + linesPerPage - contextLines;
+}
 
 void PText::VerticallyScrollToSelection(int startOffset,
 										int endOffset,
@@ -3274,6 +3297,8 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 			return;
 		}
 		
+		bool keepContext = OffsetIsOutsideOfContextArea(fCaret);
+
 		switch (bytes[0])
 		{
 			case B_FUNCTION_KEY:
@@ -3284,18 +3309,18 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 				if (gGlossary->IsGlossaryShortcut(key, modifiers))
 				{
 					GlossaryKey(key, modifiers);
-					ScrollToCaret(true);
+					ScrollToCaret(keepContext);
 				}
 				break;
 			
 			case B_BACKSPACE:
 				BackspaceKeyDown();
-				ScrollToCaret(true);
+				ScrollToCaret(keepContext);
 				break;
 			
 			case B_DELETE:
 				DeleteKeyDown();
-				ScrollToCaret(true);
+				ScrollToCaret(keepContext);
 				break;
 			
 			case B_ESCAPE:
@@ -3323,7 +3348,7 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 					CharKeyDown(bytes, numBytes);
 				}
 				
-				ScrollToCaret(true);
+				ScrollToCaret(keepContext);
 				break;
 			}
 		}
@@ -3365,16 +3390,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 	bool scroll = true, handled = true, extend = fCaret != fAnchor, catchOffset = true;
 	bool clearLastCommand = true;
 
-	// [zooey]:
-	// only keep a context if the cursor is actually outside of the
-	// vertical context area. This avoids unexpected scroll-jumps when the
-	// user clicks into the context area and then navigates via keys.
-	// Of course, this could be done horizontally, too, but it seems to
-	// be less of a problem there (and the code would be a bit more 
-	// complicated), so we only respect vertical contexts here:
-	bool keepContext
-		= line >= topline + contextLines 
-			&& line <= topline + 1 + linesPerPage - contextLines;
+	bool keepContext = OffsetIsOutsideOfContextArea(fCaret);
 
 	switch (what)
 	{

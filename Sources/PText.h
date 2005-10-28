@@ -281,6 +281,7 @@ private:
 			BRect CursorFrame(int caret);
 			void SetupBitmap();
 			BRect PartBounds(int part);
+			bool OffsetIsOutsideOfContextArea(int32 offset);
 			void NavigateOverFunctions(char direction);
 			
 			BBitmap *fLineMap;
