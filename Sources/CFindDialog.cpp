@@ -1305,6 +1305,13 @@ void CFindDialog::ShowBatch(vector<PMessageItem*> *lst, BWindow** w)
 
 void initskip(const char *p, int skip[], bool ignoreCase)
 {
+	for (int i = 0; i < 255; i++)
+		skip[i] = 1;
+		
+	// [zooey]: temporary fix, as the current code isn't able to deal
+	//          with utf-8 chars correctly.
+
+#if 0
 	int M = strlen((char *)p), i;
 	
 	for (i = 0; i < 255; i++)
@@ -1320,6 +1327,7 @@ void initskip(const char *p, int skip[], bool ignoreCase)
 		for (i = 0; i < M; i++)
 			skip[p[i]] = M - i - 1;
 	}
+#endif
 } /* initskip */
 
 int mismatchsearch(const char *p, const char *a, int N, int skip[], bool ignoreCase)
@@ -1365,6 +1373,13 @@ int mismatchsearch(const char *p, const char *a, int N, int skip[], bool ignoreC
 
 void initskip_b(const char*p, int skip[], bool ignoreCase)
 {
+	for (int i = 0; i < 255; i++)
+		skip[i] = 1;
+		
+	// [zooey]: temporary fix, as the current code isn't able to deal
+	//          with utf-8 chars correctly.
+
+#if 0
 	int M = strlen((char *)p), i;
 	
 	for (i = 0; i < 255; i++)
@@ -1380,6 +1395,7 @@ void initskip_b(const char*p, int skip[], bool ignoreCase)
 		for (i = M - 1; i >= 0; i--)
 			skip[p[i]] = i;
 	}
+#endif
 } /* initskip_b */
 
 int mismatchsearch_b(const char *p, const char *a, int N, int skip[], bool ignoreCase)
