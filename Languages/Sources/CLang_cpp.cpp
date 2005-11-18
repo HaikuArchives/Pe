@@ -411,28 +411,23 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				break;
 			
 			case CHAR_CONST:
-				if (c == '\t' || c == '\n' || c == 0)	// don't like this
+				if (c == '\t' || c == '\n' || c == 0
+					|| (c == '\'' && !esc && (cc_cnt == 0 || cc_cnt > 5)))
 				{
+					// invalid char constant - either invalid char or too short/long
 					proxy.SetColor(s, kLTextColor);
 					state = START;
 				}
 				else if (c == '\'' && !esc)
 				{
-					if (cc_cnt != 1 && cc_cnt != 3 && cc_cnt != 5)
-					{
-						proxy.SetColor(s, kLTextColor);
-						i--;
-						state = START;
-					}
-					else
-					{
-						proxy.SetColor(s, kLCharConstColor);
-						state = START;
-					}
+					proxy.SetColor(s, kLCharConstColor);
+					state = START;
 				}
 				else
 				{
-					if (!esc) cc_cnt++;
+					if (!esc)
+						cc_cnt++;
+
 					esc = !esc && (c == '\\');
 				}
 				break;
