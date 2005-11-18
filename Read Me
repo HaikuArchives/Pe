@@ -1,4 +1,3 @@
-
 Pe has now been released as open source under a BSD style license.
 
 To build Pe you theoretically only need to execute make in the base directory of the pe distribution. To flip between debug and non-debug builds you can change the value of the DEBUG variable in the Makefile.
