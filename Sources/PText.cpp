@@ -1208,7 +1208,7 @@ void PText::CharKeyDown(const char *bytes, int numBytes)
 	fCaret = fAnchor = from + numBytes;
 
 	tc->fInsertedLen += numBytes;
-	
+
 	if (numBytes == 1)
 	{
 		switch (bytes[0])
@@ -3195,61 +3195,82 @@ void PText::AutoIndent(int offset)
 
 void PText::SmartBrace()
 {
+	// auto-indent the brace to match its counterpart
 	int open, close;
 	
 	close = fCaret - 1;
 	open = FindTheOther(close, '}');
 	
-	if (open >= 0)
-	{
-		int openLine, closeLine;
-		
-		openLine = Offset2Line(open);
-		closeLine = Offset2Line(close);
+	if (open < 0)
+		return;
 
-		if (openLine == closeLine)
-			return;
-		
-		char buf[128];
-		int oWhite = 0, i = LineStart(openLine);
-		
-		while (isspace(fText[i]) && oWhite < 127)
-			buf[oWhite++] = fText[i++];
-		
-		i = LineStart(closeLine);
-		while (isspace(fText[i]))
-			i++;
-		
-		if (i < close)
+	int openLine, closeLine;
+	
+	openLine = Offset2Line(open);
+	closeLine = Offset2Line(close);
+
+	if (openLine == closeLine)
+		return;
+
+	// special treatmeant for longer if/for/while-clauses in C/C++/Java/...
+	// TODO: maybe this could be solved better over the language
+	//	interface
+	// find the line where the clause starts
+
+	int i = open - 2;
+	while (i > 0 && fText[i] != '\n' && isspace(fText[i]))
+		i--;
+
+	if (fText[i] == ')')
+	{
+		// we found a closing ')', so we balance the '{' for the line
+		// where the '(' was opened
+		open = FindTheOther(i, ')');
+		openLine = Offset2Line(open);
+	}
+
+	// duplicate indent
+
+	char buf[128];
+	int openWhite = 0;
+	i = LineStart(openLine);
+
+	while (isspace(fText[i]) && openWhite < 127)
+		buf[openWhite++] = fText[i++];
+
+	i = LineStart(closeLine);
+	while (isspace(fText[i]))
+		i++;
+
+	if (i < close)
+	{
+		if (openWhite == 0)
 		{
-			if (oWhite == 0)
-			{
-				BackspaceKeyDown();
-				TypeString("\n}");
-			}
-			else
-			{
-				memmove(buf + 1, buf, oWhite);
-				buf[0] = '\n';
-				fAnchor = --fCaret;
-				CharKeyDown(buf, oWhite + 1);
-				fAnchor = ++fCaret;
-			}
+			BackspaceKeyDown();
+			TypeString("\n}");
 		}
 		else
 		{
-			fLastCommand = NULL;
-	
-			fAnchor = LineStart(closeLine);
-			fCaret = close;
-			
-			if (oWhite || fCaret != close)
-				CharKeyDown(buf, oWhite);
-			else if (fAnchor < fCaret)
-				BackspaceKeyDown();
-			
+			memmove(buf + 1, buf, openWhite);
+			buf[0] = '\n';
+			fAnchor = --fCaret;
+			CharKeyDown(buf, openWhite + 1);
 			fAnchor = ++fCaret;
 		}
+	}
+	else
+	{
+		fLastCommand = NULL;
+
+		fAnchor = LineStart(closeLine);
+		fCaret = close;
+
+		if (openWhite || fCaret != close)
+			CharKeyDown(buf, openWhite);
+		else if (fAnchor < fCaret)
+			BackspaceKeyDown();
+
+		fAnchor = ++fCaret;
 	}
 } /* PText::SmartBrace */
 
