@@ -53,23 +53,35 @@ const char
 		"a high performance editor\n"
 		"created by Maarten Hekkelman.\n"
 		"Hekkelman Programmatuur B.V.\n"
-		"Copyright © 1997, 1998, 2002.\n"
-		"http://www.hekkelman.com/\n\n-\n\n"
-		"Thanks to all those\nwho sent in feedback.\n"
-		"Your help is invaluable.\n\n"
-		"Special thanks to\nTom Hays\nfor improving the TeX addon\n\n"
-		"and Be of course\nfor making this wonderful OS.\n\n"
+		"Copyright © 1997, 1998, 2002.\n\n"
 		"-\n\n"
 		"This is the Open Source version of Pe,\n"
+		"copyright © 2003-2005, Team Pe at BeUnited,\n"
 		"compiled on:\n%s\n\n"
-		"Pe now lives at http://www.beunited.org\n\n"
-		"You can reach the current developers\n"
-		"via Pe's mailing-list,\n"
+		"Pe is now hosted at BerliOS:\n"
+		"http://developer.berlios.de/projects/pe-editor\n\n"
+		"You can reach Team Pe\n"
+		"via Pe's mailing-list:\n"
 		"pedevel@freelists.org\n\n"
 		"-\n\n"
 		"Please send suggestions and/or bugreports\n"
-		"to pedevel@hirschkaefer.org\n\n"
-		"Thanks to all contributors.\n\n",
+		"to the list or use the bug-tracker at BerliOS.\n\n"
+		"-\n\n"
+		"Thanks to all contributors (in alphabetical order):\n\n"
+		"Andrew Bachmann\n"
+		"Axel Dörfler\n"
+		"Chris Roberts\n"
+		"Christian Packmann\n"
+		"Guy ?\n"			// ToDo: there's something missing here >:oP
+		"Ingo Weinhold\n"
+		"Keith McAfee\n"
+		"Oliver Tappe\n"
+		"Oscar Lesta\n"
+		"Rainer Riedl\n"
+		"Stephan Aßmus\n\n\n"
+		"...and thanks to everyone we forgot, too!\n\n";
+
+const char
 	kAboutText2[] = "BeOS Rules!";
 
 #if STANDALONE
@@ -87,7 +99,7 @@ const long
 	kAboutTextHeight = 100;
 
 const bigtime_t
-	kDelay = 30000;
+	kDelay = 60000;
 
 const unsigned long msg_Animate = 'anim';
 
