@@ -72,7 +72,7 @@ const char
 		"Axel Dörfler\n"
 		"Chris Roberts\n"
 		"Christian Packmann\n"
-		"Guy ?\n"			// ToDo: there's something missing here >:oP
+		"Guy Haviv\n"
 		"Ingo Weinhold\n"
 		"Keith McAfee\n"
 		"Oliver Tappe\n"
@@ -721,9 +721,9 @@ void PAboutView::MouseDown(BPoint /*where*/)
 #if STANDALONE
 main()
 {
-	new BApplication("application/x-be-executable");
+	new BApplication("application/x-vnd.pe-AboutTest");
 	new PAboutBox;
-	
+
 	be_app->Run();
 	delete be_app;
 	return 0;
