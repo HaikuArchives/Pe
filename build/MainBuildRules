@@ -195,55 +195,81 @@ actions BisonC++
 
 rule Rez
 {
-	Depends $(<) : $(>) ;	
+	# Rez <output> : <rezFile> [ : <flags> ] ;
+	#
+	local output = $(1) ;
+	local rezFile = $(2) ;
+	local flags = $(3) ;
+	
+	REZHDRS on $(output) = [ on $(output) FIncludes $(HDRS) ] ;
+	REZFLAGS on $(output) = [ on $(output) return $(REZFLAGS) ] $(flags) ;
+	Depends $(output) : rez $(rezFile) ;
+	Rez1 $(output) : rez $(rezFile) ;
 }
 
-actions Rez
+actions Rez1
 {
-	$(REZ) -o "$(<)" "$(>)" ;
+	$(2[1]) $(REZFLAGS) $(REZHDRS) -o "$(1)" "$(2[2-])" ;
 }
 
 rule RezObjects
 {
-	local rsrcs = $(1) ;
-	local rsrc ;
-	for rsrc in $(rsrcs) {
-		SEARCH on $(rsrc) = $(SEARCH_SOURCE) ;
-		RezObject $(rsrc:B) : $(rsrc) ;
+	local rezFiles = $(1) ;
+	local rezFile ;
+	for rezFile in $(rezFiles) {
+		local rsrcFile = $(rezFile:BS=.rsrc) ;
+		RezObject $(rsrcFile) : [ FGristFiles $(rezFile) ] ;
 	}
 }
 
 rule RezObject
 {
-	local _rsrc = $(1).rsrc ;
+	# RezObject <resource file> : <rez file> ;
+	#
+	local _rsrc = $(1) ;
 	local _r = $(2) ;
-	HDRS on $(_r) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
-	HDRS on $(_rsrc) = [ on $(_r) FIncludes $(HDRS) ] ;
+
+	local tmp = [ FGristFiles $(_rsrc)_tmp ] ;
+
+	SEARCH on $(_r) = $(SEARCH_SOURCE) ;
+
+	# include directories to by used
+	HDRS on $(_rsrc) $(tmp) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
+
+	# preprocess the rez file
+	PreProcess $(tmp) : $(_r) ;
+
+	# generate the resource file from the preprocessed rez file
 	MakeLocate $(_rsrc) : $(LOCATE_TARGET) ;
-	PreProcessRez $(_rsrc) : $(_r) ;
+	Rez $(_rsrc) : $(tmp) : -t ;
+
+	RmTemps $(_rsrc) : $(tmp) ;
 	Clean clean : $(_rsrc) ;
 }
 
-rule PreProcessRez
+rule PreProcess
 {
-	local _tmp = $(<)_tmp ;
-	MakeLocate $(_tmp) : $(LOCATE_TARGET) ;
-	Depends $(_tmp) : $(>) ;
-	Depends $(<) : $(_tmp) ;
-	RmTemps $(<) : $(_tmp) ;
+	# PreProcess <target> : <source> ;
+	#
+	local target = $(1) ;
+	local source = $(2) ;
+
+	Depends $(target) : $(source) ;
+
+	CPPHDRS on $(target) = [ on $(target) FIncludes $(HDRS) ] ;
+
+	MakeLocate $(target) : $(LOCATE_SOURCE) ;
 }
 
 if $(OSPLAT) = PPC {
-	actions PreProcessRez
+	actions PreProcess
 	{
-		mwcc -preprocess -o "$(<)_tmp" $(HDRS) $(>) ;
-		$(REZ) -t -o "$(<)" $(HDRS) "$(<)_tmp" ;
+		mwcc -preprocess $(CPPHDRS) -o "$(1)" $(2)
 	}
 } else {
-	actions PreProcessRez
+	actions PreProcess
 	{
-		gcc -E -x c -o "$(<)_tmp" $(HDRS) $(>)  ;
-		$(REZ) -o "$(<)" -t $(HDRS) "$(<)_tmp" ;
+		gcc -E -x c $(CPPHDRS) -o "$(1)" $(2)
 	}
 }
 
@@ -255,22 +281,13 @@ rule RezHeader
 	#
 	local _hdr = $(1) ;
 	local _rsrc = $(2) ;
+
 	SEARCH on $(_rsrc) = $(SEARCH_SOURCE) ;
-	HDRS on $(_rsrc) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
-	HDRS on $(_hdr) = [ FIncludes $(SEARCH_SOURCE) ] ;
-	MakeLocate $(_hdr) : $(LOCATE_TARGET) ;
-	RezH $(_hdr) : $(_rsrc) ;
+	HDRS on $(_hdr) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
+	MakeLocate $(_hdr) : $(LOCATE_SOURCE) ;
 	Clean clean : $(_hdr) ;
-}
 
-rule RezH
-{
-	Depends $(<) : $(>) ;
-}
-
-actions RezH
-{
-	$(REZ) -h -o "$(<)" $(HDRS) "$(>)" ;
+	Rez $(_hdr) : $(_rsrc) : -h ;
 }
 
 rule PreCompile
@@ -308,10 +325,8 @@ rule PeLanguage
 	local libs = $(3) ;
 	local rsrc = $(4) ;		# contains keywords
 
-	LOCATE_TARGET on $(lang) = [ FDirName $(DISTRO_DIR) Languages ] ;
-	Depends $(rsrc:B).rsrc : $(REZ) ;
 	SharedLibrary $(lang) : $(srcs) : $(libs) ;
-	XRes $(lang) :	$(rsrc) ;
+	XRes $(lang) : $(rsrc) ;
 }
 
 rule PeExtension
@@ -321,22 +336,37 @@ rule PeExtension
 	# generates a SharedLib which extends Pe with a specific feature.
 	#
 	local ext = $(1) ;
-	local srcs = $(2) ;
+	local srcs = [ FGristFiles $(2) ] ;
 	local libs = $(3) ;
-	local rsrc = $(4) ;		# optional resource file
+	local rsrc = [ FGristFiles $(4) ] ;		# optional resource file
 
 	if $(rsrc) {
-		Depends $(rsrc:B).r.h : $(REZ) ;
-		Depends $(ext) : $(rsrc:B).r.h ;
-		Depends $(srcs) : $(rsrc:B).r.h ;
-		RezHeader $(rsrc:B).r.h : $(rsrc) ;
+		local header = $(rsrc:BS=.r.h) ;
+
+		Includes $(srcs) : $(header) ;
+		RezHeader $(header) : $(rsrc) ;
 	}
 	SharedLibrary $(ext) : $(srcs) : $(libs) ;
+
+	SymlinkDistroExtensionsLibDir $(ext) ;
 }
 
-actions PeExtension
+rule SymlinkDistroExtensionsLibDir
+{
+	# SymlinkDistroExtensionsLibDir <extension> ;
+	#
+	local extension = $(1) ;
+
+	Depends $(extension) : <distro_extensions_dir_symlink>lib ;
+	NoUpdate <distro_extensions_dir_symlink>lib ;
+	MakeLocate <distro_extensions_dir_symlink>lib : $(DISTRO_DIR)/Extensions ;
+
+	SymlinkDistroExtensionsLibDir1 <distro_extensions_dir_symlink>lib ;
+}
+
+actions together SymlinkDistroExtensionsLibDir1
 {	# create a link to the folder where libhekkel.so lives
-	ln -sfn ../lib $(DISTRO_DIR)/Extensions/lib ;
+	ln -sfn ../lib $(1) ;
 }
 
 rule SubDirSysHdrs

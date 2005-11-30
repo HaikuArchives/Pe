@@ -7,9 +7,6 @@ if $(OSPLAT) = X86 {
 	C++FLAGS += -Wno-uninitialized -Wno-unused ;
 }
 
-REZ = [ FDirName $(TOP) rez rez ] ;
-Depends $(REZ) : rez ;
-
 # <pe-src>
 Application rez 
 	:	rez_parser.y
