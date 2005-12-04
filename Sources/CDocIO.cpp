@@ -247,7 +247,7 @@ CLocalDocIO::~CLocalDocIO()
 
 bool CLocalDocIO::IsLocal() const
 {
-	return false;
+	return true;
 }
 
 const char* CLocalDocIO::Name() const
