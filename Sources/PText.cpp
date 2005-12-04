@@ -181,6 +181,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fWalkOffset = 3.0;
 	fNextCaret = 0;
 	fCaretVisible = false;
+	fCaretDrawn = false;
 	fStatus = NULL;
 	fLastCommand = NULL;
 	fExec = NULL;
@@ -1720,19 +1721,6 @@ void PText::ScrollBarChanged(BScrollBar *bar, g_unit_t dy)
 	BRect src = fBounds & ConvertFromScreen(BScreen().Frame());
 	BRect dst;
 	
-	if (fCaretVisible && ((fActivePart == 1) == (fVScrollBar1 == bar)))
-	{
-		fNextCaret = system_time() + 500000;
-		fCaretVisible = false;
-		
-		SetDrawingMode(B_OP_INVERT);
-		BRect rect = CursorFrame(fCaret);
-		rect.OffsetBy(0, dy);
-
-		FillRect(rect);
-		SetDrawingMode(B_OP_COPY);
-	}
-	
 	if (bar == fVScrollBar1)
 	{
 		if (dy > 0)
@@ -1791,7 +1779,7 @@ void PText::ScrollTo(BPoint p)
 	BView::ScrollTo(p);
 
 	Doc()->ToolBar()->SetHOffset(-p.x + 3);
-} /* PText::ScrollBy */
+} /* PText::ScrollTo */
 
 #pragma mark - Mouse
 
@@ -3255,7 +3243,9 @@ void PText::SmartBrace()
 			buf[0] = '\n';
 			fAnchor = --fCaret;
 			CharKeyDown(buf, openWhite + 1);
+			HideCaret();
 			fAnchor = ++fCaret;
+			ShowCaret();
 		}
 	}
 	else
@@ -4655,9 +4645,8 @@ void PText::Draw(BRect updateRect)
 			{
 				DrawLine(i, y, false);
 				y += fLineHeight;
-				if (cl == i) fCaretVisible = false;
 			}
-	
+
 			r.Set(0, y, updateRect.right, fSplitAt - kSplitterHeight);
 			if (updateRect.Intersects(r))
 				FillRect(r, B_SOLID_LOW);
@@ -4695,7 +4684,6 @@ void PText::Draw(BRect updateRect)
 		{
 			DrawLine(i, y, false);
 			y += fLineHeight;
-			if (cl == i) fCaretVisible = false;
 		}
 		
 		SetLowColor(gColor[kLowColor]);
@@ -4705,6 +4693,12 @@ void PText::Draw(BRect updateRect)
    	}
 
 	ConstrainClippingRegion(NULL);
+
+	// draw the caret
+	if (fCaret == fAnchor && updateRect.Intersects(CursorFrame(fCaret))) {
+		fCaretDrawn = false;
+		DrawCaret();
+	}
 } /* PText::Draw */
 
 void PText::DrawLine(int lineNr, float y, bool buffer)
@@ -5051,7 +5045,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 		vw->StrokeLine(BPoint(x, E.top), BPoint(x, E.bottom));
 		vw->SetHighColor(kBlack);
 	}
-	
+
 	if (buffer)
 	{
 		fLineView->Sync();
@@ -5064,6 +5058,9 @@ void PText::RedrawDirtyLines()
 	BRect b(fBounds);
 	int i;
 	float y1, y2;
+
+	int caretLine = Offset2Line(fCaret);
+	BRegion dirtyCaretRegion;
 
 	BRegion clip1, clip2;
 	BRect r(b);
@@ -5108,6 +5105,15 @@ void PText::RedrawDirtyLines()
 					DrawBitmap(fLineMap, BPoint(fHScrollBar->Value(), y2 + 1));
 				}
 			}
+
+			// If the caret intersects with the line, add the line rects to
+			// the dirty caret region.
+			if (i == caretLine || i == caretLine + 1) {
+				BRect lineRect(0, y1, fBounds.Width(), y1 + fLineHeight - 1);
+				dirtyCaretRegion.Include(lineRect);
+				if (fSplitAt > 0)
+					dirtyCaretRegion.Include(lineRect.OffsetToSelf(0, y2));
+			}
 		}
 	}
 	ConstrainClippingRegion(NULL);
@@ -5142,8 +5148,14 @@ void PText::RedrawDirtyLines()
 		AddLine(p1, p2, tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));	p1.y++; p2.y++;
 		EndLineArray();
 	}
-	
-	fCaretVisible = false;
+
+	// Redraw the caret, if necessary.
+	if (dirtyCaretRegion.Frame().IsValid()) {
+		ConstrainClippingRegion(&dirtyCaretRegion);
+		fCaretDrawn = false;
+		DrawCaret();
+		ConstrainClippingRegion(NULL);
+	}
 } /* PText::RedrawDirtyLines */
 
 void PText::HiliteSelection()
@@ -5247,11 +5259,23 @@ void PText::ToggleCaret()
 	
 	Window()->UpdateIfNeeded();
 	Sync();
+
+	fCaretVisible = !fCaretVisible;
+
+	DrawCaret();	
+} /* PText::ToggleCaret */
+
+void PText::DrawCaret()
+{
+	if (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible)
+		|| fCaretVisible == fCaretDrawn) {
+		return;
+	}
 	
 	BRegion clip;
 	BRect r(fBounds);
 	if (fActivePart == 1)
-		r.bottom = fSplitAt;
+		r.bottom = fSplitAt - kSplitterHeight - 1;
 	else
 		r.top = fSplitAt;
 	clip.Include(r);
@@ -5260,22 +5284,17 @@ void PText::ToggleCaret()
 
 	if (clip.Frame().IsValid())
 	{
-		if (clip.Intersects(r))
-		{
-			ConstrainClippingRegion(&clip);
-			SetDrawingMode(B_OP_INVERT);
+		ConstrainClippingRegion(&clip);
 
-			FillRect(r);
-			
-			fCaretVisible = !fCaretVisible;
+		SetDrawingMode(B_OP_INVERT);
+		FillRect(r);
+		SetDrawingMode(B_OP_COPY);
 
-			SetDrawingMode(B_OP_COPY);
-			ConstrainClippingRegion(NULL);
-		}
-		else
-			fCaretVisible = false;
+		ConstrainClippingRegion(NULL);
 	}
-} /* PText::ToggleCaret */
+
+	fCaretDrawn = fCaretVisible;
+} /* PText::DrawCaret */
 
 void PText::ShiftLines(int first, int dy, int part)
 {

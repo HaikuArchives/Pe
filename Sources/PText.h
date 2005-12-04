@@ -149,6 +149,7 @@ virtual		void FrameResized(float w, float h);
 			void ShiftLines(int first, int dy, int part);
 			void HiliteSelection();
 			void ToggleCaret();
+			void DrawCaret();
 			void HideCaret();
 			void ShowCaret();
 			
@@ -307,7 +308,8 @@ private:
 			CFontStyle *fMetrics;
 			int fAnchor, fCaret, fStoredCaret;
 			bool fBlockSelect;
-			bool fCaretVisible;
+			bool fCaretVisible;	// logically visible
+			bool fCaretDrawn;	// actually drawn on screen
 			long fCaretShielded;
 			PStatus *fStatus;
 			PCmd* fLastCommand;
