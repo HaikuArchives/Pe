@@ -1,7 +1,7 @@
 //	MAlert.cpp
 //	Utility class for sane-ifying Be alerts
-//	© Copyright 1995 Metrowerks Corporation. All rights reserved.
-//	Jon WŠtte
+//	Â© Copyright 1995 Metrowerks Corporation. All rights reserved.
+//	Jon WÃ¤tte
 
 #include "MAlert.h"
 
@@ -65,8 +65,14 @@ MAlert::MakeAlert(
 	}
 	fAlert = new BAlert("Alert", message, a1, a2, a3,
 		B_WIDTH_AS_USUAL, type);
+
+	// The Escape key shall trigger the second button from the right
+	// (usually "Cancel"). If there is only one button, map Escape to that
+	// one.
 	if (fNumButtons > 1)
-		SetShortcut(2, B_ESCAPE);	//	Escape
+		SetShortcut(2, B_ESCAPE);
+	else
+		SetShortcut(1, B_ESCAPE);
 }
 
 

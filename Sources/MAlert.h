@@ -1,6 +1,6 @@
 //	MAlert.h
-//	© Copyright 1995 Metrowerks Corporation. All rights reserved.
-//	Jon WŠtte
+//	Â© Copyright 1995 Metrowerks Corporation. All rights reserved.
+//	Jon WÃ¤tte
 //
 //	This handy set of utility classes can be used to simplify BAlerts.
 //	It will make sure that the buttons are numbered in the RIGHT order,
