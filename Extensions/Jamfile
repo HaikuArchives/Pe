@@ -18,7 +18,7 @@ PeExtension PrefixLines
 # <pe-src>
 PeExtension BeBookFetch 
 	: BeBookFetch.cpp 
-	: be $(STDC++LIB) 
+	: libhekkel.so be $(STDC++LIB) 
 	;
 # </pe-src>
 
