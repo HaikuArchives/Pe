@@ -3252,15 +3252,19 @@ void PText::SmartBrace()
 	{
 		fLastCommand = NULL;
 
+		HideCaret();
 		fAnchor = LineStart(closeLine);
 		fCaret = close;
+		ShowCaret();
 
 		if (openWhite || fCaret != close)
 			CharKeyDown(buf, openWhite);
 		else if (fAnchor < fCaret)
 			BackspaceKeyDown();
 
+		HideCaret();
 		fAnchor = ++fCaret;
+		ShowCaret();
 	}
 } /* PText::SmartBrace */
 
