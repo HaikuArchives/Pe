@@ -245,7 +245,7 @@ void PGroupWindow::MessageReceived(BMessage *msg)
 				break;
 			
 			default:
-				BWindow::MessageReceived(msg);
+				inherited::MessageReceived(msg);
 				break;
 		}
 } /* PGroupWindow::MessageReceived */
