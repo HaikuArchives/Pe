@@ -37,6 +37,7 @@
 
 #include <NodeMonitor.h>
 #include <fs_attr.h>
+#include <String.h>
 
 #include "CDocIO.h"
 #include "CDocWindow.h"
@@ -51,7 +52,7 @@
 int CDocWindow::sfNewCount = -1;
 
 CDocWindow::CDocWindow(const entry_ref *doc)
-	: BWindow(NextPosition(), "Untitled", B_DOCUMENT_WINDOW, 0)
+	: BWindow(BRect(0,0,0,0), "Untitled", B_DOCUMENT_WINDOW, 0)
 	, CDoc("", this, doc)
 	, fWaitForSave(false)
 {
@@ -60,7 +61,7 @@ CDocWindow::CDocWindow(const entry_ref *doc)
 }
 
 CDocWindow::CDocWindow(URLData& url)
-	: BWindow(NextPosition(), "Untitled", B_DOCUMENT_WINDOW, 0)
+	: BWindow(BRect(0,0,0,0), "Untitled", B_DOCUMENT_WINDOW, 0)
 	, CDoc(url)
 	, fWaitForSave(false)
 {
@@ -73,14 +74,6 @@ CDocWindow::~CDocWindow()
 	{
 		(*i)->Lock();
 		(*i)->Quit();
-	}
-
-	if (fDocIO->LastSaved() == 0)
-	{
-		// closing a new (unsaved) document (a.k.a. 'Untitled') defines
-		// the default document frame:
-		gPrefs->SetPrefRect(prf_R_DefaultDocumentRect, Frame());
-		sfNewCount = -1;
 	}
 }
 
@@ -182,7 +175,23 @@ bool CDocWindow::QuitRequested()
 void CDocWindow::Quit()
 {
 	WriteState();
+	if (fDocIO->LastSaved() == 0)
+	{
+		// closing a new (unsaved) document (a.k.a. 'Untitled') defines
+		// the default document frame for the current window type:
+		BString prefsName = prf_R_DefaultDocumentRect;
+			prefsName << DocWindowType();
+		gPrefs->SetPrefRect(prefsName.String(), Frame());
+		sfNewCount = -1;
+	}
 	inherited::Quit();
+}
+
+void CDocWindow::SetupSizeAndLayout()
+{
+	BRect winRect = NextPosition();
+	MoveTo(winRect.LeftTop());
+	ResizeTo(winRect.Width(), winRect.Height());
 }
 
 void CDocWindow::Show()
@@ -319,8 +328,10 @@ BRect CDocWindow::NextPosition(bool inc)
 		40 + 80*textFont.StringWidth("m") + B_V_SCROLL_BAR_WIDTH + 5, 
 		25 + 40*lh + B_H_SCROLL_BAR_HEIGHT
 	);
-	BRect defaultFrame = gPrefs->GetPrefRect(prf_R_DefaultDocumentRect, 
-											 initialDefaultRect);
+	BString prefsName = prf_R_DefaultDocumentRect;
+		prefsName << DocWindowType();
+	BRect defaultFrame 
+		= gPrefs->GetPrefRect(prefsName.String(), initialDefaultRect);
 
 	if (inc)
 		sfNewCount++;

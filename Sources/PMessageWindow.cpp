@@ -284,7 +284,7 @@ void PMessageItem::ShowMessage()
 const ulong msg_MsgInvoked = 'MsgI';
 
 PMessageWindow::PMessageWindow(const char *title)
-	: BWindow(PDoc::NextPosition(), title, B_DOCUMENT_WINDOW, 0)
+	: BWindow(BRect(100,100,100,100), title, B_DOCUMENT_WINDOW, 0)
 {
 	ResizeTo(400, 150);
 	

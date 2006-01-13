@@ -85,6 +85,7 @@ const float
 PDoc::PDoc(const entry_ref *doc, bool show)
 	: inherited(doc)
 {
+	SetupSizeAndLayout();
 	fShortcut = atomic_add(&sDocCount, 1);
 	fIsWorksheet = false;
 	fWindowMenuLength = -1;
@@ -123,6 +124,7 @@ PDoc::PDoc(const entry_ref *doc, bool show)
 PDoc::PDoc(URLData& url)
 	: inherited(url)
 {
+	SetupSizeAndLayout();
 	fShortcut = atomic_add(&sDocCount, 1);
 	fIsWorksheet = false;
 	fWindowMenuLength = -1;
@@ -154,6 +156,12 @@ PDoc::PDoc(URLData& url)
 PDoc::~PDoc()
 {
 } /* PDoc::~PDoc */
+
+const char* PDoc::DocWindowType()
+{
+	return "";	
+		// default window type
+}
 
 bool PDoc::QuitRequested()
 {

@@ -36,6 +36,7 @@
 #include <fs_attr.h>
 #include <String.h>
 
+#include "CDocIO.h"
 #include "HAppResFile.h"
 #include "HButtonBar.h"
 #include "HDefines.h"
@@ -43,7 +44,6 @@
 #include "HPreferences.h"
 #include "MThread.h"
 #include "PApp.h"
-//#include "PDoc.h"
 #include "PGroupWindow.h"
 #include "PKeyDownFilter.h"
 #include "PMessages.h"
@@ -119,6 +119,38 @@ PGroupWindow::PGroupWindow(const entry_ref *doc)
 	, fNewItems(NULL)
 {
 	SetMimeType("text/x-vnd.Hekkel-Pe-Group", false);
+	SetupSizeAndLayout();
+	if (doc)
+	{
+		SetTitle(doc->name);
+		
+		BEntry e;
+		FailOSErr(e.SetTo(doc));
+		BPath p;
+		FailOSErr(e.GetPath(&p));
+		fStatus->SetPath(p.Path());
+		AddRecent(p.Path());
+		
+		Read();
+	}
+	
+	fList->AddFilter(new PKeyDownFilter());
+	fList->MakeFocus();
+	Show();
+}
+
+PGroupWindow::~PGroupWindow()
+{
+	if (fPanel)
+	{
+		delete fPanel;
+		fPanel = NULL;
+	}
+} /* PGroupWindow::~PGroupWindow */
+
+void PGroupWindow::SetupSizeAndLayout()
+{
+	inherited::SetupSizeAndLayout();
 	SetFlags(Flags()|B_WILL_ACCEPT_FIRST_CLICK);
 	
 	ResizeTo(180, 400);
@@ -143,7 +175,8 @@ PGroupWindow::PGroupWindow(const entry_ref *doc)
 	r = Bounds();
 	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT + 1;
 	r.right -= B_V_SCROLL_BAR_WIDTH;
-	AddChild(fStatus = new PGroupStatus(r, doc ? doc->name : NULL));
+	AddChild(fStatus 
+		= new PGroupStatus(r, fDocIO->EntryRef() ? fDocIO->EntryRef()->name : NULL));
 
 	r = Bounds();
 	r.top = fToolBar->Frame().bottom;
@@ -157,33 +190,12 @@ PGroupWindow::PGroupWindow(const entry_ref *doc)
 	
 	AddShortcut('S', 0, new BMessage(msg_Save));
 	
-	if (doc)
-	{
-		SetTitle(doc->name);
-		
-		BEntry e;
-		FailOSErr(e.SetTo(doc));
-		BPath p;
-		FailOSErr(e.GetPath(&p));
-		fStatus->SetPath(p.Path());
-		AddRecent(p.Path());
-		
-		Read();
-	}
-	
-	fList->AddFilter(new PKeyDownFilter());
-	fList->MakeFocus();
-	Show();
 } /* PGroupWindow::PGroupWindow */
 
-PGroupWindow::~PGroupWindow()
+const char* PGroupWindow::DocWindowType()
 {
-	if (fPanel)
-	{
-		delete fPanel;
-		fPanel = NULL;
-	}
-} /* PGroupWindow::~PGroupWindow */
+	return "-group-window";
+}
 
 bool PGroupWindow::QuitRequested()
 {

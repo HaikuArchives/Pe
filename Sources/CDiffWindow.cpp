@@ -652,9 +652,7 @@ void CDiffWindow::HiliteDiffs()
 				FailOSErr(e1.GetRef(&f1));
 				FailOSErr(e2.GetRef(&f2));
 
-				BRect r = PDoc::NextPosition();
-				r.right = r.left + 400;
-				r.bottom = r.top + 150;
+				BRect r(100,100,500,250);
 						
 				CDiffWindow *ndw = new CDiffWindow(r, "Differences");
 				

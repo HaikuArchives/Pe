@@ -61,6 +61,9 @@ public:
 	static PProjectWindow* Create(const entry_ref *doc, const char* mimetype);
 	~PProjectWindow();
 
+	virtual void SetupSizeAndLayout();
+	virtual const char* DocWindowType();
+
 	virtual bool QuitRequested();
 
 	virtual void MessageReceived(BMessage *msg);

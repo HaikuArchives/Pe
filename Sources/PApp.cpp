@@ -794,10 +794,7 @@ void PApp::MessageReceived(BMessage *msg)
 			
 			case msg_FindDifferences:
 			{
-				BRect r = PDoc::NextPosition();
-				r.right = r.left + 400;
-				r.bottom = r.top + 150;
-				
+				BRect r(100,100,500,250);
 				new CDiffWindow(r, "Differences");
 				break;
 			}

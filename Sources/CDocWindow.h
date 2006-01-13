@@ -46,12 +46,15 @@ public:
 			CDocWindow(URLData& url);
 virtual		~CDocWindow();
 		
+virtual		void SetupSizeAndLayout();
+virtual		const char* DocWindowType() = 0;
+
 virtual		void Show();
 virtual		bool QuitRequested();
 virtual		void Quit();
 virtual 	void MessageReceived(BMessage *msg);
 
-static		BRect NextPosition(bool inc = true);
+			BRect NextPosition(bool inc = true);
 
 			void AddDialog(HDialog *dlog, bool isModal);
 			void RemoveDialog(HDialog *dlog);
@@ -74,6 +77,7 @@ private:
 
 			BRect fLastStoredFrame;
 			BRect fInitialFrame;
+protected:
 static		int sfNewCount;
 };
 

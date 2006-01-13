@@ -55,6 +55,9 @@ public:
 			PGroupWindow(const entry_ref *doc = NULL);
 			~PGroupWindow();
 
+virtual	void SetupSizeAndLayout();
+virtual	const char* DocWindowType();
+
 virtual	bool QuitRequested();
 
 virtual	void MessageReceived(BMessage *msg);

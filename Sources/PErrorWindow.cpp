@@ -278,7 +278,7 @@ long CReadStdErr::Execute()
 } /* CReadStdErr::Execute */
 
 PErrorWindow::PErrorWindow(int *fd, const char *cwd)
-	: BWindow(PDoc::NextPosition(), "stderr", B_DOCUMENT_WINDOW, 0)
+	: BWindow(BRect(100,100,100,100), "stderr", B_DOCUMENT_WINDOW, 0)
 {
 	ResizeTo(400, 150);
 	

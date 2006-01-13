@@ -39,6 +39,7 @@
 
 #include <fs_attr.h>
 
+#include "CDocIO.h"
 #include "CProjectJamFile.h"
 #include "CProjectMakeFile.h"
 #include "CProjectRoster.h"
@@ -78,6 +79,23 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
 	, fPanel(NULL)
 {
 	SetMimeType(mimetype, false);
+	SetupSizeAndLayout();
+} /* PProjectWindow::PProjectWindow */
+
+PProjectWindow::~PProjectWindow()
+{
+	delete fPrjFile;
+	if (fPanel)
+	{
+		delete fPanel;
+		fPanel = NULL;
+	}
+	
+} /* PProjectWindow::~PProjectWindow */
+
+void PProjectWindow::SetupSizeAndLayout()
+{
+	inherited::SetupSizeAndLayout();
 	ResizeTo(180, 400);
 	SetSizeLimits(100, 100000, 100, 100000);
 	
@@ -100,7 +118,8 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
 	r = Bounds();
 	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT + 1;
 	r.right -= B_V_SCROLL_BAR_WIDTH;
-	AddChild(fStatus = new PGroupStatus(r, doc ? doc->name : NULL));
+	AddChild(fStatus 
+		= new PGroupStatus(r, fDocIO->EntryRef() ? fDocIO->EntryRef()->name : NULL));
 
 	r = Bounds();
 	r.top = fToolBar->Frame().bottom;
@@ -117,18 +136,12 @@ PProjectWindow::PProjectWindow(const entry_ref *doc, const char* mimetype)
 
 	NameChanged();
 	SelectionChanged();
-} /* PProjectWindow::PProjectWindow */
+}
 
-PProjectWindow::~PProjectWindow()
+const char* PProjectWindow::DocWindowType()
 {
-	delete fPrjFile;
-	if (fPanel)
-	{
-		delete fPanel;
-		fPanel = NULL;
-	}
-	
-} /* PProjectWindow::~PProjectWindow */
+	return "-project-window";
+}
 
 bool PProjectWindow::QuitRequested()
 {

@@ -66,6 +66,8 @@ public:
 			PDoc(URLData& url);
 virtual		~PDoc();
 		
+virtual		const char* DocWindowType();
+
 virtual		void MessageReceived(BMessage *msg);
 virtual		bool QuitRequested();
 
