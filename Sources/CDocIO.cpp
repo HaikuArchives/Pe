@@ -530,10 +530,12 @@ bool CLocalDocIO::VerifyFile()
 				}
 			}
 
-			fLastSaved = time(NULL);
+			fLastSaved = max(fLastSaved, time(NULL));
 				// if more than one update request was issued
 				// in the mean time, only the first one is
 				// considered
+				// the max() takes care of mod-times in the future
+				// (cvs may cause that kind of thing). 
 		}
 	}
 	catch (HErr& e)
