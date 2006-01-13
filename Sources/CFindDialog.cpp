@@ -141,7 +141,9 @@ bool CRecentPatternController::AddCurrentPattern()
 
 void CRecentPatternController::Next()
 {
-	if (fCurrIdx == fPatternVect.size()-1 && !fSavedPattern.IsEmpty())
+	if (fSavedPattern.IsEmpty())
+		return;
+	if (fCurrIdx == fPatternVect.size()-1)
 	{	// restore the saved pattern edited by user:
 		gFindDialog->SetPatternInfo(&fSavedPattern);
 	} 
