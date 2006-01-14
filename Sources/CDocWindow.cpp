@@ -70,7 +70,6 @@ CDocWindow::CDocWindow(URLData& url)
 
 CDocWindow::~CDocWindow()
 {
-printf("destroying %s\n",CDoc::Name());
 	vector<HDialog*>::iterator i;
 	for (i = fDialogs.begin(); i != fDialogs.end(); i++)
 	{
