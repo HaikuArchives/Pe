@@ -234,7 +234,7 @@ virtual		void FrameResized(float w, float h);
 			bool CanReplace(const char *s, bool ignoreCase, bool regx);
 			bool FindNext(const char *what, int& offset, bool ignoreCase,
 					bool wrap, bool backward, bool entireWord, bool regx,
-					bool scroll = true);
+					bool scroll = true, int* foundLen = NULL);
 			bool IsIncSearching() const;
 			void DoIncSearch(bool forward);
 			void IncSearchKey(const char *bytes, int numBytes);

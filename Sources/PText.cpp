@@ -4023,7 +4023,7 @@ bool PText::CanReplace(const char *what, bool ignoreCase, bool regx)
 } /* CCellView::CanReplace */
 
 bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
-	bool wrap, bool backward, bool entireWord, bool regx, bool scroll)
+	bool wrap, bool backward, bool entireWord, bool regx, bool scroll, int* foundLen)
 {
 	int skip[256], wl = strlen((char *)what);
 	bool wrapped = false;
@@ -4113,6 +4113,9 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 					fAnchor = offset;
 					fCaret = offset + wl;
 				}
+				if (foundLen)
+					// fill in the length of the match:
+					*foundLen = wl;
 				return true;
 			}
 		}

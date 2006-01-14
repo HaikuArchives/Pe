@@ -618,18 +618,18 @@ void PReplaceAllCmd::Do()
 
 	int a, c;
 	
-	int fl, rl, offset = 0;
-	fl = strlen(fFind);
+	int rl, offset = 0;
 	rl = strlen(fRepl);
 		
 	PLongAction la(fText);
 		
 	BString what;
+	int matchLen = 0;
 	while (fText->FindNext(fFind, offset, fIgnoreCase,	false, false, 
-		fEntireWord, fGrep, false))
+		fEntireWord, fGrep, false, &matchLen))
 	{
-		what.SetTo(fText->Text() + offset, fl);
-		fText->Delete(offset, offset + fl);
+		what.SetTo(fText->Text() + offset, matchLen);
+		fText->Delete(offset, offset + matchLen);
 		if (fGrep)
 		{
 			char* repStr 
