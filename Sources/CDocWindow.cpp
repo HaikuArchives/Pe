@@ -52,7 +52,8 @@
 int CDocWindow::sfNewCount = -1;
 
 CDocWindow::CDocWindow(const entry_ref *doc)
-	: BWindow(BRect(0,0,0,0), "Untitled", B_DOCUMENT_WINDOW, 0)
+	: BWindow(BRect(0,0,0,0), doc ? doc->name : "Untitled", B_DOCUMENT_WINDOW, 
+				 B_ASYNCHRONOUS_CONTROLS)
 	, CDoc("", this, doc)
 	, fWaitForSave(false)
 {
@@ -61,7 +62,7 @@ CDocWindow::CDocWindow(const entry_ref *doc)
 }
 
 CDocWindow::CDocWindow(URLData& url)
-	: BWindow(BRect(0,0,0,0), "Untitled", B_DOCUMENT_WINDOW, 0)
+	: BWindow(BRect(0,0,0,0), url.File(), B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 	, CDoc(url)
 	, fWaitForSave(false)
 {
@@ -69,6 +70,7 @@ CDocWindow::CDocWindow(URLData& url)
 
 CDocWindow::~CDocWindow()
 {
+printf("destroying %s\n",CDoc::Name());
 	vector<HDialog*>::iterator i;
 	for (i = fDialogs.begin(); i != fDialogs.end(); i++)
 	{
@@ -134,7 +136,7 @@ status_t CDocWindow::WriteState()
 
 bool CDocWindow::QuitRequested()
 {
-	bool result = true;
+	bool result = inherited::QuitRequested();
 	fWaitForSave = false;
 
 	if (IsDirty())
