@@ -271,6 +271,7 @@ PText::~PText()
 
 	free(fCWD);
 	delete fMainPopUp;
+	delete fLineMap;
 } /* PText::~PText */
 
 void PText::SetDefaultLanguageByExtension(const char *extension)
