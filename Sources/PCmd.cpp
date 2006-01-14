@@ -551,11 +551,11 @@ PReplaceCmd::~PReplaceCmd()
 void PReplaceCmd::Do()
 {
 	fText->Delete(fOffset, fOffset + fSize);
-	if (*fWith)
+	if (fWith && *fWith)
 		fText->Insert(fWith, strlen(fWith), fOffset);
 
 	int offset = fOffset;
-	if (!fBackward)
+	if (!fBackward && fWith)
 		offset += strlen(fWith);
 	fText->SetCaret(offset);
 
@@ -577,7 +577,8 @@ void PReplaceCmd::Do()
 
 void PReplaceCmd::Undo()
 {
-	if (fWith && *fWith) fText->Delete(fOffset, fOffset + strlen(fWith));
+	if (fWith && *fWith) 
+		fText->Delete(fOffset, fOffset + strlen(fWith));
 	fText->Insert(fWhat, strlen(fWhat), fOffset);
 	Update();
 	fText->Select(fOffset, fOffset + strlen(fWhat), true, false);
