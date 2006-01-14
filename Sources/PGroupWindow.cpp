@@ -257,7 +257,7 @@ void PGroupWindow::SetText(const BString& docText)
 		if (docText.Compare("### pe Group File\n", 18) != 0)
 			THROW(("Not a group file!"));
 		
-		if (EntryRef())
+		if (!EntryRef())
 			THROW(("Can only read local groups"));
 
 		node_ref nref;
