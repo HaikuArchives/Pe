@@ -143,22 +143,6 @@ const char* PProjectWindow::DocWindowType()
 	return "-project-window";
 }
 
-bool PProjectWindow::QuitRequested()
-{
-	fWaitForSave = false;
-
-	if (IsDirty() && (fSavePanel == NULL || fSavePanel->IsShowing()))
-	{
-		if (!EntryRef())
-			fWaitForSave = true;
-		Save();
-	}
-	else
-		WriteState();
-	
-	return !fWaitForSave;
-} /* PProjectWindow::QuitRequested */
-
 void PProjectWindow::MessageReceived(BMessage *msg)
 {
 	if (msg->WasDropped() && msg->HasRef("refs"))

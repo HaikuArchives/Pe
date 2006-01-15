@@ -56,7 +56,7 @@ virtual	~PApp();
 			PDoc* NewWindow(URLData& url);
 			CDoc* OpenWindow(const entry_ref& doc, bool show = true);
 
-	virtual	void ReadyToRun();
+virtual	void ReadyToRun();
 
 virtual	void ArgvReceived(int32 argc, const char **argv, const char * cwd);
 virtual	void RefsReceived(BMessage *msg);
@@ -73,6 +73,8 @@ virtual	void DispatchMessage(BMessage *an_event, BHandler *handler);
 	
 			HDialog* FindDialog();
 			HDialog* PrefsDialog();
+
+			bool IsQuitting();
 	
 private:
 
@@ -80,9 +82,10 @@ virtual	BHandler* ResolveSpecifier(BMessage *msg, int32 index,
 						BMessage *specifier, int32 form, const char *property);
 
 			BFilePanel *fOpenPanel;
-	thread_id fPrefOpener;
+			thread_id fPrefOpener;
 			HDialog *fFindDialog;
 			HDialog *fPrefsDialog;
+			bool fIsQuitting;
 };
 
 extern BDirectory gAppDir, gCWD, gPrefsDir;
@@ -94,6 +97,10 @@ inline HDialog* PApp::FindDialog() {
 
 inline HDialog* PApp::PrefsDialog() {
 	return fPrefsDialog;
+}
+
+inline bool PApp::IsQuitting() {
+       return fIsQuitting;
 }
 
 extern PApp *gApp;

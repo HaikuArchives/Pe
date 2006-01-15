@@ -64,8 +64,6 @@ public:
 	virtual void SetupSizeAndLayout();
 	virtual const char* DocWindowType();
 
-	virtual bool QuitRequested();
-
 	virtual void MessageReceived(BMessage *msg);
 	virtual void SetDirty(bool dirty);
 	virtual void WindowActivated(bool active);

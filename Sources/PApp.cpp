@@ -45,7 +45,6 @@ static char *rcsid = "$Id$";
 #include "Utils.h"
 #include "PGroupWindow.h"
 #include "CGlossary.h"
-//#include "CKeywords.h"
 #include "CLangIntf.h"
 #include "HColorUtils.h"
 #include "PGlossyWindow.h"
@@ -280,6 +279,8 @@ PApp::PApp()
 		InitSelectedMap();
 
 		CLangIntf::SetupLanguageInterfaces();
+
+		fIsQuitting = false;
 	
 		fPrefsDialog = NULL;
 		CPrefOpener *prefOpener = new CPrefOpener;
@@ -328,6 +329,8 @@ bool PApp::QuitRequested()
 {
 	BWindow *doc;
 	
+	fIsQuitting = true;
+
 	while ((doc = dynamic_cast<BWindow*>(CDoc::FirstDoc())) != NULL)
 	{
 		doc->Lock();
@@ -336,6 +339,7 @@ bool PApp::QuitRequested()
 		else
 		{
 			doc->Unlock();
+			fIsQuitting = false;
 			return false;
 		}
 	}

@@ -822,7 +822,7 @@ void PDoc::OpenPartner()
 
 void PDoc::SetDirty(bool dirty)
 {
-	CDoc::SetDirty(dirty);
+	inherited::SetDirty(dirty);
 	if (!dirty)
 		// if the new state is non-dirty, we propagate this info to the 
 		// undo-stack, such that the non-dirty state is updated accordingly:

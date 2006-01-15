@@ -52,19 +52,22 @@
 int CDocWindow::sfNewCount = -1;
 
 CDocWindow::CDocWindow(const entry_ref *doc)
-	: BWindow(BRect(0,0,0,0), doc ? doc->name : "Untitled", B_DOCUMENT_WINDOW, 
-				 B_ASYNCHRONOUS_CONTROLS)
-	, CDoc("", this, doc)
-	, fWaitForSave(false)
+	: inheritedWindow(BRect(0,0,0,0), doc ? doc->name : "Untitled", B_DOCUMENT_WINDOW, 
+				 			B_ASYNCHRONOUS_CONTROLS)
+	, inheritedDoc("", this, doc)
+	, fCloseWinAfterSave(false)
+	, fCloseAppAfterSave(false)
 {
 	if (doc)
 		StartWatchingFile();
 }
 
 CDocWindow::CDocWindow(URLData& url)
-	: BWindow(BRect(0,0,0,0), url.File(), B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
-	, CDoc(url)
-	, fWaitForSave(false)
+	: inheritedWindow(BRect(0,0,0,0), url.File(), B_DOCUMENT_WINDOW, 
+							B_ASYNCHRONOUS_CONTROLS)
+	, inheritedDoc(url)
+	, fCloseWinAfterSave(false)
+	, fCloseAppAfterSave(false)
 {
 }
 
@@ -135,13 +138,15 @@ status_t CDocWindow::WriteState()
 
 bool CDocWindow::QuitRequested()
 {
-	bool result = inherited::QuitRequested();
-	fWaitForSave = false;
+	bool result = true;
+
+	fCloseWinAfterSave = false;
+	fCloseAppAfterSave = false;
 
 	if (IsDirty())
 	{
 		char title[256];
-		sprintf(title, "Save changes to '%s' before closing?", CDoc::Name());
+		sprintf(title, "Save changes to '%s' before closing?", inheritedDoc::Name());
 		
 		MInfoAlert alert(title, "Save", "Cancel", "Don't save");
 		
@@ -163,7 +168,8 @@ bool CDocWindow::QuitRequested()
 				else
 				{
 					result = false;
-					fWaitForSave = true;
+                                       fCloseWinAfterSave = true;
+                                       fCloseAppAfterSave = gApp->IsQuitting();
 					SaveAs();
 				}
 				break;
@@ -185,7 +191,7 @@ void CDocWindow::Quit()
 		gPrefs->SetPrefRect(prefsName.String(), Frame());
 		sfNewCount = -1;
 	}
-	inherited::Quit();
+	inheritedWindow::Quit();
 }
 
 void CDocWindow::SetupSizeAndLayout()
@@ -205,7 +211,7 @@ void CDocWindow::Show()
 	newFrame.top = MAX(20.0, MIN(sr.Height()-newFrame.Height()-5, newFrame.top));
 	MoveTo(newFrame.LeftTop());
 
-	BWindow::Show();
+	inheritedWindow::Show();
 	fInitialFrame = Frame();
 }
 
@@ -277,13 +283,26 @@ void CDocWindow::MessageReceived(BMessage *msg)
 			
 			default:
 			{
-				BWindow::MessageReceived(msg);
+				inheritedWindow::MessageReceived(msg);
 			}
 		}
 	}
 	catch (HErr& e)
 	{
 		e.DoError();
+	}
+}
+
+void CDocWindow::SetDirty(bool dirty)
+{
+	inheritedDoc::SetDirty(dirty);
+	
+	if (!dirty && fCloseWinAfterSave) {
+		if (fCloseAppAfterSave) {
+			gApp->PostMessage(B_QUIT_REQUESTED);
+		} else {
+			PostMessage(B_QUIT_REQUESTED);
+		}
 	}
 }
 
@@ -312,7 +331,7 @@ void CDocWindow::NameChanged()
 		SetTitle(title);
 	}
 	else
-		SetTitle(CDoc::Name());
+		SetTitle(inheritedDoc::Name());
 }
 
 BRect CDocWindow::NextPosition(bool inc)

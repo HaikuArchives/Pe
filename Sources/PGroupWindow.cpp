@@ -199,14 +199,17 @@ const char* PGroupWindow::DocWindowType()
 
 bool PGroupWindow::QuitRequested()
 {
-	long l;
+	if (!inherited::QuitRequested())
+		return false;
+
 	if (fIconFinder)
 	{
+		status_t s;
 		fIconFinder->Cancel();
-		wait_for_thread(fIconFinder->Thread(), &l);
+		wait_for_thread(fIconFinder->Thread(), &s);
 	}
 
-	return inherited::QuitRequested();	
+	return true;
 } /* PGroupWindow::QuitRequested */
 
 void PGroupWindow::MessageReceived(BMessage *msg)
@@ -381,7 +384,6 @@ void PGroupWindow::WriteAttr(BFile& file, const BMessage& settingsMsg)
 
 void PGroupWindow::NameChanged()
 {
-	inherited::NameChanged();
 	if (EntryRef())
 	{
 		BEntry e;
@@ -389,6 +391,7 @@ void PGroupWindow::NameChanged()
 		FailOSErr(e.SetTo(EntryRef()));
 		FailOSErr(e.GetPath(&p));
 		fStatus->SetPath(p.Path());
+		SetTitle(EntryRef()->name);
 	}
 }
 

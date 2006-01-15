@@ -41,6 +41,9 @@ class HDialog;
 
 class CDocWindow : public BWindow, public CDoc
 {
+            typedef BWindow inheritedWindow;
+            typedef CDoc inheritedDoc;
+
 public:
 			CDocWindow(const entry_ref *ref = NULL);
 			CDocWindow(URLData& url);
@@ -66,11 +69,13 @@ virtual 	void CollectSettings(BMessage& settingsMsg) const;
 virtual 	void ApplySettings(const BMessage& settingsMsg);
 			status_t WriteState();
 
+virtual                void SetDirty(bool dirty);
 virtual		void NameChanged();
 
 			vector<HDialog*> fDialogs;
 
-			bool fWaitForSave;
+            bool fCloseWinAfterSave;
+            bool fCloseAppAfterSave;
 
 private:
 			HDialog *fWindowModal;
