@@ -422,6 +422,8 @@ void PDropCmd::Undo()
 	}
 } /* PDropCmd::Undo */
 
+#pragma mark --- ExtAction
+
 ExtAction::ExtAction()
 {
 	aText = NULL;
@@ -437,6 +439,8 @@ ExtAction::ExtAction(int type, int offset, char *text)
 ExtAction::~ExtAction()
 {
 } /* ExtAction::~ExtAction */
+
+#pragma mark --- PExtCmd
 
 PExtCmd::PExtCmd(PText *txt, const char *ext)
 	: PCmd(ext, txt)
@@ -511,6 +515,8 @@ void PExtCmd::Redo()
 } /* PExtCmd::Redo */
 
 
+#pragma mark --- PReplaceCmd
+
 PReplaceCmd::PReplaceCmd(PText *txt, int offset, int size, bool findNext, bool backward)
 	: PCmd("Replace", txt)
 {
@@ -583,6 +589,8 @@ void PReplaceCmd::Undo()
 	Update();
 	fText->Select(fOffset, fOffset + strlen(fWhat), true, false);
 } /* PReplaceCmd::Undo */
+
+#pragma mark --- PReplaceAllCmd
 
 PReplaceAllCmd::PReplaceAllCmd(PText *txt)
 	: PCmd("Replace All", txt)
@@ -689,6 +697,8 @@ void PReplaceAllCmd::Redo()
 {
 	Undo();
 } /* PReplaceAllCmd::Redo */
+
+#pragma mark --- PScriptCmd
 
 const int
 	kBufferSize = 1024;
@@ -886,15 +896,23 @@ void PScriptCmd::Redo()
 long PScriptCmd::Piper(void *data)
 {
 	PScriptCmd *cmd = static_cast<PScriptCmd*>(data);
+	long status = 0;
 	
-	write(cmd->fFD, cmd->fOldText, cmd->fOldTextSize);
+	long written = 0;
+	do {
+		long ww = write(cmd->fFD, cmd->fOldText+written, cmd->fOldTextSize-written);
+		if (ww < 0) {
+			status = ww;
+			break;
+		}
+		written += ww;
+	} while(written < cmd->fOldTextSize);
 	close(cmd->fFD);
 
-	return 0;
+	return status;
 } /* PScriptCmd::Piper */
 
-#pragma mark -
-#pragma mark --- Shift Command ---
+#pragma mark --- Shift Command
 
 PShiftCmd::PShiftCmd(const char *name, PText *txt)
 	: PCmd(name, txt)
