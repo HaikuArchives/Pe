@@ -48,17 +48,20 @@ public:
 virtual void MouseDown(BPoint where);
 virtual void Draw(BRect update);
 	
-BRect ClientArea();
+		void MessageReceived(BMessage *msg);
+		void AttachedToWindow();
+
+		BPoint AdjustBottomRightOfAllPanes();
+
+		BRect ClientArea();
 	
-BView* AddSheet(const char *name, const char *desc = NULL);
+		BView* AddSheet(const char *name, const char *desc = NULL);
 	
 		int CurrentTab()	{ return fCurrent; };
-	
 private:
 		
 		void FlipTo(int page);
-		void MessageReceived(BMessage *msg);
-		void AttachedToWindow();
+		BPoint DetermineBottomRightOfPane(BView* pane);
 
 		BRect fClientArea, fListArea;
 		BList fPanes;

@@ -59,6 +59,7 @@ virtual bool OKClicked();
 virtual bool CancelClicked();
 virtual void UpdateFields();
 virtual void MessageReceived(BMessage *msg);
+virtual	void Show();
 	void GetDefPageSetup();
 
 	static void CreateField(int kind, BPositionIO& data, BView*& inside);

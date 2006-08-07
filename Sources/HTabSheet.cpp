@@ -43,7 +43,7 @@ const int
 	kListWidth = 80;
 
 HTabSheet::HTabSheet(BRect frame, const char *name)
-	: BView(frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_NAVIGABLE)
+	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW | B_NAVIGABLE)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -56,9 +56,9 @@ HTabSheet::HTabSheet(BRect frame, const char *name)
 	fListArea.OffsetTo(f, f);
 	fListArea.right = fListArea.left + kListWidth * gFactor;
 	
-	fEntries = new BListView(fListArea, "entries");
+	fEntries = new BListView(fListArea, "entries", B_SINGLE_SELECTION_LIST, B_FOLLOW_TOP_BOTTOM);
 	fEntries->SetSelectionMessage(new BMessage(msg_Flip));
-	AddChild(new BScrollView("scroller", fEntries, B_FOLLOW_ALL_SIDES, 0, false, true));
+	AddChild(new BScrollView("scroller", fEntries, B_FOLLOW_TOP_BOTTOM, 0, false, true));
 	
 	fListArea.right += B_V_SCROLL_BAR_WIDTH;
 
@@ -125,6 +125,50 @@ void HTabSheet::Draw(BRect update)
 	
 	EndLineArray();
 } /* HTabSheet::Draw */
+
+BPoint HTabSheet::AdjustBottomRightOfAllPanes()
+{
+	BPoint overallBottomRight(0.0, 0.0);
+	for(int i=0; i<fPanes.CountItems(); ++i)
+	{
+		BView* pane = (BView*)fPanes.ItemAt(i);
+		if (!pane)
+			continue;
+		BPoint paneBottomRight = DetermineBottomRightOfPane(pane);
+		if (overallBottomRight.x < paneBottomRight.x)
+			overallBottomRight.x = paneBottomRight.x;
+		if (overallBottomRight.y < paneBottomRight.y)
+			overallBottomRight.y = paneBottomRight.y;
+	}
+	BPoint paneLeftTop;
+	for(int i=0; i<fPanes.CountItems(); ++i)
+	{
+		BView* pane = (BView*)fPanes.ItemAt(i);
+		if (!pane)
+			continue;
+		if (i == 0)
+			paneLeftTop = pane->Frame().LeftTop();
+		pane->ResizeTo(overallBottomRight.x + 51, overallBottomRight.y + 51);
+	}
+	return overallBottomRight+paneLeftTop;
+}
+
+BPoint HTabSheet::DetermineBottomRightOfPane(BView* pane)
+{
+	BPoint bottomRight(0, 0);
+	for(int i=0; i<pane->CountChildren(); ++i)
+	{
+		BView* child = pane->ChildAt(i);
+		if (!child)
+			continue;
+		BRect childFrame = child->Frame();
+		if (bottomRight.x < childFrame.right)
+			bottomRight.x = childFrame.right;
+		if (bottomRight.y < childFrame.bottom)
+			bottomRight.y = childFrame.bottom;
+	}
+	return bottomRight;
+}
 
 BRect HTabSheet::ClientArea()
 {

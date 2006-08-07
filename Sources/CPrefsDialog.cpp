@@ -50,6 +50,7 @@
 #include "HColorControl.h"
 #include "HPreferences.h"
 #include "HDefines.h"
+#include "HTabSheet.h"
 #include "MAlert.h"
 #include "CMimeBox.h"
 #include "CGrepBox.h"
@@ -1046,3 +1047,22 @@ void CPrefsDialog::DeleteKeybinding()
 		}
 	}
 } /* CPrefsDialog::DeleteKeybinding */
+
+void CPrefsDialog::Show() 
+{
+	HDialog::Show();
+	if (LockLooper())
+	{
+		HTabSheet* tabBook = (HTabSheet*)FindView("tabB");
+		BRect okFrame = FindView("ok  ")->Frame();
+		if (tabBook) {
+			BPoint bottomRight = tabBook->AdjustBottomRightOfAllPanes();
+			if (bottomRight.x < okFrame.right)
+				bottomRight.x = okFrame.right;
+			if (bottomRight.y < okFrame.bottom)
+				bottomRight.y = okFrame.bottom;
+			ResizeTo(bottomRight.x+5, bottomRight.y+5);
+		}
+		UnlockLooper();
+	}
+}

@@ -43,6 +43,7 @@
 #include "CLangIntf.h"
 #include "HPreferences.h"
 #include "HDefines.h"
+#include "HTabSheet.h"
 #include "MAlert.h"
 #include "Prefs.h"
 
@@ -187,7 +188,7 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 	lang->SetRadioMode(true);
 	int curLang = fDoc->TextView()->Language();
 	SetValue("language", curLang >= 0 ? curLang + 3 : 1);
-	
+
 	CancelClicked();
 } /* CInfoDialog::CInfoDialog */
 		
@@ -319,3 +320,22 @@ void CInfoDialog::UpdateFields()
 	SetEnabled("ok", true);
 	SetEnabled("cancel", true);
 } /* CInfoDialog::UpdateFields */
+
+void CInfoDialog::Show() 
+{
+	HDialog::Show();
+	if (LockLooper())
+	{
+		HTabSheet* tabBook = (HTabSheet*)FindView("tabbook");
+		BRect okFrame = FindView("ok")->Frame();
+		if (tabBook) {
+			BPoint bottomRight = tabBook->AdjustBottomRightOfAllPanes();
+			if (bottomRight.x < okFrame.right)
+				bottomRight.x = okFrame.right;
+			if (bottomRight.y < okFrame.bottom)
+				bottomRight.y = okFrame.bottom;
+			ResizeTo(bottomRight.x+5, bottomRight.y+5);
+		}
+		UnlockLooper();
+	}
+}

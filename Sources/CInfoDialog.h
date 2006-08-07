@@ -51,6 +51,8 @@ virtual	bool OKClicked();
 virtual	bool CancelClicked();
 virtual	void UpdateFields();
 
+		void Show();
+
 private:
 		BMenu *fTypes, *fMenu, *fSourceEncoding, *fEncoding, *fLineBreaks;
 		PDoc *fDoc;
