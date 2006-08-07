@@ -121,7 +121,16 @@ static void CopyAttributes(BFile& from, BFile& to)
 	}
 }
 
-#pragma mark -
+bool operator< (const node_ref& left, const node_ref& right)
+{
+	if (left.node < right.node)
+		return true;
+	else
+		return left.device < right.device;
+}
+
+
+// #pragma mark - CDocIO
 
 CDocIO::CDocIO(CDoc* doc)
 	: fDoc(doc)
@@ -167,6 +176,11 @@ void CDocIO::StopWatchingFile(bool stopDirectory)
 
 void CDocIO::HandleNodeMonitorMsg(BMessage* msg)
 {
+}
+
+bool CDocIO::MatchesNodeMonitorMsg(BMessage* msg)
+{
+	return false;
 }
 
 bool CDocIO::DoPreEditTextConversions(BString& docText)
@@ -229,7 +243,9 @@ bool CDocIO::DoPostEditTextConversions(BString& docText)
 	return true;
 }
 
-#pragma mark -
+// #pragma mark - CLocalDocIO
+
+BLocker CLocalDocIO::sfDocListLock("DocListLock");
 
 CLocalDocIO::CLocalDocIO(CDoc* doc, const entry_ref* eref, BLooper* target)
 	: CDocIO(doc)
@@ -411,6 +427,40 @@ BLooper* CLocalDocIO::Target()
 	return fTarget;
 }
 
+void CLocalDocIO::StartWatchingFolder()
+{
+	node_ref directoryNodeRef;
+	BEntry entry(fEntryRef);
+	BNode node;
+	if (entry.GetParent(&entry) == B_OK
+		&& node.SetTo(&entry) == B_OK
+		&& node.GetNodeRef(&directoryNodeRef) == B_OK)
+	{
+		if (sfDocListLock.Lock()) {
+			if (sfWatchedFolderMap[directoryNodeRef]++ == 0)
+				watch_node(&directoryNodeRef, B_WATCH_DIRECTORY, be_app);
+			sfDocListLock.Unlock();
+		}
+	}
+}
+
+void CLocalDocIO::StopWatchingFolder()
+{
+	node_ref directoryNodeRef;
+	BEntry entry(fEntryRef);
+	BNode node;
+	if (entry.GetParent(&entry) == B_OK
+		&& node.SetTo(&entry) == B_OK
+		&& node.GetNodeRef(&directoryNodeRef) == B_OK)
+	{
+		if (sfDocListLock.Lock()) {
+			if (sfWatchedFolderMap[directoryNodeRef]-- == 1)
+				watch_node(&directoryNodeRef, B_STOP_WATCHING, be_app);
+			sfDocListLock.Unlock();
+		}
+	}
+}
+
 void CLocalDocIO::StartWatchingFile()
 {
 	if (fEntryRef == NULL || fTarget == NULL)
@@ -421,12 +471,8 @@ void CLocalDocIO::StartWatchingFile()
 	if (node.GetNodeRef(&fNodeRef) == B_OK)
 		watch_node(&fNodeRef, B_WATCH_NAME | B_WATCH_STAT, fTarget);
 
-	node_ref directoryNodeRef;
-	BEntry entry(fEntryRef);
-	if (entry.GetParent(&entry) == B_OK
-		&& node.SetTo(&entry) == B_OK
-		&& node.GetNodeRef(&directoryNodeRef) == B_OK)
-		watch_node(&directoryNodeRef, B_WATCH_DIRECTORY, fTarget);
+
+	StartWatchingFolder();
 }
 
 void CLocalDocIO::StopWatchingFile(bool stopDirectory)
@@ -434,21 +480,16 @@ void CLocalDocIO::StopWatchingFile(bool stopDirectory)
 	if (fEntryRef == NULL || fTarget == NULL)
 		return;
 
+
+
 	watch_node(&fNodeRef, B_STOP_WATCHING, fTarget);
 
 	// if we get late messages, we don't want to deal with them
 	fNodeRef.device = -1;
 	fNodeRef.node = -1;
 
-	if (stopDirectory) {
-		node_ref directoryNodeRef;
-		BEntry entry(fEntryRef);
-		BNode node;
-		if (entry.GetParent(&entry) == B_OK
-			&& node.SetTo(&entry) == B_OK
-			&& node.GetNodeRef(&directoryNodeRef) == B_OK)
-			watch_node(&directoryNodeRef, B_STOP_WATCHING, fTarget);
-	}
+	if (stopDirectory)
+		StopWatchingFolder();
 }
 
 void CLocalDocIO::HandleNodeMonitorMsg(BMessage* msg)
@@ -484,11 +525,14 @@ void CLocalDocIO::HandleNodeMonitorMsg(BMessage* msg)
 			if (msg->FindString("name", &name) == B_OK)
 				fEntryRef->set_name(name);
 
+printf("detected changed name of <%s:%Ld>\n", name, fNodeRef.node);
+
 			fDoc->NameChanged();
 			break;
 		}
 		case B_ENTRY_REMOVED:
 		{
+printf("detected removal of <%s:%Ld>\n", fEntryRef->name, fNodeRef.node);
 			StopWatchingFile(false);
 				// We don't want to stop monitoring the directory; BTW, it
 				// will get automatically updated on next save, the monitoring
@@ -501,6 +545,17 @@ void CLocalDocIO::HandleNodeMonitorMsg(BMessage* msg)
 				ReadDoc(false);
 			break;
 	}
+}
+
+bool CLocalDocIO::MatchesNodeMonitorMsg(BMessage* msg)
+{
+	node_ref nref;
+	if (fEntryRef == NULL 
+	|| msg->FindInt64("node", &nref.node) != B_OK
+	|| msg->FindInt32("device", &nref.device) != B_OK)
+		return false;
+
+	return nref == fNodeRef;
 }
 
 bool CLocalDocIO::VerifyFile()
@@ -546,7 +601,7 @@ bool CLocalDocIO::VerifyFile()
 	return result;
 }
 
-#pragma mark -
+// #pragma mark - CFtpDocIO
 
 CFtpDocIO::CFtpDocIO(CDoc* doc, const URLData& url)
 	: CDocIO(doc)

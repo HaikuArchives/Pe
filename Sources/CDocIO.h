@@ -7,6 +7,10 @@
 #ifndef CDOC_IO_H
 #define CDOC_IO_H
 
+#include <map>
+
+#include <Locker.h>
+
 #include "CFtpStream.h"
 #include "utf-support.h"
 
@@ -30,6 +34,7 @@ public:
 	virtual	void StartWatchingFile(void);
 	virtual	void StopWatchingFile(bool stopDirectory = true);
 	virtual void HandleNodeMonitorMsg(BMessage* msg);
+	virtual bool MatchesNodeMonitorMsg(BMessage* msg);
 	virtual bool VerifyFile();
 	virtual void SetEntryRef(const entry_ref* ref);
 	virtual BLooper* Target();
@@ -64,14 +69,22 @@ public:
 
 	virtual	void StartWatchingFile(void);
 	virtual	void StopWatchingFile(bool stopDirectory = true);
+	virtual bool MatchesNodeMonitorMsg(BMessage* msg);
 	virtual void HandleNodeMonitorMsg(BMessage* msg);
 	virtual bool VerifyFile();
 	virtual void SetEntryRef(const entry_ref* ref);
 	virtual BLooper* Target();
 private:
+	virtual	void StartWatchingFolder(void);
+	virtual	void StopWatchingFolder(void);
+
 			entry_ref *fEntryRef;
 			node_ref fNodeRef;
 			BLooper* fTarget;
+
+	typedef map<node_ref, int32> WatchedFolderMap;
+	WatchedFolderMap sfWatchedFolderMap;
+	static	BLocker sfDocListLock;
 };
 
 class CFtpDocIO : public CDocIO

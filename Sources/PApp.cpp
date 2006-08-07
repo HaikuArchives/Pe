@@ -747,6 +747,11 @@ void PApp::MessageReceived(BMessage *msg)
 				break;
 			}
 	
+			case B_NODE_MONITOR: {
+				CDoc::HandleFolderNodeMonitorMsg(msg);
+				break;
+			}
+
 			case msg_OpenSelected:
 				DialogCreator<COpenSelection>::CreateDialog(NULL);
 				break;

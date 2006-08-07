@@ -536,6 +536,8 @@ void CDoc::PostToAll(unsigned long msg, bool async)
 	
 	doclist lst = sfDocList;
 	
+	BLooper *me = BLooper::LooperForThread(find_thread(NULL));
+
 	for (di = lst.begin(); di != lst.end(); di++)
 	{
 		BWindow *w = dynamic_cast<BWindow*>(*di);
@@ -543,8 +545,6 @@ void CDoc::PostToAll(unsigned long msg, bool async)
 		{
 			BMessage reply;
 			
-			BLooper *me = BLooper::LooperForThread(find_thread(NULL));
-
 			if (async || w == dynamic_cast<BWindow*>(me))
 				w->PostMessage(msg);
 			else
@@ -555,3 +555,17 @@ void CDoc::PostToAll(unsigned long msg, bool async)
 		}
 	}
 }
+
+void CDoc::HandleFolderNodeMonitorMsg(BMessage* msg)
+{
+	doclist::iterator di;
+	
+	doclist lst = sfDocList;
+	
+	for (di = lst.begin(); di != lst.end(); di++)
+	{
+		if ((*di)->fDocIO && (*di)->fDocIO->MatchesNodeMonitorMsg(msg))
+			(*di)->fDocIO->HandleNodeMonitorMsg(msg);
+	}
+}
+

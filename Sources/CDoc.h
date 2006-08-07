@@ -94,6 +94,7 @@ public:
 	static	const doclist& DocList();
 	static	void InvalidateAll();
 	static	void PostToAll(unsigned long msg, bool async);
+	static  void HandleFolderNodeMonitorMsg(BMessage* msg);
 
 	static	void AddRecent(const char *path);
 	static	bool GetNextRecent(char *path, int& indx);
