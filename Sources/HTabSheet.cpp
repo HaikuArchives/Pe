@@ -148,7 +148,7 @@ BPoint HTabSheet::AdjustBottomRightOfAllPanes()
 			continue;
 		if (i == 0)
 			paneLeftTop = pane->Frame().LeftTop();
-		pane->ResizeTo(overallBottomRight.x + 51, overallBottomRight.y + 51);
+		pane->ResizeTo(overallBottomRight.x + 1, overallBottomRight.y + 1);
 	}
 	return overallBottomRight+paneLeftTop;
 }
