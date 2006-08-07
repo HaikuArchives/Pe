@@ -394,13 +394,13 @@ void HDialog::CreateField(int kind, BPositionIO& data, BView*& inside)
 		case 'edit':
 		{
 			char val[256], allowed[256];
-			short max, width;
-			data >> r >> name >> label >> val >> allowed >> max >> width;
+			short max, divider;
+			data >> r >> name >> label >> val >> allowed >> max >> divider;
 			
 			BRect b = r.ToBe();
 			
 			inside->AddChild(v = new BTextControl(b, name, *label ? label : NULL,
-				val, new BMessage(msg_FieldChanged)));
+				val, new BMessage(msg_FieldChanged), B_FOLLOW_NONE));
 					
 			BTextView *tv = static_cast<BTextControl*>(v)->TextView();
 			if (*allowed)
@@ -414,7 +414,7 @@ void HDialog::CreateField(int kind, BPositionIO& data, BView*& inside)
 			}
 
 			if (max) tv->SetMaxBytes(max);
-			if (width) static_cast<BTextControl*>(v)->SetDivider(width * gFactor);
+			if (divider) static_cast<BTextControl*>(v)->SetDivider(divider * gFactor);
 			
 			if (v->Bounds().Height() < b.Height())
 			{
