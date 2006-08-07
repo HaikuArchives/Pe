@@ -822,7 +822,8 @@ void PDoc::OpenPartner()
 
 void PDoc::SetDirty(bool dirty)
 {
-	if (LockLooper()) {
+	if (LockLooper()) 
+	{
 		inherited::SetDirty(dirty);
 		if (!dirty)
 			// if the new state is non-dirty, we propagate this info to the 
