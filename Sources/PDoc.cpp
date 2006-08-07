@@ -822,13 +822,15 @@ void PDoc::OpenPartner()
 
 void PDoc::SetDirty(bool dirty)
 {
-	inherited::SetDirty(dirty);
-	if (!dirty)
-		// if the new state is non-dirty, we propagate this info to the 
-		// undo-stack, such that the non-dirty state is updated accordingly:
-		fText->ResetUndo();
-	fButtonBar->SetEnabled(msg_Save, dirty);
-	BString title = Title();
+	if (LockLooper()) {
+		inherited::SetDirty(dirty);
+		if (!dirty)
+			// if the new state is non-dirty, we propagate this info to the 
+			// undo-stack, such that the non-dirty state is updated accordingly:
+			fText->ResetUndo();
+		fButtonBar->SetEnabled(msg_Save, dirty);
+		UnlockLooper();
+	}
 } /* PDoc::SetDirty */
 
 void PDoc::CreateFilePanel()
