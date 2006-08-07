@@ -59,7 +59,7 @@ void HHelpView::Draw(BRect update)
 } /* HHelpView::Draw */
 			
 HHelpWindow::HHelpWindow(BRect r, const char *msg)
-	: BWindow(r, "", B_BORDERED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL, B_AVOID_FOCUS | B_AVOID_FRONT)
+	: BWindow(r, "", B_BORDERED_WINDOW_LOOK, B_FLOATING_APP_WINDOW_FEEL, B_AVOID_FOCUS | B_AVOID_FRONT)
 {
 	r.OffsetTo(0, 0);
 	AddChild(new HHelpView(r, msg));
