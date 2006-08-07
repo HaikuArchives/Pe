@@ -436,7 +436,8 @@ void CLocalDocIO::StartWatchingFolder()
 		&& node.SetTo(&entry) == B_OK
 		&& node.GetNodeRef(&directoryNodeRef) == B_OK)
 	{
-		if (sfDocListLock.Lock()) {
+		if (sfDocListLock.Lock()) 
+		{
 			if (sfWatchedFolderMap[directoryNodeRef]++ == 0)
 				watch_node(&directoryNodeRef, B_WATCH_DIRECTORY, be_app);
 			sfDocListLock.Unlock();
@@ -453,7 +454,8 @@ void CLocalDocIO::StopWatchingFolder()
 		&& node.SetTo(&entry) == B_OK
 		&& node.GetNodeRef(&directoryNodeRef) == B_OK)
 	{
-		if (sfDocListLock.Lock()) {
+		if (sfDocListLock.Lock()) 
+		{
 			if (sfWatchedFolderMap[directoryNodeRef]-- == 1)
 				watch_node(&directoryNodeRef, B_STOP_WATCHING, be_app);
 			sfDocListLock.Unlock();
@@ -525,14 +527,11 @@ void CLocalDocIO::HandleNodeMonitorMsg(BMessage* msg)
 			if (msg->FindString("name", &name) == B_OK)
 				fEntryRef->set_name(name);
 
-printf("detected changed name of <%s:%Ld>\n", name, fNodeRef.node);
-
 			fDoc->NameChanged();
 			break;
 		}
 		case B_ENTRY_REMOVED:
 		{
-printf("detected removal of <%s:%Ld>\n", fEntryRef->name, fNodeRef.node);
 			StopWatchingFile(false);
 				// We don't want to stop monitoring the directory; BTW, it
 				// will get automatically updated on next save, the monitoring

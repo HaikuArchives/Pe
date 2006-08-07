@@ -747,7 +747,8 @@ void PApp::MessageReceived(BMessage *msg)
 				break;
 			}
 	
-			case B_NODE_MONITOR: {
+			case B_NODE_MONITOR: 
+			{
 				CDoc::HandleFolderNodeMonitorMsg(msg);
 				break;
 			}
