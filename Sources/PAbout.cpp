@@ -46,9 +46,9 @@
 const char
 	kAboutText[] =
 #if __INTEL__
-		"Pe 2.3 (x86) Open Source Version\n\n"
+		"Pe 2.4 (x86) Open Source Version\n\n"
 #else
-		"Pe 2.3 (PPC) Open Source Version\n\n"
+		"Pe 2.4 (PPC) Open Source Version\n\n"
 #endif
 		"a high performance editor\n"
 		"created by Maarten Hekkelman.\n"
@@ -56,7 +56,7 @@ const char
 		"Copyright © 1997, 1998, 2002.\n\n"
 		"-\n\n"
 		"This is the Open Source version of Pe,\n"
-		"copyright © 2003-2005, Team Pe at BeUnited,\n"
+		"copyright © 2003-2006, Team Pe at BeUnited,\n"
 		"compiled on:\n%s\n\n"
 		"Pe is now hosted at BerliOS:\n"
 		"http://developer.berlios.de/projects/pe-editor\n\n"
