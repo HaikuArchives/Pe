@@ -78,6 +78,8 @@ public:
 	bool Grep();
 	bool IsInMultiFileState() const;
 	
+	CRegex* Regex();
+	
 	void GetPatternInfo(BMessage* patternMsg);
 	void SetPatternInfo(const BMessage* patternMsg);
 	bool PatternInfoDiffersFrom(const BMessage* patternMsg);
@@ -187,6 +189,11 @@ inline bool CFindDialog::Grep()
 inline bool CFindDialog::IsInMultiFileState() const
 {
 	return fCurrentDir != NULL || fOpenWindowIndex >= 0;
+}
+
+inline CRegex* CFindDialog::Regex()
+{
+	return &fRegex;
 }
 
 #pragma mark - Find

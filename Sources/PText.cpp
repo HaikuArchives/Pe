@@ -4037,15 +4037,12 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 		return false;
 	}
 	
-	CRegex rx;
+	CRegex* rx = NULL;
 	if (regx)
 	{
-		if (rx.SetTo(what, ignoreCase, entireWord, backward) != B_OK)
-		{
-			MWarningAlert a(rx.ErrorStr().String());
-			a.Go();
+		rx = gFindDialog->Regex();
+		if (!rx)
 			return false;
-		}
 	}
 	else
 	{
@@ -4065,9 +4062,9 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 							: krx_NotBOL;
  
 			if (backward)
-				r = rx.Match(fText.Buffer(), offset, 0, options);
+				r = rx->Match(fText.Buffer(), offset, 0, options);
 			else
-				r = rx.Match(fText.Buffer(), fText.Size(), offset, options);
+				r = rx->Match(fText.Buffer(), fText.Size(), offset, options);
 			
 			if (r == krx_NoMatch)
 			{
@@ -4076,8 +4073,8 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 			}
 			else 
 			{
-				offset = rx.MatchStart();
-				wl = rx.MatchLen();
+				offset = rx->MatchStart();
+				wl = rx->MatchLen();
 			}
 		}
 		else if (backward)

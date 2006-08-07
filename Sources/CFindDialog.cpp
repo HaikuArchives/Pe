@@ -503,7 +503,7 @@ void CFindDialog::DoFind(unsigned long cmd)
 	if (CRecentPatternController::ActiveController()->AddCurrentPattern())
 		AddCurrentPatternToFindPopup(cmd != msg_Find);
 
-	if (fChkGrep->IsOn())
+	if (fChkGrep->IsOn() && (cmd == msg_Find || cmd == msg_ReplaceAll))
 	{
 		status_t res = fRegex.SetTo(fEdiFind->Text(), fChkCase->IsOn(), 
 									fChkWord->IsOn());
