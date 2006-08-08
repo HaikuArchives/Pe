@@ -156,6 +156,16 @@ void ImageToC::DumpBitmap(BBitmap* bitmap, const char *name)
 	baseName.Prepend("k");
 
 	char line[1024];
+#ifdef __MWERKS__
+	sprintf(line,
+		"const %sWidth = %ld;\n"
+		"const %sHeight = %ld;\n"
+		"const %sColorSpace = %s;\n"
+		"const %sBytesPerRow = %ld;\n\n",
+		baseName.String(), bitmap->Bounds().IntegerWidth() + 1, baseName.String(),
+		bitmap->Bounds().IntegerHeight() + 1, baseName.String(), colorSpace,
+		baseName.String(), bitmap->BytesPerRow());
+#else
 	snprintf(line, sizeof(line),
 		"const %sWidth = %ld;\n"
 		"const %sHeight = %ld;\n"
@@ -164,6 +174,7 @@ void ImageToC::DumpBitmap(BBitmap* bitmap, const char *name)
 		baseName.String(), bitmap->Bounds().IntegerWidth() + 1, baseName.String(),
 		bitmap->Bounds().IntegerHeight() + 1, baseName.String(), colorSpace,
 		baseName.String(), bitmap->BytesPerRow());
+#endif
 
 	text.Insert(line);
 
@@ -181,8 +192,12 @@ void ImageToC::DumpBitmap(BBitmap* bitmap, const char *name)
 
 	int32 size = bitmap->BitsLength() / bytesPerPixel;
 
+#ifdef __MWERKS__
+	sprintf(line, "const %sData[%ld] = {", baseName.String(), size);
+#else
 	snprintf(line, sizeof(line), "const %sData[%ld] = {",
 		baseName.String(), size);
+#endif
 	text.Insert(line);
 
 	line[0] = '\0';

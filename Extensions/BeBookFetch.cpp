@@ -12,6 +12,8 @@
 
 #include "PeAddOn.h"
 
+#include <vector>
+
 #define kTrackerSig		"application/x-vnd.Be-TRAK"
 
 //------------------------------------------------------------------------------

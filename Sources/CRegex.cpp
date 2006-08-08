@@ -53,7 +53,7 @@ status_t CRegex::Match(const char* subject, int32 len, int32 offset,
 		return res;
 	infoCount++;
 	int vs = infoCount*3;
-	int mvect[vs];
+	int *mvect = new int [vs];
 	res = pcre_exec(fRegex, NULL, subject, len, offset, options, mvect, vs);
 	fMatchInfos.clear();
 	if (res >= 0)
@@ -74,8 +74,9 @@ status_t CRegex::Match(const char* subject, int32 len, int32 offset,
 			}
 			fMatchInfos.push_back(mi);
 		}
-		return 0;
+		res = 0;
 	}
+	delete [] mvect;
 	return res;
 }
 

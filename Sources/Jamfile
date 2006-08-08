@@ -10,8 +10,6 @@ if $(OSPLAT) = X86 {
 	Depends libhekkel.so : $(PREFIX_FILE) ;
 	PreCompile $(PREFIX_FILE) : [ FDirName $(TOP) Sources pe.pch++ ] ;
 	C++FLAGS += -prefix $(PREFIX_FILE) ;
-
-	SubDirSysHdrs $(TOP) regex ;
 }
 
 SAVED_DEFINES = $(DEFINES) ;

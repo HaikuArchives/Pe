@@ -2,10 +2,8 @@ SubDir TOP Extensions ;
 
 SubDirHdrs $(TOP) Sources ;
 
-if $(OSPLAT) = PPC {
-	# include regex-subfolder as system header folder
-	SubDirSysHdrs $(TOP) regex ;
-}
+SubDirSysHdrs /boot/home/config/include ;
+LINKFLAGS += -L/boot/home/config/lib ;
 
 # <pe-src>
 PeExtension PrefixLines 
@@ -25,7 +23,7 @@ PeExtension BeBookFetch
 # <pe-src>
 PeExtension Copy\ Lines\ Containing 
 	: CopyContaining.cpp 
-	: libhekkel.so $(RX_LIB) be $(STDC++LIB) 
+	: libhekkel.so pcreposix $(RX_LIB) be $(STDC++LIB) 
 	: copycon.r
 	;
 # </pe-src>
@@ -33,7 +31,7 @@ PeExtension Copy\ Lines\ Containing
 # <pe-src>
 PeExtension Cut\ Lines\ Containing 
 	: CutContaining.cpp 
-	: libhekkel.so $(RX_LIB) be $(STDC++LIB) 
+	: libhekkel.so pcreposix $(RX_LIB) be $(STDC++LIB) 
 	;
 # </pe-src>
 

@@ -53,6 +53,8 @@ inline time_t CDocIO::LastSaved() const
 	return fLastSaved;
 }
 
+bool operator< (const node_ref& left, const node_ref& right);
+
 class CLocalDocIO : public CDocIO
 {
 public:

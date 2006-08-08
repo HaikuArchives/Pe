@@ -272,11 +272,8 @@ void HCheckBox::SetOn(bool on)
 
 
 HScrollView::HScrollView(BView* view, const char *name, BView *target,
-				uint32 resizingMode = B_FOLLOW_LEFT|B_FOLLOW_TOP,
-				uint32 flags = 0,
-				bool horizontal = false,
-				bool vertical = false,
-				border_style border = B_FANCY_BORDER)
+				uint32 resizingMode, uint32 flags, bool horizontal, bool vertical,
+				border_style border)
 : BScrollView(name, target, resizingMode, flags, horizontal, vertical, border)
 {
 	if (view != NULL)
@@ -286,10 +283,8 @@ HScrollView::HScrollView(BView* view, const char *name, BView *target,
 #pragma mark - HBox
 
 
-HBox::HBox(BView* view, const char *name = NULL,
-			uint32 resizingMode,
-			uint32 flags,
-			border_style border)
+HBox::HBox(BView* view, const char *name, uint32 resizingMode, uint32 flags,
+			  border_style border)
 : BBox(BRect(0, 0, 100, 50), name, resizingMode, flags, border)
 {
 	if (view != NULL)

@@ -45,6 +45,7 @@
 
 	// include only subset of interfacekit
 #include <Alert.h>
+#include <Box.h>
 #include <Bitmap.h>
 #include <Button.h>
 #include <CheckBox.h>

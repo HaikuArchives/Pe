@@ -34,7 +34,8 @@
 */
 
 #include "PeAddOn.h"
-#include <regex.h>
+#include <pcreposix.h>
+#define REG_NOERROR 0
 #include "copycon.r.h"
 
 #if __INTEL__

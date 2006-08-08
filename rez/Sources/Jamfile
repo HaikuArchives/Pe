@@ -1,7 +1,7 @@
 
 SubDir TOP rez Sources ;
 
-SubDirHdrs $(OBJECTS_DIR) Sources ;
+# SubDirHdrs $(OBJECTS_DIR) Sources ;
 
 if $(OSPLAT) = X86 {
 	C++FLAGS += -Wno-uninitialized -Wno-unused ;

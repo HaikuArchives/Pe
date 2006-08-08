@@ -161,7 +161,7 @@ public:
 			   uint32 resizingMode = H_FOLLOW_LEFT_TOP, bool fixedSize = false, float width = 100);
 	void ResizeLocalized(const char* label=NULL, const char* itemLabel=NULL);
 	BMenuItem *AddMenuItem(uint32 cmd, int32 index = -1);
-	int32 HMenuField::FindMarkedIndex(void);
+	int32 FindMarkedIndex(void);
 	//
 	float Left(void)									{ return Frame().left; }
 	float Right(void)									{ return Frame().right; }
