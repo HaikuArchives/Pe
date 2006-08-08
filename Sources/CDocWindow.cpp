@@ -183,7 +183,7 @@ void CDocWindow::Quit()
 {
 	WriteState();
 	BRect frame = Frame();
-	if (fDocIO->LastSaved() == 0 && frame != fInitialFrame)
+	if (fDocIO->LastSaved() == 0 && !IsDirty() && frame != fInitialFrame)
 	{
 		// closing a new (unsaved) document (a.k.a. 'Untitled') defines
 		// the default document frame for the current window type:
