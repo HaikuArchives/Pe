@@ -182,13 +182,14 @@ bool CDocWindow::QuitRequested()
 void CDocWindow::Quit()
 {
 	WriteState();
-	if (fDocIO->LastSaved() == 0)
+	BRect frame = Frame();
+	if (fDocIO->LastSaved() == 0 && frame != fInitialFrame)
 	{
 		// closing a new (unsaved) document (a.k.a. 'Untitled') defines
 		// the default document frame for the current window type:
 		BString prefsName = prf_R_DefaultDocumentRect;
 			prefsName << DocWindowType();
-		gPrefs->SetPrefRect(prefsName.String(), Frame());
+		gPrefs->SetPrefRect(prefsName.String(), frame);
 		sfNewCount = -1;
 	}
 	inheritedWindow::Quit();
@@ -344,7 +345,7 @@ BRect CDocWindow::NextPosition(bool inc)
 	lh = fh.ascent + fh.descent + fh.leading;
 
 	BRect initialDefaultRect(
-		40, 25,	
+		40, 25,
 		40 + 80*textFont.StringWidth("m") + B_V_SCROLL_BAR_WIDTH + 5, 
 		25 + 40*lh + B_H_SCROLL_BAR_HEIGHT
 	);
