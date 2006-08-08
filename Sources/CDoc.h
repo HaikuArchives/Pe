@@ -105,6 +105,11 @@ public:
 			const entry_ref* EntryRef() const;
 			void SetEntryRef(const entry_ref* ref);
 			
+			bool HadError() const;
+			const char* ErrorMsg() const;
+			void SetErrorMsg(const char*);
+			void ClearErrorMsg();
+
 			const URLData* URL() const;
 			
 			void SetDocIO( CDocIO* docIO);
@@ -129,7 +134,7 @@ protected:
 
 			void StartWatchingFile(void);
 			void StopWatchingFile(bool stopDirectory = true);
-
+			
 protected:
 			CDocIO* fDocIO;
 			BFilePanel *fSavePanel;
@@ -141,6 +146,7 @@ private:
 			bool fReadOnly;
 			int fEncoding;
 			int fLineEndType;
+			string fErrorMsg;
 };
 
 inline bool CDoc::IsDirty() const
@@ -171,6 +177,26 @@ inline int CDoc::LineEndType() const
 inline void CDoc::SetLineEndType(int lineEndType)
 {
 	fLineEndType = lineEndType;
+}
+
+inline bool CDoc::HadError() const
+{
+	return fErrorMsg.length() > 0;
+}
+
+inline const char* CDoc::ErrorMsg() const
+{
+	return fErrorMsg.c_str();
+}
+
+inline void CDoc::SetErrorMsg(const char* errorMsg)
+{
+	fErrorMsg = errorMsg;
+}
+
+inline void CDoc::ClearErrorMsg()
+{
+	fErrorMsg.clear();
 }
 
 inline const char *CDoc::MimeType() const

@@ -214,6 +214,14 @@ void CDocWindow::Show()
 
 	inheritedWindow::Show();
 	fInitialFrame = Frame();
+
+	// now that the window is shown, we might have to show any error alongside
+	// it that may have ocurred during load (conversion failure):
+	if (HadError()) {
+		MInfoAlert a(ErrorMsg(), "I See");
+		a.Go();
+		ClearErrorMsg();
+	}
 }
 
 void CDocWindow::MessageReceived(BMessage *msg)
