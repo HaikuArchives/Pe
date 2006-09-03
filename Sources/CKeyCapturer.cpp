@@ -66,7 +66,7 @@ filter_result CCaptureFilter::Filter(BMessage *msg, BHandler **target)
 } /* CKeyCapturer::Filter */
 
 CKeyCapturer::CKeyCapturer(BRect frame, const char *name)
-	: BView(frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_NAVIGABLE)
+	: BView(frame, name, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE)
 {
 	fFilter = new CCaptureFilter;
 } /* CKeyCapturer::CKeyCapturer */
