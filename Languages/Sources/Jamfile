@@ -10,6 +10,22 @@ if $(OSPLAT) = X86 {
 }
 
 # <pe-src>
+PeLanguage AntlrExt 
+	: CLang_antlr.cpp CantlrPopup.cpp
+	: be 
+	: keywords.g.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage AsmExt 
+	: CLang_asm.cpp 
+	: be 
+	: keywords.asm.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
 PeLanguage CppExt 
 	: CLang_cpp.cpp CcppPopup.cpp 
 	: be 
@@ -18,26 +34,19 @@ PeLanguage CppExt
 # </pe-src>
 
 # <pe-src>
-PeLanguage PascalExt 
-	: CLang_pas.cpp CpasPopup.cpp 
+PeLanguage DExt : 
+	CLang_d.cpp
+	CDPopup.cpp
 	: be 
-	: keywords.pas.rsrc 
+	: keywords.d.rsrc 
 	;
 # </pe-src>
 
 # <pe-src>
-PeLanguage SQLExt 
-	: CLang_sql.cpp 
+PeLanguage DiffExt 
+	: CLang_diff.cpp 
 	: be 
-	: keywords.sql.rsrc 
-	;
-# </pe-src>
-
-# <pe-src>
-PeLanguage JavaExt 
-	: CLang_java.cpp CjavaFuncPopup.l 
-	: be 
-	: keywords.java.rsrc 
+	: keywords.diff.rsrc 
 	;
 # </pe-src>
 
@@ -58,10 +67,59 @@ PeLanguage HtmlJSExt
 # </pe-src>
 
 # <pe-src>
+PeLanguage JamExt 
+	: CLang_jam.cpp 
+	: be 
+	: keywords.jam.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage JavaExt 
+	: CLang_java.cpp CjavaFuncPopup.l 
+	: be 
+	: keywords.java.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage LoutExt : 
+	CLang_lout.cpp
+	CLoutFuncPopup.l
+	: be
+	: keywords.lt.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage LuaExt 
+	: CLang_lua.cpp CluaPopup.cpp 
+	: be 
+	: keywords.lua.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage MathematicaExt 
+	: CLang_m.cpp CmFuncPopup.l 
+	: be 
+	: keywords.m.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
 PeLanguage OberonExt 
 	: CLang_ob2.cpp Cob2FuncPopup.l 
 	: be 
 	: keywords.ob2.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
+PeLanguage PascalExt 
+	: CLang_pas.cpp CpasPopup.cpp 
+	: be 
+	: keywords.pas.rsrc 
 	;
 # </pe-src>
 
@@ -90,22 +148,6 @@ PeLanguage RezExt
 # </pe-src>
 
 # <pe-src>
-PeLanguage TexExt 
-	: CLang_tex.cpp CtexFuncPopup.l 
-	: be 
-	: keywords.tex.rsrc 
-	;
-# </pe-src>
-
-# <pe-src>
-PeLanguage MathematicaExt 
-	: CLang_m.cpp CmFuncPopup.l 
-	: be 
-	: keywords.m.rsrc 
-	;
-# </pe-src>
-
-# <pe-src>
 PeLanguage ShellExt 
 	: CLang_shell.cpp 
 	: be 
@@ -114,42 +156,17 @@ PeLanguage ShellExt
 # </pe-src>
 
 # <pe-src>
-PeLanguage JamExt 
-	: CLang_jam.cpp 
+PeLanguage SQLExt 
+	: CLang_sql.cpp 
 	: be 
-	: keywords.jam.rsrc 
+	: keywords.sql.rsrc 
 	;
 # </pe-src>
 
 # <pe-src>
-PeLanguage LuaExt 
-	: CLang_lua.cpp CluaPopup.cpp 
+PeLanguage TexExt 
+	: CLang_tex.cpp CtexFuncPopup.l 
 	: be 
-	: keywords.lua.rsrc 
+	: keywords.tex.rsrc 
 	;
 # </pe-src>
-
-# <pe-src>
-PeLanguage AsmExt 
-	: CLang_asm.cpp 
-	: be 
-	: keywords.asm.rsrc 
-	;
-# </pe-src>
-
-# <pe-src>
-PeLanguage DiffExt 
-	: CLang_diff.cpp 
-	: be 
-	: keywords.diff.rsrc 
-	;
-# </pe-src>
-
-# <pe-src>
-PeLanguage AntlrExt 
-	: CLang_antlr.cpp CantlrPopup.cpp
-	: be 
-	: keywords.g.rsrc 
-	;
-# </pe-src>
-
