@@ -87,6 +87,43 @@ static int32 DetermineLineEndType(const BString& str)
 
 static int32 DetermineEncoding(const BString& str)
 {
+	/* HACK: Get the first line and see if there's something like 
+	  "[PE:ENC=<encoding>]" in there. <encoding> is supported encodings
+	  with spaces replaced by "-", eg.: "ISO-8859-15" */
+	int32			pos;
+	BString			line;
+	int32			enc_id = -1;
+	BString			enc_name;
+	CEncodingRoster	enc_roster;
+
+	// Get the first line
+	if ((pos = str.FindFirst('\n')) != B_ERROR ||
+	    (pos = str.FindFirst('\r')) != B_ERROR)
+	{
+		str.CopyInto(line, 0, pos);
+		// Cut down to begin of magic identifier, if there
+		if ((pos = line.IFindFirst("[PE:")) != B_ERROR)
+		{
+			line.Remove(0, pos+4);
+			// Find end of settings and cut the rest off
+			if ((pos = line.FindFirst(']')) != B_ERROR)
+			{
+				line.Remove(pos, line.Length()-pos);
+				// Check supported encodings
+				// (sofar no other settings allowed)
+				while (enc_roster.IsSupportedEncoding(++enc_id))
+				{
+					enc_name = enc_roster.EncodingNameByIdx(enc_id);
+					enc_name.ReplaceAll(' ', '-');
+					enc_name.Prepend("ENC=");
+					if (line.ICompare(enc_name) == 0)
+					{
+						return enc_id;
+					}
+				}
+			}
+		}
+	}
 	return B_UNICODE_UTF8;
 }
 
@@ -100,7 +137,7 @@ static void CopyAttributes(BFile& from, BFile& to)
 		{
 			attr_info ai;
 			
-			if (strcmp(name, "BEOS:TYPE") == 0)
+			if (strcmp(name, "_trk/_clipping_file_") == 0)
 				continue;
 			
 			FailOSErr(from.GetAttrInfo(name, &ai));
@@ -119,6 +156,47 @@ static void CopyAttributes(BFile& from, BFile& to)
 	{
 		e.DoError();
 	}
+}
+
+static bool CopyFile(BEntry& srcEntry, BEntry& dstEntry)
+{
+	try
+	{
+		char srcName[B_FILE_NAME_LENGTH];
+
+		BFile srcFile;
+		BFile dstFile;
+		BDirectory dir;
+		const int bufSize = 1024;
+		char buf[bufSize];
+		ssize_t bytesRead;
+		time_t created;
+
+		// Create destination file
+		FailOSErr(srcEntry.GetCreationTime(&created));
+		FailOSErr(srcEntry.GetName(srcName));
+		string dstName(srcName);
+		dstName += '~';
+		FailOSErr(srcEntry.GetParent(&dir));
+		FailOSErr(dstEntry.SetTo(&dir, dstName.c_str(), true));
+		FailOSErr(dstFile.SetTo(&dstEntry, B_WRITE_ONLY|B_CREATE_FILE|B_ERASE_FILE));
+
+		// Copy file data, attributes and time
+		FailOSErr(srcFile.SetTo(&srcEntry, B_READ_ONLY));
+		while ((bytesRead = srcFile.Read((void *)buf, bufSize)) > 0)
+		{
+			dstFile.Write(buf, bytesRead);
+		}
+		CopyAttributes(srcFile, dstFile);
+		FailOSErr(dstFile.SetCreationTime(created));
+		FailOSErr(dstFile.Sync());
+	}
+	catch (HErr& e)
+	{
+		e.DoError();
+		return false;
+	}
+	return true;
 }
 
 bool operator< (const node_ref& left, const node_ref& right)
@@ -343,11 +421,12 @@ bool CLocalDocIO::ReadDoc(bool readAttributes)
 
 	return result;
 }
-	
+
 bool CLocalDocIO::WriteDoc()
 {
 	char name[B_FILE_NAME_LENGTH];
 	BEntry e(fEntryRef, true);
+	BEntry backup;
 	bool existed = e.Exists();
 
 	try
@@ -358,36 +437,27 @@ bool CLocalDocIO::WriteDoc()
 		fDoc->GetText(docText);
 		if (!DoPostEditTextConversions(docText))
 			return false;
-	
-		FailOSErr(e.GetName(name));
-	
-		time_t created;
-		if (existed)
-		{
-			FailOSErr(e.GetCreationTime(&created));
 
-			string bname(name);
-			bname += '~';
-			FailOSErr(e.Rename(bname.c_str(), true));
+		FailOSErr(e.GetName(name));
+
+		if (existed) 
+		{	// Create a backup file
+			if (!CopyFile(e, backup))
+				return false;
 		}
 
+		// Write document
 		BFile file;
 		BDirectory dir;
 		FailOSErr(e.GetParent(&dir));
-		FailOSErr(dir.CreateFile(name, &file, true));
+		FailOSErr(dir.CreateFile(name, &file, false));
 		CheckedWrite(file, docText.String(), docText.Length());
-		if (existed)
-		{
-			BFile old;
-			FailOSErr(old.SetTo(&e, B_READ_ONLY));
-			CopyAttributes(old, file);
-			FailOSErr(file.SetCreationTime(created));
-		}
 		fDoc->WriteAttr(file, settingsMsg);
 		file.Sync();
-
+		
+		// Remove backup file
 		if (existed && !gPrefs->GetPrefInt(prf_I_Backup))
-			FailOSErr(e.Remove());
+			FailOSErr(backup.Remove());
 
 		// Update MIME type info
 		e.SetTo(&dir, name);
@@ -408,10 +478,6 @@ bool CLocalDocIO::WriteDoc()
 	catch (HErr& err)
 	{
 		err.DoError();
-		// Now don't check error codes anymore... hope this is right
-		BEntry(fDoc->EntryRef(), true).Remove();
-		if (existed)
-			e.Rename(name);
 		return false;
 	}
 	return true;
