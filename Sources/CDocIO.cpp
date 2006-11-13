@@ -189,7 +189,7 @@ static bool CopyFile(BEntry& srcEntry, BEntry& dstEntry)
 		}
 		CopyAttributes(srcFile, dstFile);
 		FailOSErr(dstFile.SetCreationTime(created));
-		FailOSErr(dstFile.Sync());
+		dstFile.Sync();
 	}
 	catch (HErr& e)
 	{
