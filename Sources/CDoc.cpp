@@ -138,17 +138,20 @@ void CDoc::Save()
 		if (!fDocIO)
 			THROW(("No file available"));
 		// Only save directly if the file is writable and if we already
-		// have a place (entry) for the file:
+		// have a place (entry) for the file
 		if (!fReadOnly && (!fDocIO->IsLocal() || EntryRef()))
 		{
-			StopWatchingFile();
-			if (fDocIO->WriteDoc())
-				SetDirty(false);
-			StartWatchingFile();
+			if (IsDirty())
+			{
+				StopWatchingFile();
+				if (fDocIO->WriteDoc())
+					SetDirty(false);
+				StartWatchingFile();
+			}
 		}
 		else
 		{
-			// ask user where to save to:
+			// Ask user where to save to
 			SaveAs();
 		}
 	}

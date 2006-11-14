@@ -1536,6 +1536,12 @@ void PDoc::MenusBeginning()
 		fWindows->AddItem(new BMenuItem(w->Title(), msg,
 			(doc && doc->fShortcut < 10) ? '0' + doc->fShortcut : 0), insertId);
 	}
+
+	// Disable "Save" menuitem on non-dirty/new files
+	BMenuItem* saveItem = fMBar->FindItem(msg_Save);
+	if (saveItem)
+		saveItem->SetEnabled(fText->IsDirty() || !EntryRef());
+
 	
 	i = fRecent->CountItems() - 1;
 	while (i >= 0)
