@@ -1512,7 +1512,8 @@ void PDoc::MenusBeginning()
 	UpdateShortCuts();
 
 	doclist::iterator di;
-	
+
+	int32 firstIndex = fWindows->CountItems();
 	for (di = sfDocList.begin(); di != sfDocList.end(); di++)
 	{
 		PDoc *doc = dynamic_cast<PDoc*>(*di);
@@ -1525,8 +1526,15 @@ void PDoc::MenusBeginning()
 			continue;
 		BMessage *msg = new BMessage(msg_SelectWindow);
 		msg->AddPointer("window", w);
+		// Sort alphabetically; TODO: utf-8 compare?!
+		int32 insertId = firstIndex-1;
+		while (++insertId<fWindows->CountItems() && 
+			   strcmp(fWindows->ItemAt(insertId)->Label(), w->Title()) < 0)
+		{
+		}
+		// Finally insert
 		fWindows->AddItem(new BMenuItem(w->Title(), msg,
-			(doc && doc->fShortcut < 10) ? '0' + doc->fShortcut : 0));
+			(doc && doc->fShortcut < 10) ? '0' + doc->fShortcut : 0), insertId);
 	}
 	
 	i = fRecent->CountItems() - 1;
