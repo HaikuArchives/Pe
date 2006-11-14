@@ -1499,59 +1499,66 @@ void PDoc::MessageReceived(BMessage *msg)
 
 void PDoc::MenusBeginning()
 {
-	int i;
+	int32 i;
+	int32 unsavedDocs = 0;
+	BMenuItem* mitem;
 
+	// First call, remember number of entries without OpenWindows
 	if (fWindowMenuLength == -1)
 		fWindowMenuLength = fWindows->CountItems();
+	// Otherwise remove OpenWindows entries
 	else
-		for (i = fWindows->CountItems() - 1; i >= fWindowMenuLength; i--)
+		for (int32 i = fWindows->CountItems() - 1; i >= fWindowMenuLength; i--)
 		{
 			delete fWindows->RemoveItem(i);
 		}
-
 	UpdateShortCuts();
 
+	// Add OpenWindows entries
 	doclist::iterator di;
-
-	int32 firstIndex = fWindows->CountItems();
 	for (di = sfDocList.begin(); di != sfDocList.end(); di++)
 	{
 		PDoc *doc = dynamic_cast<PDoc*>(*di);
-
-		if (doc && doc->IsWorksheet())
-			continue;
-
 		BWindow *w = dynamic_cast<BWindow*>(*di);
-		if (!w)
+
+		if ((doc && doc->IsWorksheet()) || !w)
 			continue;
+		// Count files to be saved
+		if (doc->IsDirty() || !doc->EntryRef())
+			unsavedDocs++;
 		BMessage *msg = new BMessage(msg_SelectWindow);
 		msg->AddPointer("window", w);
 		// Sort alphabetically; TODO: utf-8 compare?!
-		int32 insertId = firstIndex-1;
+		int32 insertId = fWindowMenuLength-1;
 		while (++insertId<fWindows->CountItems() && 
-			   strcmp(fWindows->ItemAt(insertId)->Label(), w->Title()) < 0)
-		{
-		}
+			   strcmp(fWindows->ItemAt(insertId)->Label(), w->Title()) < 0) ;
 		// Finally insert
 		fWindows->AddItem(new BMenuItem(w->Title(), msg,
 			(doc && doc->fShortcut < 10) ? '0' + doc->fShortcut : 0), insertId);
 	}
 
 	// Disable "Save" menuitem on non-dirty/new files
-	BMenuItem* saveItem = fMBar->FindItem(msg_Save);
-	if (saveItem)
-		saveItem->SetEnabled(fText->IsDirty() || !EntryRef());
+	if ((mitem = fMBar->FindItem(msg_Save)))
+		mitem->SetEnabled(fText->IsDirty() || !EntryRef());
 
-	
+	// Disable "SaveAll" menuitem on non-dirty/new files
+	if ((mitem = fMBar->FindItem(msg_SaveAll)))
+	{
+		BString str = mitem->Label();
+		if ((i = str.FindLast("  (")) > 0)
+		{
+			str.Remove(i, str.Length()-i);
+		}
+		if (unsavedDocs > 0)
+			str << "  (" << unsavedDocs << ")";
+		mitem->SetLabel(str.String());
+		mitem->SetEnabled(unsavedDocs > 0);
+	}
+
+	// List of recent Documents
 	i = fRecent->CountItems() - 1;
 	while (i >= 0)
 		delete fRecent->RemoveItem(i--);
-
-	float w;
-
-	{
-		w = BScreen().Frame().Width() / 3;
-	}
 
 	int cnt = sfTenLastDocs.size();
 	char **p = (char **)malloc(cnt * sizeof(char *));	
@@ -1563,6 +1570,7 @@ void PDoc::MenusBeginning()
 		p[i] = (char *)malloc(strlen(s[i]) + 4);
 	}
 
+	float w = BScreen().Frame().Width() / 3;
 	be_bold_font->GetTruncatedStrings(s, cnt, B_TRUNCATE_SMART, w, p);
 	
 	for (i = 0; i < cnt; i++)
