@@ -4,14 +4,14 @@ SubDir TOP Languages Sources ;
 SubDirHdrs $(TOP) Sources ;
 
 if $(OSPLAT) = X86 {
-	C++FLAGS += -include [ FDirName $(TOP) Languages Sources CLangIncl.h ] -Wno-unused ;
+	C++FLAGS += -include [ FDirName $(TOP) Languages Sources LanguageIncludes.h ] -Wno-unused ;
 } else {
-	C++FLAGS += -prefix CLangIncl.h -w nounusedvar ;
+	C++FLAGS += -prefix LanguageIncludes.h -w nounusedvar ;
 }
 
 # <pe-src>
 PeLanguage AntlrExt 
-	: CLang_antlr.cpp CantlrPopup.cpp
+	: Antlr_Language.cpp Antlr_Popup.cpp 
 	: be 
 	: keywords.g.rsrc 
 	;
@@ -19,7 +19,7 @@ PeLanguage AntlrExt
 
 # <pe-src>
 PeLanguage AsmExt 
-	: CLang_asm.cpp 
+	: Asm_Language.cpp
 	: be 
 	: keywords.asm.rsrc 
 	;
@@ -27,16 +27,15 @@ PeLanguage AsmExt
 
 # <pe-src>
 PeLanguage CppExt 
-	: CLang_cpp.cpp CcppPopup.cpp 
+	: Cpp_Language.cpp Cpp_Popup.cpp 
 	: be 
 	: keywords.cpp.rsrc 
 	;
 # </pe-src>
 
 # <pe-src>
-PeLanguage DExt : 
-	CLang_d.cpp
-	CDPopup.cpp
+PeLanguage DExt
+	: D_Language.cpp D_Popup.cpp 
 	: be 
 	: keywords.d.rsrc 
 	;
@@ -44,7 +43,7 @@ PeLanguage DExt :
 
 # <pe-src>
 PeLanguage DiffExt 
-	: CLang_diff.cpp 
+	: Diff_Language.cpp
 	: be 
 	: keywords.diff.rsrc 
 	;
@@ -52,7 +51,7 @@ PeLanguage DiffExt
 
 # <pe-src>
 PeLanguage HtmlExt 
-	: CLang_html.cpp ChtmlPopup.cpp 
+	: Html_Language.cpp Html_Popup.cpp 
 	: be $(STDC++LIB) 
 	: keywords.html.rsrc 
 	;
@@ -60,7 +59,7 @@ PeLanguage HtmlExt
 
 # <pe-src>
 PeLanguage HtmlJSExt 
-	: CLang_html_2.cpp ChtmlPopup.cpp 
+	: HtmlJs_Language.cpp HtmlJs_Popup.cpp 
 	: be $(STDC++LIB) 
 	: keywords.html-js.rsrc 
 	;
@@ -68,7 +67,7 @@ PeLanguage HtmlJSExt
 
 # <pe-src>
 PeLanguage JamExt 
-	: CLang_jam.cpp 
+	: Jam_Language.cpp 
 	: be 
 	: keywords.jam.rsrc 
 	;
@@ -76,16 +75,15 @@ PeLanguage JamExt
 
 # <pe-src>
 PeLanguage JavaExt 
-	: CLang_java.cpp CjavaFuncPopup.l 
+	: Java_Language.cpp Java_Popup.l 
 	: be 
 	: keywords.java.rsrc 
 	;
 # </pe-src>
 
 # <pe-src>
-PeLanguage LoutExt : 
-	CLang_lout.cpp
-	CLoutFuncPopup.l
+PeLanguage LoutExt
+	: Lout_Language.cpp Lout_Popup.l 
 	: be
 	: keywords.lt.rsrc 
 	;
@@ -93,7 +91,7 @@ PeLanguage LoutExt :
 
 # <pe-src>
 PeLanguage LuaExt 
-	: CLang_lua.cpp CluaPopup.cpp 
+	: Lua_Language.cpp Lua_Popup.cpp 
 	: be 
 	: keywords.lua.rsrc 
 	;
@@ -101,7 +99,7 @@ PeLanguage LuaExt
 
 # <pe-src>
 PeLanguage MathematicaExt 
-	: CLang_m.cpp CmFuncPopup.l 
+	: Mathematica_Language.cpp Mathematica_Popup.l 
 	: be 
 	: keywords.m.rsrc 
 	;
@@ -109,7 +107,7 @@ PeLanguage MathematicaExt
 
 # <pe-src>
 PeLanguage OberonExt 
-	: CLang_ob2.cpp Cob2FuncPopup.l 
+	: Oberon_Language.cpp Oberon_Popup.l 
 	: be 
 	: keywords.ob2.rsrc 
 	;
@@ -117,7 +115,7 @@ PeLanguage OberonExt
 
 # <pe-src>
 PeLanguage PascalExt 
-	: CLang_pas.cpp CpasPopup.cpp 
+	: Pascal_Language.cpp Pascal_Popup.cpp 
 	: be 
 	: keywords.pas.rsrc 
 	;
@@ -125,7 +123,7 @@ PeLanguage PascalExt
 
 # <pe-src>
 PeLanguage PerlExt 
-	: CLang_perl.cpp CperlFuncPopup.l 
+	: Perl_Language.cpp Perl_Popup.l 
 	: be 
 	: keywords.pl.rsrc 
 	;
@@ -133,7 +131,7 @@ PeLanguage PerlExt
 
 # <pe-src>
 PeLanguage PythonExt 
-	: CLang_python.cpp CpythonFuncPopup.l 
+	: Python_Language.cpp Python_Popup.l 
 	: be 
 	: keywords.py.rsrc 
 	;
@@ -141,7 +139,7 @@ PeLanguage PythonExt
 
 # <pe-src>
 PeLanguage RezExt 
-	: CLang_rez.cpp CrezFuncPopup.l 
+	: Rez_Language.cpp Rez_Popup.l 
 	: be 
 	: keywords.rez.rsrc 
 	;
@@ -149,7 +147,7 @@ PeLanguage RezExt
 
 # <pe-src>
 PeLanguage ShellExt 
-	: CLang_shell.cpp 
+	: Shell_Language.cpp 
 	: be 
 	: keywords.sh.rsrc 
 	;
@@ -157,7 +155,7 @@ PeLanguage ShellExt
 
 # <pe-src>
 PeLanguage SQLExt 
-	: CLang_sql.cpp 
+	: Sql_Language.cpp 
 	: be 
 	: keywords.sql.rsrc 
 	;
@@ -165,7 +163,7 @@ PeLanguage SQLExt
 
 # <pe-src>
 PeLanguage TexExt 
-	: CLang_tex.cpp CtexFuncPopup.l 
+	: Tex_Language.cpp Tex_Popup.l 
 	: be 
 	: keywords.tex.rsrc 
 	;
