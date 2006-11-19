@@ -48,7 +48,7 @@
  *     the amount of words contained in the map beforehand, the memory footprint
  *     of the hashmap would be (much) worse than that of a map.
  *     Benchmarks have indicated that lookup speed is good enough with maps
- *		 anyway (it performs at least s well as the older DFA-approach), 
+ *		 anyway (it performs at least as well as the older DFA-approach), 
  *		 so I have decided to use a map for now.
  */
 void GenerateKWMap(const char *file, const char *ext, map<BString,int>& kwMap)
@@ -106,7 +106,7 @@ void GenerateKWMap(const char *file, const char *ext, map<BString,int>& kwMap)
 		BString word;
 		char* buf;
 		int currType = kKeywordLanguage;
-		while(start < end) {
+		while (start < end) {
 			// ideally, we'd like to use this:
 			//			word.SetTo(start, end-start);
 			// but the implementation of SetTo() seems to do a strlen() without
@@ -123,7 +123,7 @@ void GenerateKWMap(const char *file, const char *ext, map<BString,int>& kwMap)
 				start += strspn(start, white);
 				end = start + strcspn(start, white);
 			} else {
-				if(word[0] == '-') {
+				if (word[0] == '-') {
 					// it's a keyword-class specifier, we check which one:
 					if (!word.ICompare("-Pe-Keywords-Language-"))
 						currType = kKeywordLanguage;
@@ -140,9 +140,7 @@ void GenerateKWMap(const char *file, const char *ext, map<BString,int>& kwMap)
 						// '-' entry bumps the type...
 						currType++;
 						// ...and skips to end of line:
-						start += strcspn(start, "\n");
-						start += strspn(start, white);
-						end = start + strcspn(start, white);
+						end = start + strcspn(start, "\n");
 					}
 				} else {
 					kwMap[word] = currType;
