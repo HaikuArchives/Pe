@@ -40,7 +40,7 @@
 #include "PText.h"
 #include "PMessages.h"
 #include "PToolBar.h"
-#include "CLangIntf.h"
+#include "CLanguageInterface.h"
 #include "HPreferences.h"
 #include "HDefines.h"
 #include "HTabSheet.h"
@@ -180,9 +180,9 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 	FailNil(mf);
 	lang = mf->Menu();
 	
-	CLangIntf *intf;
+	CLanguageInterface *intf;
 	int cookie = 0;
-	while ((intf = CLangIntf::NextIntf(cookie)) != NULL)
+	while ((intf = CLanguageInterface::NextIntf(cookie)) != NULL)
 		lang->AddItem(new BMenuItem(intf->Name(), new BMessage(msg_FieldChanged)));
 
 	lang->SetRadioMode(true);

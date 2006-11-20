@@ -45,12 +45,12 @@ static char *rcsid = "$Id$";
 #include "Utils.h"
 #include "PGroupWindow.h"
 #include "CGlossary.h"
-#include "CLangIntf.h"
+#include "CLanguageInterface.h"
 #include "HColorUtils.h"
 #include "PGlossyWindow.h"
 #include "utf-support.h"
-#include "CHTMLBar.h"
-#include "PIDECompat.h"
+#include "CHtmlBar.h"
+#include "PIdeCompat.h"
 #include "PText.h"
 #include "COpenSelection.h"
 #include "CFtpDialog.h"
@@ -278,7 +278,7 @@ PApp::PApp()
 		
 		InitSelectedMap();
 
-		CLangIntf::SetupLanguageInterfaces();
+		CLanguageInterface::SetupLanguageInterfaces();
 
 		fIsQuitting = false;
 	
@@ -288,7 +288,7 @@ PApp::PApp()
 		
 		if (gPrefs->GetPrefInt(prf_I_ShowHtmlPalette, 1)
 		&& !gPrefs->GetPrefInt(prf_I_ShowHtmlpaletteForHtml, 1))
-			CHTMLBar::Instance()->Show();
+			CHtmlBar::Instance()->Show();
 		
 		try
 		{
@@ -344,7 +344,7 @@ bool PApp::QuitRequested()
 		}
 	}
 
-	CHTMLBar::Close();
+	CHtmlBar::Close();
 	
 	if (fFindDialog)
 	{
@@ -976,7 +976,7 @@ void PApp::MessageReceived(BMessage *msg)
 
 			case msg_ShowHtmlPalette:
 			{
-				BWindow *w = CHTMLBar::Instance();
+				BWindow *w = CHtmlBar::Instance();
 				BAutolock lock(w);
 
 				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
@@ -989,7 +989,7 @@ void PApp::MessageReceived(BMessage *msg)
 			
 			case msg_HideHtmlPalette:
 			{
-				BWindow *w = CHTMLBar::Instance();
+				BWindow *w = CHtmlBar::Instance();
 				BAutolock lock(w);
 
 				if (!w->IsHidden())

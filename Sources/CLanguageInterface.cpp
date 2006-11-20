@@ -35,7 +35,7 @@
 
 #include "pe.h"
 #include "PText.h"
-#include "CLangIntf.h"
+#include "CLanguageInterface.h"
 #include "CKeywords.h"
 #include "PApp.h"
 #include "CLanguageAddOn.h"
@@ -49,7 +49,7 @@
 #include "Prefs.h"
 #include <algorithm>
 
-unsigned char *CLangIntf::sfWordBreakTable = NULL;
+unsigned char *CLanguageInterface::sfWordBreakTable = NULL;
 
 class ext {
 public:
@@ -62,35 +62,35 @@ public:
 	char t[12];
 };
 		
-static map<ext, CLangIntf*> sInterfaces;
-static CLangIntf *sDefault;
-vector<CLangIntf*> CLangIntf::fInterfaces;
+static map<ext, CLanguageInterface*> sInterfaces;
+static CLanguageInterface *sDefault;
+vector<CLanguageInterface*> CLanguageInterface::fInterfaces;
 
 ext::ext()
 {
 	t[0] = 0;
-} /* CLangIntf::ext::ext */
+} /* CLanguageInterface::ext::ext */
 
 ext::ext(const char *e)
 {
 	if (strlen(e) > 11) THROW(("Extension `%s' is too long", e));
 	
 	strcpy(t, e);
-} /* CLangIntf::ext::ext */
+} /* CLanguageInterface::ext::ext */
 
 bool ext::operator<(const ext& e) const
 {
 	return strcmp(t, e.t) < 0;
-} /* CLangIntf::ext::operator< */
+} /* CLanguageInterface::ext::operator< */
 
 bool ext::operator==(const ext& e) const
 {
 	return strcmp(t, e.t) == 0;
-} /* CLangIntf::ext::operator== */
+} /* CLanguageInterface::ext::operator== */
 
 #pragma mark -
 
-CLangIntf::CLangIntf()
+CLanguageInterface::CLanguageInterface()
 	:	fHaveParsedKeywords(false)
 {
 	if (sfWordBreakTable == NULL)
@@ -110,9 +110,9 @@ CLangIntf::CLangIntf()
 	fKeywordFile = NULL;
 	fLineCommentStart = fLineCommentEnd = "";
 	fInterfaceVersion = 1;
-} /* CLangIntf::CLangIntf */
+} /* CLanguageInterface::CLanguageInterface */
 
-CLangIntf::CLangIntf(const char *path, image_id image)
+CLanguageInterface::CLanguageInterface(const char *path, image_id image)
 	:	fHaveParsedKeywords(false)
 {
 	if (sfWordBreakTable == NULL)
@@ -144,11 +144,11 @@ CLangIntf::CLangIntf(const char *path, image_id image)
 		if (strlen(fKeywordFile))
 			GenerateKWTables(fKeywordFile, path, ec, accept, base, nxt, chk);
 	}
-} /* CLangIntf::CLangIntf */
+} /* CLanguageInterface::CLanguageInterface */
 
-CLangIntf::~CLangIntf()
+CLanguageInterface::~CLanguageInterface()
 {
-} /* CLangIntf::~CLangIntf */
+} /* CLanguageInterface::~CLanguageInterface */
 
 template <class T>
 void AddInterface(char *s, T* i)
@@ -164,9 +164,9 @@ void AddInterface(char *s, T* i)
 	free(s);
 } /* AddInterface */
 
-void CLangIntf::SetupLanguageInterfaces()
+void CLanguageInterface::SetupLanguageInterfaces()
 {
-	sDefault = new CLangIntf();
+	sDefault = new CLanguageInterface();
 	AddInterface(strdup(""), sDefault);
 
 	char path[PATH_MAX];
@@ -204,7 +204,7 @@ void CLangIntf::SetupLanguageInterfaces()
 				(err = get_image_symbol(next, "kLanguageName", B_SYMBOL_TYPE_DATA, (void**)&l)) == B_OK)
 			{
 				if (strlen(l) > 28) THROW(("Language name too long"));
-				CLangIntf *intf = new CLangIntf(plug, next);
+				CLanguageInterface *intf = new CLanguageInterface(plug, next);
 				fInterfaces.push_back(intf);
 				
 				const char *s = intf->Extensions();
@@ -214,9 +214,9 @@ void CLangIntf::SetupLanguageInterfaces()
 	}
 
 	ChooseDefault();
-} /* CLangIntf::SetupLanguageInterfaces */
+} /* CLanguageInterface::SetupLanguageInterfaces */
 
-CLangIntf* CLangIntf::FindByExtension(const char *filename)
+CLanguageInterface* CLanguageInterface::FindByExtension(const char *filename)
 {
 	char *e;
 	
@@ -234,7 +234,7 @@ CLangIntf* CLangIntf::FindByExtension(const char *filename)
 	}
 
 	return sDefault;
-} /* CLangIntf::FindIntf */
+} /* CLanguageInterface::FindIntf */
 
 static const char *skip(const char *txt)
 {
@@ -379,7 +379,7 @@ static bool InternalBalance(CLanguageProxy& proxy, int& start, int& end)
 	return false;
 } /* InternalBalance */
 
-bool CLangIntf::Balance(PText& text, int& start, int& end)
+bool CLanguageInterface::Balance(PText& text, int& start, int& end)
 {
 	try
 	{
@@ -394,9 +394,9 @@ bool CLangIntf::Balance(PText& text, int& start, int& end)
 	{
 		return false;
 	}
-} /* CLangIntf::Balance */
+} /* CLanguageInterface::Balance */
 
-void CLangIntf::Balance(PText& text)
+void CLanguageInterface::Balance(PText& text)
 {
 	try
 	{
@@ -420,9 +420,9 @@ void CLangIntf::Balance(PText& text)
 	{
 		beep();
 	}
-} /* CLangIntf::Balance */
+} /* CLanguageInterface::Balance */
 
-void CLangIntf::ColorLine(const char *text, int size, int& state,
+void CLanguageInterface::ColorLine(const char *text, int size, int& state,
 		int *starts, rgb_color *colors)
 {
 	try
@@ -442,9 +442,9 @@ void CLangIntf::ColorLine(const char *text, int size, int& state,
 	{
 		beep();
 	}
-} /* CLangIntf::ColorLine */
+} /* CLanguageInterface::ColorLine */
 
-void CLangIntf::ScanForFunctions(PText& text, CFunctionScanHandler& handler)
+void CLanguageInterface::ScanForFunctions(PText& text, CFunctionScanHandler& handler)
 {
 	try
 	{
@@ -457,9 +457,9 @@ void CLangIntf::ScanForFunctions(PText& text, CFunctionScanHandler& handler)
 	{
 		beep();
 	}
-} /* CLangIntf::ScanForFunctions */
+} /* CLanguageInterface::ScanForFunctions */
 
-int CLangIntf::FindNextWord(PText& text, int offset, int& mlen)
+int CLanguageInterface::FindNextWord(PText& text, int offset, int& mlen)
 {
 	try
 	{
@@ -555,17 +555,17 @@ int CLangIntf::FindNextWord(PText& text, int offset, int& mlen)
 	}
 
 	return offset;
-} /* CLangIntf::FindNextWord */
+} /* CLanguageInterface::FindNextWord */
 
-CLangIntf* CLangIntf::NextIntf(int& cookie)
+CLanguageInterface* CLanguageInterface::NextIntf(int& cookie)
 {
 	if (cookie >= 0 && cookie < fInterfaces.size())
 		return fInterfaces[cookie++];
 	else
 		return NULL;
-} /* CLangIntf::NextIntf */
+} /* CLanguageInterface::NextIntf */
 
-const char *CLangIntf::Extensions() const
+const char *CLanguageInterface::Extensions() const
 {
 	char extPref[64];
 	
@@ -574,9 +574,9 @@ const char *CLangIntf::Extensions() const
 	strcat(extPref, ".ext");
 	
 	return gPrefs->GetPrefString(extPref, fExtensions);
-} /* CLangIntf::Extensions */
+} /* CLanguageInterface::Extensions */
 
-void CLangIntf::SetExtensions(const char *ext)
+void CLanguageInterface::SetExtensions(const char *ext)
 {
 	char extPref[32];
 	
@@ -584,12 +584,12 @@ void CLangIntf::SetExtensions(const char *ext)
 	strcat(extPref, ".ext");
 	
 	gPrefs->SetPrefString(extPref, ext);
-} /* CLangIntf::SetExtensions */
+} /* CLanguageInterface::SetExtensions */
 
-void CLangIntf::ChooseDefault()
+void CLanguageInterface::ChooseDefault()
 {
 	const char *d = gPrefs->GetPrefString(prf_S_DefLang, "None");
-	vector<CLangIntf*>::iterator i;
+	vector<CLanguageInterface*>::iterator i;
 	
 	for (i = fInterfaces.begin(); i != fInterfaces.end(); i++)
 	{
@@ -599,20 +599,20 @@ void CLangIntf::ChooseDefault()
 			return;
 		}
 	}
-} /* CLangIntf::ChooseDefault */
+} /* CLanguageInterface::ChooseDefault */
 
-int CLangIntf::GetIndex(const CLangIntf* intf)
+int CLanguageInterface::GetIndex(const CLanguageInterface* intf)
 {
-	vector<CLangIntf*>::iterator i = find(fInterfaces.begin(), fInterfaces.end(), intf);
+	vector<CLanguageInterface*>::iterator i = find(fInterfaces.begin(), fInterfaces.end(), intf);
 	if (i == fInterfaces.end())
 		return -1;
 	else
 		return i - fInterfaces.begin();
-} // CLangIntf::GetIndex
+} // CLanguageInterface::GetIndex
 
-CLangIntf* CLangIntf::FindByName(const char *language)
+CLanguageInterface* CLanguageInterface::FindByName(const char *language)
 {
-	vector<CLangIntf*>::iterator i;
+	vector<CLanguageInterface*>::iterator i;
 	
 	for (i = fInterfaces.begin(); i != fInterfaces.end(); i++)
 	{
@@ -621,9 +621,9 @@ CLangIntf* CLangIntf::FindByName(const char *language)
 	}
 	
 	return sDefault;
-} // CLangIntf::FindByName
+} // CLanguageInterface::FindByName
 
-int CLangIntf::AddToCurrentKeyword(int ch, int state)
+int CLanguageInterface::AddToCurrentKeyword(int ch, int state)
 {
 	if (state > 0 && state <= kKeywordBufSize) {
 		fKeywordBuf[state-1] = ch;
@@ -632,7 +632,7 @@ int CLangIntf::AddToCurrentKeyword(int ch, int state)
 	return 0;
 }
 
-int CLangIntf::LookupCurrentKeyword(int state) const
+int CLanguageInterface::LookupCurrentKeyword(int state) const
 {
 	if (state < 2)
 		return 0;
@@ -641,7 +641,7 @@ int CLangIntf::LookupCurrentKeyword(int state) const
 	return LookupKeyword(word);
 }
 
-int CLangIntf::LookupKeyword(const BString& word) const
+int CLanguageInterface::LookupKeyword(const BString& word) const
 {
 	if (!fHaveParsedKeywords) {
 		// do lazy loading of keywords-info:

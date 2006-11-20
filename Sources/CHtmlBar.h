@@ -37,31 +37,31 @@
 #define CHTMLBAR_H
 
 
-class CHTMLBar;
-class CHTMLButtonPane;
-class CHTMLButton;
+class CHtmlBar;
+class CHtmlButtonPane;
+class CHtmlButton;
 
-class CHTMLBar : public BWindow {
+class CHtmlBar : public BWindow {
 public:
 
 virtual	void MessageReceived(BMessage *msg);
 
-static		CHTMLBar* Instance();
+static		CHtmlBar* Instance();
 static		void Close();
 			
 private:
-			CHTMLBar();
+			CHtmlBar();
 virtual	bool QuitRequested();
 
-static		CHTMLBar *sfInstance;
-			CHTMLButtonPane *fButtonPane;
+static		CHtmlBar *sfInstance;
+			CHtmlButtonPane *fButtonPane;
 };
 
 #pragma mark - Pane
 
-class CHTMLButtonPane : public BView {
+class CHtmlButtonPane : public BView {
 public:
-			CHTMLButtonPane(BRect frame, const char *name, BPositionIO& data);
+			CHtmlButtonPane(BRect frame, const char *name, BPositionIO& data);
 			
 virtual	void Draw(BRect update);
 virtual	void MouseDown(BPoint where);
@@ -70,26 +70,26 @@ virtual	void MouseDown(BPoint where);
 			float ButtonHeight() const;
 			
 private:
-			vector<CHTMLButton*> fButtons;
+			vector<CHtmlButton*> fButtons;
 			font_height fFH;
 };
 
-inline float CHTMLButtonPane::BaseLine() const
+inline float CHtmlButtonPane::BaseLine() const
 {
 	return fFH.descent;
-} /* CHTMLButtonPane::BaseLine */
+} /* CHtmlButtonPane::BaseLine */
 
-inline float CHTMLButtonPane::ButtonHeight() const
+inline float CHtmlButtonPane::ButtonHeight() const
 {
 	return fFH.ascent + fFH.descent + fFH.leading + 7;
-} /* CHTMLButtonPane::ButtonHeight */
+} /* CHtmlButtonPane::ButtonHeight */
 
 #pragma mark - Button
 
-class CHTMLButton {
+class CHtmlButton {
 public:
-			CHTMLButton(BRect frame, BPositionIO& data, CHTMLButtonPane *pane);
-virtual	~CHTMLButton();
+			CHtmlButton(BRect frame, BPositionIO& data, CHtmlButtonPane *pane);
+virtual	~CHtmlButton();
 			
 			BRect Frame() const;
 			
@@ -101,14 +101,14 @@ protected:
 			bool TrackClick();
 			
 			BRect fFrame;
-			CHTMLButtonPane *fPane;
+			CHtmlButtonPane *fPane;
 			char *fLabel;
 };
 
-class CHTMLSimpleButton : public CHTMLButton {
+class CHtmlSimpleButton : public CHtmlButton {
 public:
-			CHTMLSimpleButton(BRect frame, BPositionIO& data, CHTMLButtonPane *pane);
-			~CHTMLSimpleButton();
+			CHtmlSimpleButton(BRect frame, BPositionIO& data, CHtmlButtonPane *pane);
+			~CHtmlSimpleButton();
 			
 virtual	void Draw();
 virtual	void Click(BPoint where);
@@ -117,10 +117,10 @@ private:
 			char *fGlossary;
 };
 
-class CHTMLMenu : public CHTMLButton {
+class CHtmlMenu : public CHtmlButton {
 public:
-			CHTMLMenu(BRect frame, BPositionIO& data, CHTMLButtonPane *pane);
-			~CHTMLMenu();
+			CHtmlMenu(BRect frame, BPositionIO& data, CHtmlButtonPane *pane);
+			~CHtmlMenu();
 
 virtual	void Draw();
 virtual	void Click(BPoint where);
@@ -144,9 +144,9 @@ private:
 			BPopUpMenu *fMenu;
 };
 
-class CHTMLCmdButton : public CHTMLButton {
+class CHtmlCmdButton : public CHtmlButton {
 public:
-			CHTMLCmdButton(BRect frame, BPositionIO& data, CHTMLButtonPane *pane);
+			CHtmlCmdButton(BRect frame, BPositionIO& data, CHtmlButtonPane *pane);
 			
 virtual	void Click(BPoint where);
 			
@@ -154,10 +154,10 @@ private:
 			unsigned long fCmd;
 };
 
-class CHTMLDialog : public CHTMLButton {
+class CHtmlDialog : public CHtmlButton {
 public:
-			CHTMLDialog(BRect frame, BPositionIO& data, CHTMLButtonPane *pane);
-			~CHTMLDialog();
+			CHtmlDialog(BRect frame, BPositionIO& data, CHtmlButtonPane *pane);
+			~CHtmlDialog();
 
 virtual	void Click(BPoint where);
 
@@ -165,9 +165,9 @@ private:
 			char *fExt;
 };
 
-inline BRect CHTMLButton::Frame() const
+inline BRect CHtmlButton::Frame() const
 {
 	return fFrame;
-} /* CHTMLButton::Frame */
+} /* CHtmlButton::Frame */
 
 #endif // CHTMLBAR_H

@@ -37,7 +37,7 @@
 #include "PText.h"
 #include "PApp.h"
 #include "CLanguageAddOn.h"
-#include "CLangIntf.h"
+#include "CLanguageInterface.h"
 #include "PMessages.h"
 #include "PItalicMenuItem.h"
 #include "utf-support.h"
@@ -46,7 +46,7 @@
 #include "HError.h"
 #include "HColorUtils.h"
 
-CLanguageProxy::CLanguageProxy(CLangIntf& intf, const char *text, int size,
+CLanguageProxy::CLanguageProxy(CLanguageInterface& intf, const char *text, int size,
 	int *starts, rgb_color *colors)
 	: fText(text)
 	, fSize(size)
@@ -60,7 +60,7 @@ CLanguageProxy::CLanguageProxy(CLangIntf& intf, const char *text, int size,
 {
 } /* CLanguageProxy::CLanguageProxy */
 
-CLanguageProxy::CLanguageProxy(CLangIntf& intf, PText& text,
+CLanguageProxy::CLanguageProxy(CLanguageInterface& intf, PText& text,
 	CFunctionScanHandler* handler)
 	: fText(text.Text())
 	, fSize(text.Size())

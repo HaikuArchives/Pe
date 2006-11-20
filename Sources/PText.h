@@ -48,7 +48,7 @@ class BPopUpMenu;
 class PCmd;
 class PStatus;
 class PExec;
-class CLangIntf;
+class CLanguageInterface;
 class CFunctionScanHandler;
 class PSplitter;
 class PDoc;
@@ -301,7 +301,7 @@ private:
 			g_unit_t fWalkOffset;
 
 			bool fUsingDefaultLanguage;
-			CLangIntf *fLangIntf;
+			CLanguageInterface *fLangIntf;
 			BRect fBounds;
 			PTextBuffer& fText;
 			VLineInfo fLineInfo;

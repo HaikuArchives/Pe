@@ -43,7 +43,7 @@
 #include "HColorUtils.h"
 #include "CListBox.h"
 #include "CPathsBox.h"
-#include "CLangIntf.h"
+#include "CLanguageInterface.h"
 #include "CKeyCapturer.h"
 #include "CFindDialog.h"
 #include "CStdErrBox.h"
@@ -172,9 +172,9 @@ CPrefsDialog::CPrefsDialog(BRect frame, const char *name, window_type type, int 
 	fDefLanguage = mf->Menu();
 	FailNil(fDefLanguage);
 
-	CLangIntf *intf;
+	CLanguageInterface *intf;
 	int cookie = 0;
-	while ((intf = CLangIntf::NextIntf(cookie)) != NULL)
+	while ((intf = CLanguageInterface::NextIntf(cookie)) != NULL)
 	{
 		fLanguage->AddItem(new BMenuItem(intf->Name(), new BMessage(msg_LanguageSelected)));
 		fDefLanguage->AddItem(new BMenuItem(intf->Name(), new BMessage(msg_FieldChanged)));
@@ -393,13 +393,13 @@ bool CPrefsDialog::OKClicked()
 	gPrefs->SetPrefInt(prf_I_Worksheet, gUseWorksheet = IsOn("wosh"));
 	
 	int cookie = 0;
-	CLangIntf *intf;
-	while ((intf = CLangIntf::NextIntf(cookie)) != NULL)
+	CLanguageInterface *intf;
+	while ((intf = CLanguageInterface::NextIntf(cookie)) != NULL)
 		intf->SetExtensions(fSuffixes[cookie - 1].c_str());
 	
 	item = fDefLanguage->FindMarked();
 	gPrefs->SetPrefString(prf_S_DefLang, item ? item->Label() : "None");
-	CLangIntf::ChooseDefault();
+	CLanguageInterface::ChooseDefault();
 	
 	gPrefs->SetPrefInt(prf_I_RestorePosition, gRestorePosition = IsOn("repo"));
 	gPrefs->SetPrefInt(prf_I_RestoreFont, gRestoreFont = IsOn("refo"));
@@ -623,11 +623,11 @@ bool CPrefsDialog::CancelClicked()
 
 	fSuffixes.erase(fSuffixes.begin(), fSuffixes.end());
 	
-	CLangIntf *intf;
+	CLanguageInterface *intf;
 	int cookie = 0, i = 0;
 	const char *defLang = gPrefs->GetPrefString(prf_S_DefLang, "None");
 
-	while ((intf = CLangIntf::NextIntf(cookie)) != NULL)
+	while ((intf = CLanguageInterface::NextIntf(cookie)) != NULL)
 	{
 		fSuffixes.push_back(intf->Extensions());
 		if (strcmp(intf->Name(), defLang) == 0)
@@ -835,8 +835,8 @@ void CPrefsDialog::MessageReceived(BMessage *msg)
 			fLang = GetValue("lang") - 1;
 			{
 				int cookie = 0, i = 0;
-				CLangIntf *intf = NULL;
-				while ((intf = CLangIntf::NextIntf(cookie)) != NULL) {
+				CLanguageInterface *intf = NULL;
+				while ((intf = CLanguageInterface::NextIntf(cookie)) != NULL) {
 					if (i == fLang) {
 						fCurrentSuffix = intf->Extensions();
 						break;

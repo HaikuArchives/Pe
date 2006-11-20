@@ -34,7 +34,7 @@
 */
 
 #include "pe.h"
-#include "CHTMLBar.h"
+#include "CHtmlBar.h"
 #include "PApp.h"
 #include "HPreferences.h"
 #include "PDoc.h"
@@ -46,17 +46,17 @@
 #include "ResourcesMisc.h"
 #include "Prefs.h"
 
-CHTMLBar *CHTMLBar::sfInstance;
+CHtmlBar *CHtmlBar::sfInstance;
 
-CHTMLBar* CHTMLBar::Instance()
+CHtmlBar* CHtmlBar::Instance()
 {
 	if (sfInstance == NULL)
-		sfInstance = new CHTMLBar();
+		sfInstance = new CHtmlBar();
 
 	return sfInstance;
-} /* CHTMLBar::Instance */
+} /* CHtmlBar::Instance */
 
-void CHTMLBar::Close()
+void CHtmlBar::Close()
 {
 	if (sfInstance)
 	{
@@ -66,9 +66,9 @@ void CHTMLBar::Close()
 
 		sfInstance->Quit();
 	}
-} /* CHTMLBar::Close */
+} /* CHtmlBar::Close */
 
-CHTMLBar::CHTMLBar()
+CHtmlBar::CHtmlBar()
 	: BWindow(gPrefs->GetPrefRect(prf_R_HtmlPalettePos, BRect(20, 20, 120, 120)),
 		"HTML Palette",
 		B_FLOATING_WINDOW,
@@ -115,7 +115,7 @@ CHTMLBar::CHTMLBar()
 	BRect frame(Bounds());
 	frame.right = width;
 	
-	AddChild(fButtonPane = new CHTMLButtonPane(frame, "buttonpane", data));
+	AddChild(fButtonPane = new CHtmlButtonPane(frame, "buttonpane", data));
 
 	SetTitle(barname);
 	ResizeTo(width, fButtonPane->Bounds().Height() - 2);
@@ -131,22 +131,22 @@ CHTMLBar::CHTMLBar()
 	
 	if (Frame() != frame)
 		MoveTo(frame.left, frame.top);
-} /* CHTMLBar::CHTMLBar */
+} /* CHtmlBar::CHtmlBar */
 			
-void CHTMLBar::MessageReceived(BMessage *msg)
+void CHtmlBar::MessageReceived(BMessage *msg)
 {
 	BWindow::MessageReceived(msg);
-} /* CHTMLBar::MessageReceived */
+} /* CHtmlBar::MessageReceived */
 
-bool CHTMLBar::QuitRequested()
+bool CHtmlBar::QuitRequested()
 {
 	Hide();
 	return false;
-} /* CHTMLBar::QuitRequested */
+} /* CHtmlBar::QuitRequested */
 
 #pragma mark - Pane
 
-CHTMLButtonPane::CHTMLButtonPane(BRect frame, const char *name, BPositionIO& data)
+CHtmlButtonPane::CHtmlButtonPane(BRect frame, const char *name, BPositionIO& data)
 	: BView(frame, name, 0, B_WILL_DRAW)
 {
 	long bCnt;
@@ -168,16 +168,16 @@ CHTMLButtonPane::CHTMLButtonPane(BRect frame, const char *name, BPositionIO& dat
 		switch (type)
 		{
 			case 'btn ':
-				fButtons.push_back(new CHTMLSimpleButton(r, data, this));
+				fButtons.push_back(new CHtmlSimpleButton(r, data, this));
 				break;
 			case 'menu':
-				fButtons.push_back(new CHTMLMenu(r, data, this));
+				fButtons.push_back(new CHtmlMenu(r, data, this));
 				break;
 			case 'cmnd':
-				fButtons.push_back(new CHTMLCmdButton(r, data, this));
+				fButtons.push_back(new CHtmlCmdButton(r, data, this));
 				break;
 			case 'dlog':
-				fButtons.push_back(new CHTMLDialog(r, data, this));
+				fButtons.push_back(new CHtmlDialog(r, data, this));
 				break;
 		}
 		
@@ -185,15 +185,15 @@ CHTMLButtonPane::CHTMLButtonPane(BRect frame, const char *name, BPositionIO& dat
 	}
 	
 	ResizeTo(r.Width(), r.top);
-} /* CHTMLButtonPane::CHTMLButtonPane */
+} /* CHtmlButtonPane::CHtmlButtonPane */
 			
-void CHTMLButtonPane::Draw(BRect /*update*/)
+void CHtmlButtonPane::Draw(BRect /*update*/)
 {
 	for (int i = 0; i < fButtons.size(); i++)
 		fButtons[i]->Draw();
-} /* CHTMLButtonPane::Draw */
+} /* CHtmlButtonPane::Draw */
 
-void CHTMLButtonPane::MouseDown(BPoint where)
+void CHtmlButtonPane::MouseDown(BPoint where)
 {
 	for (int i = 0; i < fButtons.size(); i++)
 		if (fButtons[i]->Frame().Contains(where))
@@ -201,11 +201,11 @@ void CHTMLButtonPane::MouseDown(BPoint where)
 			fButtons[i]->Click(where);
 			break;
 		}
-} /* CHTMLButtonPane::MouseDown */
+} /* CHtmlButtonPane::MouseDown */
 
 #pragma mark - Button
 
-CHTMLButton::CHTMLButton(BRect frame, BPositionIO& data, CHTMLButtonPane *pane)
+CHtmlButton::CHtmlButton(BRect frame, BPositionIO& data, CHtmlButtonPane *pane)
 {
 	fFrame = frame;
 	fPane = pane;
@@ -213,14 +213,14 @@ CHTMLButton::CHTMLButton(BRect frame, BPositionIO& data, CHTMLButtonPane *pane)
 	char label[256];
 	data >> label;
 	fLabel = strdup(label);
-} /* CHTMLButton::CHTMLButton */
+} /* CHtmlButton::CHtmlButton */
 
-CHTMLButton::~CHTMLButton()
+CHtmlButton::~CHtmlButton()
 {
 	free(fLabel);
-} /* CHTMLButton::~CHTMLButton */
+} /* CHtmlButton::~CHtmlButton */
 
-void CHTMLButton::Draw()
+void CHtmlButton::Draw()
 {
 	fPane->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fPane->SetFont(be_plain_font);
@@ -258,9 +258,9 @@ void CHTMLButton::Draw()
 	
 	fPane->MovePenTo(r.left + 5, r.bottom - fPane->BaseLine());
 	fPane->DrawString(fLabel);
-} /* CHTMLButton::Draw */
+} /* CHtmlButton::Draw */
 
-bool CHTMLButton::TrackClick()
+bool CHtmlButton::TrackClick()
 {
 	BPoint p;
 	unsigned long btns;
@@ -307,27 +307,27 @@ bool CHTMLButton::TrackClick()
 		Draw();
 
 	return in;
-} /* CHTMLButton::TrackClick */
+} /* CHtmlButton::TrackClick */
 			
-CHTMLSimpleButton::CHTMLSimpleButton(BRect frame, BPositionIO& data, CHTMLButtonPane *pane)
-	: CHTMLButton(frame, data, pane)
+CHtmlSimpleButton::CHtmlSimpleButton(BRect frame, BPositionIO& data, CHtmlButtonPane *pane)
+	: CHtmlButton(frame, data, pane)
 {
 	char glos[256];
 	data >> glos;
 	fGlossary = strdup(glos);
-} /* CHTMLSimpleButton::CHTMLSimpleButton */
+} /* CHtmlSimpleButton::CHtmlSimpleButton */
 
-CHTMLSimpleButton::~CHTMLSimpleButton()
+CHtmlSimpleButton::~CHtmlSimpleButton()
 {
 	free(fGlossary);
-} /* CHTMLSimpleButton::~CHTMLSimpleButton */
+} /* CHtmlSimpleButton::~CHtmlSimpleButton */
 			
-void CHTMLSimpleButton::Draw()
+void CHtmlSimpleButton::Draw()
 {
-	CHTMLButton::Draw();
-} /* CHTMLSimpleButton::Draw */
+	CHtmlButton::Draw();
+} /* CHtmlSimpleButton::Draw */
 
-void CHTMLSimpleButton::Click(BPoint /*where*/)
+void CHtmlSimpleButton::Click(BPoint /*where*/)
 {
 	if (TrackClick())
 	{
@@ -341,10 +341,10 @@ void CHTMLSimpleButton::Click(BPoint /*where*/)
 			doc->PostMessage(&msg, doc->TextView());
 		}
 	}
-} /* CHTMLSimpleButton::Click */
+} /* CHtmlSimpleButton::Click */
 			
-CHTMLMenu::CHTMLMenu(BRect frame, BPositionIO& data, CHTMLButtonPane *pane)
-	: CHTMLButton(frame, data, pane)
+CHtmlMenu::CHtmlMenu(BRect frame, BPositionIO& data, CHtmlButtonPane *pane)
+	: CHtmlButton(frame, data, pane)
 {
 	fMenu = new BPopUpMenu("mymenu");
 	fMenu->SetFont(be_plain_font);
@@ -362,16 +362,16 @@ CHTMLMenu::CHTMLMenu(BRect frame, BPositionIO& data, CHTMLButtonPane *pane)
 		
 		fMenu->AddItem(new CItem(label, glos));
 	}
-} /* CHTMLMenu::CHTMLMenu */
+} /* CHtmlMenu::CHtmlMenu */
 
-CHTMLMenu::~CHTMLMenu()
+CHtmlMenu::~CHtmlMenu()
 {
 	delete fMenu;
-} /* CHTMLMenu::~CHTMLMenu */
+} /* CHtmlMenu::~CHtmlMenu */
 
-void CHTMLMenu::Draw()
+void CHtmlMenu::Draw()
 {
-	CHTMLButton::Draw();
+	CHtmlButton::Draw();
 	
 	float x = fFrame.right - 10;
 	float y = fFrame.top + 7;
@@ -383,9 +383,9 @@ void CHTMLMenu::Draw()
 	y += 1; x += 1;
 	fPane->AddLine(BPoint(x, y), BPoint(x, y), kBlack);
 	fPane->EndLineArray();
-} /* CHTMLMenu::Draw */
+} /* CHtmlMenu::Draw */
 
-void CHTMLMenu::Click(BPoint /*where*/)
+void CHtmlMenu::Click(BPoint /*where*/)
 {
 	BRect r(fFrame);
 	r.bottom -= 2;
@@ -416,15 +416,15 @@ void CHTMLMenu::Click(BPoint /*where*/)
 	}
 	
 	Draw();
-} /* CHTMLMenu::Click */
+} /* CHtmlMenu::Click */
 
-CHTMLCmdButton::CHTMLCmdButton(BRect frame, BPositionIO& data, CHTMLButtonPane *pane)
-	: CHTMLButton(frame, data, pane)
+CHtmlCmdButton::CHtmlCmdButton(BRect frame, BPositionIO& data, CHtmlButtonPane *pane)
+	: CHtmlButton(frame, data, pane)
 {
 	data >> fCmd;
-} /* CHTMLCmdButton::CHTMLCmdButton */
+} /* CHtmlCmdButton::CHtmlCmdButton */
 			
-void CHTMLCmdButton::Click(BPoint /*where*/)
+void CHtmlCmdButton::Click(BPoint /*where*/)
 {
 	if (TrackClick())
 	{
@@ -432,23 +432,23 @@ void CHTMLCmdButton::Click(BPoint /*where*/)
 		if (doc)
 			doc->PostMessage(fCmd, doc->TextView());
 	}
-} /* CHTMLCmdButton::Click */
+} /* CHtmlCmdButton::Click */
 
-CHTMLDialog::CHTMLDialog(BRect frame, BPositionIO& data, CHTMLButtonPane *pane)
-	: CHTMLButton(frame, data, pane)
+CHtmlDialog::CHtmlDialog(BRect frame, BPositionIO& data, CHtmlButtonPane *pane)
+	: CHtmlButton(frame, data, pane)
 {
 	char s[512];
 	data >> s;
 	
 	fExt = strdup(s);
-} /* CHTMLDialog::CHTMLDialog */
+} /* CHtmlDialog::CHtmlDialog */
 
-CHTMLDialog::~CHTMLDialog()
+CHtmlDialog::~CHtmlDialog()
 {
 	free(fExt);
-} /* CHTMLDialog::~CHTMLDialog */
+} /* CHtmlDialog::~CHtmlDialog */
 
-void CHTMLDialog::Click(BPoint /*where*/)
+void CHtmlDialog::Click(BPoint /*where*/)
 {
 	if (TrackClick())
 	{
@@ -462,4 +462,4 @@ void CHTMLDialog::Click(BPoint /*where*/)
 			doc->PostMessage(&msg, doc->TextView());
 		}
 	}
-} /* CHTMLDialog::Click */
+} /* CHtmlDialog::Click */

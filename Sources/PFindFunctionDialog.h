@@ -8,7 +8,7 @@
 
 #include "PText.h"
 #include "CFilterChoiceDialog.h"
-#include "CLangIntf.h"
+#include "CLanguageInterface.h"
 
 // PFindFunctionDialogController
 class PFindFunctionDialogController : private CFilterChoiceDialog::Listener,

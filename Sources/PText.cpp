@@ -44,7 +44,7 @@
 #include "PStatus.h"
 #include "PApp.h"
 #include "PCmd.h"
-#include "CLangIntf.h"
+#include "CLanguageInterface.h"
 #include "PDoc.h"
 #include "PExec.h"
 #include "PToolBar.h"
@@ -279,7 +279,7 @@ void PText::SetDefaultLanguageByExtension(const char *extension)
 	if (!fUsingDefaultLanguage)
 		return;
 
-	CLangIntf *language = CLangIntf::FindByExtension(extension);
+	CLanguageInterface *language = CLanguageInterface::FindByExtension(extension);
 
 	if (language != fLangIntf)
 	{
@@ -292,12 +292,12 @@ void PText::SetDefaultLanguageByExtension(const char *extension)
 
 int PText::Language() const
 {
-	return CLangIntf::GetIndex(fLangIntf);
+	return CLanguageInterface::GetIndex(fLangIntf);
 } // PText::Language
 
 void PText::SetLanguage(int index)
 {
-	CLangIntf *i = (index >= 0) ? CLangIntf::FindIntf(index) : CLangIntf::FindByExtension("");
+	CLanguageInterface *i = (index >= 0) ? CLanguageInterface::FindIntf(index) : CLanguageInterface::FindByExtension("");
 	if (i != fLangIntf)
 	{
 		fLangIntf = i;
@@ -502,10 +502,10 @@ void PText::ApplySettings(const BMessage& msg)
 
 	if (msg.FindString("language", &s1) == B_OK)
 	{
-		CLangIntf *language = CLangIntf::FindByName(s1);
+		CLanguageInterface *language = CLanguageInterface::FindByName(s1);
 		if (language != NULL)
 			fUsingDefaultLanguage = false;
-		SetLanguage(CLangIntf::GetIndex(language));
+		SetLanguage(CLanguageInterface::GetIndex(language));
 	}
 } /* PText::SetSettings */
 

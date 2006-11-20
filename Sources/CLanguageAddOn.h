@@ -47,7 +47,7 @@ enum {
 };
 
 class CFunctionScanHandler;
-class CLangIntf;
+class CLanguageInterface;
 class PText;
 
 /*
@@ -60,8 +60,8 @@ class PText;
 
 class CLanguageProxy {
 public:
-		CLanguageProxy(CLangIntf& intf, const char *text, int size, int *starts = NULL, rgb_color *colors = NULL);
-		CLanguageProxy(CLangIntf& intf, PText& text, CFunctionScanHandler* handler = NULL);
+		CLanguageProxy(CLanguageInterface& intf, const char *text, int size, int *starts = NULL, rgb_color *colors = NULL);
+		CLanguageProxy(CLanguageInterface& intf, PText& text, CFunctionScanHandler* handler = NULL);
 		
 /*
 	Use the next two methods to recognize keywords in the text.
@@ -134,7 +134,7 @@ private:
 		const char *fText;
 		int fSize;
 		int fDeprecated_was_Encoding;		// deprecated, is always set to 0
-		CLangIntf& fInterface;
+		CLanguageInterface& fInterface;
 		int fCIndx;
 		int *fStarts;
 		rgb_color *fColors;

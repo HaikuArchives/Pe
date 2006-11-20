@@ -33,8 +33,8 @@
 	Created: 09/19/97 10:49:36
 */
 
-#ifndef CLANGINTF_H
-#define CLANGINTF_H
+#ifndef CLANGUAGEINTERFACE_H
+#define CLANGUAGEINTERFACE_H
 
 #include <map>
 #include <String.h>
@@ -42,10 +42,10 @@
 class CFunctionScanHandler;
 class CLanguageProxy;
 
-class CLangIntf {
+class CLanguageInterface {
 friend class CLanguageProxy;
 public:
-		~CLangIntf();
+		~CLanguageInterface();
 
 		void Balance(PText& text);
 		bool Balance(PText& text, int& start,  int& end);
@@ -67,19 +67,19 @@ static	void ChooseDefault();
 		rgb_color *Colors() const;
 
 static	void SetupLanguageInterfaces();
-static	CLangIntf* FindIntf(int index)	{ return fInterfaces[index]; }
-static	CLangIntf* FindByExtension(const char *filename);
-static CLangIntf* FindByName(const char *language);
+static	CLanguageInterface* FindIntf(int index)	{ return fInterfaces[index]; }
+static	CLanguageInterface* FindByExtension(const char *filename);
+static CLanguageInterface* FindByName(const char *language);
 
-static CLangIntf* NextIntf(int& cookie);
-static int GetIndex(const CLangIntf* intf);
+static CLanguageInterface* NextIntf(int& cookie);
+static int GetIndex(const CLanguageInterface* intf);
 			
 		const char* LineCommentStart() const;
 		const char* LineCommentEnd() const;
 		
 protected:
-		CLangIntf();
-		CLangIntf(const char *path, image_id image);
+		CLanguageInterface();
+		CLanguageInterface(const char *path, image_id image);
 		
 		void InitTables(const char *kwFile);
 		void RegisterExtension(const char *ext);
@@ -115,23 +115,23 @@ protected:
 		mutable bool fHaveParsedKeywords;
 		mutable KeywordMap fKeywordMap;
 		
-static	vector<CLangIntf*>	fInterfaces;
+static	vector<CLanguageInterface*>	fInterfaces;
 };
 
-inline const char* CLangIntf::LineCommentStart() const
+inline const char* CLanguageInterface::LineCommentStart() const
 {
 	return fLineCommentStart;
-} /* CLangIntf::LineCommentStart */
+} /* CLanguageInterface::LineCommentStart */
 
-inline const char* CLangIntf::LineCommentEnd() const
+inline const char* CLanguageInterface::LineCommentEnd() const
 {
 	return fLineCommentEnd;
-} /* CLangIntf::LineCommentEnd */
+} /* CLanguageInterface::LineCommentEnd */
 
-inline const char *CLangIntf::Name() const
+inline const char *CLanguageInterface::Name() const
 {
 	return fLanguage;
-} /* CLangIntf::Name */
+} /* CLanguageInterface::Name */
 
 
 class CFunctionScanHandler {
@@ -145,4 +145,4 @@ virtual	void AddInclude(const char *name, const char *open, bool italic);
 virtual	void AddSeparator(const char* name);
 };
 
-#endif // CLANGINTF_H
+#endif // CLANGUAGEINTERFACE_H

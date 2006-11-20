@@ -60,12 +60,12 @@ Application pe :
 	CGlossary.cpp
 	CGoToLine.cpp
 	CGrepBox.cpp
-	CHTMLBar.cpp
+	CHtmlBar.cpp
 	CInfoDialog.cpp
 	CKeyCapturer.cpp
 	CKeyMapper.cpp
 	CKeywords.cpp
-	CLangIntf.cpp
+	CLanguageInterface.cpp
 	CLanguageAddOn.cpp
 	CLineObject.cpp
 	CListBox.cpp
