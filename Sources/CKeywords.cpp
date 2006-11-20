@@ -137,8 +137,9 @@ void GenerateKWMap(const char *file, const char *ext, map<BString,int>& kwMap)
 						currType = kKeywordUser4;
 					else {
 						// be compatible with old style, meaning that an unknown
-						// '-' entry bumps the type...
-						currType++;
+						// '-' entry bumps the type... Ignore a leading '-' entry
+						if (!kwMap.empty())
+							currType++;
 						// ...and skips to end of line:
 						end = start + strcspn(start, "\n");
 					}

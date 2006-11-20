@@ -117,22 +117,22 @@ enum {
 };
 
 enum {
-	kKwHtmlTag			= 2,
-	kKwHtmlAttribute	= 3,
-	kKwJsLanguage		= 4,
-	kKwJsConstants		= 5,	// TODO
-	kKwPhpLanguage		= 6,
-	kKwPhpFunctions		= 7,
-	kKwPhpConstants		= 8,	// TODO
-	kKwUserset1			= 9,
-	kKwUserset2			= 10,
-	kKwUserset3			= 11,
-	kKwUserset4			= 12
+	kKwHtmlTag			= 1,
+	kKwHtmlAttribute	= 2,
+	kKwJsLanguage		= 3,
+	kKwJsConstants		= 4,	// TODO
+	kKwPhpLanguage		= 5,
+	kKwPhpFunctions		= 6,
+	kKwPhpConstants		= 7,	// TODO
+	kKwUserset1			= 8,
+	kKwUserset2			= 9,
+	kKwUserset3			= 10,
+	kKwUserset4			= 11
 };
 
 
-
 #pragma mark Debug-Functions
+
 
 #define DEBUG_PHP 0
 
