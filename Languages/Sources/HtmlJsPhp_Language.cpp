@@ -33,10 +33,11 @@
 	Created: 12/07/97 22:01:11 by Maarten Hekkelman
 */
 
-#include "CLanguageAddOn.h"
 #include <cctype>
 #include <cstring>
 #include <stack>
+#include "CLanguageAddOn.h"
+#include "HColorUtils.h"
 
 using namespace std;
 
@@ -64,29 +65,29 @@ _EXPORT const char kLanguageCommentEnd[] = ">";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.html-js-php";
 
 //	--- Available Colors ---
-//	kLTextColor
-//	kLKeyWordColor,				kLAltKeyWordColor,
-//	kLCommentColor,				kLAltCommentColor,
-//	kLStringColor,				kLAltStringColor,
-//	kLCharConstColor,
-//	kLTagColor,
-//	kLSystemIdentifierColor,	kLUserIdentifierColor,
-//	kLNumberColor,				kLAltNumberColor,
-//	kLPreProcessorColor,		kLAltProcessorColor,
-//	kLErrorColor,				kLAltErrorColor,
-//	kLOperatorColor,			kLAltOperatorColor,
-//	kLSeparatorColor,			kLAltSeparatorColor,
-//	kLUser1, kLUser2, kLUser3, kLUser4,
+//	kColorText
+//	kColorKeyword1,				kColorKeyword2,
+//	kColorComment1,				kColorComment2,
+//	kColorString1,				kColorString2,
+//	kColorCharConst,
+//	kColorTag,
+//	kColorIdentifierSystem,	kColorIdentifierUser,
+//	kColorNumber1,				kColorNumber2,
+//	kColorPreprocessor1,		kColorPreprocessor2,
+//	kColorError1,				kColorError2,
+//	kColorOperator1,			kColorOperator2,
+//	kColorSeparator1,			kColorSeparator2,
+//	kColorUserSet1, kColorUserSet2, kColorUserSet3, kColorUserSet4,
 
 // Translate from pepper-colors to pe-colors
 enum {
-	kLngColorHtmlKeyword	= kLAltKeyWordColor,
-	kLngColorHtmlAttribute	= kLAltKeyWordColor,
-	kLngColorJsKeyword		= kLKeyWordColor,
-	kLngColorPhpKeyword		= kLKeyWordColor,
-	kLngColorSpecialChar	= kLUser4,
-	kLngColorTagString		= kLStringColor,
-	kLngColorPhpFunction	= kLUser4
+	kLngColorHtmlKeyword	= kColorKeyword2,
+	kLngColorHtmlAttribute	= kColorKeyword2,
+	kLngColorJsKeyword		= kColorKeyword1,
+	kLngColorPhpKeyword		= kColorKeyword1,
+	kLngColorSpecialChar	= kColorUserSet4,
+	kLngColorTagString		= kColorString1,
+	kLngColorPhpFunction	= kColorUserSet4
 };
 
 enum {
@@ -286,7 +287,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 	int color, kwc;
 	bool leave = false, esc = false, script = false, percent = false;
 	
-	proxy.SetColor(0, kLTextColor);
+	proxy.SetColor(0, kColorText);
 	
 	if (size <= 0)
 		return;
@@ -315,7 +316,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					
 				if ((leave || state != START) && s < i)
 				{
-					proxy.SetColor(s, kLTextColor);
+					proxy.SetColor(s, kColorText);
 					s = i - 1;
 				}
 				break;
@@ -331,7 +332,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (c == '?' || c == '%')
 				{
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					s = i;
 					
 					if (strncasecmp(text + s, "php", 3) == 0)
@@ -345,14 +346,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (isalpha(c))
 				{
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					s = i - 1;
 					kws = proxy.Move(tolower(c), 1);
 					state = TAGSTARTKEYWORD;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					leave = true;
 				}
 				else if (!isspace(c))
@@ -366,14 +367,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (isalpha(c))
 				{
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					s = i - 1;
 					kws = proxy.Move(tolower(c), 1);
 					state = TAGSTARTKEYWORD;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					leave = true;
 				}
 				else if (!isspace(c))
@@ -387,14 +388,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (!isalnum(c) && c != '-')
 				{
-					switch (kwc = proxy.IsKeyWord(kws))
+					switch (kwc = proxy.IsKeyword(kws))
 					{
-						case kKwHtmlTag:   color = kLKeyWordColor; break;
-						case kKwUserset1:  color = kLUser1; break;
-						case kKwUserset2:  color = kLUser2; break;
-						case kKwUserset3:  color = kLUser3; break;
-						case kKwUserset4:  color = kLUser4; break;
-						default:           color = kLTagColor; break;
+						case kKwHtmlTag:  color = kColorKeyword1; break;
+						case kKwUserset1: color = kColorUserSet1; break;
+						case kKwUserset2: color = kColorUserSet2; break;
+						case kKwUserset3: color = kColorUserSet3; break;
+						case kKwUserset4: color = kColorUserSet4; break;
+						default:          color = kColorTag;      break;
 					}
 					proxy.SetColor(s, color);
 					DEB_PrintSetKw(state, kwc);
@@ -415,32 +416,32 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				{
 					case 0:
 					case '\n':
-						proxy.SetColor(s, kLTagColor);
+						proxy.SetColor(s, kColorTag);
 						leave = true;
 						break;
 					case '>':
-						proxy.SetColor(s, kLTagColor);
+						proxy.SetColor(s, kColorTag);
 						s = i;
-						proxy.SetColor(s, kLTextColor);
+						proxy.SetColor(s, kColorText);
 						if (script)
 							state = JAVASCRIPT;
 						else
 							state = START;
 						break;
 					case '"':
-						proxy.SetColor(s, kLTagColor);
+						proxy.SetColor(s, kColorTag);
 						s = i - 1;
 						state = TAGSTRING1;
 						break;
 					case '\'':
-						proxy.SetColor(s, kLTagColor);
+						proxy.SetColor(s, kColorTag);
 						s = i - 1;
 						state = TAGSTRING2;
 						break;
 					case '!':
 						if (i == s + 2)
 						{
-							proxy.SetColor(s, kLTagColor);
+							proxy.SetColor(s, kColorTag);
 							state = COMMENT_DTD;
 							forceState = START;
 						}
@@ -448,7 +449,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					default:
 						if (isalpha(c))
 						{
-							proxy.SetColor(s, kLTagColor);
+							proxy.SetColor(s, kColorTag);
 							s = i - 1;
 							kws = proxy.Move(tolower(c), 1);
 							state = TAGATTRIBUTE;
@@ -491,14 +492,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (!isalnum(c) && c != '-')
 				{
-					switch (kwc = proxy.IsKeyWord(kws))
+					switch (kwc = proxy.IsKeyword(kws))
 					{
-						case kKwHtmlAttribute:  color = kLngColorHtmlAttribute; break;
-						case kKwUserset1:       color = kLUser1; break;
-						case kKwUserset2:       color = kLUser2; break;
-						case kKwUserset3:       color = kLUser3; break;
-						case kKwUserset4:       color = kLUser4; break;
-						default:                color = kLTextColor; break;
+						case kKwHtmlAttribute: color = kLngColorHtmlAttribute; break;
+						case kKwUserset1:      color = kColorUserSet1;         break;
+						case kKwUserset2:      color = kColorUserSet2;         break;
+						case kKwUserset3:      color = kColorUserSet3;         break;
+						case kKwUserset4:      color = kColorUserSet4;         break;
+						default:               color = kColorText;             break;
 					}
 					proxy.SetColor(s, color);
 					DEB_PrintSetKw(state, kwc);
@@ -514,7 +515,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kLTextColor);
+					proxy.SetColor(s, kColorText);
 					state = START;
 					leave = true;
 				}
@@ -532,19 +533,19 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (c == '-' && text[i] == '-' && i == s + 3 && text[i - 2] == '!' && text[i - 3] == '<')
 				{
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					s = i - 1;
 					state = COMMENT;
 				}
 				else if (c == '>')
 				{
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					s = i;
 					state = forceState;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					leave = true;
 				}
 				break;
@@ -560,13 +561,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (c == '-' && text[i] == '-')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					s = ++i;
 					state = COMMENT_DTD;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					leave = true;
 				}
 				break;
@@ -577,8 +578,8 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 
 				if (c == '<' && strncasecmp(text + i, "!--", 3) == 0)
 				{
-					proxy.SetColor(s, kLTagColor);
-					proxy.SetColor(i + 1, kLCommentColor);
+					proxy.SetColor(s, kColorTag);
+					proxy.SetColor(i + 1, kColorComment1);
 					i += 3;
 					s = i;
 				}
@@ -608,7 +609,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					
 				if ((leave || state != JAVASCRIPT) && s < i)
 				{
-					proxy.SetColor(s, kLTextColor);
+					proxy.SetColor(s, kColorText);
 					s = i - 1;
 				}
 				break;
@@ -617,13 +618,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == '/')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					s = i + 1;
 					state = JAVASCRIPT;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					leave = true;
 				}
 				break;
@@ -632,13 +633,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (c == '-' && text[i] == '-')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					s = i + 1;
 					state = TAG;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					state = JAVASCRIPT;
 					leave = true;
 				}
@@ -648,23 +649,23 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (!isalnum(c) && c != '_')
 				{
-					if (i > s + 1 && (kwc = proxy.IsKeyWord(kws)) != 0)
+					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0)
 					{
 						switch (kwc)
 						{
 							case kKwJsLanguage:  color = kLngColorJsKeyword; break;
-							case kKwUserset1:    color = kLUser1; break;
-							case kKwUserset2:    color = kLUser2; break;
-							case kKwUserset3:    color = kLUser3; break;
-							case kKwUserset4:    color = kLUser4; break;
-							default:             color = kLTextColor; break;
+							case kKwUserset1:    color = kColorUserSet1; break;
+							case kKwUserset2:    color = kColorUserSet2; break;
+							case kKwUserset3:    color = kColorUserSet3; break;
+							case kKwUserset4:    color = kColorUserSet4; break;
+							default:             color = kColorText; break;
 						}
 						proxy.SetColor(s, color);
 						DEB_PrintSetKw(state, kwc);
 					}
 					else
 					{
-						proxy.SetColor(s, kLTextColor);
+						proxy.SetColor(s, kColorText);
 					}
 					
 					s = --i;
@@ -681,7 +682,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					((state == JS_STRING1 && c == '\'') ||
 					(state == JS_STRING2 && c == '"')))
 				{
-					proxy.SetColor(s, kLStringColor);
+					proxy.SetColor(s, kColorString1);
 					s = i;
 					state = JAVASCRIPT;
 				}
@@ -689,11 +690,11 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				{
 					if (text[i - 2] == '\\' && text[i - 3] != '\\')
 					{
-						proxy.SetColor(s, kLStringColor);
+						proxy.SetColor(s, kColorString1);
 					}
 					else
 					{
-						proxy.SetColor(s, kLTextColor);
+						proxy.SetColor(s, kColorText);
 						state = JAVASCRIPT;
 					}
 					
@@ -708,7 +709,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (((c == '?' && !percent) || (c == '%' && percent)) && text[i] == '>')
 				{
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					s = ++i;
 					state = START;
 				}
@@ -730,7 +731,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 
 				if ((leave || state != START) && s < i)
 				{
-					proxy.SetColor(s, kLTextColor);
+					proxy.SetColor(s, kColorText);
 					s = i - 1;
 				}
 				break;
@@ -738,18 +739,18 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case PHP_IDENTIFIER:
 				if (!isalnum(c) && c != '_')
 				{
-					if (i > s + 1 && (kwc = proxy.IsKeyWord(kws)) != 0)
+					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0)
 					{
 						DEB_PrintState(state, c, "KWD");
 						switch (kwc)
 						{
-							case kKwPhpLanguage:   color = kLKeyWordColor; break;
-							case kKwPhpFunctions:  color = kLAltKeyWordColor; break;
-							case kKwUserset1:      color = kLUser1; break;
-							case kKwUserset2:      color = kLUser2; break;
-							case kKwUserset3:      color = kLUser3; break;
-							case kKwUserset4:      color = kLUser4; break;
-							default:               color = kLTextColor; break;
+							case kKwPhpLanguage:   color = kColorKeyword1; break;
+							case kKwPhpFunctions:  color = kColorKeyword2; break;
+							case kKwUserset1:      color = kColorUserSet1; break;
+							case kKwUserset2:      color = kColorUserSet2; break;
+							case kKwUserset3:      color = kColorUserSet3; break;
+							case kKwUserset4:      color = kColorUserSet4; break;
+							default:               color = kColorText;     break;
 						}
 						proxy.SetColor(s, color);
 						DEB_PrintSetKw(state, kwc);
@@ -757,7 +758,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					else
 					{
 						DEB_PrintState(state, c, "TXT");
-						proxy.SetColor(s, kLTextColor);
+						proxy.SetColor(s, kColorText);
 					}
 					
 					s = --i;
@@ -772,13 +773,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (!esc && c == '"')
 				{
-					proxy.SetColor(s, kLStringColor);
+					proxy.SetColor(s, kColorString1);
 					s = i;
 					state = PHP_SCRIPT;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLStringColor);
+					proxy.SetColor(s, kColorString1);
 					s = size;
 					leave = true;
 				}
@@ -790,13 +791,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (!esc && c == '\'')
 				{
-					proxy.SetColor(s, kLAltStringColor);
+					proxy.SetColor(s, kColorString2);
 					s = i;
 					state = PHP_SCRIPT;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLAltStringColor);
+					proxy.SetColor(s, kColorString2);
 					s = size;
 					leave = true;
 				}
@@ -808,21 +809,21 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == '/')
 				{
-					proxy.SetColor(s, kLAltCommentColor);
+					proxy.SetColor(s, kColorComment2);
 					s = i + 1;
 					state = PHP_SCRIPT;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kLAltCommentColor);
+					proxy.SetColor(s, kColorComment2);
 					leave = true;
 				}
 				else if (((percent && c == '%') || (!percent && c == '?')) &&
 					text[i] == '>')
 				{
-					proxy.SetColor(s, kLAltCommentColor);
+					proxy.SetColor(s, kColorComment2);
 					s = i - 1;
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					s = ++i;
 					state = START;
 				}
@@ -832,16 +833,16 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					state = PHP_SCRIPT;
 					leave = true;
 				}
 				else if (((percent && c == '%') || (!percent && c == '?')) &&
 					text[i] == '>')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					s = i - 1;
-					proxy.SetColor(s, kLTagColor);
+					proxy.SetColor(s, kColorTag);
 					s = ++i;
 					state = START;
 				}

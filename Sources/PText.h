@@ -339,7 +339,7 @@ private:
 static		PText *sfDragSource;
 
 			rgb_color fLowColor, fTextColor;
-			rgb_color fKeyWordColor, fStringColor, fCommentColor;
+			rgb_color fKeywordColor, fStringColor, fCommentColor;
 
 // saveable settings
 			int fTabStops;

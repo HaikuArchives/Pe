@@ -34,6 +34,7 @@
 */
 
 #include "CLanguageAddOn.h"
+#include "HColorUtils.h"
 
 _EXPORT const char kLanguageName[] = "Oberon-2";
 _EXPORT const char kLanguageExtensions[] = "ob2;Mod";
@@ -176,9 +177,9 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 	bool leave = false;
 	
 	if (state == COMMENT || state == XCOMMENT)
-		proxy.SetColor(0, kLCommentColor);
+		proxy.SetColor(0, kColorComment1);
 	else
-		proxy.SetColor(0, kLTextColor);
+		proxy.SetColor(0, kColorText);
 	
 	if (size <= 0)
 		return;
@@ -205,7 +206,7 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 					
 				if (leave || (state != START && s < i))
 				{
-					proxy.SetColor(s, kLTextColor);
+					proxy.SetColor(s, kColorText);
 					s = i - 1;
 				}
 				break;
@@ -213,13 +214,13 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 			case COMMENT:
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == ')')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					s = i + 1;
 					state = START;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					leave = true;
 				}
 				break;
@@ -227,13 +228,13 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 			case XCOMMENT:
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == '>')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					s = i + 1;
 					state = START;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kLCommentColor);
+					proxy.SetColor(s, kColorComment1);
 					leave = true;
 				}
 				break;
@@ -243,21 +244,21 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 				{
 					int kwc;
 
-					if (i > s + 1 && (kwc = proxy.IsKeyWord(kws)) != 0)
+					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0)
 					{
 						switch (kwc)
 						{
-							case 1:	proxy.SetColor(s, kLKeyWordColor); break;
-							case 2:	proxy.SetColor(s, kLUser1); break;
-							case 3:	proxy.SetColor(s, kLUser2); break;
-							case 4:	proxy.SetColor(s, kLUser3); break;
-							case 5:	proxy.SetColor(s, kLUser4); break;
+							case 1:	proxy.SetColor(s, kColorKeyword1); break;
+							case 2:	proxy.SetColor(s, kColorUserSet1); break;
+							case 3:	proxy.SetColor(s, kColorUserSet2); break;
+							case 4:	proxy.SetColor(s, kColorUserSet3); break;
+							case 5:	proxy.SetColor(s, kColorUserSet4); break;
 //							default:	ASSERT(false);
 						}
 					}
 					else
 					{
-						proxy.SetColor(s, kLTextColor);
+						proxy.SetColor(s, kColorText);
 					}
 					
 					s = --i;
@@ -270,7 +271,7 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 			case STRING:
 				if (c == '"' && !esc)
 				{
-					proxy.SetColor(s, kLStringColor);
+					proxy.SetColor(s, kColorString1);
 					s = i;
 					state = START;
 				}
@@ -278,11 +279,11 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 				{
 					if (text[i - 2] == '\\' && text[i - 3] != '\\')
 					{
-						proxy.SetColor(s, kLStringColor);
+						proxy.SetColor(s, kColorString1);
 					}
 					else
 					{
-						proxy.SetColor(s, kLTextColor);
+						proxy.SetColor(s, kColorText);
 						state = START;
 					}
 					

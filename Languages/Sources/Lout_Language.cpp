@@ -15,19 +15,19 @@
 
   - There is a series of predefined symbols and operators.
     (those listed in Keywords.lt, under the "-Pe-Keywords-Language-" category.
-    Here we'll assign kLKeyWordColor to those.
+    Here we'll assign kColorKeyword1 to those.
 
   - Beyond that, anything that matches the RegEx: @[_A-Za-z0-9]+
     (ie.: @MyNewSymbol) is a valid user (or package) defined symbol.
 
-    We'll assign kLAltKeyWordColor to those, unless the keyword is found in
+    We'll assign kColorKeyword2 to those, unless the keyword is found in
     one of the "-Pe-Keywords-UserX-" categories.
 
     Almost all of the symbols defined in the packages provided with lout 3.31
     are already listed there.
 
   - There is a set of concatenation symbols (here we blindly assign
-    kLOperatorColor to those).
+    kColorOperator1 to those).
 
   - After that, it comes the part we don't even attempt to support because it
     would require way too much work to properly colouring them.
@@ -45,6 +45,7 @@
 */
 
 #include "CLanguageAddOn.h"
+#include "HColorUtils.h"
 
 _EXPORT const char kLanguageName[] = "Lout";
 _EXPORT const char kLanguageExtensions[] = "lt;ld";
@@ -94,9 +95,9 @@ ColorLine(CLanguageProxy& proxy, int& state)
 		return;
 
 	if (state == COMMENT)
-		proxy.SetColor(0, kLCommentColor);
+		proxy.SetColor(0, kColorComment1);
 	else
-		proxy.SetColor(0, kLTextColor);
+		proxy.SetColor(0, kColorText);
 
 	const char* text = proxy.Text();
 
@@ -113,7 +114,7 @@ ColorLine(CLanguageProxy& proxy, int& state)
 		{
 			case START:
 				s = i - 1;
-				proxy.SetColor(s, kLTextColor);
+				proxy.SetColor(s, kColorText);
 
 				if (c == '@')	{
 					state = COMMAND;
@@ -130,7 +131,7 @@ ColorLine(CLanguageProxy& proxy, int& state)
 			break;
 
 			case COMMENT:
-				proxy.SetColor(s, kLCommentColor);
+				proxy.SetColor(s, kColorComment1);
 				leave = true;
 				if (text[size - 1] == '\n')
 					state = START;
@@ -140,28 +141,18 @@ ColorLine(CLanguageProxy& proxy, int& state)
 				if (!isalnum(c) && c != '_') {
 					int kwc;
 
-					if (i > s + 1 && (kwc = proxy.IsKeyWord(kws)) != 0) {
+					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0) {
 						switch (kwc) {
-							case 1:	
-								proxy.SetColor(s, kLKeyWordColor); 
-								break;
-							case 2:	
-								proxy.SetColor(s, kLUser1); 
-								break;
-							case 3:	
-								proxy.SetColor(s, kLUser2); 
-								break;
-							case 4:	
-								proxy.SetColor(s, kLUser3); 
-								break;
-							case 5:	
-								proxy.SetColor(s, kLUser4); 
-								break;
+							case 1:	proxy.SetColor(s, kColorKeyword1); break;
+							case 2:	proxy.SetColor(s, kColorUserSet1); break;
+							case 3:	proxy.SetColor(s, kColorUserSet2); break;
+							case 4:	proxy.SetColor(s, kColorUserSet3); break;
+							case 5:	proxy.SetColor(s, kColorUserSet4); break;
 						}
 					}
 					else
-						// use kLUserIdentifierColor instead?
-						proxy.SetColor(s, kLAltKeyWordColor);
+						// use kColorIdentifierUser instead?
+						proxy.SetColor(s, kColorKeyword2);
 
 					i--;
 					state = START;
@@ -171,7 +162,7 @@ ColorLine(CLanguageProxy& proxy, int& state)
 			break;
 
 			case OPERATOR:
-				proxy.SetColor(s, kLOperatorColor);
+				proxy.SetColor(s, kColorOperator1);
 				if (!isOperator(text[i - 1])) {
 					i--;
 					state = START;
@@ -180,13 +171,13 @@ ColorLine(CLanguageProxy& proxy, int& state)
 
 			case STRING:
 				if (c == '"' && !esc) {
-					proxy.SetColor(s, kLStringColor);
+					proxy.SetColor(s, kColorString1);
 					state = START;
 				} else if (c == '\n' || c == 0) {
 					if (text[i - 2] == '\\' && text[i - 3] != '\\') {
-						proxy.SetColor(s, kLStringColor);
+						proxy.SetColor(s, kColorString1);
 					} else {
-						proxy.SetColor(s, kLTextColor);
+						proxy.SetColor(s, kColorText);
 						state = START;
 					}
 					leave = true;

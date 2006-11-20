@@ -86,7 +86,7 @@ const char
 
 #if STANDALONE
 const rgb_color
-	gKeyWordColor = { 0, 0, 255, 0 },
+	gKeywordColor = { 0, 0, 255, 0 },
 	gCommentColor = { 255, 0, 0, 0 };
 #endif
 
@@ -314,7 +314,7 @@ void PAboutBox::Animate()
 			case 0:
 			{
 //				fOffView->FillRect(b, B_SOLID_LOW);
-//				fOffView->SetHighColor(gColor[kKeyWordColor]);
+//				fOffView->SetHighColor(gColor[kColorKeyword1]);
 				fOffView->SetHighColor(0x39, 0x74, 0x79, 255);
 				
 				BPoint p;

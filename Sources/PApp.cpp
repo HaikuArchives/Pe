@@ -192,46 +192,46 @@ PApp::PApp()
 
 		InitUTFTables();
 
-		rgb_color c = { 0xFF, 0xFF, 0xFF, 0 };			gColor[kLowColor] = gPrefs->GetPrefColor(prf_C_Low, c);
-		c.red = 0x00; c.green = 0x00; c.blue = 0x00;	gColor[kTextColor] = gPrefs->GetPrefColor(prf_C_Text, c);
+		rgb_color c = { 0xFF, 0xFF, 0xFF, 0 };			gColor[kColorLow] = gPrefs->GetPrefColor(prf_C_Low, c);
+		c.red = 0x00; c.green = 0x00; c.blue = 0x00;	gColor[kColorText] = gPrefs->GetPrefColor(prf_C_Text, c);
 
-		c.red = 0xff; c.green = 0xec; c.blue = 0x7c;	gColor[kSelectionColor] = gPrefs->GetPrefColor(prf_C_Selection, c);
-		c.red = 0x00; c.green = 0x00; c.blue = 0xFF;	gColor[kMarkColor] = gPrefs->GetPrefColor(prf_C_Mark, c);
+		c.red = 0xff; c.green = 0xec; c.blue = 0x7c;	gColor[kColorSelection] = gPrefs->GetPrefColor(prf_C_Selection, c);
+		c.red = 0x00; c.green = 0x00; c.blue = 0xFF;	gColor[kColorMark] = gPrefs->GetPrefColor(prf_C_Mark, c);
 
-		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kKeyWordColor] = gPrefs->GetPrefColor(prf_C_Keyword, c);
-														gColor[kAltKeyWordColor] = gPrefs->GetPrefColor(prf_C_AltKeyword, c);
-		c.red = 0xA1; c.green = 0x64; c.blue = 0x0E;	gColor[kCommentColor] = gPrefs->GetPrefColor(prf_C_Comment, c);
-														gColor[kAltCommentColor] = gPrefs->GetPrefColor(prf_C_AltComment, c);
+		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kColorKeyword1] = gPrefs->GetPrefColor(prf_C_Keyword, c);
+														gColor[kColorKeyword2] = gPrefs->GetPrefColor(prf_C_AltKeyword, c);
+		c.red = 0xA1; c.green = 0x64; c.blue = 0x0E;	gColor[kColorComment1] = gPrefs->GetPrefColor(prf_C_Comment, c);
+														gColor[kColorComment2] = gPrefs->GetPrefColor(prf_C_AltComment, c);
 
-		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kStringColor] = gPrefs->GetPrefColor(prf_C_String, c);
-		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kAltStringColor] = gPrefs->GetPrefColor(prf_C_Tagstring, c);
-		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kNumberColor] = gPrefs->GetPrefColor(prf_C_Number, c);	
-														gColor[kAltNumberColor] = gPrefs->GetPrefColor(prf_C_AltNumber, c);
+		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kColorString1] = gPrefs->GetPrefColor(prf_C_String, c);
+		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kColorString2] = gPrefs->GetPrefColor(prf_C_Tagstring, c);
+		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kColorNumber1] = gPrefs->GetPrefColor(prf_C_Number, c);	
+														gColor[kColorNumber2] = gPrefs->GetPrefColor(prf_C_AltNumber, c);
 
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kOperatorColor] = gPrefs->GetPrefColor(prf_C_Operator, c);	
-														gColor[kAltOperatorColor] = gPrefs->GetPrefColor(prf_C_AltOperator, c);
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kSeparatorColor] = gPrefs->GetPrefColor(prf_C_Separator, c);	
-														gColor[kAltSeparatorColor] = gPrefs->GetPrefColor(prf_C_AltSeparator, c);
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kColorOperator1] = gPrefs->GetPrefColor(prf_C_Operator, c);	
+														gColor[kColorOperator2] = gPrefs->GetPrefColor(prf_C_AltOperator, c);
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kColorSeparator1] = gPrefs->GetPrefColor(prf_C_Separator, c);	
+														gColor[kColorSeparator2] = gPrefs->GetPrefColor(prf_C_AltSeparator, c);
 
-		c.red = 0x00; c.green = 0x64; c.blue = 0x00;	gColor[kPreProcessorColor] = gPrefs->GetPrefColor(prf_C_Preprocessor, c);	
-														gColor[kAltProcessorColor] = gPrefs->GetPrefColor(prf_C_AltProcessor, c);
-		c.red = 0xFF; c.green = 0x00; c.blue = 0x00;	gColor[kErrorColor] = gPrefs->GetPrefColor(prf_C_Error, c);	
-														gColor[kAltErrorColor] = gPrefs->GetPrefColor(prf_C_AltError, c);
+		c.red = 0x00; c.green = 0x64; c.blue = 0x00;	gColor[kColorPreprocessor1] = gPrefs->GetPrefColor(prf_C_Preprocessor, c);	
+														gColor[kColorPreprocessor2] = gPrefs->GetPrefColor(prf_C_AltProcessor, c);
+		c.red = 0xFF; c.green = 0x00; c.blue = 0x00;	gColor[kColorError1] = gPrefs->GetPrefColor(prf_C_Error, c);	
+														gColor[kColorError2] = gPrefs->GetPrefColor(prf_C_AltError, c);
 
-		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kSystemIdentifierColor] = gPrefs->GetPrefColor(prf_C_SystemIdentifier, c);
-		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kCharConstColor] = gPrefs->GetPrefColor(prf_C_CharConstant, c);
+		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kColorIdentifierSystem] = gPrefs->GetPrefColor(prf_C_SystemIdentifier, c);
+		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kColorCharConst] = gPrefs->GetPrefColor(prf_C_CharConstant, c);
 
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kUserIdentifierColor] = gPrefs->GetPrefColor(prf_C_UserIdentifier, c);
-		c.red = 0x88; c.green = 0x88; c.blue = 0x88;	gColor[kTagColor] = gPrefs->GetPrefColor(prf_C_Tag, c);
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kColorIdentifierUser] = gPrefs->GetPrefColor(prf_C_UserIdentifier, c);
+		c.red = 0x88; c.green = 0x88; c.blue = 0x88;	gColor[kColorTag] = gPrefs->GetPrefColor(prf_C_Tag, c);
 
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kUser1] = gPrefs->GetPrefColor(prf_C_User1, c);
-														gColor[kUser2] = gPrefs->GetPrefColor(prf_C_User2, c);
-														gColor[kUser3] = gPrefs->GetPrefColor(prf_C_User3, c);
-														gColor[kUser4] = gPrefs->GetPrefColor(prf_C_User4, c);
+		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kColorUserSet1] = gPrefs->GetPrefColor(prf_C_User1, c);
+														gColor[kColorUserSet2] = gPrefs->GetPrefColor(prf_C_User2, c);
+														gColor[kColorUserSet3] = gPrefs->GetPrefColor(prf_C_User3, c);
+														gColor[kColorUserSet4] = gPrefs->GetPrefColor(prf_C_User4, c);
 
-		c.red = 200; c.green = 100; c.blue = 100;		gColor[kInvisiblesColor] = gPrefs->GetPrefColor(prf_C_Invisibles, c);
+		c.red = 200; c.green = 100; c.blue = 100;		gColor[kColorInvisibles] = gPrefs->GetPrefColor(prf_C_Invisibles, c);
 		
-		DefineInvColors(gColor[kSelectionColor]);
+		DefineInvColors(gColor[kColorSelection]);
 
 		gAutoIndent = gPrefs->GetPrefInt(prf_I_AutoIndent, 1);
 		gSyntaxColoring = gPrefs->GetPrefInt(prf_I_SyntaxColoring, 1);

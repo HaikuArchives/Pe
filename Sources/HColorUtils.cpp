@@ -40,7 +40,7 @@ const int kDistinctColorTresholdSquare = 10000;
 
 rgb_color DistinctColor(rgb_color highColor, rgb_color lowColor);
 
-rgb_color gColor[kLastColor], gInvColor[kLastColor];
+rgb_color gColor[kColorEnd], gInvColor[kColorEnd];
 
 //
 // This comes from Pavel Cisler:
@@ -72,13 +72,13 @@ rgb_color DistinctColor(rgb_color highColor, rgb_color lowColor)
 
 void DefineInvColors(rgb_color selectionColor)
 {
-	for (int i = 0; i < kLastColor; i++)
+	for (int i = 0; i < kColorEnd; i++)
 		gInvColor[i] = DistinctColor(gColor[i], selectionColor);
 } /* DefineInvColors */
 
 rgb_color LookupDistinctColor(rgb_color highColor)
 {
-	for (int i = 0; i < kLastColor; i++)
+	for (int i = 0; i < kColorEnd; i++)
 		if (*(long*)&gColor[i] == *(long*)&highColor)
 			return gInvColor[i];
 

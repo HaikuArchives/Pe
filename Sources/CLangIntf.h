@@ -105,15 +105,15 @@ static	unsigned char *sfWordBreakTable;
 		
 		// members for new (map-based) keyword implementation:
 public:
-		int AddToCurrentKeyWord(int ch, int state);
-		int LookupCurrentKeyWord(int state) const;
-		int LookupKeyWord(const BString& word) const;
+		int AddToCurrentKeyword(int ch, int state);
+		int LookupCurrentKeyword(int state) const;
+		int LookupKeyword(const BString& word) const;
 protected:
-		static const int kKeyWordBufSize = 128;
-		char fKeyWordBuf[kKeyWordBufSize+1];
-		typedef map<BString, int> KeyWordMap;
-		mutable bool fHaveParsedKeyWords;
-		mutable KeyWordMap fKeyWordMap;
+		static const int kKeywordBufSize = 128;
+		char fKeywordBuf[kKeywordBufSize+1];
+		typedef map<BString, int> KeywordMap;
+		mutable bool fHaveParsedKeywords;
+		mutable KeywordMap fKeywordMap;
 		
 static	vector<CLangIntf*>	fInterfaces;
 };

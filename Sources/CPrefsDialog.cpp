@@ -266,74 +266,74 @@ bool CPrefsDialog::OKClicked()
 	fAltFontSize = atof(GetText("alfs"));
 
 	HColorControl *cc = dynamic_cast<HColorControl*>(FindView("lowc"));
-	if (cc) { gColor[kLowColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Low, gColor[kLowColor]); }
+	if (cc) { gColor[kColorLow] = cc->Color(); gPrefs->SetPrefColor(prf_C_Low, gColor[kColorLow]); }
 	cc = dynamic_cast<HColorControl*>(FindView("txtc"));
-	if (cc) { gColor[kTextColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Text, gColor[kTextColor]); }
+	if (cc) { gColor[kColorText] = cc->Color(); gPrefs->SetPrefColor(prf_C_Text, gColor[kColorText]); }
 
 	cc = dynamic_cast<HColorControl*>(FindView("selc"));
-	if (cc) { gColor[kSelectionColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Selection, gColor[kSelectionColor]); }
+	if (cc) { gColor[kColorSelection] = cc->Color(); gPrefs->SetPrefColor(prf_C_Selection, gColor[kColorSelection]); }
 	cc = dynamic_cast<HColorControl*>(FindView("mrkc"));
-	if (cc) { gColor[kMarkColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Mark, gColor[kMarkColor]); }
+	if (cc) { gColor[kColorMark] = cc->Color(); gPrefs->SetPrefColor(prf_C_Mark, gColor[kColorMark]); }
 	
 	cc = dynamic_cast<HColorControl*>(FindView("keyc"));
-	if (cc) { gColor[kKeyWordColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Keyword, gColor[kKeyWordColor]); }
+	if (cc) { gColor[kColorKeyword1] = cc->Color(); gPrefs->SetPrefColor(prf_C_Keyword, gColor[kColorKeyword1]); }
 	cc = dynamic_cast<HColorControl*>(FindView("ke2c"));
-	if (cc) { gColor[kAltKeyWordColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltKeyword, gColor[kAltKeyWordColor]); }
+	if (cc) { gColor[kColorKeyword2] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltKeyword, gColor[kColorKeyword2]); }
 	cc = dynamic_cast<HColorControl*>(FindView("cmtc"));
-	if (cc) { gColor[kCommentColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Comment, gColor[kCommentColor]); }
+	if (cc) { gColor[kColorComment1] = cc->Color(); gPrefs->SetPrefColor(prf_C_Comment, gColor[kColorComment1]); }
 	cc = dynamic_cast<HColorControl*>(FindView("cm2c"));
-	if (cc) { gColor[kAltCommentColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltComment, gColor[kAltCommentColor]); }
+	if (cc) { gColor[kColorComment2] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltComment, gColor[kColorComment2]); }
 	
 	cc = dynamic_cast<HColorControl*>(FindView("strc"));
-	if (cc) { gColor[kStringColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_String, gColor[kStringColor]); }
+	if (cc) { gColor[kColorString1] = cc->Color(); gPrefs->SetPrefColor(prf_C_String, gColor[kColorString1]); }
 	cc = dynamic_cast<HColorControl*>(FindView("tgsc"));
-	if (cc) { gColor[kAltStringColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Tagstring, gColor[kAltStringColor]); }
+	if (cc) { gColor[kColorString2] = cc->Color(); gPrefs->SetPrefColor(prf_C_Tagstring, gColor[kColorString2]); }
 	cc = dynamic_cast<HColorControl*>(FindView("numc"));
-	if (cc) { gColor[kNumberColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Number, gColor[kNumberColor]); }
+	if (cc) { gColor[kColorNumber1] = cc->Color(); gPrefs->SetPrefColor(prf_C_Number, gColor[kColorNumber1]); }
 	cc = dynamic_cast<HColorControl*>(FindView("nu2c"));
-	if (cc) { gColor[kAltNumberColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltNumber, gColor[kAltNumberColor]); }
+	if (cc) { gColor[kColorNumber2] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltNumber, gColor[kColorNumber2]); }
 
 	cc = dynamic_cast<HColorControl*>(FindView("opec"));
-	if (cc) { gColor[kOperatorColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Operator, gColor[kOperatorColor]); }
+	if (cc) { gColor[kColorOperator1] = cc->Color(); gPrefs->SetPrefColor(prf_C_Operator, gColor[kColorOperator1]); }
 	cc = dynamic_cast<HColorControl*>(FindView("op2c"));
-	if (cc) { gColor[kAltOperatorColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltOperator, gColor[kAltOperatorColor]); }
+	if (cc) { gColor[kColorOperator2] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltOperator, gColor[kColorOperator2]); }
 	cc = dynamic_cast<HColorControl*>(FindView("sepc"));
-	if (cc) { gColor[kSeparatorColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Separator, gColor[kSeparatorColor]); }
+	if (cc) { gColor[kColorSeparator1] = cc->Color(); gPrefs->SetPrefColor(prf_C_Separator, gColor[kColorSeparator1]); }
 	cc = dynamic_cast<HColorControl*>(FindView("se2c"));
-	if (cc) { gColor[kAltSeparatorColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltSeparator, gColor[kAltSeparatorColor]); }
+	if (cc) { gColor[kColorSeparator2] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltSeparator, gColor[kColorSeparator2]); }
 
 	cc = dynamic_cast<HColorControl*>(FindView("proc"));
-	if (cc) { gColor[kPreProcessorColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Preprocessor, gColor[kPreProcessorColor]); }
+	if (cc) { gColor[kColorPreprocessor1] = cc->Color(); gPrefs->SetPrefColor(prf_C_Preprocessor, gColor[kColorPreprocessor1]); }
 	cc = dynamic_cast<HColorControl*>(FindView("pr2c"));
-	if (cc) { gColor[kAltProcessorColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltProcessor, gColor[kAltProcessorColor]); }
+	if (cc) { gColor[kColorPreprocessor2] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltProcessor, gColor[kColorPreprocessor2]); }
 	cc = dynamic_cast<HColorControl*>(FindView("errc"));
-	if (cc) { gColor[kErrorColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Error, gColor[kErrorColor]); }
+	if (cc) { gColor[kColorError1] = cc->Color(); gPrefs->SetPrefColor(prf_C_Error, gColor[kColorError1]); }
 	cc = dynamic_cast<HColorControl*>(FindView("er2c"));
-	if (cc) { gColor[kAltErrorColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltError, gColor[kAltErrorColor]); }
+	if (cc) { gColor[kColorError2] = cc->Color(); gPrefs->SetPrefColor(prf_C_AltError, gColor[kColorError2]); }
 
 	cc = dynamic_cast<HColorControl*>(FindView("sidc"));
-	if (cc) { gColor[kSystemIdentifierColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_SystemIdentifier, gColor[kSystemIdentifierColor]); }
+	if (cc) { gColor[kColorIdentifierSystem] = cc->Color(); gPrefs->SetPrefColor(prf_C_SystemIdentifier, gColor[kColorIdentifierSystem]); }
 	cc = dynamic_cast<HColorControl*>(FindView("chcc"));
-	if (cc) { gColor[kCharConstColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_CharConstant, gColor[kCharConstColor]); }
+	if (cc) { gColor[kColorCharConst] = cc->Color(); gPrefs->SetPrefColor(prf_C_CharConstant, gColor[kColorCharConst]); }
 
 	cc = dynamic_cast<HColorControl*>(FindView("uidc"));
-	if (cc) { gColor[kUserIdentifierColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_UserIdentifier, gColor[kUserIdentifierColor]); }
+	if (cc) { gColor[kColorIdentifierUser] = cc->Color(); gPrefs->SetPrefColor(prf_C_UserIdentifier, gColor[kColorIdentifierUser]); }
 	cc = dynamic_cast<HColorControl*>(FindView("tagc"));
-	if (cc) { gColor[kTagColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Tag, gColor[kTagColor]); }
+	if (cc) { gColor[kColorTag] = cc->Color(); gPrefs->SetPrefColor(prf_C_Tag, gColor[kColorTag]); }
 
 	cc = dynamic_cast<HColorControl*>(FindView("us1c"));
-	if (cc) { gColor[kUser1] = cc->Color(); gPrefs->SetPrefColor(prf_C_User1, gColor[kUser1]); }
+	if (cc) { gColor[kColorUserSet1] = cc->Color(); gPrefs->SetPrefColor(prf_C_User1, gColor[kColorUserSet1]); }
 	cc = dynamic_cast<HColorControl*>(FindView("us2c"));
-	if (cc) { gColor[kUser2] = cc->Color(); gPrefs->SetPrefColor(prf_C_User2, gColor[kUser2]); }
+	if (cc) { gColor[kColorUserSet2] = cc->Color(); gPrefs->SetPrefColor(prf_C_User2, gColor[kColorUserSet2]); }
 	cc = dynamic_cast<HColorControl*>(FindView("us3c"));
-	if (cc) { gColor[kUser3] = cc->Color(); gPrefs->SetPrefColor(prf_C_User3, gColor[kUser3]); }
+	if (cc) { gColor[kColorUserSet3] = cc->Color(); gPrefs->SetPrefColor(prf_C_User3, gColor[kColorUserSet3]); }
 	cc = dynamic_cast<HColorControl*>(FindView("us4c"));
-	if (cc) { gColor[kUser4] = cc->Color(); gPrefs->SetPrefColor(prf_C_User4, gColor[kUser4]); }
+	if (cc) { gColor[kColorUserSet4] = cc->Color(); gPrefs->SetPrefColor(prf_C_User4, gColor[kColorUserSet4]); }
 
 	cc = dynamic_cast<HColorControl*>(FindView("invc"));
-	if (cc) { gColor[kInvisiblesColor] = cc->Color(); gPrefs->SetPrefColor(prf_C_Invisibles, gColor[kInvisiblesColor]); }
+	if (cc) { gColor[kColorInvisibles] = cc->Color(); gPrefs->SetPrefColor(prf_C_Invisibles, gColor[kColorInvisibles]); }
 
-	DefineInvColors(gColor[kSelectionColor]);
+	DefineInvColors(gColor[kColorSelection]);
 
 	gPrefs->SetPrefString(prf_S_FontFamily, fFontFamily);
 	gPrefs->SetPrefString(prf_S_FontStyle, fFontStyle);
@@ -503,71 +503,71 @@ bool CPrefsDialog::CancelClicked()
 //	fPageSetup = (char *)Hex2Bin(gPrefs->GetPrefString(prf_S_DefaultPageSetup, ""), fPageSetupSize);
 	
 	HColorControl *cc = dynamic_cast<HColorControl*>(FindView("lowc"));
-	if (cc) cc->SetColor(gColor[kLowColor]);
+	if (cc) cc->SetColor(gColor[kColorLow]);
 	cc = dynamic_cast<HColorControl*>(FindView("txtc"));
-	if (cc) cc->SetColor(gColor[kTextColor]);
+	if (cc) cc->SetColor(gColor[kColorText]);
 	
 	cc = dynamic_cast<HColorControl*>(FindView("selc"));
-	if (cc) cc->SetColor(gColor[kSelectionColor]);
+	if (cc) cc->SetColor(gColor[kColorSelection]);
 	cc = dynamic_cast<HColorControl*>(FindView("mrkc"));
-	if (cc) cc->SetColor(gColor[kMarkColor]);
+	if (cc) cc->SetColor(gColor[kColorMark]);
 
 	cc = dynamic_cast<HColorControl*>(FindView("keyc"));
-	if (cc) cc->SetColor(gColor[kKeyWordColor]);
+	if (cc) cc->SetColor(gColor[kColorKeyword1]);
 	cc = dynamic_cast<HColorControl*>(FindView("ke2c"));
-	if (cc) cc->SetColor(gColor[kAltKeyWordColor]);
+	if (cc) cc->SetColor(gColor[kColorKeyword2]);
 	cc = dynamic_cast<HColorControl*>(FindView("cmtc"));
-	if (cc) cc->SetColor(gColor[kCommentColor]);
+	if (cc) cc->SetColor(gColor[kColorComment1]);
 	cc = dynamic_cast<HColorControl*>(FindView("cm2c"));
-	if (cc) cc->SetColor(gColor[kAltCommentColor]);
+	if (cc) cc->SetColor(gColor[kColorComment2]);
 	
 	cc = dynamic_cast<HColorControl*>(FindView("strc"));
-	if (cc) cc->SetColor(gColor[kStringColor]);
+	if (cc) cc->SetColor(gColor[kColorString1]);
 	cc = dynamic_cast<HColorControl*>(FindView("tgsc"));
-	if (cc) cc->SetColor(gColor[kAltStringColor]);
+	if (cc) cc->SetColor(gColor[kColorString2]);
 	cc = dynamic_cast<HColorControl*>(FindView("numc"));
-	if (cc) cc->SetColor(gColor[kNumberColor]);
+	if (cc) cc->SetColor(gColor[kColorNumber1]);
 	cc = dynamic_cast<HColorControl*>(FindView("nu2c"));
-	if (cc) cc->SetColor(gColor[kAltNumberColor]);
+	if (cc) cc->SetColor(gColor[kColorNumber2]);
 
 	cc = dynamic_cast<HColorControl*>(FindView("opec"));
-	if (cc) cc->SetColor(gColor[kOperatorColor]);
+	if (cc) cc->SetColor(gColor[kColorOperator1]);
 	cc = dynamic_cast<HColorControl*>(FindView("op2c"));
-	if (cc) cc->SetColor(gColor[kAltOperatorColor]);
+	if (cc) cc->SetColor(gColor[kColorOperator2]);
 	cc = dynamic_cast<HColorControl*>(FindView("sepc"));
-	if (cc) cc->SetColor(gColor[kSeparatorColor]);
+	if (cc) cc->SetColor(gColor[kColorSeparator1]);
 	cc = dynamic_cast<HColorControl*>(FindView("se2c"));
-	if (cc) cc->SetColor(gColor[kAltSeparatorColor]);
+	if (cc) cc->SetColor(gColor[kColorSeparator2]);
 
 	cc = dynamic_cast<HColorControl*>(FindView("proc"));
-	if (cc) cc->SetColor(gColor[kPreProcessorColor]);
+	if (cc) cc->SetColor(gColor[kColorPreprocessor1]);
 	cc = dynamic_cast<HColorControl*>(FindView("pr2c"));
-	if (cc) cc->SetColor(gColor[kAltProcessorColor]);
+	if (cc) cc->SetColor(gColor[kColorPreprocessor2]);
 	cc = dynamic_cast<HColorControl*>(FindView("errc"));
-	if (cc) cc->SetColor(gColor[kErrorColor]);
+	if (cc) cc->SetColor(gColor[kColorError1]);
 	cc = dynamic_cast<HColorControl*>(FindView("er2c"));
-	if (cc) cc->SetColor(gColor[kAltErrorColor]);
+	if (cc) cc->SetColor(gColor[kColorError2]);
 
 	cc = dynamic_cast<HColorControl*>(FindView("sidc"));
-	if (cc) cc->SetColor(gColor[kSystemIdentifierColor]);
+	if (cc) cc->SetColor(gColor[kColorIdentifierSystem]);
 	cc = dynamic_cast<HColorControl*>(FindView("chcc"));
-	if (cc) cc->SetColor(gColor[kCharConstColor]);
+	if (cc) cc->SetColor(gColor[kColorCharConst]);
 
 	cc = dynamic_cast<HColorControl*>(FindView("uidc"));
-	if (cc) cc->SetColor(gColor[kUserIdentifierColor]);
+	if (cc) cc->SetColor(gColor[kColorIdentifierUser]);
 	cc = dynamic_cast<HColorControl*>(FindView("tagc"));
-	if (cc) cc->SetColor(gColor[kTagColor]);
+	if (cc) cc->SetColor(gColor[kColorTag]);
 	
 	cc = dynamic_cast<HColorControl*>(FindView("us1c"));
-	if (cc) cc->SetColor(gColor[kUser1]);
+	if (cc) cc->SetColor(gColor[kColorUserSet1]);
 	cc = dynamic_cast<HColorControl*>(FindView("us2c"));
-	if (cc) cc->SetColor(gColor[kUser2]);
+	if (cc) cc->SetColor(gColor[kColorUserSet2]);
 	cc = dynamic_cast<HColorControl*>(FindView("us3c"));
-	if (cc) cc->SetColor(gColor[kUser3]);
+	if (cc) cc->SetColor(gColor[kColorUserSet3]);
 	cc = dynamic_cast<HColorControl*>(FindView("us4c"));
-	if (cc) cc->SetColor(gColor[kUser4]);
+	if (cc) cc->SetColor(gColor[kColorUserSet4]);
 	cc = dynamic_cast<HColorControl*>(FindView("invc"));
-	if (cc) cc->SetColor(gColor[kInvisiblesColor]);
+	if (cc) cc->SetColor(gColor[kColorInvisibles]);
 	
 	SetOn("auin", gPrefs->GetPrefInt(prf_I_AutoIndent, 1));
 	SetOn("syco", gPrefs->GetPrefInt(prf_I_SyntaxColoring, 1));

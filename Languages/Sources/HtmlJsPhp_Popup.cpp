@@ -33,6 +33,11 @@
 	Created: 04/19/98 19:30:25
 */
 
+/* TODO:
+	- AddInclude() for include, include_once, require and require_once
+	- Support for x='attribute'
+	- PHP class support
+*/
 #include "CLanguageAddOn.h"
 #include <string>
 

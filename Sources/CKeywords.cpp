@@ -176,7 +176,7 @@ struct kws {
 
 typedef map<int, kws> kwm;
 
-static void AddKeyWord(kwm& dfa, unsigned char *nkw, int& nextState, int a);
+static void AddKeyword(kwm& dfa, unsigned char *nkw, int& nextState, int a);
 static void CompressDFA(kwm& dfa, vector<int>& accept, unsigned char ec[],
 	vector<int>& base, vector<int>& nxt, vector<int>& chk, bool used[]);
 static void RemapChars(kwm& dfa, unsigned char *map);
@@ -190,7 +190,7 @@ static void WriteTablesToAttributes(const char *file,
 	vector<int>& accept, unsigned char ec[], vector<int>& base,
 	vector<int>& nxt, vector<int>& chk);
 
-static void AddKeyWord(kwm& dfa, unsigned char *nkw, int& nextState, int a)
+static void AddKeyword(kwm& dfa, unsigned char *nkw, int& nextState, int a)
 {
 	int state = 1, laststate = 1;
 	unsigned char *nkwi = nkw;
@@ -225,7 +225,7 @@ static void AddKeyWord(kwm& dfa, unsigned char *nkw, int& nextState, int a)
 
 		dfa[state].accept = a;
 	}
-} /* AddKeyWord */
+} /* AddKeyword */
 
 static void CompressDFA(kwm& dfa, vector<int>& accept, unsigned char ec[],
 	vector<int>& base, vector<int>& nxt, vector<int>& chk, bool used[])
@@ -367,7 +367,7 @@ static void GenerateKWTables(FILE *f,
 			}
 
 			if (p)
-				AddKeyWord(dfa, (unsigned char *)p, nextState, set);
+				AddKeyword(dfa, (unsigned char *)p, nextState, set);
 			
 //			dfa[1].PrintToStream();
 			

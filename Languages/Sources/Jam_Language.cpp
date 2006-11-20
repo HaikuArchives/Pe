@@ -26,8 +26,8 @@
 // copyright holder.
 
 #include <String.h>
-
 #include "CLanguageAddOn.h"
+#include "HColorUtils.h"
 
 class ParseContext;
 class Token;
@@ -97,7 +97,7 @@ public:
 		  fLine(proxy.Text()),
 		  fLength(offset + length),
 		  fOffset(offset),
-		  fNoKeyWord(false)
+		  fNoKeyword(false)
 	{
 	}
 
@@ -106,7 +106,7 @@ public:
 		  fLine(line),
 		  fLength(offset + length),
 		  fOffset(offset),
-		  fNoKeyWord(false)
+		  fNoKeyword(false)
 	{
 	}
 
@@ -123,7 +123,7 @@ private:
 	const char*		fLine;
 	int				fLength;
 	int				fOffset;
-	bool			fNoKeyWord;
+	bool			fNoKeyword;
 };
 
 // GetNextToken
@@ -133,7 +133,7 @@ Tokenizer::GetNextToken(Token& token)
 	// skip leading white space
 	int c = _GetCurrentChar();
 	while (c != 0 && isspace(c)) {
-		fNoKeyWord = false;
+		fNoKeyword = false;
 		c = _GetNextChar();
 	}
 	if (c == 0)
@@ -154,7 +154,7 @@ Tokenizer::GetNextToken(Token& token)
 			if (c == '"') {
 				_GetNextChar();
 				token.length = fOffset - token.offset;
-				fNoKeyWord = true;
+				fNoKeyword = true;
 				return true;
 			}
 			if (c == '\\')
@@ -174,16 +174,16 @@ Tokenizer::GetNextToken(Token& token)
 	}
 	// text or keyword
 	if (!isalpha(c))
-		fNoKeyWord = true;
+		fNoKeyword = true;
 	while (true) {
 		if (c == 0 || isspace(c))
 			break;
 		if (c == '"') {
-			fNoKeyWord = true;
+			fNoKeyword = true;
 			break;
 		}
 		if (c == '\\') {
-			fNoKeyWord = true;
+			fNoKeyword = true;
 			_GetNextChar();
 		}
 		c = _GetNextChar();
@@ -191,11 +191,11 @@ Tokenizer::GetNextToken(Token& token)
 	// check whether it is a keyword or not
 	token.length = fOffset - token.offset;
 	int state = 0;
-	if (!fNoKeyWord) {
+	if (!fNoKeyword) {
 		state = 1;
 		for (int i = 0; state && i < token.length; i++)
 			state = fProxy.Move(token.string[i], state);
-		state = fProxy.IsKeyWord(state);
+		state = fProxy.IsKeyword(state);
 	}
 	if (state) {
 		token.type = Token::KEYWORD;
@@ -543,23 +543,23 @@ ColorParseAction::TokenParsed(ParseContext& context, const Token& token)
 {
 	switch (token.type) {
 		case Token::STRING:
-			context.proxy.SetColor(token.offset, kLStringColor);
+			context.proxy.SetColor(token.offset, kColorString1);
 			break;
 		case Token::COMMENT:
-			context.proxy.SetColor(token.offset, kLCommentColor);
+			context.proxy.SetColor(token.offset, kColorComment1);
 			break;
 		case Token::TEXT:
-			context.proxy.SetColor(token.offset, kLTextColor);
+			context.proxy.SetColor(token.offset, kColorText);
 			break;
 		case Token::KEYWORD:
 		{
-			int color = kLTextColor;
+			int color = kColorText;
 			switch (token.keyword) {
-				case 1:	color = kLKeyWordColor; break;
-				case 2:	color = kLUser1; break;
-				case 3:	color = kLUser2; break;
-				case 4:	color = kLUser3; break;
-				case 5:	color = kLUser4; break;
+				case 1:	color = kColorKeyword1; break;
+				case 2:	color = kColorUserSet1; break;
+				case 3:	color = kColorUserSet2; break;
+				case 4:	color = kColorUserSet3; break;
+				case 5:	color = kColorUserSet4; break;
 			}
 			context.proxy.SetColor(token.offset, color);
 			break;
@@ -568,11 +568,11 @@ ColorParseAction::TokenParsed(ParseContext& context, const Token& token)
 		case Token::RBRACE:
 		case Token::LBRACKET:
 		case Token::RBRACKET:
-			context.proxy.SetColor(token.offset, kLSeparatorColor);
+			context.proxy.SetColor(token.offset, kColorSeparator1);
 			break;
 		case Token::COLON:
 		case Token::SEMICOLON:
-			context.proxy.SetColor(token.offset, kLAltSeparatorColor);
+			context.proxy.SetColor(token.offset, kColorSeparator2);
 			break;
 		case Token::NOT:
 		case Token::AND:
@@ -585,10 +585,10 @@ ColorParseAction::TokenParsed(ParseContext& context, const Token& token)
 		case Token::LESS_EQUAL:
 		case Token::GREATER_EQUAL:
 		case Token::CONDITIONAL_ASSIGN:
-			context.proxy.SetColor(token.offset, kLOperatorColor);
+			context.proxy.SetColor(token.offset, kColorOperator1);
 			break;
 		case Token::ACTIONS:
-			context.proxy.SetColor(token.offset, kLTextColor);
+			context.proxy.SetColor(token.offset, kColorText);
 			break;
 	}
 	return true;

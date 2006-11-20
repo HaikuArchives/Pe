@@ -36,40 +36,8 @@
 #ifndef CLANGUAGEADDON_H
 #define CLANGUAGEADDON_H
 
-//using namespace std;
-
-/*
-	These enums define all the colours that are available for syntax colouring in Pe. 
-	Specifying an out of range colour results in normal text colour.
-*/
-enum {
-	kLTextColor = 3,
-	kLKeyWordColor,    // like c's    : if
-	kLCommentColor,    // like c's    : /* comment */
-	kLStringColor,     // like c's    : "this is a string"
-	kLCharConstColor,  // like c's    : 'c'
-	kLUser1, kLUser2, kLUser3, kLUser4,
-	kLTagColor,        // like (from <html>) : <image>
-	kLAltKeyWordColor,       // like c++'s  : class
-	kLAltCommentColor,       // like c++'s  : // comment
-	kLAltStringColor,  // like html's : "this is a string"
-	kLSystemIdentifierColor, // like (from java) : java.util.String
-	kLUserIdentifierColor,   // like (from c's int foo;) : foo
-	kLNumberColor,           // like c's : 4.5
-	kLAltNumberColor,        // like c's : 4
-	kLPreProcessorColor,     // like c's : #define
-	kLAltProcessorColor,     // like doxygen's : @param
-	kLErrorColor,            // like c's : 5.4.3
-	kLAltErrorColor,         // like c's : for int (
-	kLOperatorColor,         // like c's : +
-	kLAltOperatorColor,      // like c's : &
-	kLSeparatorColor,        // like c's : {
-	kLAltSeparatorColor,     // like c's : ;
-	kLEndColor // just a marker, same as kLTextColor if you care
-};
-
 // these constants define the different keyword-types that are returned
-// by IsKeyWord() (see below):
+// by IsKeyword() (see below):
 enum {
 	kKeywordLanguage = 1,
 	kKeywordUser1,
@@ -100,8 +68,8 @@ public:
 	Move is used to walk through a DFA (deterministic finite automaton)
 	and reports back the state it is currently in. Always start with a state 1 (one).
 	If the result of a Move is 0 (zero), than you haven't fed it a keyword.
-	If the state is not zero, you can test if it's a valid keyword by calling IsKeyWord.
-	IsKeyWord returns the set the keyword is in, or zero if it's not a keyword.
+	If the state is not zero, you can test if it's a valid keyword by calling IsKeyword.
+	IsKeyword returns the set the keyword is in, or zero if it's not a keyword.
 	A value of 1 (one) corresponds to a standard keyword, a value of 2 means a
 	keyword from user set 1 and so on.
 	
@@ -109,7 +77,7 @@ public:
 	syntax colouring.	
 */
 virtual	int Move(int ch, int state);
-virtual	int IsKeyWord(int state);
+virtual	int IsKeyword(int state);
 		
 /*
 	The next pair of calls return the text to colour or parse and it's size.

@@ -272,7 +272,7 @@ CFilterChoiceDialog::SeparatorListItem::DrawItem(BView *owner, BRect frame,
 								 	 labelPT.y+labelHeight-1),
 							 B_SOLID_LOW);
 		owner->MovePenTo(labelPT.x+lineDist, labelPT.y+fontHeight.ascent);
-		owner->SetHighColor(gColor[kCommentColor]);
+		owner->SetHighColor(gColor[kColorComment1]);
 		owner->DrawString(name);
 		owner->SetHighColor(oldHighColor);
 	}

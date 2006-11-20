@@ -218,7 +218,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 
 	gPrefs->InitTextFont(&fFont);
 
-	SetViewColor(gColor[kLowColor]);
+	SetViewColor(gColor[kColorLow]);
 	
 	fTabStops = gPrefs->GetPrefInt(prf_I_SpacesPerTab, 4);
 
@@ -2244,10 +2244,10 @@ void CSeparatorItem::DrawContent()
 	Menu()->BeginLineArray(4);
 	Menu()->AddLine(BPoint(0, topY), 
 						 BPoint(labelPT.x-lineDist, topY),
-						 gColor[kCommentColor]);
+						 gColor[kColorComment1]);
 	Menu()->AddLine(BPoint(labelPT.x+labelWidth+2*lineDist, topY), 
 						 BPoint(frame.right, topY),
-						 gColor[kCommentColor]);
+						 gColor[kColorComment1]);
 	Menu()->AddLine(BPoint(0, bottomY), 
 						 BPoint(labelPT.x-lineDist, bottomY),
 						 lightCol);
@@ -2261,7 +2261,7 @@ void CSeparatorItem::DrawContent()
 	font.GetHeight(&fontHeight);
 	Menu()->MovePenTo(labelPT.x+lineDist, labelPT.y+fontHeight.ascent);
 	rgb_color highCol = Menu()->HighColor();
-	Menu()->SetHighColor(gColor[kCommentColor]);
+	Menu()->SetHighColor(gColor[kColorComment1]);
 	Menu()->DrawString(Label());
 	Menu()->SetHighColor(highCol);
 }
@@ -4624,7 +4624,7 @@ void PText::Draw(BRect updateRect)
 	
 	cl = Offset2Line(fCaret);
 	
-	SetLowColor(gColor[kLowColor]);
+	SetLowColor(gColor[kColorLow]);
 	
 	if (fSplitAt > 0)
 	{
@@ -4636,7 +4636,7 @@ void PText::Draw(BRect updateRect)
 
 		if (clip.Frame().IsValid())
 		{
-			SetHighColor(gColor[kLowColor]);
+			SetHighColor(gColor[kColorLow]);
 			StrokeLine(fBounds.LeftTop(), fBounds.RightTop());
 			ConstrainClippingRegion(&clip);
 			
@@ -4674,7 +4674,7 @@ void PText::Draw(BRect updateRect)
 
 	if (clip.Frame().IsValid())
 	{
-		SetHighColor(gColor[kLowColor]);
+		SetHighColor(gColor[kColorLow]);
 		StrokeLine(BPoint(0, fSplitAt), BPoint(updateRect.right, fSplitAt));
 		ConstrainClippingRegion(&clip);
 	
@@ -4691,7 +4691,7 @@ void PText::Draw(BRect updateRect)
 			y += fLineHeight;
 		}
 		
-		SetLowColor(gColor[kLowColor]);
+		SetLowColor(gColor[kColorLow]);
 		r.Set(0, y, updateRect.right, updateRect.bottom);
 		if (updateRect.Intersects(r))
 			FillRect(r, B_SOLID_LOW);
@@ -4729,7 +4729,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 		y = E.bottom - fFH.descent;
 	}
 	vw->SetFont(&fFont);
-	vw->SetLowColor(gColor[kLowColor]);
+	vw->SetLowColor(gColor[kColorLow]);
 	vw->FillRect(E, B_SOLID_LOW);
 	
 	int s, e, l;
@@ -4765,7 +4765,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 		}
 		else
 		{
-			colors[0] = gColor[kTextColor];
+			colors[0] = gColor[kColorText];
 			starts[0] = 0;
 			starts[1] = 0;
 		}
@@ -4791,7 +4791,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 				r.right = Offset2Position(fCaret).x - hv;
 				if (r.right < r.left) swap(r.right, r.left);
 				
-				vw->SetLowColor(gColor[kSelectionColor]);
+				vw->SetLowColor(gColor[kColorSelection]);
 				vw->FillRect(r, B_SOLID_LOW);
 			}
 		}
@@ -4807,12 +4807,12 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 
 			if (fWindowActive)
 			{
-				vw->SetLowColor(gColor[kSelectionColor]);
+				vw->SetLowColor(gColor[kColorSelection]);
 				vw->FillRect(r, B_SOLID_LOW);
 			}
 			else if (a <= e && c > s)
 			{
-				vw->SetHighColor(gColor[kSelectionColor]);
+				vw->SetHighColor(gColor[kColorSelection]);
 				
 				vw->StrokeLine(r.LeftBottom(), r.LeftTop());
 				vw->StrokeLine(r.RightBottom(), r.RightTop());
@@ -4862,7 +4862,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 		}
 		
 		if (a > s)
-			vw->SetLowColor(gColor[kLowColor]);
+			vw->SetLowColor(gColor[kColorLow]);
 	}
 	
 	int i, j, ci = 0;
@@ -4878,13 +4878,13 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 		
 		if (inSelection && fWindowActive)
 		{
-			vw->SetLowColor(gColor[kSelectionColor]);
-			vw->SetHighColor(gInvColor[kInvisiblesColor]);
+			vw->SetLowColor(gColor[kColorSelection]);
+			vw->SetHighColor(gInvColor[kColorInvisibles]);
 		}
 		else
 		{
-			vw->SetLowColor(gColor[kLowColor]);
-			vw->SetHighColor(gColor[kInvisiblesColor]);
+			vw->SetLowColor(gColor[kColorLow]);
+			vw->SetHighColor(gColor[kColorInvisibles]);
 		}
 
 		while (i < l)
@@ -4913,14 +4913,14 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 				if (i == a - s)
 				{
 					inSelection = true;
-					vw->SetLowColor(gColor[kSelectionColor]);
-					vw->SetHighColor(gInvColor[kInvisiblesColor]);
+					vw->SetLowColor(gColor[kColorSelection]);
+					vw->SetHighColor(gInvColor[kColorInvisibles]);
 				}
 				else if (i == c - s)
 				{
 					inSelection = false;
-					vw->SetLowColor(gColor[kLowColor]);
-					vw->SetHighColor(gColor[kInvisiblesColor]);
+					vw->SetLowColor(gColor[kColorLow]);
+					vw->SetHighColor(gColor[kColorInvisibles]);
 				}
 			}
 	
@@ -4943,9 +4943,9 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 	inSelection = fWindowActive && (i >= a - s && i < c - s);
 
 	if (inSelection)
-		vw->SetHighColor(gInvColor[kTextColor]);
+		vw->SetHighColor(gInvColor[kColorText]);
 	else
-		vw->SetHighColor(gColor[kTextColor]);
+		vw->SetHighColor(gColor[kColorText]);
 	
 	while (i < l)
 	{
@@ -4986,9 +4986,9 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 				{
 					savedColor = vw->HighColor();
 					if (inSelection)
-						vw->SetHighColor(gInvColor[kInvisiblesColor]);
+						vw->SetHighColor(gInvColor[kColorInvisibles]);
 					else
-						vw->SetHighColor(gColor[kInvisiblesColor]);
+						vw->SetHighColor(gColor[kColorInvisibles]);
 				}
 				vw->DrawString(gControlChar, BPoint(x + 3 - hv, y));
 				
@@ -5010,14 +5010,14 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 				if (i == a - s)
 				{
 					inSelection = true;
-					vw->SetLowColor(gColor[kSelectionColor]);
-					vw->SetHighColor(ci ? LookupDistinctColor(colors[ci - 1]) : gInvColor[kTextColor]);
+					vw->SetLowColor(gColor[kColorSelection]);
+					vw->SetHighColor(ci ? LookupDistinctColor(colors[ci - 1]) : gInvColor[kColorText]);
 				}
 				else if (i == c - s)
 				{
 					inSelection = false;
-					vw->SetLowColor(gColor[kLowColor]);
-					vw->SetHighColor(ci ? colors[ci - 1] : gColor[kTextColor]);
+					vw->SetLowColor(gColor[kColorLow]);
+					vw->SetHighColor(ci ? colors[ci - 1] : gColor[kColorText]);
 				}
 			}
 
@@ -5046,7 +5046,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 	{
 		float x = Offset2Position(fMark).x;
 		
-		vw->SetHighColor(gColor[kMarkColor]);
+		vw->SetHighColor(gColor[kColorMark]);
 		vw->StrokeLine(BPoint(x, E.top), BPoint(x, E.bottom));
 		vw->SetHighColor(kBlack);
 	}
@@ -5129,7 +5129,7 @@ void PText::RedrawDirtyLines()
 		r = b;
 		r.top = y1;
 		r.bottom = fSplitAt - kSplitterHeight;
-		SetLowColor(gColor[kLowColor]);
+		SetLowColor(gColor[kColorLow]);
 		FillRect(r, B_SOLID_LOW);
 	}
 	
@@ -5138,7 +5138,7 @@ void PText::RedrawDirtyLines()
 	{
 		r = b;
 		r.top = y2;
-		SetLowColor(gColor[kLowColor]);
+		SetLowColor(gColor[kColorLow]);
 		FillRect(r, B_SOLID_LOW);
 	}
 	

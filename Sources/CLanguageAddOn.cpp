@@ -76,13 +76,13 @@ CLanguageProxy::CLanguageProxy(CLangIntf& intf, PText& text,
 
 int CLanguageProxy::Move(int ch, int state)
 {
-	return fInterface.AddToCurrentKeyWord(ch, state);
+	return fInterface.AddToCurrentKeyword(ch, state);
 } /* CLanguageProxy::Move */
 
-int CLanguageProxy::IsKeyWord(int state)
+int CLanguageProxy::IsKeyword(int state)
 {
-	return fInterface.LookupCurrentKeyWord(state);
-} /* CLanguageProxy::IsKeyWord */
+	return fInterface.LookupCurrentKeyword(state);
+} /* CLanguageProxy::IsKeyword */
 
 const char *CLanguageProxy::Text() const
 {
@@ -98,8 +98,8 @@ void CLanguageProxy::SetColor(int start, int color)
 {
 	if (start < 0)
 		start = 0;
-	if (color < kLTextColor || color >= kLEndColor)
-		color = kLTextColor;
+	if (color < kColorText || color >= kColorEnd)
+		color = kColorText;
 	
 	if (fStarts && fCIndx < 99 &&
 		(fCIndx == 0 || fColors[fCIndx - 1] != gColor[color]))

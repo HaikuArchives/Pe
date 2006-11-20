@@ -4,8 +4,9 @@
 // TODO: there are too many flavours of asm. Try to find a minimum common
 //       denominator? (#include's, #define's, //-style comments, etc)
 
-#include "CLanguageAddOn.h"
 #include <stack>
+#include "CLanguageAddOn.h"
+#include "HColorUtils.h"
 
 extern "C" {
 _EXPORT const char kLanguageName[] = "ASM-x86";
@@ -65,9 +66,9 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 	bool hex_num = false;
 
 	if (state == COMMENT || state == LCOMMENT)
-		proxy.SetColor(0, kLCommentColor);
+		proxy.SetColor(0, kColorComment1);
 	else
-		proxy.SetColor(0, kLTextColor);
+		proxy.SetColor(0, kColorText);
 
 	if (size <= 0)
 		return;
@@ -113,7 +114,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 
 				if (leave || (state != START && s < i))
 				{
-					proxy.SetColor(s, kLTextColor);
+					proxy.SetColor(s, kColorText);
 					s = i - 1;
 				}
 			break;
@@ -121,19 +122,19 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case COMMENT:
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == '/')
 				{
-					proxy.SetColor(s - 1, kLCommentColor);
+					proxy.SetColor(s - 1, kColorComment1);
 					s = i + 1;
 					state = START;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s - 1, kLCommentColor);
+					proxy.SetColor(s - 1, kColorComment1);
 					leave = true;
 				}
 			break;
 
 			case LCOMMENT:
-				proxy.SetColor(s - 1, kLCommentColor);
+				proxy.SetColor(s - 1, kColorComment1);
 				leave = true;
 				if (text[size - 1] == '\n')
 					state = START;
@@ -144,20 +145,20 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				{
 					int kwc;
 
-					if (i > s + 1 && (kwc = proxy.IsKeyWord(kws)) != 0)
+					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0)
 					{
 						switch (kwc)
 						{
-							case 1:	proxy.SetColor(s, kLKeyWordColor); break;
-							case 2:	proxy.SetColor(s, kLUser1); break;
-							case 3:	proxy.SetColor(s, kLUser2); break;
-							case 4:	proxy.SetColor(s, kLUser3); break;
-							case 5:	proxy.SetColor(s, kLUser4); break;
+							case 1:	proxy.SetColor(s, kColorKeyword1); break;
+							case 2:	proxy.SetColor(s, kColorUserSet1); break;
+							case 3:	proxy.SetColor(s, kColorUserSet2); break;
+							case 4:	proxy.SetColor(s, kColorUserSet3); break;
+							case 5:	proxy.SetColor(s, kColorUserSet4); break;
 						}
 					}
 					else
 					{
-						proxy.SetColor(s, kLTextColor);
+						proxy.SetColor(s, kColorText);
 					}
 
 					s = --i;
@@ -170,13 +171,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case STRING:
 				if (c == '"')
 				{
-					proxy.SetColor(s, kLStringColor);
+					proxy.SetColor(s, kColorString1);
 					s = i;
 					state = START;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLTextColor);
+					proxy.SetColor(s, kColorText);
 					state = START;
 					s = size;
 					leave = true;
@@ -185,7 +186,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 
 			case NUMERIC:
 			{
-				proxy.SetColor(s, kLNumberColor);
+				proxy.SetColor(s, kColorNumber1);
 				if (isNumeric(text[i - 1]) || (hex_num && isHexNum(text[i - 1])))
 					;
 				else
@@ -205,7 +206,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 
 			case OPERATOR:
 			{
-				proxy.SetColor(s, kLOperatorColor);
+				proxy.SetColor(s, kColorOperator1);
 				if (isOperator(text[i - 1]))
 					;
 				else
@@ -219,7 +220,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 
 			case SYMBOL:
 			{
-				proxy.SetColor(s, kLSeparatorColor);
+				proxy.SetColor(s, kColorSeparator1);
 				if (isSymbol(text[i - 1]))
 					;
 				else

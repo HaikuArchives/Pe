@@ -48,36 +48,41 @@ struct IMPEXP_LIBHEKKEL roSColor
 };
 
 IMPEXP_LIBHEKKEL enum {
-	kLowColor,
-	kSelectionColor,
-	kInvisiblesColor,
-	kTextColor,
-	kKeyWordColor,
-	kCommentColor,
-	kStringColor,
-	kCharConstColor,
-	kUser1, kUser2, kUser3, kUser4,
-	kTagColor,
-	kAltKeyWordColor,
-	kAltCommentColor,
-	kAltStringColor,
-	kSystemIdentifierColor,
-	kUserIdentifierColor,
-	kNumberColor,
-	kAltNumberColor,
-	kPreProcessorColor,
-	kAltProcessorColor,
-	kErrorColor,
-	kAltErrorColor,
-	kOperatorColor,
-	kAltOperatorColor,
-	kSeparatorColor,
-	kAltSeparatorColor,
-	kMarkColor,
-	kLastColor
+	kColorLow,
+	kColorSelection,
+	kColorInvisibles,
+	kColorMark,
+	// Constants below are used for syntax coloring
+	kColorText,				// simple Text
+	kColorKeyword1,			// like c's    : if
+	kColorComment1,			// like c's    : /* comment */
+	kColorString1,			// like c's    : "this is a string"
+	kColorCharConst,		// like c's    : 'c'
+	kColorUserSet1,
+	kColorUserSet2,
+	kColorUserSet3,
+	kColorUserSet4,
+	kColorTag,				// like (from <html>) : <image>
+	kColorKeyword2,			// like c++'s  : class
+	kColorComment2,			// like c++'s  : // comment
+	kColorString2,			// like html's : "this is a string"
+	kColorIdentifierSystem,	// like java's : java.util.String
+	kColorIdentifierUser,	// like (from c's int foo;) : foo
+	kColorNumber1,			// like c's : 4.5
+	kColorNumber2,			// like c's : 4
+	kColorPreprocessor1,	// like c's : #define
+	kColorPreprocessor2,	// like doxygen's : @param
+	kColorError1,			// like c's : 5.4.3
+	kColorError2,			// like c's : for int (
+	kColorOperator1,		// like c's : +
+	kColorOperator2,		// like c's : &
+	kColorSeparator1,		// like c's : {
+	kColorSeparator2,		// like c's : ;
+	//
+	kColorEnd				// just a marker, same as kColorText if you care
 };
 
-extern IMPEXP_LIBHEKKEL rgb_color gColor[kLastColor], gInvColor[kLastColor];
+extern IMPEXP_LIBHEKKEL rgb_color gColor[kColorEnd], gInvColor[kColorEnd];
 
 extern IMPEXP_LIBHEKKEL unsigned char gSelectedMap[256];
 extern IMPEXP_LIBHEKKEL unsigned char gDisabledMap[256];

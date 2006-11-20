@@ -75,13 +75,13 @@ CMessageItem::~CMessageItem()
 void CMessageItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 {
 	if (IsSelected())
-		owner->SetLowColor(gColor[kSelectionColor]);
+		owner->SetLowColor(gColor[kColorSelection]);
 	else
-		owner->SetLowColor(gColor[kLowColor]);
+		owner->SetLowColor(gColor[kColorLow]);
 	
 	owner->FillRect(bounds, B_SOLID_LOW);
 	
-	owner->SetHighColor(gColor[kTextColor]);
+	owner->SetHighColor(gColor[kColorText]);
 	
 	font_height fi;
 

@@ -91,7 +91,7 @@ bool ext::operator==(const ext& e) const
 #pragma mark -
 
 CLangIntf::CLangIntf()
-	:	fHaveParsedKeyWords(false)
+	:	fHaveParsedKeywords(false)
 {
 	if (sfWordBreakTable == NULL)
 	{
@@ -113,7 +113,7 @@ CLangIntf::CLangIntf()
 } /* CLangIntf::CLangIntf */
 
 CLangIntf::CLangIntf(const char *path, image_id image)
-	:	fHaveParsedKeyWords(false)
+	:	fHaveParsedKeywords(false)
 {
 	if (sfWordBreakTable == NULL)
 	{
@@ -435,7 +435,7 @@ void CLangIntf::ColorLine(const char *text, int size, int& state,
 		else if (starts)
 		{
 			starts[0] = 0;
-			colors[0] = gColor[kTextColor];
+			colors[0] = gColor[kColorText];
 		}
 	}
 	catch (...)
@@ -623,35 +623,35 @@ CLangIntf* CLangIntf::FindByName(const char *language)
 	return sDefault;
 } // CLangIntf::FindByName
 
-int CLangIntf::AddToCurrentKeyWord(int ch, int state)
+int CLangIntf::AddToCurrentKeyword(int ch, int state)
 {
-	if (state > 0 && state <= kKeyWordBufSize) {
-		fKeyWordBuf[state-1] = ch;
+	if (state > 0 && state <= kKeywordBufSize) {
+		fKeywordBuf[state-1] = ch;
 		return ++state;
 	}
 	return 0;
 }
 
-int CLangIntf::LookupCurrentKeyWord(int state) const
+int CLangIntf::LookupCurrentKeyword(int state) const
 {
 	if (state < 2)
 		return 0;
-	BString word(fKeyWordBuf, state-1);
-	//printf("LookupCurrentKeyWord: '%s' <%i>\n", word.String(), LookupKeyWord(word));
-	return LookupKeyWord(word);
+	BString word(fKeywordBuf, state-1);
+	//printf("LookupCurrentKeyword: '%s' <%i>\n", word.String(), LookupKeyword(word));
+	return LookupKeyword(word);
 }
 
-int CLangIntf::LookupKeyWord(const BString& word) const
+int CLangIntf::LookupKeyword(const BString& word) const
 {
-	if (!fHaveParsedKeyWords) {
+	if (!fHaveParsedKeywords) {
 		// do lazy loading of keywords-info:
 		image_info imageInfo;
 		if (get_image_info(fImage, &imageInfo) == B_OK && strlen(fKeywordFile))
-			GenerateKWMap(fKeywordFile, imageInfo.name, fKeyWordMap);
-		fHaveParsedKeyWords = true;
+			GenerateKWMap(fKeywordFile, imageInfo.name, fKeywordMap);
+		fHaveParsedKeywords = true;
 	}
-	KeyWordMap::const_iterator iter = fKeyWordMap.find(word);
-	return iter == fKeyWordMap.end() ? 0 : iter->second;
+	KeywordMap::const_iterator iter = fKeywordMap.find(word);
+	return iter == fKeywordMap.end() ? 0 : iter->second;
 }
 
 

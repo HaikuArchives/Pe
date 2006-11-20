@@ -33,8 +33,9 @@
  * each diffed file, too.
  */
 
-#include "CLanguageAddOn.h"
 #include <String.h>
+#include "CLanguageAddOn.h"
+#include "HColorUtils.h"
 
 extern "C" {
 _EXPORT const char kLanguageName[] = "Diff";
@@ -54,13 +55,13 @@ ColorLine(CLanguageProxy& proxy, int& /*state*/)
 {
 	if (strncmp(proxy.Text(), "diff", 4) == 0
 	|| strncmp(proxy.Text(), "@@", 2) == 0) {
-		proxy.SetColor(0, kLCommentColor);
+		proxy.SetColor(0, kColorComment1);
 	} else if (*proxy.Text() == '-' || *proxy.Text() == '<') {
-		proxy.SetColor(0, kLStringColor);
+		proxy.SetColor(0, kColorString1);
 	} else if (*proxy.Text() == '+' || *proxy.Text() == '>') {
-		proxy.SetColor(0, kLErrorColor);
+		proxy.SetColor(0, kColorError1);
 	} else
-		proxy.SetColor(0, kLTextColor);
+		proxy.SetColor(0, kColorText);
 }
 
 // #pragma mark - function scanning
