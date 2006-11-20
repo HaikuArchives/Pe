@@ -637,6 +637,7 @@ int CLangIntf::LookupCurrentKeyWord(int state) const
 	if (state < 2)
 		return 0;
 	BString word(fKeyWordBuf, state-1);
+	//printf("LookupCurrentKeyWord: '%s' <%i>\n", word.String(), LookupKeyWord(word));
 	return LookupKeyWord(word);
 }
 
