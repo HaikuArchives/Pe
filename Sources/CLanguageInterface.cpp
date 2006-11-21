@@ -632,16 +632,16 @@ int CLanguageInterface::AddToCurrentKeyword(int ch, int state)
 	return 0;
 }
 
-int CLanguageInterface::LookupCurrentKeyword(int state) const
+int CLanguageInterface::LookupCurrentKeyword(int state, int32 inSets) const
 {
 	if (state < 2)
 		return 0;
 	BString word(fKeywordBuf, state-1);
 	//printf("LookupCurrentKeyword: '%s' <%i>\n", word.String(), LookupKeyword(word));
-	return LookupKeyword(word);
+	return LookupKeyword(word, inSets);
 }
 
-int CLanguageInterface::LookupKeyword(const BString& word) const
+int CLanguageInterface::LookupKeyword(const BString& word, int32 inSets) const
 {
 	if (!fHaveParsedKeywords) {
 		// do lazy loading of keywords-info:
@@ -650,14 +650,37 @@ int CLanguageInterface::LookupKeyword(const BString& word) const
 			GenerateKWMap(fKeywordFile, imageInfo.name, fKeywordMap);
 		fHaveParsedKeywords = true;
 	}
+	// Lets search
 	KeywordMap::const_iterator iter = fKeywordMap.find(word);
-	return iter == fKeywordMap.end() ? 0 : iter->second;
+	//cout << "LookupKeyword in Set " << inSets << ": " << word.String() << ":" << endl;
+	if (iter != fKeywordMap.end()) {
+		// No special sets to search for
+		if (inSets == 0)
+		{
+			//cout << "<S> " << iter->second << ": " << iter->first.String() << endl;
+			return iter->second;
+		}
+		else
+		{
+			int bit;
+			//int ret=0;
+			do {
+				bit = 1 << (iter->second-1);
+				//cout << ">>> AND:[" << (bit & inSets) << ":" << bit << "] " << iter->second << ": " << iter->first.String() << endl;
+				if (bit & inSets)
+					return bit;
+					//ret = bit;
+			} while (++iter != fKeywordMap.upper_bound(word));
+			//return ret;
+		}
+	}
+	// Nothing found
+	return 0;
 }
 
 
-
-
 // #pragma mark -
+
 
 CFunctionScanHandler::CFunctionScanHandler()
 {

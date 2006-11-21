@@ -36,8 +36,9 @@
 #ifndef CKEYWORDS_H
 #define CKEYWORDS_H
 
+
 void GenerateKWMap(const char *file, const char *ext,
-						 map<BString,int>& kwMap);
+						 multimap<BString,int>& kwMap);
 
 void GenerateKWTables(const char *file, const char *ext,
 							 unsigned char ec[],

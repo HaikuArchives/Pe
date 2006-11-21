@@ -53,7 +53,7 @@ public:
 		void ColorLine(const char *buf, int size,
 				int& state, int *starts, rgb_color *colors);
 		int FindNextWord(PText& text, int offset, int& mlen);
-		
+
 		const char *Text() const;
 		int Size() const;
 		
@@ -80,12 +80,12 @@ static int GetIndex(const CLanguageInterface* intf);
 protected:
 		CLanguageInterface();
 		CLanguageInterface(const char *path, image_id image);
-		
+
 		void InitTables(const char *kwFile);
 		void RegisterExtension(const char *ext);
 
 static	unsigned char *sfWordBreakTable;
-		
+
 		// data members for old (DFA-based) keyword implementation, needed to 
 		// support binary-only language-addons that use this implementation
 		// (like phpext):
@@ -102,19 +102,20 @@ static	unsigned char *sfWordBreakTable;
 
 		// member introduced for proper interface version detection:
 		int16 fInterfaceVersion;
-		
+
 		// members for new (map-based) keyword implementation:
 public:
 		int AddToCurrentKeyword(int ch, int state);
-		int LookupCurrentKeyword(int state) const;
-		int LookupKeyword(const BString& word) const;
+		int LookupCurrentKeyword(int state, int32 inSets=0) const;
+		int LookupKeyword(const BString& word, int32 inSets=0) const;
 protected:
 		static const int kKeywordBufSize = 128;
 		char fKeywordBuf[kKeywordBufSize+1];
-		typedef map<BString, int> KeywordMap;
+		typedef multimap<BString, int> KeywordMap;
 		mutable bool fHaveParsedKeywords;
 		mutable KeywordMap fKeywordMap;
-		
+//		void GenerateKeywordMap(const char *ext);
+
 static	vector<CLanguageInterface*>	fInterfaces;
 };
 

@@ -77,7 +77,7 @@ public:
 	syntax colouring.	
 */
 virtual	int Move(int ch, int state);
-virtual	int IsKeyword(int state);
+virtual	int IsKeyword(int state, int32 inSets=0);
 		
 /*
 	The next pair of calls return the text to colour or parse and it's size.

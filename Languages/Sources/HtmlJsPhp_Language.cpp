@@ -39,102 +39,94 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-using namespace std;
+#define DEBUG_PHP 0
+const bool CASE_SENSITIVE_PHP  = true;
+const bool CASE_SENSITIVE_JS   = true;
+const bool CASE_SENSITIVE_TAG  = true;
+const bool CASE_SENSITIVE_ATTR = true;
+
 
 enum Language {
-	lang_HTML,
-	lang_JavaScript,
-	lang_PHP
+	kLanguageHtml,
+	kLanguageJs,
+	kLanguagePhp
 };
 
-//template <class I1, class I2>
-//inline int strncasecmp(I1 a, I2 b, int l)
-//{
-//	int d = 0;
-//
-//	while (l-- > 0 && d == 0)
-//		d = tolower(*a++) - tolower(*b++);
-//	
-//	return d;
-//}
-
-_EXPORT const char kLanguageName[] = "HTML-JS-PHP";
-_EXPORT const char kLanguageExtensions[] = "html;htm;php";
+_EXPORT const char kLanguageName[]         = "HTML-JS-PHP";
+_EXPORT const char kLanguageExtensions[]   = "html;htm;php";
 _EXPORT const char kLanguageCommentStart[] = "<!";
-_EXPORT const char kLanguageCommentEnd[] = ">";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.html-js-php";
-
-//	--- Available Colors ---
-//	kColorText
-//	kColorKeyword1,				kColorKeyword2,
-//	kColorComment1,				kColorComment2,
-//	kColorString1,				kColorString2,
-//	kColorCharConst,
-//	kColorTag,
-//	kColorIdentifierSystem,	kColorIdentifierUser,
-//	kColorNumber1,				kColorNumber2,
-//	kColorPreprocessor1,		kColorPreprocessor2,
-//	kColorError1,				kColorError2,
-//	kColorOperator1,			kColorOperator2,
-//	kColorSeparator1,			kColorSeparator2,
-//	kColorUserSet1, kColorUserSet2, kColorUserSet3, kColorUserSet4,
-
-// Translate from pepper-colors to pe-colors
-enum {
-	kLngColorHtmlKeyword	= kColorKeyword2,
-	kLngColorHtmlAttribute	= kColorKeyword2,
-	kLngColorJsKeyword		= kColorKeyword1,
-	kLngColorPhpKeyword		= kColorKeyword1,
-	kLngColorSpecialChar	= kColorUserSet4,
-	kLngColorTagString		= kColorString1,
-	kLngColorPhpFunction	= kColorUserSet4
-};
+_EXPORT const char kLanguageCommentEnd[]   = ">";
+_EXPORT const char kLanguageKeywordFile[]  = "keywords.html-js-php";
 
 enum {
 	START = 0,
-		TAGSTART,
-		TAGSTARTKEYWORD,
-		TAGENDKEYWORD,
+		TAG_START,
+		TAG_KEYWORD_START,
+		TAG_KEYWORD_END,
 		TAG,
-		TAGSTRING1,
-		TAGSTRING2,
-		TAGATTRIBUTE,
+		TAG_STRING_DOUBLE_QUOTES,
+		TAG_STRING_SINGLE_QUOTES,
+		TAG_ATTRIBUTE,
 		SPECIAL,
 		COMMENT_DTD,
 		COMMENT,
 	JAVASCRIPT,
-		JS_COMMENT,
-		JS_LCOMMENT,
+		JS_COMMENT_MULTI_LINE,
+		JS_COMMENT_SINGLE_LINE,
 		JS_IDENTIFIER,
-		JS_STRING1,
-		JS_STRING2,
+		JS_STRING_SINGLE_QUOTES,
+		JS_STRING_DOUBLE_QUOTES,
 	PHP_SCRIPT,
 		PHP_IDENTIFIER,
-		PHP_COMMENT,
-		PHP_LCOMMENT,
-		PHP_STRING1,
-		PHP_STRING2
+		PHP_COMMENT_MULTI_LINE,
+		PHP_COMMENT_SINGLE_LINE,
+		PHP_STRING_DOUBLE_QUOTES,
+		PHP_STRING_SINGLE_QUOTES
 };
 
 enum {
-	kKwHtmlTag			= 1,
-	kKwHtmlAttribute	= 2,
-	kKwJsLanguage		= 3,
-	kKwJsConstants		= 4,	// TODO
-	kKwPhpLanguage		= 5,
-	kKwPhpFunctions		= 6,
-	kKwPhpConstants		= 7,	// TODO
-	kKwUserset1			= 8,
-	kKwUserset2			= 9,
-	kKwUserset3			= 10,
-	kKwUserset4			= 11
+	kKwHtmlTag			= 1,	// Set 1
+	kKwHtmlAttribute	= 2,	// Set 2
+	kKwJsLanguage		= 4,	// Set 3
+	kKwJsConstants		= 8,	// Set 4
+	kKwPhpLanguage		= 16,	// Set 5
+	kKwPhpFunctions		= 32,	// Set 6
+	kKwPhpConstants		= 64,	// Set 7
+	kKwUserset1			= 128,	// Set 8
+	kKwUserset2			= 256,	// Set 9
+	kKwUserset3			= 512,	// Set 10
+	kKwUserset4			= 1024,	// Set 11
+	//
+	kKwUsersets			= kKwUserset1|kKwUserset2|kKwUserset3|kKwUserset4,
+	kKwJs				= kKwJsLanguage|kKwJsConstants,
+	kKwPhp				= kKwPhpLanguage|kKwPhpFunctions|kKwPhpConstants
 };
 
+// Color configuration
+enum {
+	kColHtmlComment					= kColorComment1,
+	kColHtmlDtd						= kColorComment2,
+	kColHtmlEntity					= kColorCharConst,
+	kColHtmlAttribute				= kColorKeyword2,
+	kColHtmlTagStringDoubleQuotes	= kColorString1,
+	kColHtmlTagStringSingleQuotes	= kColorString2,
+	//
+	kColJsStringDoubleQuotes		= kColorString1,
+	kColJsStringSingleQuotes		= kColorString2,
+	kColJsComment					= kColorComment2,
+	kColJsCommentL					= kColorComment1,
+	//
+	kColPhpLanguage					= kColorKeyword1,
+	kColPhpFunction					= kColorKeyword2,
+	kColPhpConstants				= kColorCharConst,
+	kColPhpStringDoubleQuotes		= kColorString1,
+	kColPhpStringSingleQuotes		= kColorString2,
+	kColPhpComment					= kColorComment2,
+	kColPhpCommentL					= kColorComment1,
+};
 
 #pragma mark Debug-Functions
 
-
-#define DEBUG_PHP 0
 
 #if DEBUG_PHP
 
@@ -143,29 +135,29 @@ void DEB_PrintState(const int state, const char c, const char *sub="")
 	const char* name = NULL;
 	switch (state)
 	{
-		case START:				name = "START"; break;
-		case TAGSTART:			name = "TAGSTART"; break;
-		case TAGSTARTKEYWORD:	name = "TAGSTARTKEYWORD"; break;
-		case TAGENDKEYWORD:		name = "TAGENDKEYWORD"; break;
-		case TAG:				name = "TAG"; break;
-		case TAGSTRING1:		name = "TAGSTRING1"; break;
-		case TAGSTRING2:		name = "TAGSTRING2"; break;
-		case TAGATTRIBUTE:		name = "TAGATTRIBUTE"; break;
-		case SPECIAL:			name = "SPECIAL"; break;
-		case COMMENT_DTD:		name = "COMMENT_DTD"; break;
-		case COMMENT:			name = "COMMENT"; break;
-		case JAVASCRIPT:		name = "JAVASCRIPT"; break;
-		case JS_COMMENT:		name = "JS_COMMENT"; break;
-		case JS_LCOMMENT:		name = "JS_LCOMMENT"; break;
-		case JS_IDENTIFIER:		name = "JS_IDENTIFIER"; break;
-		case JS_STRING1:		name = "JS_STRING1"; break;
-		case JS_STRING2:		name = "JS_STRING2"; break;
-		case PHP_SCRIPT:		name = "PHP_SCRIPT"; break;
-		case PHP_IDENTIFIER:	name = "PHP_IDENTIFIER"; break;
-		case PHP_COMMENT:		name = "PHP_COMMENT"; break;
-		case PHP_LCOMMENT:		name = "PHP_LCOMMENT"; break;
-		case PHP_STRING1:		name = "PHP_STRING1"; break;
-		case PHP_STRING2:		name = "PHP_STRING2"; break;
+		case START:						name = "START"; break;
+		case TAG_START:					name = "TAG_START"; break;
+		case TAG_KEYWORD_START:			name = "TAG_KEYWORD_START"; break;
+		case TAG_KEYWORD_END:			name = "TAG_KEYWORD_END"; break;
+		case TAG:						name = "TAG"; break;
+		case TAG_STRING_DOUBLE_QUOTES:	name = "TAG_STRING_DOUBLE_QUOTES"; break;
+		case TAG_STRING_SINGLE_QUOTES:	name = "TAG_STRING_SINGLE_QUOTES"; break;
+		case TAG_ATTRIBUTE:				name = "TAG_ATTRIBUTE"; break;
+		case SPECIAL:					name = "SPECIAL"; break;
+		case COMMENT_DTD:				name = "COMMENT_DTD"; break;
+		case COMMENT:					name = "COMMENT"; break;
+		case JAVASCRIPT:				name = "JAVASCRIPT"; break;
+		case JS_COMMENT_MULTI_LINE:		name = "JS_COMMENT_MULTI_LINE"; break;
+		case JS_COMMENT_SINGLE_LINE:	name = "JS_COMMENT_SINGLE_LINE"; break;
+		case JS_IDENTIFIER:				name = "JS_IDENTIFIER"; break;
+		case JS_STRING_SINGLE_QUOTES:	name = "JS_STRING_SINGLE_QUOTES"; break;
+		case JS_STRING_DOUBLE_QUOTES:	name = "JS_STRING_DOUBLE_QUOTES"; break;
+		case PHP_SCRIPT:				name = "PHP_SCRIPT"; break;
+		case PHP_IDENTIFIER:			name = "PHP_IDENTIFIER"; break;
+		case PHP_COMMENT_MULTI_LINE:	name = "PHP_COMMENT_MULTI_LINE"; break;
+		case PHP_COMMENT_SINGLE_LINE:	name = "PHP_COMMENT_SINGLE_LINE"; break;
+		case PHP_STRING_DOUBLE_QUOTES:	name = "PHP_STRING_DOUBLE_QUOTES"; break;
+		case PHP_STRING_SINGLE_QUOTES:	name = "PHP_STRING_SINGLE_QUOTES"; break;
 	}
 	if (name)
 	{
@@ -180,29 +172,29 @@ void DEB_PrintSetKw(const int state, int keyword)
 	const char* name = NULL;
 	switch (state)
 	{
-		case START:				name = "START"; break;
-		case TAGSTART:			name = "TAGSTART"; break;
-		case TAGSTARTKEYWORD:	name = "TAGSTARTKEYWORD"; break;
-		case TAGENDKEYWORD:		name = "TAGENDKEYWORD"; break;
-		case TAG:				name = "TAG"; break;
-		case TAGSTRING1:		name = "TAGSTRING1"; break;
-		case TAGSTRING2:		name = "TAGSTRING2"; break;
-		case TAGATTRIBUTE:		name = "TAGATTRIBUTE"; break;
-		case SPECIAL:			name = "SPECIAL"; break;
-		case COMMENT_DTD:		name = "COMMENT_DTD"; break;
-		case COMMENT:			name = "COMMENT"; break;
-		case JAVASCRIPT:		name = "JAVASCRIPT"; break;
-		case JS_COMMENT:		name = "JS_COMMENT"; break;
-		case JS_LCOMMENT:		name = "JS_LCOMMENT"; break;
-		case JS_IDENTIFIER:		name = "JS_IDENTIFIER"; break;
-		case JS_STRING1:		name = "JS_STRING1"; break;
-		case JS_STRING2:		name = "JS_STRING2"; break;
-		case PHP_SCRIPT:		name = "PHP_SCRIPT"; break;
-		case PHP_IDENTIFIER:	name = "PHP_IDENTIFIER"; break;
-		case PHP_COMMENT:		name = "PHP_COMMENT"; break;
-		case PHP_LCOMMENT:		name = "PHP_LCOMMENT"; break;
-		case PHP_STRING1:		name = "PHP_STRING1"; break;
-		case PHP_STRING2:		name = "PHP_STRING2"; break;
+		case START:						name = "START"; break;
+		case TAG_START:					name = "TAG_START"; break;
+		case TAG_KEYWORD_START:			name = "TAG_KEYWORD_START"; break;
+		case TAG_KEYWORD_END:			name = "TAG_KEYWORD_END"; break;
+		case TAG:						name = "TAG"; break;
+		case TAG_STRING_DOUBLE_QUOTES:	name = "TAG_STRING_DOUBLE_QUOTES"; break;
+		case TAG_STRING_SINGLE_QUOTES:	name = "TAG_STRING_SINGLE_QUOTES"; break;
+		case TAG_ATTRIBUTE:				name = "TAG_ATTRIBUTE"; break;
+		case SPECIAL:					name = "SPECIAL"; break;
+		case COMMENT_DTD:				name = "COMMENT_DTD"; break;
+		case COMMENT:					name = "COMMENT"; break;
+		case JAVASCRIPT:				name = "JAVASCRIPT"; break;
+		case JS_COMMENT_MULTI_LINE:		name = "JS_COMMENT_MULTI_LINE"; break;
+		case JS_COMMENT_SINGLE_LINE:	name = "JS_COMMENT_SINGLE_LINE"; break;
+		case JS_IDENTIFIER:				name = "JS_IDENTIFIER"; break;
+		case JS_STRING_SINGLE_QUOTES:	name = "JS_STRING_SINGLE_QUOTES"; break;
+		case JS_STRING_DOUBLE_QUOTES:	name = "JS_STRING_DOUBLE_QUOTES"; break;
+		case PHP_SCRIPT:				name = "PHP_SCRIPT"; break;
+		case PHP_IDENTIFIER:			name = "PHP_IDENTIFIER"; break;
+		case PHP_COMMENT_MULTI_LINE:	name = "PHP_COMMENT_MULTI_LINE"; break;
+		case PHP_COMMENT_SINGLE_LINE:	name = "PHP_COMMENT_SINGLE_LINE"; break;
+		case PHP_STRING_DOUBLE_QUOTES:	name = "PHP_STRING_DOUBLE_QUOTES"; break;
+		case PHP_STRING_SINGLE_QUOTES:	name = "PHP_STRING_SINGLE_QUOTES"; break;
 	}
 	const char* kwname = NULL;
 	switch (keyword)
@@ -237,30 +229,30 @@ const char* DEB_StateName(int state)
 {
 	switch (state)
 	{
-		case START:				return "START";
-		case TAGSTART:			return "TAGSTART";
-		case TAGSTARTKEYWORD:	return "TAGSTARTKEYWORD";
-		case TAGENDKEYWORD:		return "TAGENDKEYWORD";
-		case TAG:				return "TAG";
-		case TAGSTRING1:		return "TAGSTRING1";
-		case TAGSTRING2:		return "TAGSTRING2";
-		case TAGATTRIBUTE:		return "TAGATTRIBUTE";
-		case SPECIAL:			return "SPECIAL";
-		case COMMENT_DTD:		return "COMMENT_DTD";
-		case COMMENT:			return "COMMENT";
-		case JAVASCRIPT:		return "JAVASCRIPT";
-		case JS_COMMENT:		return "JS_COMMENT";
-		case JS_LCOMMENT:		return "JS_LCOMMENT";
-		case JS_IDENTIFIER:		return "JS_IDENTIFIER";
-		case JS_STRING1:		return "JS_STRING1";
-		case JS_STRING2:		return "JS_STRING2";
-		case PHP_SCRIPT:		return "PHP_SCRIPT";
-		case PHP_IDENTIFIER:	return "PHP_IDENTIFIER";
-		case PHP_COMMENT:		return "PHP_COMMENT";
-		case PHP_LCOMMENT:		return "PHP_LCOMMENT";
-		case PHP_STRING1:		return "PHP_STRING1";
-		case PHP_STRING2:		return "PHP_STRING2";
-		default:				return "UNKOWN";
+		case START:						return "START";
+		case TAG_START:					return "TAG_START";
+		case TAG_KEYWORD_START:			return "TAG_KEYWORD_START";
+		case TAG_KEYWORD_END:			return "TAG_KEYWORD_END";
+		case TAG:						return "TAG";
+		case TAG_STRING_DOUBLE_QUOTES:	return "TAG_STRING_DOUBLE_QUOTES";
+		case TAG_STRING_SINGLE_QUOTES:	return "TAG_STRING_SINGLE_QUOTES";
+		case TAG_ATTRIBUTE:				return "TAG_ATTRIBUTE";
+		case SPECIAL:					return "SPECIAL";
+		case COMMENT_DTD:				return "COMMENT_DTD";
+		case COMMENT:					return "COMMENT";
+		case JAVASCRIPT:				return "JAVASCRIPT";
+		case JS_COMMENT_MULTI_LINE:		return "JS_COMMENT_MULTI_LINE";
+		case JS_COMMENT_SINGLE_LINE:	return "JS_COMMENT_SINGLE_LINE";
+		case JS_IDENTIFIER:				return "JS_IDENTIFIER";
+		case JS_STRING_SINGLE_QUOTES:	return "JS_STRING_SINGLE_QUOTES";
+		case JS_STRING_DOUBLE_QUOTES:	return "JS_STRING_DOUBLE_QUOTES";
+		case PHP_SCRIPT:				return "PHP_SCRIPT";
+		case PHP_IDENTIFIER:			return "PHP_IDENTIFIER";
+		case PHP_COMMENT_MULTI_LINE:	return "PHP_COMMENT_MULTI_LINE";
+		case PHP_COMMENT_SINGLE_LINE:	return "PHP_COMMENT_SINGLE_LINE";
+		case PHP_STRING_DOUBLE_QUOTES:	return "PHP_STRING_DOUBLE_QUOTES";
+		case PHP_STRING_SINGLE_QUOTES:	return "PHP_STRING_SINGLE_QUOTES";
+		default:						return "UNKOWN";
 	}
 }
 
@@ -308,7 +300,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case START:
 				DEB_PrintState(state, c);
 				if (c == '<')
-					state = TAGSTART;
+					state = TAG_START;
 				else if (c == '&')
 					state = SPECIAL;
 				else if (c == 0 || c == '\n')
@@ -321,10 +313,10 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				break;
 			
-			case TAGSTART:
+			case TAG_START:
 				DEB_PrintState(state, c);
 				if (c == '/')
-					state = TAGENDKEYWORD;
+					state = TAG_KEYWORD_END;
 				else if (c == '!')
 				{
 					state = COMMENT_DTD;
@@ -337,7 +329,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					
 					if (strncasecmp(text + s, "php", 3) == 0)
 					{
-						proxy.SetColor(s, kLngColorHtmlKeyword);
+						proxy.SetColor(s, kColorTag);
 						s = (i += 3);
 					}
 					
@@ -348,8 +340,8 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				{
 					proxy.SetColor(s, kColorTag);
 					s = i - 1;
-					kws = proxy.Move(tolower(c), 1);
-					state = TAGSTARTKEYWORD;
+					kws = proxy.Move(CASE_SENSITIVE_TAG ? c : tolower(c), 1);
+					state = TAG_KEYWORD_START;
 				}
 				else if (c == 0 || c == '\n')
 				{
@@ -363,14 +355,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				break;
 			
-			case TAGENDKEYWORD:
+			case TAG_KEYWORD_END:
 				DEB_PrintState(state, c);
 				if (isalpha(c))
 				{
 					proxy.SetColor(s, kColorTag);
 					s = i - 1;
-					kws = proxy.Move(tolower(c), 1);
-					state = TAGSTARTKEYWORD;
+					kws = proxy.Move(CASE_SENSITIVE_TAG ? c : tolower(c), 1);
+					state = TAG_KEYWORD_START;
 				}
 				else if (c == 0 || c == '\n')
 				{
@@ -384,18 +376,18 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				break;
 			
-			case TAGSTARTKEYWORD:
+			case TAG_KEYWORD_START:
 				DEB_PrintState(state, c);
 				if (!isalnum(c) && c != '-')
 				{
-					switch (kwc = proxy.IsKeyword(kws))
+					switch (kwc = proxy.IsKeyword(kws, kKwHtmlTag|kKwUsersets))
 					{
-						case kKwHtmlTag:  color = kColorKeyword1; break;
+						case kKwHtmlTag:  color = kColorTag;      break;
 						case kKwUserset1: color = kColorUserSet1; break;
 						case kKwUserset2: color = kColorUserSet2; break;
 						case kKwUserset3: color = kColorUserSet3; break;
 						case kKwUserset4: color = kColorUserSet4; break;
-						default:          color = kColorTag;      break;
+						default:          color = kColorText;     break;
 					}
 					proxy.SetColor(s, color);
 					DEB_PrintSetKw(state, kwc);
@@ -407,7 +399,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					s = --i;
 				}
 				else if (kws)
-					kws = proxy.Move(tolower(c), kws);
+					kws = proxy.Move(CASE_SENSITIVE_TAG ? c : tolower(c), kws);
 				break;
 			
 			case TAG:
@@ -431,12 +423,12 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					case '"':
 						proxy.SetColor(s, kColorTag);
 						s = i - 1;
-						state = TAGSTRING1;
+						state = TAG_STRING_DOUBLE_QUOTES;
 						break;
 					case '\'':
 						proxy.SetColor(s, kColorTag);
 						s = i - 1;
-						state = TAGSTRING2;
+						state = TAG_STRING_SINGLE_QUOTES;
 						break;
 					case '!':
 						if (i == s + 2)
@@ -451,55 +443,55 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						{
 							proxy.SetColor(s, kColorTag);
 							s = i - 1;
-							kws = proxy.Move(tolower(c), 1);
-							state = TAGATTRIBUTE;
+							kws = proxy.Move(CASE_SENSITIVE_ATTR ? c : tolower(c), 1);
+							state = TAG_ATTRIBUTE;
 						}
 						break;
 				}
 				break;
 			
-			case TAGSTRING1:
+			case TAG_STRING_DOUBLE_QUOTES:
 				DEB_PrintState(state, c);
 				if (c == '"')
 				{
-					proxy.SetColor(s, kLngColorTagString);
+					proxy.SetColor(s, kColHtmlTagStringDoubleQuotes);
 					s = i;
 					state = TAG;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLngColorTagString);
+					proxy.SetColor(s, kColHtmlTagStringDoubleQuotes);
 					leave = true;
 				}
 				break;
 			
-			case TAGSTRING2:
+			case TAG_STRING_SINGLE_QUOTES:
 				DEB_PrintState(state, c);
 				if (c == '\'')
 				{
-					proxy.SetColor(s, kLngColorTagString);
+					proxy.SetColor(s, kColHtmlTagStringSingleQuotes);
 					s = i;
 					state = TAG;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kLngColorTagString);
+					proxy.SetColor(s, kColHtmlTagStringSingleQuotes);
 					leave = true;
 				}
 				break;
 			
-			case TAGATTRIBUTE:
+			case TAG_ATTRIBUTE:
 				DEB_PrintState(state, c);
 				if (!isalnum(c) && c != '-')
 				{
-					switch (kwc = proxy.IsKeyword(kws))
+					switch (kwc = proxy.IsKeyword(kws, kKwHtmlAttribute|kKwUsersets))
 					{
-						case kKwHtmlAttribute: color = kLngColorHtmlAttribute; break;
-						case kKwUserset1:      color = kColorUserSet1;         break;
-						case kKwUserset2:      color = kColorUserSet2;         break;
-						case kKwUserset3:      color = kColorUserSet3;         break;
-						case kKwUserset4:      color = kColorUserSet4;         break;
-						default:               color = kColorText;             break;
+						case kKwHtmlAttribute: color = kColHtmlAttribute; break;
+						case kKwUserset1:      color = kColorUserSet1;    break;
+						case kKwUserset2:      color = kColorUserSet2;    break;
+						case kKwUserset3:      color = kColorUserSet3;    break;
+						case kKwUserset4:      color = kColorUserSet4;    break;
+						default:               color = kColorText;        break;
 					}
 					proxy.SetColor(s, color);
 					DEB_PrintSetKw(state, kwc);
@@ -508,7 +500,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					state = TAG;
 				}
 				else if (kws)
-					kws = proxy.Move(tolower(c), kws);
+					kws = proxy.Move(CASE_SENSITIVE_ATTR ? c : tolower(c), kws);
 				break;
 			
 			case SPECIAL:
@@ -521,7 +513,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (c == ';')
 				{
-					proxy.SetColor(s, kLngColorSpecialChar);
+					proxy.SetColor(s, kColHtmlEntity);
 					s = i;
 					state = START;
 				}
@@ -533,19 +525,19 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (c == '-' && text[i] == '-' && i == s + 3 && text[i - 2] == '!' && text[i - 3] == '<')
 				{
-					proxy.SetColor(s, kColorTag);
+					proxy.SetColor(s, kColHtmlDtd);
 					s = i - 1;
 					state = COMMENT;
 				}
 				else if (c == '>')
 				{
-					proxy.SetColor(s, kColorTag);
+					proxy.SetColor(s, kColHtmlDtd);
 					s = i;
 					state = forceState;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kColorTag);
+					proxy.SetColor(s, kColHtmlDtd);
 					leave = true;
 				}
 				break;
@@ -561,13 +553,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (c == '-' && text[i] == '-')
 				{
-					proxy.SetColor(s, kColorComment1);
+					proxy.SetColor(s, kColHtmlComment);
 					s = ++i;
 					state = COMMENT_DTD;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kColorComment1);
+					proxy.SetColor(s, kColHtmlComment);
 					leave = true;
 				}
 				break;
@@ -588,22 +580,22 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					if (strncasecmp(text + i + 1, "script", 6) == 0)
 					{
 						++i;
-						state = TAGSTART;
+						state = TAG_START;
 					}
 				}
 				else if (c == '/' && text[i] == '*')
-					state = JS_COMMENT;
+					state = JS_COMMENT_MULTI_LINE;
 				else if (c == '/' && text[i] == '/')
-					state = JS_LCOMMENT;
+					state = JS_COMMENT_SINGLE_LINE;
 				else if (isalpha(c))
 				{
-					kws = proxy.Move(tolower(c), 1);
+					kws = proxy.Move(CASE_SENSITIVE_JS ? c : tolower(c), 1);
 					state = JS_IDENTIFIER;
 				}
 				else if (c == '\'')
-					state = JS_STRING1;
+					state = JS_STRING_SINGLE_QUOTES;
 				else if (c == '"')
-					state = JS_STRING2;
+					state = JS_STRING_DOUBLE_QUOTES;
 				else if (c == 0 || c == '\n')
 					leave = true;
 					
@@ -614,32 +606,32 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				break;
 				
-			case JS_COMMENT:
+			case JS_COMMENT_MULTI_LINE:
 				DEB_PrintState(state, c);
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == '/')
 				{
-					proxy.SetColor(s, kColorComment1);
+					proxy.SetColor(s, kColJsComment);
 					s = i + 1;
 					state = JAVASCRIPT;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kColorComment1);
+					proxy.SetColor(s, kColJsComment);
 					leave = true;
 				}
 				break;
 
-			case JS_LCOMMENT:
+			case JS_COMMENT_SINGLE_LINE:
 				DEB_PrintState(state, c);
 				if (c == '-' && text[i] == '-')
 				{
-					proxy.SetColor(s, kColorComment1);
+					proxy.SetColor(s, kColJsCommentL);
 					s = i + 1;
 					state = TAG;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kColorComment1);
+					proxy.SetColor(s, kColJsCommentL);
 					state = JAVASCRIPT;
 					leave = true;
 				}
@@ -649,16 +641,17 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				DEB_PrintState(state, c);
 				if (!isalnum(c) && c != '_')
 				{
-					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0)
+					if (i > s + 1 && (kwc = proxy.IsKeyword(kws, kKwJs|kKwUsersets)) != 0)
 					{
 						switch (kwc)
 						{
-							case kKwJsLanguage:  color = kLngColorJsKeyword; break;
-							case kKwUserset1:    color = kColorUserSet1; break;
-							case kKwUserset2:    color = kColorUserSet2; break;
-							case kKwUserset3:    color = kColorUserSet3; break;
-							case kKwUserset4:    color = kColorUserSet4; break;
-							default:             color = kColorText; break;
+							case kKwJsLanguage:  color = kColorKeyword1;  break;
+							case kKwJsConstants: color = kColorCharConst; break;
+							case kKwUserset1:    color = kColorUserSet1;  break;
+							case kKwUserset2:    color = kColorUserSet2;  break;
+							case kKwUserset3:    color = kColorUserSet3;  break;
+							case kKwUserset4:    color = kColorUserSet4;  break;
+							default:             color = kColorText;      break;
 						}
 						proxy.SetColor(s, color);
 						DEB_PrintSetKw(state, kwc);
@@ -672,17 +665,17 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					state = JAVASCRIPT;
 				}
 				else if (kws)
-					kws = proxy.Move((int)(unsigned char)c, kws);
+					kws = proxy.Move(CASE_SENSITIVE_JS ? c : tolower(c), kws);
 				break;
 			
-			case JS_STRING1:
-			case JS_STRING2:
+			case JS_STRING_SINGLE_QUOTES:
+			case JS_STRING_DOUBLE_QUOTES:
 				DEB_PrintState(state, c);
 				if (!esc &&
-					((state == JS_STRING1 && c == '\'') ||
-					(state == JS_STRING2 && c == '"')))
+					((state == JS_STRING_SINGLE_QUOTES && c == '\'') ||
+					(state == JS_STRING_DOUBLE_QUOTES && c == '"')))
 				{
-					proxy.SetColor(s, kColorString1);
+					proxy.SetColor(s, (state == JS_STRING_SINGLE_QUOTES) ? kColJsStringSingleQuotes : kColJsStringDoubleQuotes);
 					s = i;
 					state = JAVASCRIPT;
 				}
@@ -690,7 +683,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				{
 					if (text[i - 2] == '\\' && text[i - 3] != '\\')
 					{
-						proxy.SetColor(s, kColorString1);
+						proxy.SetColor(s, (state == JS_STRING_SINGLE_QUOTES) ? kColJsStringSingleQuotes : kColJsStringDoubleQuotes);
 					}
 					else
 					{
@@ -715,17 +708,17 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (isalpha(c))
 				{
-					kws = proxy.Move(tolower(c), 1);
+					kws = proxy.Move(CASE_SENSITIVE_PHP ? c : tolower(c), 1);
 					state = PHP_IDENTIFIER;
 				}
 				else if (c == '"')
-					state = PHP_STRING1;
+					state = PHP_STRING_DOUBLE_QUOTES;
 				else if (c == '\'')
-					state = PHP_STRING2;
+					state = PHP_STRING_SINGLE_QUOTES;
 				else if (c == '#' || (c == '/' && text[i] == '/'))
-					state = PHP_LCOMMENT;
+					state = PHP_COMMENT_SINGLE_LINE;
 				else if (c == '/' && text[i] == '*')
-					state = PHP_COMMENT;
+					state = PHP_COMMENT_MULTI_LINE;
 				else if (c == 0 || c == '\n')
 					leave = true;
 
@@ -739,18 +732,19 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case PHP_IDENTIFIER:
 				if (!isalnum(c) && c != '_')
 				{
-					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0)
+					if (i > s + 1 && (kwc = proxy.IsKeyword(kws, kKwPhp|kKwUsersets)))
 					{
 						DEB_PrintState(state, c, "KWD");
 						switch (kwc)
 						{
-							case kKwPhpLanguage:   color = kColorKeyword1; break;
-							case kKwPhpFunctions:  color = kColorKeyword2; break;
-							case kKwUserset1:      color = kColorUserSet1; break;
-							case kKwUserset2:      color = kColorUserSet2; break;
-							case kKwUserset3:      color = kColorUserSet3; break;
-							case kKwUserset4:      color = kColorUserSet4; break;
-							default:               color = kColorText;     break;
+							case kKwPhpLanguage:   color = kColPhpLanguage;  break;
+							case kKwPhpFunctions:  color = kColPhpFunction;  break;
+							case kKwPhpConstants:  color = kColPhpConstants; break;
+							case kKwUserset1:      color = kColorUserSet1;   break;
+							case kKwUserset2:      color = kColorUserSet2;   break;
+							case kKwUserset3:      color = kColorUserSet3;   break;
+							case kKwUserset4:      color = kColorUserSet4;   break;
+							default:               color = kColorText;       break;
 						}
 						proxy.SetColor(s, color);
 						DEB_PrintSetKw(state, kwc);
@@ -766,20 +760,20 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (kws)
 					DEB_PrintState(state, c, "MOV");
-					kws = proxy.Move(tolower(c), kws);
+					kws = proxy.Move(CASE_SENSITIVE_PHP ? c : tolower(c), kws);
 				break;
 
-			case PHP_STRING1:
+			case PHP_STRING_DOUBLE_QUOTES:
 				DEB_PrintState(state, c);
 				if (!esc && c == '"')
 				{
-					proxy.SetColor(s, kColorString1);
+					proxy.SetColor(s, kColPhpStringDoubleQuotes);
 					s = i;
 					state = PHP_SCRIPT;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kColorString1);
+					proxy.SetColor(s, kColPhpStringDoubleQuotes);
 					s = size;
 					leave = true;
 				}
@@ -787,17 +781,17 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					esc = !esc && (c == '\\');
 				break;
 
-			case PHP_STRING2:
+			case PHP_STRING_SINGLE_QUOTES:
 				DEB_PrintState(state, c);
 				if (!esc && c == '\'')
 				{
-					proxy.SetColor(s, kColorString2);
+					proxy.SetColor(s, kColPhpStringSingleQuotes);
 					s = i;
 					state = PHP_SCRIPT;
 				}
 				else if (c == '\n' || c == 0)
 				{
-					proxy.SetColor(s, kColorString2);
+					proxy.SetColor(s, kColPhpStringSingleQuotes);
 					s = size;
 					leave = true;
 				}
@@ -805,23 +799,23 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					esc = !esc && (c == '\\');
 				break;
 
-			case PHP_COMMENT:
+			case PHP_COMMENT_MULTI_LINE:
 				DEB_PrintState(state, c);
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == '/')
 				{
-					proxy.SetColor(s, kColorComment2);
+					proxy.SetColor(s, kColPhpComment);
 					s = i + 1;
 					state = PHP_SCRIPT;
 				}
 				else if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kColorComment2);
+					proxy.SetColor(s, kColPhpComment);
 					leave = true;
 				}
 				else if (((percent && c == '%') || (!percent && c == '?')) &&
 					text[i] == '>')
 				{
-					proxy.SetColor(s, kColorComment2);
+					proxy.SetColor(s, kColPhpComment);
 					s = i - 1;
 					proxy.SetColor(s, kColorTag);
 					s = ++i;
@@ -829,18 +823,18 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				break;
 
-			case PHP_LCOMMENT:
+			case PHP_COMMENT_SINGLE_LINE:
 				DEB_PrintState(state, c);
 				if (c == 0 || c == '\n')
 				{
-					proxy.SetColor(s, kColorComment1);
+					proxy.SetColor(s, kColPhpCommentL);
 					state = PHP_SCRIPT;
 					leave = true;
 				}
 				else if (((percent && c == '%') || (!percent && c == '?')) &&
 					text[i] == '>')
 				{
-					proxy.SetColor(s, kColorComment1);
+					proxy.SetColor(s, kColPhpCommentL);
 					s = i - 1;
 					proxy.SetColor(s, kColorTag);
 					s = ++i;
@@ -961,7 +955,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 		{
 			case START:
 				if (c == '<')
-					state = TAGSTART;
+					state = TAG_START;
 				else if (c == '&')
 					state = SPECIAL;
 				else if (c == 0 || c == '\n')
@@ -971,9 +965,9 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 					s = i - 1;
 				break;
 			
-			case TAGSTART:
+			case TAG_START:
 				if (c == '/')
-					state = TAGENDKEYWORD;
+					state = TAG_KEYWORD_END;
 				else if (c == '!')
 				{
 					state = COMMENT_DTD;
@@ -993,7 +987,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 				else if (isalpha(c))
 				{
 					s = i - 1;
-					state = TAGSTARTKEYWORD;
+					state = TAG_KEYWORD_START;
 				}
 				else if (c == 0 || c == '\n')
 				{
@@ -1006,11 +1000,11 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 				}
 				break;
 			
-			case TAGENDKEYWORD:
+			case TAG_KEYWORD_END:
 				if (isalpha(c))
 				{
 					s = i - 1;
-					state = TAGSTARTKEYWORD;
+					state = TAG_KEYWORD_START;
 				}
 				else if (c == 0 || c == '\n')
 				{
@@ -1023,7 +1017,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 				}
 				break;
 			
-			case TAGSTARTKEYWORD:
+			case TAG_KEYWORD_START:
 				if (!isalnum(c) && c != '-')
 				{
 					if (strncasecmp(text + s, "script", 6) == 0 && text[s - 1] != '/')
@@ -1053,11 +1047,11 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 						break;
 					case '"':
 						s = i - 1;
-						state = TAGSTRING1;
+						state = TAG_STRING_DOUBLE_QUOTES;
 						break;
 					case '\'':
 						s = i - 1;
-						state = TAGSTRING2;
+						state = TAG_STRING_SINGLE_QUOTES;
 						break;
 					case '!':
 						if (i == s + 2)
@@ -1070,13 +1064,13 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 						if (isalpha(c))
 						{
 							s = i - 1;
-							state = TAGATTRIBUTE;
+							state = TAG_ATTRIBUTE;
 						}
 						break;
 				}
 				break;
 			
-			case TAGSTRING1:
+			case TAG_STRING_DOUBLE_QUOTES:
 				if (c == '"')
 				{
 					s = i;
@@ -1086,7 +1080,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 					leave = true;
 				break;
 			
-			case TAGSTRING2:
+			case TAG_STRING_SINGLE_QUOTES:
 				if (c == '\'')
 				{
 					s = i;
@@ -1096,7 +1090,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 					leave = true;
 				break;
 			
-			case TAGATTRIBUTE:
+			case TAG_ATTRIBUTE:
 				if (!isalnum(c) && c != '-')
 				{
 					s = --i;
@@ -1169,20 +1163,20 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 					if (strncasecmp(text + i + 1, "script", 6) == 0)
 					{
 						++i;
-						state = TAGSTART;
+						state = TAG_START;
 						outLangStart = i - 1;
 					}
 				}
 				else if (c == '/' && text[i] == '*')
-					state = JS_COMMENT;
+					state = JS_COMMENT_MULTI_LINE;
 				else if (c == '/' && text[i] == '/')
-					state = JS_LCOMMENT;
+					state = JS_COMMENT_SINGLE_LINE;
 				else if (isalpha(c))
 					state = JS_IDENTIFIER;
 				else if (c == '\'')
-					state = JS_STRING1;
+					state = JS_STRING_SINGLE_QUOTES;
 				else if (c == '"')
-					state = JS_STRING2;
+					state = JS_STRING_DOUBLE_QUOTES;
 				else if (c == 0 || c == '\n')
 					leave = true;
 					
@@ -1190,7 +1184,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 					s = i - 1;
 				break;
 				
-			case JS_COMMENT:
+			case JS_COMMENT_MULTI_LINE:
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == '/')
 				{
 					s = i + 1;
@@ -1200,7 +1194,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 					leave = true;
 				break;
 
-			case JS_LCOMMENT:
+			case JS_COMMENT_SINGLE_LINE:
 				if (c == '-' && text[i] == '-')
 				{
 					s = i + 1;
@@ -1222,11 +1216,11 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 				}
 				break;
 			
-			case JS_STRING1:
-			case JS_STRING2:
+			case JS_STRING_SINGLE_QUOTES:
+			case JS_STRING_DOUBLE_QUOTES:
 				if (!esc &&
-					((state == JS_STRING1 && c == '\'') ||
-					(state == JS_STRING2 && c == '"')))
+					((state == JS_STRING_SINGLE_QUOTES && c == '\'') ||
+					(state == JS_STRING_DOUBLE_QUOTES && c == '"')))
 				{
 					s = i;
 					state = JAVASCRIPT;
@@ -1256,13 +1250,13 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 					state = PHP_IDENTIFIER;
 				}
 				else if (c == '"')
-					state = PHP_STRING1;
+					state = PHP_STRING_DOUBLE_QUOTES;
 				else if (c == '\'')
-					state = PHP_STRING2;
+					state = PHP_STRING_SINGLE_QUOTES;
 				else if (c == '#' || (c == '/' && text[i] == '/'))
-					state = PHP_LCOMMENT;
+					state = PHP_COMMENT_SINGLE_LINE;
 				else if (c == '/' && text[i] == '*')
-					state = PHP_COMMENT;
+					state = PHP_COMMENT_MULTI_LINE;
 				else if (c == 0 || c == '\n')
 					leave = true;
 
@@ -1278,7 +1272,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 				}
 				break;
 
-			case PHP_STRING1:
+			case PHP_STRING_DOUBLE_QUOTES:
 				if (!esc && c == '"')
 				{
 					s = i;
@@ -1293,7 +1287,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 					esc = !esc && (c == '\\');
 				break;
 
-			case PHP_STRING2:
+			case PHP_STRING_SINGLE_QUOTES:
 				if (!esc && c == '\'')
 				{
 					s = i;
@@ -1308,7 +1302,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 					esc = !esc && (c == '\\');
 				break;
 
-			case PHP_COMMENT:
+			case PHP_COMMENT_MULTI_LINE:
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == '/')
 				{
 					s = i + 1;
@@ -1328,7 +1322,7 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 				}
 				break;
 
-			case PHP_LCOMMENT:
+			case PHP_COMMENT_SINGLE_LINE:
 				if (c == 0 || c == '\n')
 				{
 					state = PHP_SCRIPT;
@@ -1359,12 +1353,12 @@ Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int&
 		}
 	}
 	
-	if (state >= JAVASCRIPT && state <= JS_STRING2)
-		return lang_JavaScript;
-	else if (state >= PHP_SCRIPT && state <= PHP_STRING2)
-		return lang_PHP;
+	if (state >= JAVASCRIPT && state <= JS_STRING_DOUBLE_QUOTES)
+		return kLanguageJs;
+	else if (state >= PHP_SCRIPT && state <= PHP_STRING_SINGLE_QUOTES)
+		return kLanguagePhp;
 	else
-		return lang_HTML;
+		return kLanguageHtml;
 } /* get_language_for_offset */
 
 const char *skip_in(const char *txt)
@@ -1453,7 +1447,7 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 	const char *txt = proxy.Text();
 	int size = proxy.Size();
 	
-	if (lang == lang_HTML)
+	if (lang == kLanguageHtml)
 	{
 		bool in = false;
 		

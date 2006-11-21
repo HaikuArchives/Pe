@@ -79,9 +79,9 @@ int CLanguageProxy::Move(int ch, int state)
 	return fInterface.AddToCurrentKeyword(ch, state);
 } /* CLanguageProxy::Move */
 
-int CLanguageProxy::IsKeyword(int state)
+int CLanguageProxy::IsKeyword(int state, int32 inSets)
 {
-	return fInterface.LookupCurrentKeyword(state);
+	return fInterface.LookupCurrentKeyword(state, inSets);
 } /* CLanguageProxy::IsKeyword */
 
 const char *CLanguageProxy::Text() const

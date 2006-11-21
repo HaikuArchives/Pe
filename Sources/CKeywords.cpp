@@ -51,7 +51,7 @@
  *		 anyway (it performs at least as well as the older DFA-approach), 
  *		 so I have decided to use a map for now.
  */
-void GenerateKWMap(const char *file, const char *ext, map<BString,int>& kwMap)
+void GenerateKWMap(const char *file, const char *ext, multimap<BString,int>& kwMap)
 {
 	try
 	{
@@ -144,12 +144,18 @@ void GenerateKWMap(const char *file, const char *ext, map<BString,int>& kwMap)
 						end = start + strcspn(start, "\n");
 					}
 				} else {
-					kwMap[word] = currType;
+					kwMap.insert(pair<BString, int>(word, currType));
 				}
 				start = end + strspn(end, white);
 				end = start + strcspn(start, white);
 			}
 		}
+		// DEBUG-OUTPUT:
+		//cout << "Elements in MAP:" << endl;
+		//int i = 0;
+		//for (multimap<BString, int>::iterator it = kwMap.begin(); it != kwMap.end(); it++) {
+		//	cout << ++i << ":  [" << (*it).second << ": " << (*it).first.String() << "]" << endl;
+		//}
 	}
 	catch (HErr& err)
 	{
