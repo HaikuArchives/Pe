@@ -107,7 +107,7 @@ enum {
 	kColHtmlComment					= kColorComment1,
 	kColHtmlDtd						= kColorComment2,
 	kColHtmlEntity					= kColorCharConst,
-	kColHtmlAttribute				= kColorKeyword2,
+	kColHtmlAttribute				= kColorAttribute,
 	kColHtmlTagStringDoubleQuotes	= kColorString1,
 	kColHtmlTagStringSingleQuotes	= kColorString2,
 	//

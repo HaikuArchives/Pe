@@ -41,6 +41,7 @@ const char* const prf_C_Separator				= "separator color";
 const char* const prf_C_String					= "string color";
 const char* const prf_C_SystemIdentifier		= "system identifier color";
 const char* const prf_C_Tag						= "tag color";
+const char* const prf_C_Attribute				= "attribute color";
 const char* const prf_C_Tagstring				= "tagstring color";
 const char* const prf_C_Text					= "text color";
 const char* const prf_C_UserIdentifier			= "user identifier color";

@@ -100,7 +100,8 @@ resource 'DLOG' (132, "Preferences") {
 				ColorControl	{{   0, 112, 145, 128 }, "sidc",		"System Identifiers"								},
 				ColorControl	{{ 155, 112, 290, 128 }, "chcc",		"Char Constants"									},
 				ColorControl	{{   0, 128, 145, 144 }, "uidc",		"User Identifiers"									},
-				ColorControl	{{ 155, 128, 290, 144 }, "tagc",		"HTML Tags"											},
+				ColorControl	{{ 155, 128, 255, 144 }, "tagc",		"Tags/Attribut."									},
+				ColorControl	{{ 255, 128, 290, 144 }, "attr",		""													},
 				
 				Line			{{   0, 148, 290, 149 }																		},
 

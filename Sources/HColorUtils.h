@@ -63,6 +63,7 @@ IMPEXP_LIBHEKKEL enum {
 	kColorUserSet3,
 	kColorUserSet4,
 	kColorTag,				// like (from <html>) : <image>
+	kColorAttribute,		// like html's: <... class="">
 	kColorKeyword2,			// like c++'s  : class
 	kColorComment2,			// like c++'s  : // comment
 	kColorString2,			// like html's : "this is a string"

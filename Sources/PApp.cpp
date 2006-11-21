@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 10/21/97 09:19:05
 */
@@ -80,7 +80,7 @@ static void SaveRecentMenu()
 {
 	int i = 0;
 	char path[PATH_MAX];
-	
+
 	while (PDoc::GetNextRecent(path, i))
 		gPrefs->SetIxPrefString("recentdoc", i, path);
 } /* SaveRecentMenu */
@@ -90,7 +90,7 @@ static void RestoreRecentMenu()
 	char name[12];
 	int i = gRecentBufferSize;
 	const char *path;
-	
+
 	while (i > 0)
 	{
 		try
@@ -113,10 +113,10 @@ long CPrefOpener::Execute()
 {
 	try
 	{
-		CPrefsDialog *prefsDialog 
+		CPrefsDialog *prefsDialog
 			= DialogCreator<CPrefsDialog>::CreateDialog(NULL);
 		prefsDialog->Run();
-		
+
 		PApp *app = dynamic_cast<PApp*>(be_app);
 		if (app)
 			app->fPrefsDialog = prefsDialog;
@@ -129,7 +129,7 @@ long CPrefOpener::Execute()
 	{
 //		puts("general exception");
 	}
-	
+
 	return 0;
 } /* CPrefOpened::Execute */
 
@@ -146,9 +146,9 @@ PApp::PApp()
 		try
 		{
 			BPath settings;
-			
+
 			FailOSErr(find_directory(B_USER_SETTINGS_DIRECTORY, &settings, true));
-			
+
 			BDirectory e;
 			FailOSErrMsg(e.SetTo(settings.Path()), "~/config/settings directory not found ?!?!?");
 			if (!e.Contains("pe", B_DIRECTORY_NODE))
@@ -164,132 +164,121 @@ PApp::PApp()
 		{
 			e.DoError();
 		}
-			
+
 		gPrefs = new HPreferences("pe/settings");
 		gPrefs->ReadPrefFile();
-		
+
 		app_info ai;
 		GetAppInfo(&ai);
-		
+
 		BEntry entry(&ai.ref);
-		
+
 		FailOSErr(gAppFile.SetTo(&entry, B_READ_ONLY));
-		
+
 		BPath appName;
 		FailOSErr(entry.GetPath(&appName));
-		
+
 		BPath dir;
 		FailOSErr(appName.GetParent(&dir));
 		FailOSErr(gAppDir.SetTo(dir.Path()));
-	
+
 		fOpenPanel = new BFilePanel();
 		FailNil(fOpenPanel);
 		entry_ref cwd_ref;
 		fOpenPanel->GetPanelDirectory(&cwd_ref);
 		FailOSErr(gCWD.SetTo(&cwd_ref));
-		
+
 		PDoc::LoadAddOns();
 
 		InitUTFTables();
 
-		rgb_color c = { 0xFF, 0xFF, 0xFF, 0 };			gColor[kColorLow] = gPrefs->GetPrefColor(prf_C_Low, c);
-		c.red = 0x00; c.green = 0x00; c.blue = 0x00;	gColor[kColorText] = gPrefs->GetPrefColor(prf_C_Text, c);
+		SetColor(kColorLow,				prf_C_Low,				0xff, 0xff, 0xff);
+		SetColor(kColorText,			prf_C_Text,				0x00, 0x00, 0x00);
+		SetColor(kColorSelection,		prf_C_Selection,		0xff, 0xec, 0x7c);
+		SetColor(kColorMark,			prf_C_Mark,				0x00, 0x00, 0xFF);
+		SetColor(kColorKeyword1,		prf_C_Keyword,			0x39, 0x74, 0x79);
+		SetColor(kColorKeyword2,		prf_C_AltKeyword,		0x39, 0x74, 0x79);
+		SetColor(kColorComment1,		prf_C_Comment,			0xA1, 0x64, 0x0E);
+		SetColor(kColorComment2,		prf_C_AltComment,		0xA1, 0x64, 0x0E);
+		SetColor(kColorString1,			prf_C_String,			0x3f, 0x48, 0x84);
+		SetColor(kColorString2,			prf_C_Tagstring,		0x3f, 0x48, 0x84);
+		SetColor(kColorNumber1,			prf_C_Number,			0x85, 0x19, 0x19);
+		SetColor(kColorNumber2,			prf_C_AltNumber,		0x85, 0x19, 0x19);
+		SetColor(kColorOperator1,		prf_C_Operator,			0x44, 0x8a, 0x00);
+		SetColor(kColorOperator2,		prf_C_AltOperator,		0x44, 0x8a, 0x00);
+		SetColor(kColorSeparator1,		prf_C_Separator,		0x44, 0x8a, 0x00);
+		SetColor(kColorSeparator2,		prf_C_AltSeparator,		0x44, 0x8a, 0x00);
+		SetColor(kColorPreprocessor1,	prf_C_Preprocessor,		0x00, 0x64, 0x00);
+		SetColor(kColorPreprocessor2,	prf_C_AltProcessor,		0x00, 0x64, 0x00);
+		SetColor(kColorError1,			prf_C_Error,			0xFF, 0x00, 0x00);
+		SetColor(kColorError2,			prf_C_AltError,			0xFF, 0x00, 0x00);
+		SetColor(kColorIdentifierSystem,prf_C_SystemIdentifier,	0x39, 0x74, 0x79);
+		SetColor(kColorCharConst,		prf_C_CharConstant,		0x85, 0x19, 0x19);
+		SetColor(kColorIdentifierUser,	prf_C_UserIdentifier,	0x44, 0x8a, 0x00);
+		SetColor(kColorTag,				prf_C_Tag,				0x88, 0x88, 0x88);
+		SetColor(kColorAttribute,		prf_C_Attribute,		0xff, 0x00, 0x00);
+		SetColor(kColorUserSet1,		prf_C_User1,			0x44, 0x8a, 0x00);
+		SetColor(kColorUserSet2,		prf_C_User2,			0x44, 0x8a, 0x00);
+		SetColor(kColorUserSet3,		prf_C_User3,			0x44, 0x8a, 0x00);
+		SetColor(kColorUserSet4,		prf_C_User4,			0x44, 0x8a, 0x00);
+		SetColor(kColorInvisibles,		prf_C_Invisibles,		0xC8, 0x64, 0x64);
 
-		c.red = 0xff; c.green = 0xec; c.blue = 0x7c;	gColor[kColorSelection] = gPrefs->GetPrefColor(prf_C_Selection, c);
-		c.red = 0x00; c.green = 0x00; c.blue = 0xFF;	gColor[kColorMark] = gPrefs->GetPrefColor(prf_C_Mark, c);
-
-		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kColorKeyword1] = gPrefs->GetPrefColor(prf_C_Keyword, c);
-														gColor[kColorKeyword2] = gPrefs->GetPrefColor(prf_C_AltKeyword, c);
-		c.red = 0xA1; c.green = 0x64; c.blue = 0x0E;	gColor[kColorComment1] = gPrefs->GetPrefColor(prf_C_Comment, c);
-														gColor[kColorComment2] = gPrefs->GetPrefColor(prf_C_AltComment, c);
-
-		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kColorString1] = gPrefs->GetPrefColor(prf_C_String, c);
-		c.red = 0x3f; c.green = 0x48; c.blue = 0x84;	gColor[kColorString2] = gPrefs->GetPrefColor(prf_C_Tagstring, c);
-		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kColorNumber1] = gPrefs->GetPrefColor(prf_C_Number, c);	
-														gColor[kColorNumber2] = gPrefs->GetPrefColor(prf_C_AltNumber, c);
-
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kColorOperator1] = gPrefs->GetPrefColor(prf_C_Operator, c);	
-														gColor[kColorOperator2] = gPrefs->GetPrefColor(prf_C_AltOperator, c);
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kColorSeparator1] = gPrefs->GetPrefColor(prf_C_Separator, c);	
-														gColor[kColorSeparator2] = gPrefs->GetPrefColor(prf_C_AltSeparator, c);
-
-		c.red = 0x00; c.green = 0x64; c.blue = 0x00;	gColor[kColorPreprocessor1] = gPrefs->GetPrefColor(prf_C_Preprocessor, c);	
-														gColor[kColorPreprocessor2] = gPrefs->GetPrefColor(prf_C_AltProcessor, c);
-		c.red = 0xFF; c.green = 0x00; c.blue = 0x00;	gColor[kColorError1] = gPrefs->GetPrefColor(prf_C_Error, c);	
-														gColor[kColorError2] = gPrefs->GetPrefColor(prf_C_AltError, c);
-
-		c.red = 0x39; c.green = 0x74; c.blue = 0x79;	gColor[kColorIdentifierSystem] = gPrefs->GetPrefColor(prf_C_SystemIdentifier, c);
-		c.red = 0x85; c.green = 0x19; c.blue = 0x19;	gColor[kColorCharConst] = gPrefs->GetPrefColor(prf_C_CharConstant, c);
-
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kColorIdentifierUser] = gPrefs->GetPrefColor(prf_C_UserIdentifier, c);
-		c.red = 0x88; c.green = 0x88; c.blue = 0x88;	gColor[kColorTag] = gPrefs->GetPrefColor(prf_C_Tag, c);
-
-		c.red = 0x44; c.green = 0x8a; c.blue = 0x00;	gColor[kColorUserSet1] = gPrefs->GetPrefColor(prf_C_User1, c);
-														gColor[kColorUserSet2] = gPrefs->GetPrefColor(prf_C_User2, c);
-														gColor[kColorUserSet3] = gPrefs->GetPrefColor(prf_C_User3, c);
-														gColor[kColorUserSet4] = gPrefs->GetPrefColor(prf_C_User4, c);
-
-		c.red = 200; c.green = 100; c.blue = 100;		gColor[kColorInvisibles] = gPrefs->GetPrefColor(prf_C_Invisibles, c);
-		
 		DefineInvColors(gColor[kColorSelection]);
 
-		gAutoIndent = gPrefs->GetPrefInt(prf_I_AutoIndent, 1);
-		gSyntaxColoring = gPrefs->GetPrefInt(prf_I_SyntaxColoring, 1);
-		gSpacesPerTab = gPrefs->GetPrefInt(prf_I_SpacesPerTab, 4);
-		gBalance = gPrefs->GetPrefInt(prf_I_Balance, 1);
-		gBlockCursor = gPrefs->GetPrefInt(prf_I_BlockCursor, 0);
-		gFlashCursor = gPrefs->GetPrefInt(prf_I_FlashCursor, 1);
-		gSmartBrace = gPrefs->GetPrefInt(prf_I_SmartBraces, 1);
-		
-		gPopupIncludes = gPrefs->GetPrefInt(prf_I_Includes, 1);
-		gPopupProtos = gPrefs->GetPrefInt(prf_I_Protos, 1);
-		gPopupFuncs = gPrefs->GetPrefInt(prf_I_Types, 1);
-		
-		gRedirectStdErr = gPrefs->GetPrefInt(prf_I_RedirectStdErr, 1);
-		gUseWorksheet = gPrefs->GetPrefInt(prf_I_Worksheet, 1);
+		gAutoIndent			= gPrefs->GetPrefInt(prf_I_AutoIndent,			1);
+		gSyntaxColoring		= gPrefs->GetPrefInt(prf_I_SyntaxColoring,		1);
+		gSpacesPerTab		= gPrefs->GetPrefInt(prf_I_SpacesPerTab,		4);
+		gBalance			= gPrefs->GetPrefInt(prf_I_Balance,				1);
+		gBlockCursor		= gPrefs->GetPrefInt(prf_I_BlockCursor,			0);
+		gFlashCursor		= gPrefs->GetPrefInt(prf_I_FlashCursor,			1);
+		gSmartBrace			= gPrefs->GetPrefInt(prf_I_SmartBraces,			1);
+		gPopupIncludes		= gPrefs->GetPrefInt(prf_I_Includes,			1);
+		gPopupProtos		= gPrefs->GetPrefInt(prf_I_Protos,				1);
+		gPopupFuncs			= gPrefs->GetPrefInt(prf_I_Types,				1);
+		gRedirectStdErr		= gPrefs->GetPrefInt(prf_I_RedirectStdErr,		1);
+		gUseWorksheet		= gPrefs->GetPrefInt(prf_I_Worksheet,			1);
+		gRestorePosition	= gPrefs->GetPrefInt(prf_I_RestorePosition,		1);
+		gRestoreFont		= gPrefs->GetPrefInt(prf_I_RestoreFont,			1);
+		gRestoreSelection	= gPrefs->GetPrefInt(prf_I_RestoreSelection,	1);
+		gRestoreScrollbar	= gPrefs->GetPrefInt(prf_I_RestoreScrollbar,	1);
+		gRestoreCWD			= gPrefs->GetPrefInt(prf_I_RestoreCwd,			1);
+		gSavedState			= gPrefs->GetPrefInt(prf_I_SavedState,			0);
 
-		gRestorePosition = gPrefs->GetPrefInt(prf_I_RestorePosition, 1);
-		gRestoreFont = gPrefs->GetPrefInt(prf_I_RestoreFont, 1);
-		gRestoreSelection = gPrefs->GetPrefInt(prf_I_RestoreSelection, 1);
-		gRestoreScrollbar = gPrefs->GetPrefInt(prf_I_RestoreScrollbar, 1);
-		gRestoreCWD = gPrefs->GetPrefInt(prf_I_RestoreCwd, 1);
-		gSavedState = gPrefs->GetPrefInt(prf_I_SavedState, 0);
-		
-		if (gPrefs->GetIxPrefString(prf_X_Mimetype, 0) == NULL) {
+		if (gPrefs->GetIxPrefString(prf_X_Mimetype, 0) == NULL)
+		{
 			gPrefs->SetIxPrefString(prf_X_Mimetype, 0, "text/plain");
 			gPrefs->SetIxPrefString(prf_X_Mimetype, 1, "text/html");
 			gPrefs->SetIxPrefString(prf_X_Mimetype, 2, "text/x-source-code");
 		}
-		
-		strcpy(gTabChar, gPrefs->GetPrefString(prf_S_TabChar, "»"));
-		strcpy(gReturnChar, gPrefs->GetPrefString(prf_S_ReturnChar, "¬"));
-		strcpy(gSpaceChar, gPrefs->GetPrefString(prf_S_SpaceChar, "."));
-		strcpy(gControlChar, gPrefs->GetPrefString(prf_S_ControlChar, "¿"));
-		
+
+		strcpy(gTabChar,		gPrefs->GetPrefString(prf_S_TabChar,		"»"));
+		strcpy(gReturnChar,		gPrefs->GetPrefString(prf_S_ReturnChar,		"¬"));
+		strcpy(gSpaceChar,		gPrefs->GetPrefString(prf_S_SpaceChar,		"."));
+		strcpy(gControlChar,	gPrefs->GetPrefString(prf_S_ControlChar,	"¿"));
+
 		gUid = getuid();
 		gGid = getgid();
 
 		gRecentBufferSize = gPrefs->GetPrefInt(prf_I_RecentSize, 10);
 		RestoreRecentMenu();
 
-		fFindDialog 
-			= DialogCreator<CFindDialog>::CreateDialog("Find", NULL, PDoc::TopWindow());
+		fFindDialog = DialogCreator<CFindDialog>::CreateDialog("Find", NULL, PDoc::TopWindow());
 		fFindDialog->Run();
-		
+
 		InitSelectedMap();
 
 		CLanguageInterface::SetupLanguageInterfaces();
 
 		fIsQuitting = false;
-	
+
 		fPrefsDialog = NULL;
 		CPrefOpener *prefOpener = new CPrefOpener;
 		fPrefOpener = prefOpener->Thread();
-		
+
 		if (gPrefs->GetPrefInt(prf_I_ShowHtmlPalette, 1)
 		&& !gPrefs->GetPrefInt(prf_I_ShowHtmlpaletteForHtml, 1))
 			CHtmlBar::Instance()->Show();
-		
+
 		try
 		{
 			gGlossary = new CGlossary;
@@ -328,7 +317,7 @@ PApp::~PApp()
 bool PApp::QuitRequested()
 {
 	BWindow *doc;
-	
+
 	fIsQuitting = true;
 
 	while ((doc = dynamic_cast<BWindow*>(CDoc::FirstDoc())) != NULL)
@@ -345,23 +334,23 @@ bool PApp::QuitRequested()
 	}
 
 	CHtmlBar::Close();
-	
+
 	if (fFindDialog)
 	{
 		fFindDialog->Lock();
 		(void)fFindDialog->QuitRequested();
 		fFindDialog->Quit();
 	}
-	
+
 	long l;
 	if (fPrefOpener) wait_for_thread(fPrefOpener, &l);
-	
+
 	if (fPrefsDialog)
 	{
 		fPrefsDialog->Lock();
 		fPrefsDialog->Quit();
 	}
-	
+
 	return true;
 } /* PApp::QuitRequested */
 
@@ -400,22 +389,22 @@ void PApp::ReadyToRun()
 				if (CDoc::CountDocs() == 0 || (doc && doc->IsWorksheet() && CDoc::CountDocs() == 1))
 					NewWindow();
 				break;
-	
+
 			case 2: // Show Open Dialog
 				PostMessage(msg_Open);
 				break;
-	
+
 			default: // Do Nothing (only effective in combination with a worksheet)
 				if (CDoc::CountDocs() == 0)
 					NewWindow();
 				break;
 		}
 	}
-	
+
 //	BPath p;
 //	if (find_directory(B_USER_DIRECTORY, &p) == B_OK)
 //		gCWD.SetTo(p.Path());
-	
+
 	if (gPrefs->GetPrefInt(prf_I_ShowGlossary, 0))
 		PostMessage(msg_ShowGlossary);
 } /* PApp::ReadyToRun */
@@ -454,7 +443,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 	{
 		BNode n(&doc);
 		char mime[256];
-		
+
 		BNodeInfo ni(&n);
 		if (ni.GetType(mime) != B_OK)
 			mime[0] = 0;
@@ -466,7 +455,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 				ni.SetType("text/x-makefile");
 			ni.GetType(mime);
 		}
-		
+
 		if (strcmp(mime, "text/x-vnd.Hekkel-Pe-Group") == 0 ||
 			strcmp(mime, "text/x-pe-group") == 0)
 		{
@@ -527,7 +516,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 	{
 		e.DoError();
 	}
-	
+
 	return NULL;
 } /* PApp::OpenWindow */
 
@@ -540,25 +529,25 @@ PDoc* PApp::OpenWorksheet()
 			BFile file;
 			gPrefsDir.CreateFile("Worksheet", &file);
 		}
-		
+
 		BEntry w;
 		entry_ref wr;
 
 		FailOSErr(gPrefsDir.FindEntry("Worksheet", &w, true));
 		FailOSErr(w.GetRef(&wr));
 		OpenWindow(wr);
-		
+
 		PDoc *d = dynamic_cast<PDoc*>(CDoc::FindDoc(wr));
 		if (d)
 			d->MakeWorksheet();
-		
+
 		return d;
 	}
 	catch (HErr& e)
 	{
 		e.DoError();
 	}
-	
+
 	return NULL;
 } /* PApp::OpenWorksheet */
 
@@ -573,7 +562,7 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 	{
 		int i = 1, lineNr = -1;
 		char *p;
-		
+
 		while (i < argc)
 		{
 			switch (argv[i][0])
@@ -589,12 +578,12 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						Usage();
 					}
 					break;
-				
+
 				case '+':
 					lineNr = strtoul(argv[i] + 1, &p, 10) - 1;
 					if (!p || p == argv[i] + 1) Usage();
 					break;
-				
+
 				default:
 				{
 					BPath path;
@@ -606,9 +595,9 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 					FailOSErr (path.InitCheck());
 					entry_ref doc;
 					CDocWindow *d;
-	
+
 					FailOSErr (get_ref_for_path(path.Path(), &doc));
-					
+
 					BEntry e;
 					FailOSErr(e.SetTo(&doc));
 
@@ -619,7 +608,7 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 						d = NewWindow(NULL);
 						d->SetEntryRef(&doc);
 					}
-					
+
 					if (d && lineNr >= 0)
 					{
 						BMessage m(msg_SelectLines);
@@ -645,9 +634,9 @@ void PApp::RefsReceived(BMessage	*inMessage)
 	{
 		unsigned long type;
 		long count;
-	
+
 		inMessage->GetInfo("refs", &type, &count);
-	
+
 		for (int i = 0; i < count; i++)
 		{
 			entry_ref doc;
@@ -659,13 +648,13 @@ void PApp::RefsReceived(BMessage	*inMessage)
 			{
 				TokenIdentifier *ident;
 				ssize_t size;
-				
+
 				FailOSErr(inMessage->FindData(kTokenIdentifier, kTokenIDType, (const void**)&ident, &size));
-				
+
 				BMessage msg(msg_SelectError);
 				FailOSErr(msg.AddInt32("start", ident->eOffset));
 				FailOSErr(msg.AddInt32("length", ident->eLength));
-				
+
 				BMessenger msgr(d->TextView());
 				FailOSErr(msgr.SendMessage(&msg));
 			}
@@ -675,11 +664,11 @@ void PApp::RefsReceived(BMessage	*inMessage)
 
 				FailOSErr(inMessage->FindInt32("be:selection_offset", &offset));
 				FailOSErr(inMessage->FindInt32("be:selection_length", &length));
-				
+
 				BMessage msg(msg_Select);
 				FailOSErr(msg.AddInt32("anchor", offset));
 				FailOSErr(msg.AddInt32("caret", offset + length));
-				
+
 				BMessenger msgr(d->TextView());
 				FailOSErr(msgr.SendMessage(&msg));
 			}
@@ -688,11 +677,11 @@ void PApp::RefsReceived(BMessage	*inMessage)
 				int32 line;
 
 				FailOSErr(inMessage->FindInt32("be:line", &line));
-				
+
 				BMessage msg(msg_SelectLines);
 				FailOSErr(msg.AddInt32("from", line));
 				FailOSErr(msg.AddInt32("to", line));
-				
+
 				BMessenger msgr(d->TextView());
 				FailOSErr(msgr.SendMessage(&msg));
 			}
@@ -714,7 +703,7 @@ void PApp::MessageReceived(BMessage *msg)
 			{
 				const doclist& lst = CDoc::DocList();
 				doclist::const_iterator di;
-				
+
 				for (di = lst.begin(); di != lst.end(); di++)
 				{
 					BWindow *w = dynamic_cast<PDoc*>(*di);
@@ -723,16 +712,16 @@ void PApp::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
-			
+
 			case msg_CloseAll:
 			{
 				const doclist& lst = CDoc::DocList();
 				doclist::const_reverse_iterator di;
-				
+
 				for (di = lst.rbegin(); di != lst.rend(); di++)
 				{
 					PDoc *doc = dynamic_cast<PDoc*>(*di);
-					
+
 					if (doc && ! doc->IsWorksheet() && doc->Lock())
 					{
 						if (doc->QuitRequested())
@@ -746,8 +735,8 @@ void PApp::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
-	
-			case B_NODE_MONITOR: 
+
+			case B_NODE_MONITOR:
 			{
 				CDoc::HandleFolderNodeMonitorMsg(msg);
 				break;
@@ -756,7 +745,7 @@ void PApp::MessageReceived(BMessage *msg)
 			case msg_OpenSelected:
 				DialogCreator<COpenSelection>::CreateDialog(NULL);
 				break;
-			
+
 			case msg_OpenInclude:
 			{
 				const char *i;
@@ -766,57 +755,56 @@ void PApp::MessageReceived(BMessage *msg)
 				FindAndOpen(i, src);
 				break;
 			}
-			
+
 			case msg_FindCmd:
 			{
 				int c = 1 << current_workspace();
-				
+
 				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 					FindDialog()->SetWorkspaces(c);
-				
+
 				FindDialog()->SetCaller(PDoc::TopWindow());
 				FindDialog()->Show();
-				
+
 				FindDialog()->Activate(true);
 				break;
 			}
-			
+
 			case B_REFS_RECEIVED:
 			case 'OpFi':
 				RefsReceived(msg);
 				break;
-			
+
 			case msg_About:
 				new PAboutBox();
 				break;
-			
+
 			case msg_IdeMake:
 				PDoc::IDEMake();
 				break;
-			
+
 			case msg_IdeBringToFront:
 				PDoc::IDEBringToFront();
 				break;
-			
+
 			case msg_IdeProjectToGroup:
 				PDoc::IDEProject2Group();
 				break;
-			
+
 			case msg_FindDifferences:
 			{
 				BRect r(100,100,500,250);
 				new CDiffWindow(r, "Differences");
 				break;
 			}
-			
+
 			case msg_FtpOpen:
 			{
-				CFtpDialog *ftpo 
-					= DialogCreator<CFtpDialog>::CreateDialog("FtpDialog", NULL);
+				CFtpDialog *ftpo = DialogCreator<CFtpDialog>::CreateDialog("FtpDialog", NULL);
 				ftpo->Show();
 				break;
 			}
-			
+
 			case msg_Open:
 			{
 				if (fOpenPanel->IsShowing())
@@ -828,35 +816,35 @@ void PApp::MessageReceived(BMessage *msg)
 				{
 					BEntry entry;
 					gCWD.GetEntry(&entry);
-					
+
 					BAutolock lock(fOpenPanel->Window());
-					
+
 					entry_ref ref;
 					entry.GetRef(&ref);
 					fOpenPanel->SetPanelDirectory(&ref);
 					fOpenPanel->Window()->SetWorkspaces(1 << current_workspace());
-					
+
 					if (gPrefs->GetPrefInt(prf_I_ZoomOpen, 0))
 					{
 						BRect r = BScreen().Frame();
-						
+
 						fOpenPanel->Window()->MoveTo(r.left + 80, r.top + 40);
 						fOpenPanel->Window()->ResizeTo(480, r.Height() - 50);
 					}
-					
+
 					fOpenPanel->Show();
 				}
 				break;
 			}
-			
+
 			case msg_CommandLineOpen:
 			{
 				entry_ref doc;
 				FailOSErr (msg->FindRef("refs", &doc));
-				
+
 				CDocWindow *w;
 				BEntry e;
-				
+
 				if (e.SetTo(&doc) == B_OK && e.Exists())
 					w = dynamic_cast<CDocWindow*>(OpenWindow(doc));
 				else
@@ -864,7 +852,7 @@ void PApp::MessageReceived(BMessage *msg)
 					w = NewWindow(NULL);
 					w->SetEntryRef(&doc);
 				}
-				
+
 				long lineNr;
 				if (w && msg->FindInt32("line", &lineNr) == B_OK)
 				{
@@ -873,7 +861,7 @@ void PApp::MessageReceived(BMessage *msg)
 					FailOSErr(m.AddInt32("to", lineNr));
 					w->PostMessage(&m, w->PreferredHandler());
 				}
-				
+
 				if (w)
 				{
 					BMessage reply;
@@ -882,14 +870,14 @@ void PApp::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
-			
+
 #if (B_BEOS_VERSION > B_BEOS_VERSION_4)
 			case B_SILENT_RELAUNCH:
 #endif
 			case msg_New:
 				NewWindow();
 				break;
-			
+
 			case msg_Select:
 			{
 				PDoc *doc;
@@ -900,45 +888,45 @@ void PApp::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
-			
+
 			case msg_DocClosed:
 				if (CDoc::CountDocs() == 0)
 					Quit();
 				break;
-			
+
 			case msg_Tile:
 				PDoc::Tile();
 				break;
-			
+
 			case msg_Stack:
 				PDoc::Stack();
 				break;
-	
+
 			case msg_Zoom:
 				if (PDoc::TopWindow())
 					PDoc::TopWindow()->Zoom();
 				break;
-			
+
 			case msg_Worksheet:
 				OpenWorksheet();
 				break;
-				
+
 			case msg_NewGroup:
 				new PGroupWindow;
 				break;
-			
+
 			case msg_Help:
 				DisplayHelp();
 				break;
-			
+
 			case 1:
 				puts(rcsid);
 				break;
-			
+
 			case msg_Quit:
 				PostMessage(B_QUIT_REQUESTED);
 				break;
-			
+
 			case msg_Preferences:
 			{
 				long l;
@@ -949,13 +937,13 @@ void PApp::MessageReceived(BMessage *msg)
 					BAutolock lock(fPrefsDialog);
 
 					int c = 1 << current_workspace();
-					
+
 					if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 						fPrefsDialog->SetWorkspaces(c);
 
 					if (fPrefsDialog->IsHidden())
 						fPrefsDialog->Show();
-					
+
 					fPrefsDialog->Activate(true);
 				}
 				else
@@ -986,7 +974,7 @@ void PApp::MessageReceived(BMessage *msg)
 					w->Show();
 				break;
 			}
-			
+
 			case msg_HideHtmlPalette:
 			{
 				BWindow *w = CHtmlBar::Instance();
@@ -1013,11 +1001,11 @@ int main()
 	be_app->Run();
 
 	SaveRecentMenu();
-	
+
 	gPrefs->WritePrefFile();
 
 	delete be_app;
-	
+
 	return 0;
 } /* main */
 
@@ -1026,13 +1014,13 @@ void PApp::DisplayInBrowser(const entry_ref& doc)
 	try
 	{
 		BMessage msg(B_NETPOSITIVE_OPEN_URL);
-		
+
 		BPath path;
 		FailOSErr(BEntry(&doc).GetPath(&path));
 
 		string url = "file://";
 		url += path.Path();
-		
+
 		msg.AddString("be:url", url.c_str());
 
 		char sig[B_MIME_TYPE_LENGTH];
@@ -1061,13 +1049,13 @@ void PApp::DisplayHelp()
 	gAppDir.FindEntry("Documentation", &entry, true);
 	BDirectory docdir(&entry);
 	docdir.FindEntry("index.html", &entry, true);
-	
+
 	if (entry.InitCheck() || !entry.Exists())
 		THROW(("The documentation could not be found."));
-	
+
 	entry_ref ref;
 	entry.GetRef(&ref);
-	
+
 	DisplayInBrowser(ref);
 } /* PApp::DisplayHelp */
 
@@ -1083,7 +1071,7 @@ BHandler *PApp::ResolveSpecifier(BMessage *msg, int32 index,
 		if (strcmp(property, "Window") == 0 && form == B_NAME_SPECIFIER)
 		{
 			msg->PopSpecifier();
-			
+
 			entry_ref file;
 			const char *fileName;
 
@@ -1095,7 +1083,7 @@ BHandler *PApp::ResolveSpecifier(BMessage *msg, int32 index,
 					doc = dynamic_cast<PDoc*>(OpenWindow(file, true));
 			}
 		}
-		
+
 		if (doc)
 			doc->PostMessage(msg);
 		else
@@ -1107,7 +1095,7 @@ BHandler *PApp::ResolveSpecifier(BMessage *msg, int32 index,
 		reply.AddString("Error", e);
 		msg->SendReply(&reply);
 	}
-	
+
 	return result;
 } /* PApp::ResolveSpecifier */
 
@@ -1128,7 +1116,7 @@ void PApp::FindAndOpen(const char *file, const char* fromSource)
 			uo->Run();
 			return;
 		}
-		
+
 		if (!found && fromSource)
 		{
 			BPath path;
@@ -1137,7 +1125,7 @@ void PApp::FindAndOpen(const char *file, const char* fromSource)
 				vector<BString> inclPathVect;
 				if (!ProjectRoster->GetIncludePathsForFile(&eref, inclPathVect))
 					ProjectRoster->GetAllIncludePaths(inclPathVect);
-				
+
 				for(uint32 i=0; !found && i<inclPathVect.size(); ++i)
 				{
 					if (path.SetTo(inclPathVect[i].String(), file) != B_OK)
@@ -1157,12 +1145,12 @@ void PApp::FindAndOpen(const char *file, const char* fromSource)
 			bi = strdup(getenv("BEINCLUDES"));
 			char *ip = bi;
 			char *p = ip;
-			
+
 			while (p && !found)
 			{
 				char *pe = strchr(p, ';');
 				if (pe) *pe = 0;
-				
+
 				FailOSErr(d.SetTo(p));
 				if (d.Contains(file, B_FILE_NODE | B_SYMLINK_NODE))
 				{
@@ -1171,11 +1159,11 @@ void PApp::FindAndOpen(const char *file, const char* fromSource)
 					FailOSErr(e.GetRef(&doc));
 					found = true;
 				}
-				
+
 				p = (pe && pe[1]) ? pe + 1 : NULL;
 			}
 		}
-		
+
 		if (!found)
 		{
 			const char *p;
@@ -1196,7 +1184,7 @@ void PApp::FindAndOpen(const char *file, const char* fromSource)
 				}
 			}
 		}
-		
+
 		if (found)
 			OpenWindow(doc);
 		else
@@ -1206,6 +1194,14 @@ void PApp::FindAndOpen(const char *file, const char* fromSource)
 	{
 		beep();
 	}
-	
-	if (bi) free(bi);
+
+	if (bi)
+		free(bi);
 } // PApp::FindAndOpen
+
+void PApp::SetColor(int colorId, const char* const prefName, uint8 red, uint8 green, uint8 blue)
+{
+	rgb_color presetColor = { red, green, blue, 0 };
+	gColor[colorId] = gPrefs->GetPrefColor(prefName, presetColor);
+} // PApp::FindAndOpen
+
