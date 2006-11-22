@@ -932,8 +932,7 @@ void PApp::MessageReceived(BMessage *msg)
 				long l;
 				if (fPrefOpener) wait_for_thread(fPrefOpener, &l);
 				fPrefOpener = (thread_id)NULL;
-				if (fPrefsDialog)
-				{
+				if (fPrefsDialog) {
 					BAutolock lock(fPrefsDialog);
 
 					int c = 1 << current_workspace();
@@ -941,10 +940,18 @@ void PApp::MessageReceived(BMessage *msg)
 					if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 						fPrefsDialog->SetWorkspaces(c);
 
-					if (fPrefsDialog->IsHidden())
-						fPrefsDialog->Show();
-
-					fPrefsDialog->Activate(true);
+					if (fPrefsDialog->Lock()) {
+	
+						if (fPrefsDialog->IsHidden()) {
+							fPrefsDialog->Show();
+						}
+	
+						fPrefsDialog->Activate(true);
+	
+						fPrefsDialog->Unlock();
+					} else {
+						THROW(("Preferences panel failed to lock"));
+					}
 				}
 				else
 					THROW(("Preferences panel failed to open"));
