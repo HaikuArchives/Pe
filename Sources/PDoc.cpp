@@ -1247,8 +1247,14 @@ void PDoc::MessageReceived(BMessage *msg)
 			}
 			
 			case msg_PrefsChanged:
-				fText->SetViewColor(gPrefs->GetPrefColor(prf_C_Low, ui_color(B_PANEL_BACKGROUND_COLOR)));
-				fText->Invalidate();
+				rgb_color viewColor = gPrefs->GetPrefColor(
+					prf_C_Low, ui_color(B_PANEL_BACKGROUND_COLOR));
+				rgb_color oldViewColor = fText->ViewColor();
+				if (*(uint32*)&viewColor != *(uint32*)&oldViewColor) {
+					fText->SetViewColor(viewColor);
+					fText->Invalidate();
+				}
+				fText->FontChanged();
 
 				fStatus->Draw(fStatus->Bounds());
 				ResetMenuShortcuts();

@@ -80,6 +80,12 @@ class PText
 
 //friend class PFontTabsCmd;	// lets keep life simple
 
+enum {
+	kNormalFont			= 0,
+	kAltFont			= 1,
+	kIndividualFont		= 2,
+};
+
 public:
 			PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], 
 				  const char *ext);
@@ -121,6 +127,10 @@ virtual		void FrameResized(float w, float h);
 			void ApplySettings(const BMessage& msg);
 			void GetSettingsMW(BPositionIO& set);
 			void SetSettingsMW(BPositionIO& set);
+
+			void SetFontKind(int kind);
+			int FontKind() const;
+			void FontChanged(bool reInit = true);
 
 			void ChangedInfo(BMessage *msg);
 			
@@ -347,6 +357,7 @@ static		PText *sfDragSource;
 			bool fSoftWrap;
 			int fWrapType;
 			int fWrapWidth;
+			int fFontKind;
 };
 
 inline void PText::HideCaret() {

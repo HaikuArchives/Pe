@@ -175,6 +175,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 		B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED | B_FRAME_EVENTS)
 	, fText(txt)
 	, fSplitCursorShown(false)
+	, fFontKind(kNormalFont)
 {
 	fAnchor = fCaret = 0;
 	fBlockSelect = false;
@@ -452,11 +453,21 @@ void PText::ApplySettings(const BMessage& msg)
 			fTabStops = i;
 		if (msg.FindBool("show tabs", &b) == B_OK)
 			ShowTabStops(b);
-		if (msg.FindFloat("fontsize", &f) == B_OK)
-			fFont.SetSize(f);
-		if (msg.FindString("fontfamily", &s1) == B_OK 
-			&& msg.FindString("fontstyle", &s2) == B_OK)
-			fFont.SetFamilyAndStyle(s1, s2);
+
+		if (msg.FindInt32("fontkind", &i) == B_OK) {
+			fFontKind = i;
+		}
+
+		if (fFontKind == kIndividualFont) {
+			if (msg.FindFloat("fontsize", &f) == B_OK)
+				fFont.SetSize(f);
+			if (msg.FindString("fontfamily", &s1) == B_OK 
+				&& msg.FindString("fontstyle", &s2) == B_OK)
+				fFont.SetFamilyAndStyle(s1, s2);
+		} else {
+			FontChanged(false);
+		}
+
 		if (msg.FindBool("syntaxcoloring", &b) == B_OK)
 			fSyntaxColoring = b;
 
@@ -513,14 +524,16 @@ void PText::CollectSettings(BMessage& msg)
 {
 	FailOSErr(msg.AddInt32("tabstop", fTabStops));
 	FailOSErr(msg.AddBool("show tabs", Doc()->ToolBar()->ShowsTabs()));
-	FailOSErr(msg.AddFloat("fontsize", fFont.Size()));
-	
-	font_family ff;
-	font_style fs;
-	fFont.GetFamilyAndStyle(&ff, &fs);
 
-	FailOSErr(msg.AddString("fontfamily", ff));
-	FailOSErr(msg.AddString("fontstyle", fs));
+	FailOSErr(msg.AddInt32("fontkind", fFontKind));
+	if (fFontKind == kIndividualFont) {
+		font_family ff;
+		font_style fs;
+		fFont.GetFamilyAndStyle(&ff, &fs);
+		FailOSErr(msg.AddString("fontfamily", ff));
+		FailOSErr(msg.AddString("fontstyle", fs));
+		FailOSErr(msg.AddFloat("fontsize", fFont.Size()));
+	}
 
 	FailOSErr(msg.AddInt32("anchor", fAnchor));
 	FailOSErr(msg.AddInt32("caret", fCaret));
@@ -596,6 +609,67 @@ void PText::SetSettingsMW(BPositionIO& set)
 	}
 	catch (...) {}
 } /* PText::SetSettingsMW */
+
+void PText::SetFontKind(int kind)
+{
+	if (fFontKind == kind)
+		return;
+
+	fFontKind = kind;
+
+	FontChanged();
+} /* PText::SetFontKind */
+
+void PText::FontChanged(bool reInit)
+{
+printf("PText::FontChanged(%d)\n", reInit);
+	const char* fontFamilyKey = NULL;
+	const char* fontStyleKey = NULL;
+	const char* fontSizeKey = NULL;
+
+	switch (fFontKind) {
+		case kAltFont:
+			fontFamilyKey = prf_S_AltFontFamily;
+			fontStyleKey = prf_S_AltFontStyle;
+			fontSizeKey = prf_D_AltFontSize;
+			break;
+
+		case kNormalFont:
+			fontFamilyKey = prf_S_FontFamily;
+			fontStyleKey = prf_S_FontStyle;
+			fontSizeKey = prf_D_FontSize;
+			break;
+
+		case kIndividualFont:
+		default:
+			break;
+	}
+
+	if (!fontFamilyKey) {
+printf("  individual font\n");
+		// don't adopt font from preferences
+		return;
+	}
+
+	BFont font;
+	font.SetFamilyAndStyle(gPrefs->GetPrefString(fontFamilyKey),
+						   gPrefs->GetPrefString(fontStyleKey));
+	font.SetSize(gPrefs->GetPrefDouble(fontSizeKey));
+
+	if (fFont != font) {
+printf("  font changed\n");
+		fFont = font;
+		if (reInit) {
+			ReInit();
+			Invalidate();
+		}
+	}
+} /* PText::FontChanged */
+
+int PText::FontKind() const
+{
+	return fFontKind;
+} /* PText::FontKind */
 
 void PText::SelectLine(int lineNr)
 {
@@ -2456,34 +2530,31 @@ void PText::ShowContextualMenu(BPoint where)
 		fMainPopUp->FindItem(B_SELECT_ALL)->SetEnabled(abs(fCaret - fAnchor) < fText.Size());
 		fMainPopUp->FindItem(msg_ToggleShowInvisibles)->SetMarked(fShowInvisibles);
 		fMainPopUp->FindItem(msg_SoftWrap)->SetMarked(fSoftWrap);
-	
-		BFont f;
-		f.SetFamilyAndStyle(gPrefs->GetPrefString(prf_S_FontFamily), gPrefs->GetPrefString(prf_S_FontStyle));
-		f.SetSize(gPrefs->GetPrefDouble(prf_D_FontSize));
-		
-		BFont af;
-		af.SetFamilyAndStyle(gPrefs->GetPrefString(prf_S_AltFontFamily), gPrefs->GetPrefString(prf_S_AltFontStyle));
-		af.SetSize(gPrefs->GetPrefDouble(prf_D_AltFontSize));
 
-		if (af == f)
-			fMainPopUp->FindItem(msg_ToggleFont)->SetEnabled(false);
-			
-		if (f == fFont)
-		{
-			f = af;
-			fMainPopUp->FindItem(msg_ToggleFont)->SetMarked(false);
+		BMenuItem* fontItem = fMainPopUp->FindItem(msg_ToggleFont);
+		int fontKind = kAltFont;
+		// TODO: what about localized item names?!?
+		switch (fFontKind) {
+			case kNormalFont:
+				fontItem->SetLabel("Alternate Font");
+				fontItem->SetMarked(false);
+				fontKind = kAltFont;
+				break;
+			case kAltFont:
+				fontItem->SetLabel("Alternate Font");
+				fontItem->SetMarked(true);
+				fontKind = kNormalFont;
+				break;
+			case kIndividualFont:
+			default:
+				fontItem->SetLabel("Individual Font");
+				fontItem->SetMarked(true);
+				fontKind = kNormalFont;
+				break;
 		}
-		else
-			fMainPopUp->FindItem(msg_ToggleFont)->SetMarked(true);
-
 		BMessage *msg = new BMessage(msg_ToggleFont);
-		font_family ff;
-		font_style fs;
-		f.GetFamilyAndStyle(&ff, &fs);
-		msg->AddString("family", ff);
-		msg->AddString("style", fs);
-		msg->AddFloat("size", f.Size());
-		fMainPopUp->FindItem(msg_ToggleFont)->SetMessage(msg);
+		msg->AddInt32("fontkind", fontKind);
+		fontItem->SetMessage(msg);
 	
 		be_clipboard->Lock();
 		fMainPopUp->FindItem(B_PASTE)->SetEnabled(be_clipboard->Data()->HasData("text/plain", B_MIME_DATA));
@@ -5524,10 +5595,10 @@ void PText::MessageReceived(BMessage *msg)
 				break;
 
 			case msg_ChangeFontAndTabs:
- //				RegisterCommand(new PFontTabsCmd(this, msg));
+//				RegisterCommand(new PFontTabsCmd(this, msg));
 				ChangedInfo(msg);
 				break;
-			
+
 			case msg_FindInNextFile:
 				gFindDialog->PostMessage(msg_FindInNextFile);
 				break;
@@ -6086,14 +6157,27 @@ void PText::ChangedInfo(BMessage *msg)
 	int32 i;
 	float f;
 	bool b, dirty = false;
-	
+
+	if (msg->FindInt32("fontkind", &i) == B_OK)
+		fFontKind = i;
+
+	BFont newFont = fFont;
 	if (msg->FindString("family", &family) == B_OK &&
 				msg->FindString("style", &style) == B_OK)
-		fFont.SetFamilyAndStyle(family, style);
+		newFont.SetFamilyAndStyle(family, style);
 	
 	if (msg->FindFloat("size", &f) == B_OK)
-		fFont.SetSize(f);
-	
+		newFont.SetSize(f);
+
+	if (newFont != fFont) {
+		// this message came from the CInfoDialog,
+		// configuring an individual font
+		fFontKind = kIndividualFont;
+		fFont = newFont;
+	}
+
+	FontChanged(false);
+
 	if (msg->FindInt32("tabs", &i) == B_OK)
 		fTabStops = i;
 	
