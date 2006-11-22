@@ -622,7 +622,6 @@ void PText::SetFontKind(int kind)
 
 void PText::FontChanged(bool reInit)
 {
-printf("PText::FontChanged(%d)\n", reInit);
 	const char* fontFamilyKey = NULL;
 	const char* fontStyleKey = NULL;
 	const char* fontSizeKey = NULL;
@@ -646,7 +645,6 @@ printf("PText::FontChanged(%d)\n", reInit);
 	}
 
 	if (!fontFamilyKey) {
-printf("  individual font\n");
 		// don't adopt font from preferences
 		return;
 	}
@@ -657,7 +655,6 @@ printf("  individual font\n");
 	font.SetSize(gPrefs->GetPrefDouble(fontSizeKey));
 
 	if (fFont != font) {
-printf("  font changed\n");
 		fFont = font;
 		if (reInit) {
 			ReInit();
