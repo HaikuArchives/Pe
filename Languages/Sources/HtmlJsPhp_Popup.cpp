@@ -129,140 +129,138 @@ inline const char *skip_white(const char *txt)
 	return txt;
 } /* skip_white */
 
+bool get_attribute(const char *&ptr, const char *&namBeg, int& namLen, const char *&valBeg, int& valLen)
+{
+	const char *namEnd=0, *valEnd=0;
+
+	namBeg = valBeg = 0;
+	ptr = skip_white(ptr);
+	if (*ptr != 0 && *ptr != '>')
+	{
+		// Search for attribue name
+		namBeg = namEnd = ptr;
+		// Gracefully also accept non alphanumeric characters
+		while (*namEnd != 0 && *namEnd != '=' && !isspace(*namEnd))
+			namEnd++;
+		ptr = skip_white(namEnd);
+		// Search for attribue value
+		if (*ptr == '=') {
+			ptr = skip_white(ptr+1);
+			if (*ptr == '"' || *ptr == '\'')
+			{
+				// Value is enclosed
+				const char *encl = ptr;
+				valBeg = valEnd = (ptr + 1);
+				while (*valEnd != 0 && *valEnd != *encl)
+					valEnd++;
+				ptr = valEnd+1;
+			}
+			else
+			{
+				// Value is not enclosed
+				valBeg = valEnd = ptr;
+				while (isalnum(*valEnd) || *valEnd == '_')
+					valEnd++;
+				ptr = valEnd;
+			}
+		}
+		//
+		namLen = namEnd - namBeg;
+		valLen = valEnd - valBeg;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+void skip_attributes(const char *&ptr)
+{
+	const char *nam, *val;
+	int namLen, valLen, len;
+
+	// Skip tagname
+	if (*(++ptr) != 0 && *ptr == '/')
+		ptr++;
+	while (*ptr != 0 && isalnum(*ptr))
+		ptr++;
+	// Skip attributes
+	while (get_attribute(ptr, nam, namLen, val, valLen)) ;
+	// skip ">"
+	ptr++;
+}
+
 const char *Anchor(const char *txt, CLanguageProxy& ao)
 {
-	char name[PATH_MAX];
+	const char *nam, *val;
+	int namLen, valLen, len;
 
-	txt = skip_white(txt);
-
-	while (*txt != 0)
+	while (get_attribute(txt, nam, namLen, val, valLen))
 	{
-		if (strncasecmp(txt, "HREF", 4) == 0)
+		if (valLen > 0)
 		{
-
-			txt = skip_white(txt + 4);
-
-			if (*txt != '=')
-				break;
-
-			txt = skip_white(txt + 1);
-
-			if (*txt != '"')
-				break;
-
-			const char *file = ++txt;
-
-			while (*txt && *txt != '"' && *txt != '#')
-				++txt;
-
-			if (*txt == 0)
-				break;
-
-			int l = min((long)PATH_MAX - 1, txt - file - 1);
-			if (l > 0)
+			if (strncasecmp(nam, "HREF", 4) == 0)
 			{
-				strncpy(name, file, l);
-				name[l] = 0;
-				ao.AddInclude(name, name);
+				if (*val != '#')
+				{
+					BString label("HREF:  "), include(val, valLen);
+					label << include;
+					ao.AddInclude(label.String(), include.String());
+				}
 			}
-			break;
-		}
-		else if (strncasecmp(txt, "NAME", 4) == 0)
-		{
-			txt = skip_white(txt + 4);
-			
-			if (*txt != '=')
-				break;
-			
-			txt = skip_white(txt + 1);
-			
-			if (*txt != '"')
-				break;
-
-			int offset = txt - ao.Text();
-			const char *anchor = txt + 1;
-			
-			txt = skip(txt + 1, '"');
-			
-			if (*txt == 0)
-				break;
-			char *p = name + kMaxNameSize;
-			int l = min(kMaxNameSize - 1, txt - anchor - 1);
-			strncpy(name, anchor, l);
-			name[l] = 0;
-
-			sprintf(p, "A: %s", name);
-
-			ao.AddFunction(p, name, offset);
-
-			break;
-		}
-		else
-		{
-			while (isalnum(*txt))
-				++txt;
-
-			txt = skip_white(txt);
-			
-			if (*txt == '=')
+			else if (strncasecmp(nam, "NAME", 4) == 0)
 			{
-				txt = skip_white(txt + 1);
-				if (*txt == '"')
-					txt = skip(txt + 1, '"');
+				BString label("A:  "), function(val, valLen);
+				label << function;
+				ao.AddFunction(label.String(), function.String(), txt - ao.Text());
 			}
-			
-			txt = skip_white(txt);
-			
-			if (*txt == '>')
-				return txt + 1;
-
-			continue;
 		}
-	}
-	
-	return skip(txt, '>');
+
+	};
+	return txt;
 } /* Anchor */
 
 const char *Heading(const char *txt, CLanguageProxy& ao)
 {
-	const char *hName;
-	int level = *txt - '0';
-	
-	txt = skip(txt + 1, '>');
-	
-	while (*txt == '<')
-		txt = skip(txt + 1, '>');
-	
-	if (*txt == 0)
-		return txt;
-	
-	hName = txt;
-	
-	txt = skip(txt + 1, '<');
-	
-	char name[kMaxNameSize];
-	int l = min(txt - hName - 1, kMaxNameSize - 1);
-	int offset = hName - ao.Text();
-	
-	strncpy(name, hName, l);
-	name[l] = 0;
-	
-	char* p = strtok(name, "\n\t\r");
-	
-	while (p)
-	{
-		int l = std::min((int)strlen(p), (int)kMaxNameSize);
-		if (l > 0)
-		{
-			char label[kMaxNameSize + 10];
-			std::snprintf(label, kMaxNameSize + 10, "H%d: %s", level, p);
-			ao.AddFunction(label, p, offset);
-			break;
+	char endTag[6];
+	bool wasSpace = false;
+	const char *ptr = txt;
+	BString label("H"), heading;
+
+	label << (*txt - '0') << ":  ";
+	skip_attributes(ptr);
+	sprintf(endTag, "</h%c>", *txt);
+	txt = ptr;
+	while (*ptr != 0) {
+		if (*ptr == '<') {
+			if (strncasecmp(ptr, endTag, 5) == 0)
+			{
+				break;
+			}
+			skip_attributes(ptr);
+		} else {
+			if (isspace(*ptr))
+			{
+				if (!wasSpace)
+					label << *ptr;
+				wasSpace = true;
+			}
+			else
+			{
+				label << *ptr;
+				wasSpace = false;
+			}
+			ptr++;
 		}
-		p = strtok(NULL, "\n\r\t");
 	}
-	
-	return txt;
+	if (label.Length() > 100)
+	{
+		label.Truncate(100);
+		label << "…";
+	}
+	heading.SetTo(txt, ptr-txt);
+	ao.AddFunction(label.String(), heading.String(), txt - ao.Text());
+
+	return ptr;
 } /* Heading */
 
 const char *JavaScript(const char *txt, CLanguageProxy& ao)
@@ -325,7 +323,7 @@ const char *JavaScript(const char *txt, CLanguageProxy& ao)
 					*n = 0;
 					
 					char label[kMaxNameSize + 3];
-					strcpy(label, "JS: ");
+					strcpy(label, "JS:  ");
 					strcat(label, name);
 
 					ao.AddFunction(label, name, offset);
@@ -403,7 +401,7 @@ const char *PhpScript(const char *txt, CLanguageProxy& ao)
 					*n = 0;
 					
 					char label[kMaxNameSize + 6];
-					strcpy(label, "PHP: ");
+					strcpy(label, "PHP:  ");
 					strcat(label, name);
 
 					ao.AddFunction(label, name, offset);
