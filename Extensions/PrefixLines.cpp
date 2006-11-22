@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 09/15/97 02:33:13
 */
@@ -65,11 +65,11 @@ const rgb_color
 class CPrefixDialog : public HDialog {
 public:
 		enum { sResID = 1 };
-		
+
 		CPrefixDialog(BRect frame, const char *name, window_type type, int flags,
 			BWindow *owner, BPositionIO* data);
 
-virtual bool OKClicked();
+virtual bool OkClicked();
 virtual bool CancelClicked();
 };
 
@@ -81,21 +81,21 @@ CPrefixDialog::CPrefixDialog(BRect frame, const char *name, window_type type, in
 		SetOn("before");
 	else
 		SetOn("after");
-	
+
 	if (sSelectionOnly)
 		SetOn("selection");
 } /* CPrefixDialog::CPrefixDialog */
 
-bool CPrefixDialog::OKClicked()
+bool CPrefixDialog::OkClicked()
 {
 	sOK = true;
-	
+
 	sSelectionOnly = IsOn("selection");
 	sBefore = IsOn("before");
 	sText = strdup(GetText("text"));
-	
+
 	return true;
-} /* CPrefixDialog::OKClicked */
+} /* CPrefixDialog::OkClicked */
 
 bool CPrefixDialog::CancelClicked()
 {
@@ -106,18 +106,18 @@ bool CPrefixDialog::CancelClicked()
 long perform_edit(MTextAddOn *addon)
 {
 	long result = B_NO_ERROR;
-	
+
 	try
 	{
 		long s, e, l;
 		addon->GetSelection(&s, &e);
 		sSelectionOnly = (s != e);
 		sBefore = true;
-		
+
 		BMemoryIO tmpl(kDLOG1, kDLOG1Size);
 		CPrefixDialog *p = DialogCreator<CPrefixDialog>::CreateDialog(addon->Window(), tmpl);
 		p->Show();
-	
+
 		wait_for_thread(p->Thread(), &l);
 		if (sOK)
 		{
@@ -132,14 +132,14 @@ long perform_edit(MTextAddOn *addon)
 		e.DoError();
 		result = B_ERROR;
 	}
-	
+
 	return result;
 } /* perform_edit */
 
 long PrefixLines(MTextAddOn *addon)
 {
 	//  error checking
-	
+
 	long	selStart;
 	long	selEnd;
 
@@ -154,26 +154,26 @@ long PrefixLines(MTextAddOn *addon)
 		selStart = 0;
 		selEnd = addon->TextLength();
 	}
-	
+
 	//  set-up
-	
+
 	const char *txt = addon->Text();
 	const char *ptr = txt + selStart;
 	const char *end = txt + selEnd;
 	int			nls = 1, insLen;
-	
+
 	insLen = strlen(sText);
-	
+
 	//  count number of lines affected (always at least one)
-	
+
 	while (ptr < end-1) { // ignore if last line is complete or not
 		if (*ptr == '\n')
 			nls++;
 		ptr++;
 	}
-	
+
 	//  perform operation into temporary buffer
-	
+
 	char *new_text = new char[selEnd - selStart + nls * insLen + 1];
 	char *out = new_text;
 	int crflag = 1;
@@ -188,22 +188,22 @@ long PrefixLines(MTextAddOn *addon)
 		crflag = (*ptr == '\n');
 	}
 	*out = 0;
-	
+
 	//  remove old text, replace with new, adjust selection
-	
+
 	addon->Select(selStart, selEnd);
 	addon->Delete();
 	addon->Insert(new_text);
 	delete[] new_text;
 	addon->Select(selStart, selEnd + nls * insLen);
-	
+
 	return B_NO_ERROR;
 } /* PrefixLines */
 
 long SuffixLines(MTextAddOn *addon)
 {
 	//  error checking
-	
+
 	long	selStart;
 	long	selEnd;
 
@@ -218,26 +218,26 @@ long SuffixLines(MTextAddOn *addon)
 		selStart = 0;
 		selEnd = addon->TextLength();
 	}
-	
+
 	//  set-up
-	
+
 	const char *txt = addon->Text();
 	const char *ptr = txt + selStart;
 	const char *end = txt + selEnd;
 	int			nls = 1, insLen;
-	
+
 	insLen = strlen(sText);
-	
+
 	//  count number of lines affected (always at least one)
-	
+
 	while (ptr < end-1) { // ignore if last line is complete or not
 		if (*ptr == '\n')
 			nls++;
 		ptr++;
 	}
-	
+
 	//  perform operation into temporary buffer
-	
+
 	char *new_text = new char[selEnd - selStart + nls * insLen + 1];
 	char *out = new_text;
 	for (ptr=txt + selStart; ptr<end; ptr++)
@@ -250,14 +250,14 @@ long SuffixLines(MTextAddOn *addon)
 		*(out++) = *ptr;
 	}
 	*out = 0;
-	
+
 	//  remove old text, replace with new, adjust selection
-	
+
 	addon->Select(selStart, selEnd);
 	addon->Delete();
 	addon->Insert(new_text);
 	delete[] new_text;
 	addon->Select(selStart, selEnd + nls * insLen);
-	
+
 	return B_NO_ERROR;
 } /* SuffixLines */

@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 02-06-02
 */
@@ -44,7 +44,7 @@
 
 struct IMPEXP_LIBHEKKEL dRect {
 	short left, top, right, bottom;
-	
+
 	BRect ToBe();
 };
 
@@ -81,10 +81,10 @@ T* DialogCreator<T>::CreateDialog(BWindow *owner, BWindow *caller,
 	const void *p = HResources::GetResource('DLOG', T::sResID, size);
 	if (!p) throw HErr("missing resource");
 	BMemoryIO buf(p, size);
-	
+
 	T *d = CreateDialog(owner, buf, placement);
 	d->SetCaller( caller);
-	
+
 	return d;
 } /* CreateDialog */
 
@@ -133,39 +133,39 @@ public:
 			HDialog(BRect frame, const char *name, window_type type, int flags,
 					BWindow *owner=NULL, BPositionIO* data=NULL);
 			~HDialog();
-	
+
 			enum { sResID = 100 };
-	
+
 			void CreateField(int kind, BPositionIO& data, BView*& inside);
 virtual		void MessageReceived(BMessage *msg);
 
 virtual		void Show();
 virtual		void Hide();
 
-virtual		bool OKClicked();
+virtual		bool OkClicked();
 virtual		bool CancelClicked();
 virtual		void UpdateFields();
 
 
 			bool IsOn(const char *name) const;
 			void SetOn(const char *name, bool on = true);
-			
+
 			const char* GetText(const char *name) const;
 			void SetText(const char *name, const char *text);
-			
+
 			const char* GetLabel(const char *name) const;
 			void SetLabel(const char *name, const char *label);
-			
+
 			void SetEnabled(const char *name, bool enabled = true);
-			
+
 			bool GetDouble(const char *name, double& d) const;
 
 			int GetValue(const char *id) const;
 			void SetValue(const char *id, int v);
-			
+
 			void SetCaller( BWindow* caller);
 			void SetPlacement( HPlacementType placement);
-			
+
 			void ResizeToLimits(float min, float maxW, float minH, float maxH);
 
 static		void RegisterFieldCreator(int kind, FieldCreator fieldCreator);
@@ -177,7 +177,7 @@ protected:
 
 			void _BuildIt(BPositionIO& data);
 			void _PlaceWindow();
-	
+
 			class HDlogView *fMainView;
 			BWindow *fOwner;
 			BMessenger fCaller;
@@ -186,9 +186,9 @@ protected:
 static		int16 sfDlgNr;
 };
 
-inline void HDialog::SetCaller( BWindow* caller) 
-{ 
-	fCaller = BMessenger(NULL, caller); 
+inline void HDialog::SetCaller( BWindow* caller)
+{
+	fCaller = BMessenger(NULL, caller);
 }
 
 inline void HDialog::SetPlacement( HPlacementType placement)

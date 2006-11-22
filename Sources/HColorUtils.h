@@ -40,10 +40,10 @@
 
 struct IMPEXP_LIBHEKKEL roSColor
 { 
-    float  m_Red; 
-    float  m_Green; 
-    float  m_Blue; 
-    float  m_Alpha; 
+    float  m_Red;
+    float  m_Green;
+    float  m_Blue;
+    float  m_Alpha;
     float  m_Hue;
 };
 

@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	First build at september 5, 1997
 */
@@ -85,7 +85,7 @@ HDialog::HDialog(BRect frame, const char *name, window_type type,
 
 	if (data)
 		_BuildIt(*data);
-	
+
 	AddCommonFilter(new BMessageFilter(B_KEY_DOWN,KeyDownFilter));
 
 	if (fOwner)
@@ -93,7 +93,7 @@ HDialog::HDialog(BRect frame, const char *name, window_type type,
 		BMessage m(msg_AddDialog);
 		m.AddPointer("dialog", this);
 		fOwner->PostMessage(&m);
-		
+
 		// [zooey]: let dialog float above owner:
 		SetFeel(B_FLOATING_SUBSET_WINDOW_FEEL);
 		AddToSubset(fOwner);
@@ -136,25 +136,25 @@ void HDialog::SetOn(const char *name, bool on)
 	if (ctrl)
 		ctrl->SetValue(on ? B_CONTROL_ON : B_CONTROL_OFF);
 } /* HDialog::SetOn */
-	
+
 void HDialog::MessageReceived(BMessage *inMessage)
 {
 	switch (inMessage->what)
 	{
 		case msg_OK:
-			if (OKClicked())
+			if (OkClicked())
 				Close();
 			break;
-		
+
 		case msg_FieldChanged:
 			UpdateFields();
 			break;
-			
+
 		case msg_Cancel:
 			if (CancelClicked())
 				Close();
 			break;
-			
+
 		default:
 			BWindow::MessageReceived(inMessage);
 	}
@@ -194,12 +194,12 @@ void HDialog::_PlaceWindow()
 		string dlgOrigin = string("dialog ") + Name() + " origin";
 		BRect lastFrame;
 		lastFrame = gPrefs->GetPrefRect(dlgRect.c_str(), BRect());
-		if (lastFrame.IsValid()) 
+		if (lastFrame.IsValid())
 		{
 			newFrame = lastFrame;
 			const char* origin = NULL;
 			origin = gPrefs->GetPrefString(dlgOrigin.c_str(), NULL);
-			if (callerFrame.IsValid() && origin) 
+			if (callerFrame.IsValid() && origin)
 			{
 				// frame was stored relative to caller, so we move to same
 				// relative position, but first we need to find out which
@@ -213,12 +213,12 @@ void HDialog::_PlaceWindow()
 				else if (!strcmp(origin, "RB"))
 					newFrame.OffsetBy(callerFrame.RightBottom());
 			}
-		} 
+		}
 		else
 			placement = H_PLACE_DEFAULT;
 				// no last position available, fallback to default placement
 	}
-	if (placement == H_PLACE_DEFAULT) 
+	if (placement == H_PLACE_DEFAULT)
 	{
 		// center horizontally, position 1/3 vertically:
 		if (callerFrame.IsValid())
@@ -245,7 +245,7 @@ void HDialog::_PlaceWindow()
 
 static void WarpMouseToWindow(const char* windowName);
 
-void HDialog::Show() 
+void HDialog::Show()
 {
 	_PlaceWindow();
 	BWindow::Show();
@@ -260,7 +260,7 @@ void HDialog::Show()
 		WarpMouseToWindow(Name());
 }
 
-void HDialog::Hide() 
+void HDialog::Hide()
 {
 	BRect frame = Frame();
 	if (!IsHidden() && fPlacement == H_PLACE_LAST_POS && frame != fInitialFrame)
@@ -299,10 +299,10 @@ void HDialog::Hide()
 	BWindow::Hide();
 }
 
-bool HDialog::OKClicked()
+bool HDialog::OkClicked()
 {
 	return true;
-} /* HDialog::OKClicked */
+} /* HDialog::OkClicked */
 
 bool HDialog::CancelClicked()
 {
@@ -355,7 +355,7 @@ void HDialog::SetEnabled(const char *name, bool enabled)
 bool HDialog::GetDouble(const char *name, double& d) const
 {
 	d = atof(GetText(name));
-	
+
 	if (isnan(d))
 	{
 		MWarningAlert a("Invalid number entered");
@@ -374,7 +374,7 @@ void HDialog::CreateField(int kind, BPositionIO& data, BView*& inside)
 	char label[256];
 	ulong cmd;
 	BView *v;
-	
+
 	switch (kind)
 	{
 		case 'btn ':
@@ -396,12 +396,12 @@ void HDialog::CreateField(int kind, BPositionIO& data, BView*& inside)
 			char val[256], allowed[256];
 			short max, divider;
 			data >> r >> name >> label >> val >> allowed >> max >> divider;
-			
+
 			BRect b = r.ToBe();
-			
+
 			inside->AddChild(v = new BTextControl(b, name, *label ? label : NULL,
 				val, new BMessage(msg_FieldChanged), B_FOLLOW_NONE));
-					
+
 			BTextView *tv = static_cast<BTextControl*>(v)->TextView();
 			if (*allowed)
 			{
@@ -415,7 +415,7 @@ void HDialog::CreateField(int kind, BPositionIO& data, BView*& inside)
 
 			if (max) tv->SetMaxBytes(max);
 			if (divider) static_cast<BTextControl*>(v)->SetDivider(divider * gFactor);
-			
+
 			if (v->Bounds().Height() < b.Height())
 			{
 				float d = v->Bounds().Height() - tv->Bounds().Height();
@@ -467,10 +467,10 @@ void HDialog::CreateField(int kind, BPositionIO& data, BView*& inside)
 		case 'olst':
 		{
 			data >> r >> name;
-			
+
 			BRect lr = r.ToBe();
 			lr.right -= B_V_SCROLL_BAR_WIDTH;
-			
+
 			BListView *lv;
 			if (kind == 'list')
 				lv = new BListView(lr, name);
@@ -491,9 +491,9 @@ void HDialog::CreateField(int kind, BPositionIO& data, BView*& inside)
 		case 'line':
 		{
 			HDlogView *dv = dynamic_cast<HDlogView*>(inside);
-			
+
 			data >> r;
-			
+
 			if (dv)
 				dv->AddMyLine(r.ToBe());
 			break;
@@ -519,7 +519,7 @@ void HDialog::_BuildIt(BPositionIO& data)
 {
 	int kind, cnt;
 	BView *contains = fMainView;
-	
+
 	if (gFactor == 0.0)
 		gFactor = be_plain_font->Size() / 10.0;
 
@@ -545,7 +545,7 @@ int HDialog::GetValue(const char *id) const
 {
 	BView *v = FindView(id);
 	if (v == NULL) THROW(("View '%s' not found", id));
-	
+
 		// according to stroustrup I shouldn't do this:
 
 	if (typeid(*v) == typeid(BMenuField))
@@ -557,7 +557,7 @@ int HDialog::GetValue(const char *id) const
 		return atoi(GetText(id));
 	else if (typeid(*v) == typeid(BSlider))
 		return static_cast<BSlider*>(v)->Value();
-	
+
 	THROW(("view '%s' not of valid type", id));
 	return 0;
 } // HDialog::GetValue
@@ -566,7 +566,7 @@ void HDialog::SetValue(const char *id, int value)
 {
 	BView *v = FindView(id);
 	if (v == NULL) THROW(("View '%s' not found", id));
-	
+
 	if (typeid(*v) == typeid(BMenuField))
 	{
 		BMenuField *mf = static_cast<BMenuField*>(v);
@@ -587,7 +587,7 @@ void HDialog::SetValue(const char *id, int value)
 		static_cast<BSlider*>(v)->SetValue(value);
 		return;
 	}
-	
+
 	THROW(("view '%s' not found", id));
 } // HDialog::SetValue
 
@@ -680,11 +680,11 @@ static void WarpMouseToWindow(const char* windowName)
 	int32 *tokens = get_token_list(-1, &count);
 	team_id pe_team = be_app->Team();
 	bool found = false;
-	for (int32 i = count-1; i>=0 && !found; i--) 
+	for (int32 i = count-1; i>=0 && !found; i--)
 	{
 		window_info* windowInfo = get_window_info(tokens[i]);
 		if (windowInfo && windowInfo->team == pe_team
-		&& !strcmp(windowInfo->name, windowName)) 
+		&& !strcmp(windowInfo->name, windowName))
 		{
 			do_window_action(windowInfo->id, B_BRING_TO_FRONT, BRect(0,0,0,0), 
 							 false);

@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,8 +28,8 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
-	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 	Created: 09/15/97 02:33:13
 */
 
@@ -67,11 +67,11 @@ const rgb_color
 class CCopyContainingDialog : public HDialog {
 public:
 		enum { sResID = 1 };
-		
+
 		CCopyContainingDialog(BRect frame, const char *name, window_type type, int flags,
 			BWindow *owner, BPositionIO* data);
 
-virtual bool OKClicked();
+virtual bool OkClicked();
 virtual bool CancelClicked();
 };
 
@@ -83,13 +83,13 @@ CCopyContainingDialog::CCopyContainingDialog(BRect frame, const char *name, wind
 	FindView("text")->MakeFocus(true);
 } /* CCopyContainingDialog::CCopyContainingDialog */
 
-bool CCopyContainingDialog::OKClicked()
+bool CCopyContainingDialog::OkClicked()
 {
 	sOK = true;
 	sText = strdup(GetText("text"));
 	sSelectionOnly = IsOn("sel");
 	return true;
-} /* CCopyContainingDialog::OKClicked */
+} /* CCopyContainingDialog::OkClicked */
 
 bool CCopyContainingDialog::CancelClicked()
 {
@@ -100,21 +100,21 @@ bool CCopyContainingDialog::CancelClicked()
 long perform_edit(MTextAddOn *addon)
 {
 	long result = B_NO_ERROR;
-	
+
 	try
 	{
 		long s, e, l;
 		addon->GetSelection(&s, &e);
 		sSelectionOnly = (s != e);
-		
+
 		BMemoryIO tmpl(kDLOG1, kDLOG1Size);
 		CCopyContainingDialog *p = DialogCreator<CCopyContainingDialog>::CreateDialog(addon->Window(), tmpl);
 		p->Show();
-		
+
 		wait_for_thread(p->Thread(), &l);
 		if (sOK)
 			result = CopyContaining(addon);
-		
+
 		if (sText)
 			free(sText);
 	}
@@ -123,14 +123,14 @@ long perform_edit(MTextAddOn *addon)
 		e.DoError();
 		result = B_ERROR;
 	}
-	
+
 	return result;
 } /* perform_edit */
 
 long CopyContaining(MTextAddOn *addon)
 {
 	//  error checking
-	
+
 	long	selStart;
 	long	selEnd;
 
@@ -145,9 +145,9 @@ long CopyContaining(MTextAddOn *addon)
 		selStart = 0;
 		selEnd = addon->TextLength();
 	}
-	
+
 	//  set-up
-	
+
 	const char *txt = addon->Text(), *ptr = txt + selStart;
 	int size = selEnd - selStart;
 
@@ -156,20 +156,20 @@ long CopyContaining(MTextAddOn *addon)
 	int r = regcomp(&pb, sText, REG_EXTENDED);
 
 	if (r == REG_NOERROR)
-	{	
+	{
 		//  perform operation into temporary buffer
-		
+
 		char *new_text = new char[size + 1];
 		int ls = 0, li = 0, i = 0;
-		
+
 		while (li <= size)
 		{
 			if (li == size || ptr[li] == '\n')
 			{
 				new_text[i] = 0;
-				
+
 				r = regexec(&pb, new_text + ls, 0, NULL, 0);
-				
+
 				if (r == 0)
 				{
 					new_text[i] = '\n';
@@ -182,11 +182,11 @@ long CopyContaining(MTextAddOn *addon)
 			}
 			else
 				new_text[i] = ptr[li];
-			
+
 			i++;
 			li++;
 		}
-		
+
 		if (r < 2)
 		{
 			if (be_clipboard->Lock())
@@ -200,7 +200,7 @@ long CopyContaining(MTextAddOn *addon)
 
 		delete[] new_text;
 	}
-	
+
 	if (r != REG_NOERROR && r != REG_NOMATCH)
 	{
 		char err[100];
@@ -210,8 +210,8 @@ long CopyContaining(MTextAddOn *addon)
 		MAlert *a = new MWarningAlert(err);
 		a->Go();
 	}
-	
+
 	regfree(&pb);
-	
+
 	return B_NO_ERROR;
 } /* CopyContaining */

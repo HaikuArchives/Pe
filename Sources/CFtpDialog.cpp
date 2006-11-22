@@ -1,8 +1,8 @@
 	/*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 11/14/98 13:50:36
 */
@@ -133,11 +133,11 @@ CFtpDialog::~CFtpDialog()
 {
 	delete[] fReply;
 	delete[] fPath;
-	
+
 	map<string,BBitmap*>::iterator iter;
 	for (iter = fIcons.begin(); iter != fIcons.end(); iter++)
 		delete iter->second;
-	
+
 	if (fSocket >= 0)
 		closesocket(fSocket);
 } // CFtpDialog::~CFtpDialog
@@ -178,7 +178,7 @@ void CFtpDialog::Create(void)
 								  B_FRAME_EVENTS, false, true);
 
 	SetDefaultButton(fConnectButton);
-	
+
 	fServerName->SetText(gPrefs->GetPrefString(prf_S_LastFtpServer));
 	fUserName->SetText(gPrefs->GetPrefString(prf_S_LastFtpUser));
 
@@ -189,7 +189,7 @@ void CFtpDialog::Create(void)
 		fPassword->MakeFocus();
 	else
 		fServerName->MakeFocus();
-	
+
 	fFileName->Hide();
 
 } // CFtpDialog::Create
@@ -270,7 +270,7 @@ BBitmap* CFtpDialog::GetIcon(const char *mimeType, const char *tryExtension)
 
 	if (*tryExtension != '\0' && (iterExt = fExtMime.find(tryExtension)) != fExtMime.end())
 		return GetIcon(iterExt->second.c_str());
-	
+
 	if ((iterBmp = fIcons.find(mimeType)) == fIcons.end())
 	{
 		BBitmap* bm = new BBitmap(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
@@ -295,13 +295,13 @@ void CFtpDialog::MakeItSave(const char *name)
 		fFileName->SetText(t + 1);
 	else
 		fFileName->SetText(name);
-	
+
 	fOkButton->SetLabel("Save");
-	
+
 	SetTitle("Save on Server");
 } // CFtpDialog::MakeItSave
 
-bool CFtpDialog::OKClicked()
+bool CFtpDialog::OkClicked()
 {
 	CFtpListItem *i;
 
@@ -366,7 +366,7 @@ bool CFtpDialog::OKClicked()
 					e.DoError();
 				}
 			}
-			
+
 			return true;
 		}
 		else
@@ -375,7 +375,7 @@ bool CFtpDialog::OKClicked()
 		}
 	}
 	return false;
-} // CFtpDialog::OKClicked
+} // CFtpDialog::OkClicked
 
 void CFtpDialog::MessageReceived(BMessage *msg)
 {
@@ -384,12 +384,12 @@ void CFtpDialog::MessageReceived(BMessage *msg)
 		case 'cnct':
 			Connect();
 			break;
-		
+
 		case msg_SelectedDirectory:
 		{
 			BMenuItem *src;
 			FailOSErr(msg->FindPointer("source", (void**)&src));
-			
+
 			strcpy(fPath, "/");
 			if (src != fDirectoryField->Menu()->ItemAt(0))
 			{
@@ -399,23 +399,23 @@ void CFtpDialog::MessageReceived(BMessage *msg)
 				{
 					if (i >= fDirectoryField->Menu()->CountItems())
 						break;
-					
+
 					BMenuItem *I = fDirectoryField->Menu()->ItemAt(i);
-					
+
 					strcat(fPath, I->Label());
 					strcat(fPath, "/");
 
 					if (src == I)
 						break;
-					
+
 					++i;
 				}
 			}
-			
+
 			ChangeDirectory();
 			break;
 		}
-		
+
 		case msg_SelectedListItem:
 		{
 			CFtpListItem *i = dynamic_cast<CFtpListItem*>(
@@ -425,22 +425,22 @@ void CFtpDialog::MessageReceived(BMessage *msg)
 				beep();
 				return;
 			}
-			
+
 			if (i->IsDirectory())
 			{
 				strcat(fPath, *i);
 				strcat(fPath, "/");
 				ChangeDirectory();
 			}
-			else if (OKClicked())
+			else if (OkClicked())
 				Quit();
 			break;
 		}
-		
+
 		case msg_ToggleDot:
 			ListDirectory();
 			break;
-		
+
 		default:
 			HDialog::MessageReceived(msg);
 			break;
@@ -454,7 +454,7 @@ void CFtpDialog::GetReply()
 
 	char *m;
 	int r = strtoul(fReply, &m, 10);
-	
+
 	if (*m == '-')
 	{
 		int r2;
@@ -482,27 +482,27 @@ void CFtpDialog::Connect()
 			if (fSocketFD) s_close(fSocketFD);
 			closesocket(fSocket);
 		}
-		
+
 		fSocket = socket(AF_INET, SOCK_STREAM, 0);
 		if (fSocket < 0)
 			THROW(("Failed to get socket: %s", strerror(errno)));
-		
+
 		fSocketFD = s_open(fSocket, "r+");
 		FailNil(fSocketFD);
-		
+
 		SetDefaultButton(static_cast<BButton*>(FindView("ok  ")));
-		
+
 		struct hostent *host;
 		if ((host = gethostbyname(GetText("srvr"))) == NULL)
 			THROW(("Failed to get server address: %s", strerror(errno)));
-		
+
 		struct sockaddr_in sa;
 		sa.sin_family = AF_INET;
 		sa.sin_port = htons(21);
 		sa.sin_addr.s_addr = *(unsigned int *)host->h_addr;
-		
+
 		FailOSErr(connect(fSocket, (struct sockaddr *)&sa, sizeof(sa)));
-		
+
 		int state = 1;
 		while (state)
 		{
@@ -516,7 +516,7 @@ void CFtpDialog::Connect()
 					s_printf(fSocketFD, "user %s\r\n", GetText("user"));
 					state = 2;
 					break;
-				
+
 				case 2:
 					if (*fReply == '3')
 					{
@@ -528,13 +528,13 @@ void CFtpDialog::Connect()
 						THROW(("Failed to login: %s", fReply));
 
 					// fall thru
-				
+
 				case 3:
 					if (*fReply == '5')
 						THROW(("Incorrect username/password.\n%s", fReply));
 					if (state == 3 && *fReply != '2')
 						THROW(("Failed to login: %s", fReply));
-					
+
 					state = 0;
 					break;
 			}
@@ -551,10 +551,10 @@ void CFtpDialog::Connect()
 		e.DoError();
 		s_close(fSocketFD); fSocketFD = NULL;
 		closesocket(fSocket); fSocket = -1;
-		
+
 		SetDefaultButton(static_cast<BButton*>(FindView("cnct")));
 	}
-	
+
 	if (fSocketFD)
 		ListDirectory();
 } // CFtpDialog::Connect
@@ -563,26 +563,26 @@ void CFtpDialog::UpdateDirectoryPopup()
 {
 	BMenu* menu = fDirectoryField->Menu();
 	BMenuItem *item;
-	
+
 	while ((item = menu->ItemAt(menu->CountItems() - 1)) != NULL)
 	{
 		menu->RemoveItem(item);
 		delete item;
 	}
-	
+
 	char p[PATH_MAX], *l;
 	strcpy(p, fPath);
-	
+
 	l = strtok(p, "/");
-	
+
 	menu->AddItem(new BMenuItem("/", new BMessage(msg_SelectedDirectory)));
-	
+
 	while (l)
 	{
 		menu->AddItem(new BMenuItem(l, new BMessage(msg_SelectedDirectory)));
 		l = strtok(NULL, "/");
 	}
-	
+
 	menu->ItemAt(menu->CountItems() - 1)->SetMarked(true);
 } // CFtpDialog::UpdateDirectoryPopup
 
@@ -593,17 +593,17 @@ void CFtpDialog::ListDirectory()
 		beep();
 		return;
 	}
-	
+
 	for (int i = fListView->CountItems() - 1; i >= 0; i--)
 		delete fListView->RemoveItem(i);
-	
+
 	int data = 0;
-	
+
 	try
 	{
 		struct sockaddr_in saData;
 		struct sockaddr_in saCmd;
-		
+
 		data = socket(AF_INET, SOCK_STREAM, 0);
 		if (data < 0)
 			THROW(("Failed to get socket: %s", strerror(errno)));
@@ -619,7 +619,7 @@ void CFtpDialog::ListDirectory()
 		} else {
 			FailSockErr(bind(data, (struct sockaddr *)&saData, sizeof(saData)));
 			FailSockErr(listen(data, 5));
-			// [zooey]: calling getsockname() on a socket that has been bound to 
+			// [zooey]: calling getsockname() on a socket that has been bound to
 			// IN_ADDR_ANY (the wildcard-address) will *not* return any IP-address,
 			// as this will only be setup by the system during connect or accept.
 			// 	[refer to W.R. Stevens - Unix Network Programming, Vol 1, p. 92]
@@ -639,7 +639,7 @@ void CFtpDialog::ListDirectory()
 			s_printf(fSocketFD, "port %d,%d,%d,%d,%d,%d\r\n", sap[0], sap[1], 
 						sap[2], sap[3], pap[0], pap[1]);
 		}
-	
+
 		int state = 1;
 		SOCK* dsf = NULL;
 
@@ -677,7 +677,7 @@ void CFtpDialog::ListDirectory()
 					s_printf(fSocketFD, "list\r\n");
 					state = 2;
 					break;
-				
+
 				case 2:
 					if (*fReply == '1')
 					{
@@ -686,14 +686,14 @@ void CFtpDialog::ListDirectory()
 							FailSockErr(ds = accept(data, (struct sockaddr *)&saData, &size));
 							dsf = s_open(ds, "r+");
 						}
-						
+
 						try
 						{
 							CFtpListItem *item;
 							char s[256];
 							bool showAll = IsOn("dotf");
 							int  entryCount = 0;
-							
+
 							while (s_gets(s, 256, dsf))
 							{
 								entryCount++;
@@ -721,13 +721,13 @@ void CFtpDialog::ListDirectory()
 							closesocket(ds);
 							throw;
 						}
-						
+
 						state = 3;
 					}
 					else
 						THROW(("Failed to get listing: %s", fReply));
 					break;
-				
+
 				case 3:
 					if (*fReply != '2')
 						THROW(("Something went wrong fetching the directory listing"));
@@ -735,7 +735,7 @@ void CFtpDialog::ListDirectory()
 					break;
 			}
 		}
-		
+
 		closesocket(data);
 	}
 	catch (HErr& e)
@@ -752,16 +752,16 @@ void CFtpDialog::ChangeDirectory()
 		beep();
 		return;
 	}
-	
+
 	try
 	{
 		s_printf(fSocketFD, "cwd %s\r\n", fPath);
-	
+
 		GetReply();
 
 		if (*fReply != '2')
 			THROW(("Changing directory failed.\n%s", fReply));
-		
+
 		ListDirectory();
 	}
 	catch (HErr& err)
@@ -779,24 +779,24 @@ void CFtpDialog::GetPWD()
 		beep();
 		return;
 	}
-	
+
 	try
 	{
 		s_printf(fSocketFD, "PWD\r\n");
-		
+
 		GetReply();
-		
+
 		if (*fReply != '2')
 			THROW(("Could not get current working directory.\n%s", fReply));
-	
+
 		char *e;
 		int n;
-		
+
 		if (sscanf(fReply, "%*d \"%n%s\"", &n, fPath) == 1)
 		{
 			strcpy(fPath, fReply + n);
 			if ((e = strchr(fPath, '"')) != NULL) *e = 0;
-			
+
 			strcat(fPath, "/");
 		}
 		else

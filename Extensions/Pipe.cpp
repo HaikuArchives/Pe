@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 09/15/97 02:33:13
 */
@@ -66,11 +66,11 @@ const rgb_color
 class CPipeDialog : public HDialog {
 public:
 		enum { sResID = 1 };
-		
+
 		CPipeDialog(BRect frame, const char *name, window_type type, int flags,
 			BWindow *owner, BPositionIO* data);
 
-virtual bool OKClicked();
+virtual bool OkClicked();
 virtual bool CancelClicked();
 };
 
@@ -81,12 +81,12 @@ CPipeDialog::CPipeDialog(BRect frame, const char *name, window_type type, int fl
 	FindView("command")->MakeFocus(true);
 } /* CPipeDialog::CPipeDialog */
 
-bool CPipeDialog::OKClicked()
+bool CPipeDialog::OkClicked()
 {
 	sOK = true;
 	sText = strdup(GetText("command"));
 	return true;
-} /* CPipeDialog::OKClicked */
+} /* CPipeDialog::OkClicked */
 
 bool CPipeDialog::CancelClicked()
 {
@@ -98,20 +98,20 @@ bool CPipeDialog::CancelClicked()
 long perform_edit(MTextAddOn *addon)
 {
 	long result = B_NO_ERROR;
-	
+
 	try
 	{
 		long s, e, l;
 		addon->GetSelection(&s, &e);
-		
+
 		BMemoryIO tmpl(kDLOG1, kDLOG1Size);
 		CPipeDialog *p = DialogCreator<CPipeDialog>::CreateDialog(addon->Window(), tmpl);
 		p->Show();
-		
+
 		wait_for_thread(p->Thread(), &l);
 		if (sOK)
 			result = Pipe(addon);
-		
+
 		if (sText)
 			free(sText);
 	}
@@ -120,7 +120,7 @@ long perform_edit(MTextAddOn *addon)
 		e.DoError();
 		result = B_ERROR;
 	}
-	
+
 	return result;
 } /* perform_edit */
 
@@ -128,25 +128,25 @@ long Pipe(MTextAddOn *addon)
 {
 	char fn[PATH_MAX];
 	long start, end;
-	
+
 	addon->GetSelection(&start, &end);
-	
+
 	tmpnam(fn);
 	FILE *f = fopen(fn, "wb");
 	if (!f) return B_ERROR;
-	
+
 	fwrite(addon->Text() + start, end - start, 1, f);
 	fclose(f);
-	
+
 	int ofd[2], pid, err;
-	
+
 	try
 	{
 		FailOSErr(pipe(ofd));
-		
+
 		pid = fork();
 		if (pid < 0) FailOSErr(pid);
-		
+
 		if (pid == 0)		// child
 		{
 			fflush(stdout);
@@ -158,20 +158,20 @@ long Pipe(MTextAddOn *addon)
 			close(STDERR_FILENO);
 			err = dup(ofd[1]);
 			if (err < 0) throw HErr(err);
-			
+
 			close(ofd[0]);
 			close(ofd[1]);
-			
+
 			char cmd[1024];
 			sprintf(cmd, "cat %s | %s", fn, sText);
-			
+
 			char *args[4];
-			
+
 			args[0] = "/bin/sh";
 			args[1] = "-c";
 			args[2] = cmd;
 			args[3] = NULL;
-			
+
 			if (execvp(args[0], args) < 0)
 				beep();	// what else can we do???
 		}
@@ -185,9 +185,9 @@ long Pipe(MTextAddOn *addon)
 
 			fcntl(ofd[0], F_GETFL, &flags);
 			fcntl(ofd[0], F_SETFL, flags | O_NONBLOCK);
-			
+
 			int r;
-			
+
 			while ((r = read(ofd[0], buf, kBufferSize)) != 0)
 			{
 				if (r > 0)
@@ -199,7 +199,7 @@ long Pipe(MTextAddOn *addon)
 						addon->Select(start, start);
 						end = start;
 					}
-					
+
 					addon->Insert(buf, r);
 					end += r;
 					addon->Select(end, end);
@@ -210,7 +210,7 @@ long Pipe(MTextAddOn *addon)
 					break;
 			}
 		}
-		
+
 		close(ofd[0]);
 //		remove(fn);
 	}
@@ -218,6 +218,6 @@ long Pipe(MTextAddOn *addon)
 	{
 		e.DoError();
 	}
-	
+
 	return 0;
 } /* Pipe */
