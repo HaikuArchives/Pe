@@ -934,24 +934,21 @@ void PApp::MessageReceived(BMessage *msg)
 				fPrefOpener = (thread_id)NULL;
 				if (fPrefsDialog) {
 					BAutolock lock(fPrefsDialog);
+					if (!lock.IsLocked()) {
+						THROW(("Preferences panel failed to lock"));
+						break;
+					}
 
 					int c = 1 << current_workspace();
 
 					if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
 						fPrefsDialog->SetWorkspaces(c);
 
-					if (fPrefsDialog->Lock()) {
-	
-						if (fPrefsDialog->IsHidden()) {
-							fPrefsDialog->Show();
-						}
-	
-						fPrefsDialog->Activate(true);
-	
-						fPrefsDialog->Unlock();
-					} else {
-						THROW(("Preferences panel failed to lock"));
+					if (fPrefsDialog->IsHidden()) {
+						fPrefsDialog->Show();
 					}
+
+					fPrefsDialog->Activate(true);
 				}
 				else
 					THROW(("Preferences panel failed to open"));
