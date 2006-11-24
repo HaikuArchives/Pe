@@ -367,16 +367,16 @@ void CDiffWindow::Work()
 		do
 		{
 			BAutolock lock(docA);
-			docA->TextView()->HashLines(va, gPrefs->GetPrefInt(prf_I_DiffCase, false),
-				gPrefs->GetPrefInt(prf_I_DiffWhite, false));
+			docA->TextView()->HashLines(va, gPrefs->GetPrefInt(prf_I_DiffCaseInsensitive, false),
+				gPrefs->GetPrefInt(prf_I_DiffIgnoreWhiteSpace, false));
 		}
 		while (false);
 		
 		do
 		{
 			BAutolock lock(docB);
-			docB->TextView()->HashLines(vb, gPrefs->GetPrefInt(prf_I_DiffCase, false),
-				gPrefs->GetPrefInt(prf_I_DiffWhite, false));
+			docB->TextView()->HashLines(vb, gPrefs->GetPrefInt(prf_I_DiffCaseInsensitive, false),
+				gPrefs->GetPrefInt(prf_I_DiffIgnoreWhiteSpace, false));
 		}
 		while (false);
 		
@@ -580,22 +580,22 @@ bool CDiffWindow::FilesDiffer(const char *f, const char *d1, const char *d2)
 	if ((doc = dynamic_cast<PDoc*>(CDoc::FindDoc(f1))) != NULL)
 	{
 		BAutolock lock(doc);
-		doc->TextView()->HashLines(v1, gPrefs->GetPrefInt(prf_I_DiffCase, false),
-			gPrefs->GetPrefInt(prf_I_DiffWhite, false));
+		doc->TextView()->HashLines(v1, gPrefs->GetPrefInt(prf_I_DiffCaseInsensitive, false),
+			gPrefs->GetPrefInt(prf_I_DiffIgnoreWhiteSpace, false));
 	}
 	else
-		HashFile(f1, v1, gPrefs->GetPrefInt(prf_I_DiffCase, false),
-				gPrefs->GetPrefInt(prf_I_DiffWhite, false));
+		HashFile(f1, v1, gPrefs->GetPrefInt(prf_I_DiffCaseInsensitive, false),
+				gPrefs->GetPrefInt(prf_I_DiffIgnoreWhiteSpace, false));
 	
 	if ((doc = dynamic_cast<PDoc*>(CDoc::FindDoc(f2))) != NULL)
 	{
 		BAutolock lock(doc);
-		doc->TextView()->HashLines(v2, gPrefs->GetPrefInt(prf_I_DiffCase, false),
-			gPrefs->GetPrefInt(prf_I_DiffWhite, false));
+		doc->TextView()->HashLines(v2, gPrefs->GetPrefInt(prf_I_DiffCaseInsensitive, false),
+			gPrefs->GetPrefInt(prf_I_DiffIgnoreWhiteSpace, false));
 	}
 	else
-		HashFile(f2, v2, gPrefs->GetPrefInt(prf_I_DiffCase, false),
-				gPrefs->GetPrefInt(prf_I_DiffWhite, false));
+		HashFile(f2, v2, gPrefs->GetPrefInt(prf_I_DiffCaseInsensitive, false),
+				gPrefs->GetPrefInt(prf_I_DiffIgnoreWhiteSpace, false));
 
 	if (v1.back() != v2.back())
 	{

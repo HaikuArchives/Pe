@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 09/19/1997
 */
@@ -127,7 +127,7 @@ class WordState {
 				}
 
 				return true;
-			} 
+			}
 			else if (fSkip)
 			{
 				// the character we got here is the first one of our word
@@ -201,18 +201,18 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fAppendNextCut = false;
 	fLastKillPoint = -1;
 	fLastSavedStateCmd = NULL;
-	
+
 	fSoftWrap = gPrefs->GetPrefInt(prf_I_SoftWrap, false);
 	fWrapType = gPrefs->GetPrefInt(prf_I_WrapType, 3);
 	fWrapWidth = gPrefs->GetPrefInt(prf_I_WrapCol, 80);
-	
+
 	fSplitAt = 0;
 	fActivePart = 2;
-	
+
 	fVScrollBar1 = bars[0];
 	fVScrollBar2 = bars[1];
 	fHScrollBar = bars[2];
-	
+
 	fHScrollBar->SetTarget(this);
 	fVScrollBar1->SetTarget(this);
 	fVScrollBar2->SetTarget(this);
@@ -220,14 +220,14 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	gPrefs->InitTextFont(&fFont);
 
 	SetViewColor(gColor[kColorLow]);
-	
+
 	fTabStops = gPrefs->GetPrefInt(prf_I_SpacesPerTab, 4);
 
 	fLineMap = NULL;
 	fLineView = NULL;
 
 	SetDefaultLanguageByExtension(ext);
-	
+
 	fMainPopUp = static_cast<BPopUpMenu*>(HResources::GetMenu(rid_Popu_CtxText, true));
 	FailNil(fMainPopUp);
 	fMainPopUp->SetFont(be_plain_font);
@@ -239,7 +239,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 void PText::ReInit()
 {
 	SetFont(&fFont);
-	
+
 	font_family ff;
 	font_style fs;
 	fFont.GetFamilyAndStyle(&ff, &fs);
@@ -250,23 +250,23 @@ void PText::ReInit()
 
 	fTabWidth = fTabStops * StringWidth(" ", 1);
 	fDefaultCharWidth = StringWidth("m", 1);
-	
+
 	if (Window())
 	{
 		PToolBar *toolBar = Doc()->ToolBar();
 		if (toolBar) toolBar->SetTabWidth(fTabWidth, fTabStops);
 	}
-	
+
 	RecalculateLineBreaks();
 	AdjustScrollBars();
-	
+
 	SetupBitmap();
 } /* PText::ReInit */
 
 PText::~PText()
 {
 	FlushUndo();
-	
+
 	if (fExec)
 		fExec->Cancel();
 
@@ -361,7 +361,7 @@ int PText::Size() const
 void PText::SetDirty(bool dirty)
 {
 	bool wasDirty = Doc()->IsDirty();
-	
+
 	if (wasDirty != dirty)
 		Doc()->SetDirty(dirty);
 } /* PText::SetDirty */
@@ -371,7 +371,7 @@ bool PText::IsDirty()
 	return Doc()->IsDirty();
 } /* PText::IsDirty */
 
-void PText::GetSelectedText(char*& s, bool extend) 
+void PText::GetSelectedText(char*& s, bool extend)
 {
 	if (fAnchor != fCaret)
 	{
@@ -388,7 +388,7 @@ void PText::GetSelectedText(char*& s, bool extend)
 				ChangeSelection(begin, end);
 			}
 		}
-		
+
 		if (fBlockSelect)
 			CopyBlock(s, min(fCaret, fAnchor), max(fCaret, fAnchor));
 		else
@@ -435,7 +435,7 @@ void PText::WindowActivated(bool active)
 		fWindowActive = active;
 		HiliteSelection();
 	}
-	
+
 	if (active)
 		AdjustScrollBars();
 } /* PText::WindowActivated */
@@ -461,7 +461,7 @@ void PText::ApplySettings(const BMessage& msg)
 		if (fFontKind == kIndividualFont) {
 			if (msg.FindFloat("fontsize", &f) == B_OK)
 				fFont.SetSize(f);
-			if (msg.FindString("fontfamily", &s1) == B_OK 
+			if (msg.FindString("fontfamily", &s1) == B_OK
 				&& msg.FindString("fontstyle", &s2) == B_OK)
 				fFont.SetFamilyAndStyle(s1, s2);
 		} else {
@@ -496,7 +496,7 @@ void PText::ApplySettings(const BMessage& msg)
 		Select(anchor, caret, true, block);
 		fWalkOffset = Offset2Position(fCaret).x;
 	}
-	
+
 	if (gRestoreScrollbar)
 	{
 		if (msg.FindFloat("vscroll", &f) == B_OK)
@@ -504,7 +504,7 @@ void PText::ApplySettings(const BMessage& msg)
 		if (msg.FindFloat("hscroll", &f) == B_OK)
 			fHScrollBar->SetValue(f);
 	}
-	
+
 	if (gRestoreCWD && msg.FindString("cwd", &s1) == B_OK)
 	{
 		if (fCWD) free(fCWD);
@@ -554,7 +554,7 @@ void PText::CollectSettings(BMessage& msg)
 
 	if (Language() /*&& !fUsingDefaultLanguage*/)
 		FailOSErr(msg.AddString("language", fLangIntf->Name()));
-	
+
 	if (fCWD) FailOSErr(msg.AddString("cwd", fCWD));
 } /* PText::GetSettings */
 
@@ -598,7 +598,7 @@ void PText::SetSettingsMW(BPositionIO& set)
 			if (fontsize)
 				fFont.SetSize((float)(ntohl(fontsize)));
 		}
-		
+
 		ReInit();
 
 		if (gRestoreSelection)
@@ -692,9 +692,9 @@ void PText::SetMark(int offset)
 {
 	if (fMark >= 0)
 		TouchLine(Offset2Line(fMark));
-	
+
 	fMark = offset;
-	
+
 	if (fMark >= 0)
 		TouchLine(Offset2Line(fMark));
 } /* PText::SetMark */
@@ -707,11 +707,11 @@ void PText::SetSplitter(PSplitter *splitter)
 void PText::ShowTabStops(bool show)
 {
 	PToolBar *toolBar = Doc()->ToolBar();
-	
+
 	if (show != toolBar->ShowsTabs())
 	{
 		toolBar->SetShowsTabs(show);
-	
+
 		if (show)
 		{
 			toolBar->ResizeBy(0, kTabStopHeight);
@@ -724,7 +724,7 @@ void PText::ShowTabStops(bool show)
 			ResizeBy(0, kTabStopHeight);
 			MoveBy(0, -kTabStopHeight);
 		}
-		
+
 		toolBar->SetTabWidth(fTabWidth, fTabStops);
 		toolBar->SetShowsTabs(show);
 		toolBar->Draw(toolBar->Bounds());
@@ -754,24 +754,24 @@ int PText::FindLineBreak(int offset, bool hard)
 		if (fWrapType == 3)
 		{
 			int i, mark, w, sw, wl;
-			
+
 			i = mark = offset;
 			w = sw = 0;
-		
+
 			while (i < fText.Size())
 			{
 				int nb;
-				
+
 				if (fText[i] == ' ')
 					nb = i;
 				else
 					nb = fLangIntf->FindNextWord(*this, i, wl);
-		
+
 				int nw = w;
-	
+
 				if (fText[nb] != ' ' && fText[nb] != '\n')
 					nw += wl + sw;
-				
+
 				if (nw > fWrapWidth)
 				{
 					if (w > 0 || sw > 0)
@@ -784,7 +784,7 @@ int PText::FindLineBreak(int offset, bool hard)
 							w++;
 						}
 						while (w < fWrapWidth);
-						
+
 						return i;
 					}
 				}
@@ -796,10 +796,10 @@ int PText::FindLineBreak(int offset, bool hard)
 				{
 					nw = (((w + sw) / fTabStops) + 1) * fTabStops;
 					w = nw;
-		
+
 					if (w > fWrapWidth)
 						return nb + 1;
-		
+
 					i = mark = nb + 1;
 					sw = 0;
 				}
@@ -815,23 +815,23 @@ int PText::FindLineBreak(int offset, bool hard)
 					sw = 0;
 				}
 			}
-			
+
 			return fText.Size();
 		}
 		else
 		{
 			g_unit_t W = (fWrapType == 1 ? Bounds().Width() : 300) - 4;
-			
+
 			int i, mark, wl;
 			float w, sw, ww;
-			
+
 			i = mark = offset;
 			w = sw = ww = 0;
-		
+
 			while (i < fText.Size())
 			{
 				int nb;
-				
+
 				if (fText[i] == ' ')
 					nb = i;
 				else
@@ -839,12 +839,12 @@ int PText::FindLineBreak(int offset, bool hard)
 					nb = fLangIntf->FindNextWord(*this, i, wl);
 					ww = TextWidth(i, nb - i + 1);
 				}
-		
+
 				float nw = w;
-	
+
 				if (fText[nb] != ' ' && fText[nb] != '\n')
 					nw += ww + sw;
-				
+
 				if (nw > W)
 				{
 					if (w > 0 || sw > 0)
@@ -852,7 +852,7 @@ int PText::FindLineBreak(int offset, bool hard)
 					else
 					{
 						ww = 0;
-						
+
 						do
 						{
 							int l = fText.CharLen(i);
@@ -860,7 +860,7 @@ int PText::FindLineBreak(int offset, bool hard)
 							i += l;
 						}
 						while (ww < W);
-						
+
 						return i;
 					}
 				}
@@ -872,12 +872,12 @@ int PText::FindLineBreak(int offset, bool hard)
 				{
 					int t = (int)floor((w + sw) / fTabWidth) + 1;
 					w = (rint(t * fTabWidth) > rint(w) ? t * fTabWidth : (t + 1) * fTabWidth);
-		
+
 					if (w > W)
 					{
 						return nb + 1;
 					}
-		
+
 					i = mark = nb + 1;
 					sw = 0;
 				}
@@ -893,7 +893,7 @@ int PText::FindLineBreak(int offset, bool hard)
 					sw = 0;
 				}
 			}
-			
+
 			return fText.Size();
 		}
 	}
@@ -906,7 +906,7 @@ int PText::FindLineBreak(int offset, bool hard)
 			if (fText[i] == '\n')
 			 return i + 1;
 		}
-		
+
 		return fText.Size();
 	}
 } /* PText::FindLineBreak */
@@ -914,14 +914,14 @@ int PText::FindLineBreak(int offset, bool hard)
 int PText::RewrapLines(int from, int to, bool hard)
 {
 	int offset, state, lb, fl, dy;
-	
+
 	// first remove invalid linebreaks
 	fl = min(Offset2Line(from), LineCount() - 1);
 
 	VLineInfo::iterator ls, le;
 
 	ls = fLineInfo.begin() + fl;
-	
+
 	while (ls != fLineInfo.begin() && (*ls).nl == false)
 		ls--;
 /*
@@ -930,13 +930,13 @@ int PText::RewrapLines(int from, int to, bool hard)
 */
 
 	le = ls + 1;
-	
+
 	while (le != fLineInfo.end() && (*le).start < to)
 		le++;
-	
+
 	while (le != fLineInfo.end() && (*le).nl == false)
 		le++;
-	
+
 	if (le == fLineInfo.end())
 		to = fText.Size();
 	else
@@ -951,21 +951,21 @@ int PText::RewrapLines(int from, int to, bool hard)
 		dy = 0;
 
 	le = ls + 1;
-	
+
 	// then determine the new ones
 	state = (*ls).state;
 	lb = (*ls).start;
-	
+
 	offset = FindLineBreak(lb, hard);
 	while (offset < to)
 	{
 		le = fLineInfo.insert(le, LineInfo(offset, 0, fText[offset - 1] == '\n')) + 1;
 		dy++;
-		
+
 		lb = offset;
 		offset = FindLineBreak(offset, hard);
 	}
-	
+
 	if (offset > 0 &&
 		offset == fText.Size() &&
 		fText[--offset] == '\n' &&
@@ -975,7 +975,7 @@ int PText::RewrapLines(int from, int to, bool hard)
 		dy++;
 	}
 
-	AdjustScrollBars(); 
+	AdjustScrollBars();
 
 	return dy;
 } /* PText::RewrapLines */
@@ -984,7 +984,7 @@ void PText::RecalculateLineBreaks()
 {
 	fLineInfo.erase(fLineInfo.begin(), fLineInfo.end());
 	fLineInfo.push_back(LineInfo(0, 0));
-	
+
 	RewrapLines(0, fText.Size());
 	RestyleDirtyLines(0);
 } /* PText::RecalculateLineBreaks */
@@ -994,15 +994,15 @@ void PText::RecalculateLineBreaks()
 void PText::Undo()
 {
 	PCmd *cmd;
-	
+
 	if (fDoneCmds.size() == 0)
 		return;
-	
+
 	HideCaret();
-	
+
 	fLastCommand = NULL;
 
-	try 
+	try
 	{
 		cmd = fDoneCmds.top();
 		if (cmd)
@@ -1032,7 +1032,7 @@ void PText::Redo()
 	HideCaret();
 
 	fLastCommand = NULL;
-	
+
 	try
 	{
 		cmd = fUndoneCmds.top();
@@ -1043,7 +1043,7 @@ void PText::Redo()
 			fDoneCmds.push(cmd);
 			ScrollToCaret(true);
 		}
-		
+
 		if (fLastSavedStateCmd == cmd)
 			SetDirty(false);
 	}
@@ -1058,12 +1058,12 @@ void PText::RegisterCommand(PCmd *cmd)
 	try
 	{
 		cmd->Do();
-		
+
 		if (cmd->IsUndoable())
 		{
 			fDoneCmds.push(cmd);
 			fLastCommand = cmd;
-			
+
 			while (fUndoneCmds.size())
 			{
 				delete fUndoneCmds.top();
@@ -1081,7 +1081,7 @@ void PText::ResetUndo()
 {
 	fLastSavedStateCmd = fDoneCmds.size() ? fDoneCmds.top() : NULL;
 } /* PText::ResetUndo */
-	
+
 void PText::FlushUndo()
 {
 	while (fDoneCmds.size())
@@ -1103,32 +1103,32 @@ void PText::FlushUndo()
 void PText::CopyBlock(char*& s, int from, int to)
 {
 	int l1, l2, c1, c2, line;
-	
+
 	l1 = Offset2Line(from);
 	l2 = Offset2Line(to);
 	if (l1 > l2) swap(l1, l2);
 	c1 = Offset2Column(from);
 	c2 = Offset2Column(to);
 	if (c1 > c2) swap(c1, c2);
-	
+
 	string t;
-	
+
 	for (line = l1; line <= l2; line++)
 	{
 		int o1, o2, l;
-		
+
 		o1 = Column2Offset(line, c1);
 		o2 = Column2Offset(line, c2);
 		l = o2 - o1;
-		
+
 		CAlloca txt(o2 - o1 + 2);
 		fText.Copy(txt, o1, l);
 		txt[l] = '\n';
 		txt[l + 1] = 0;
-		
+
 		t += txt;
 	}
-	
+
 	s = (char *)malloc(t.size() + 1);
 	FailNil(s);
 	strcpy(s, t.c_str());
@@ -1137,19 +1137,19 @@ void PText::CopyBlock(char*& s, int from, int to)
 void PText::Insert(const char *bytes, int numBytes, int offset)
 {
 	if (Doc()->IsReadOnly()) THROW(("Document is read-only"));
-	
+
 	ASSERT(numBytes >= 0);
 	ASSERT(offset >= 0);
 	ASSERT(offset <= fText.Size());
 
 	int line = Offset2Line(offset);
-		
+
 	if (fMark >= offset)
 		SetMark(fMark + numBytes);
-	
+
 	fText.Insert(bytes, numBytes, offset);
 	OffsetLineBreaks(numBytes, line + 1);
-	
+
 	fShift = 0;
 	TextChanged(offset, offset + numBytes);
 } /* PText::Insert */
@@ -1166,10 +1166,10 @@ void PText::Delete(int from, int to)
 		SetMark(from);
 	else if (fMark > to)
 		SetMark(fMark + from - to);
-	
+
 	fShift = -DeleteLineBreaks(from, to);
 	fText.Delete(from, to);
-	
+
 	TextChanged(from, from);
 } /* PText::Delete */
 
@@ -1267,7 +1267,7 @@ void PText::CharKeyDown(const char *bytes, int numBytes)
 	PTypingCmd *tc = dynamic_cast<PTypingCmd*>(fLastCommand);
 	if (!tc)
 		RegisterCommand(tc = new PTypingCmd(this));
-	
+
 	int from = min(fCaret, fAnchor);
 	int to = max(fCaret, fAnchor);
 
@@ -1276,7 +1276,7 @@ void PText::CharKeyDown(const char *bytes, int numBytes)
 		fCaret = fAnchor = from;
 		Delete(from, to);
 	}
-	
+
 	Insert(bytes, numBytes, fCaret);
 	fCaret = fAnchor = from + numBytes;
 
@@ -1295,7 +1295,7 @@ void PText::CharKeyDown(const char *bytes, int numBytes)
 			case '\n': if (gAutoIndent) AutoIndent(from); break;
 		}
 	}
-	
+
 	fWalkOffset = Offset2Position(fCaret).x;
 	RedrawDirtyLines();
 	ScrollToCaret(keepContext);
@@ -1304,7 +1304,7 @@ void PText::CharKeyDown(const char *bytes, int numBytes)
 void PText::TextChanged(int from, int to)
 {
 	int dy = 0;
-	
+
 	int line = Offset2Line(to);
 	int lc = LineCount();
 	dy = RewrapLines(from, to);
@@ -1347,7 +1347,7 @@ const g_unit_t
 void PText::TrackSplitter(BPoint where)
 {
 	unsigned long btns;
-	
+
 	BRect b;
 	BPoint p;
 
@@ -1355,7 +1355,7 @@ void PText::TrackSplitter(BPoint where)
 
 	p = where;
 	b = Bounds();
-	
+
 	if (fSplitAt == 0)
 	{
 		BRect src, dst;
@@ -1363,15 +1363,15 @@ void PText::TrackSplitter(BPoint where)
 		src = dst = b;
 		src.bottom -= kSplitterHeight;
 		dst.top += kSplitterHeight;
-		
+
 		CopyBits(src, dst);
-	
+
 		src.bottom = kSplitterHeight;
 		Invalidate(src);
-	
+
 		fSplitAt = kSplitterHeight;
 		Window()->UpdateIfNeeded();
-		
+
 		AdjustScrollBars();
 	}
 
@@ -1386,18 +1386,18 @@ void PText::TrackSplitter(BPoint where)
 				dy = b.bottom - kSplitterHeight - fSplitAt;
 			else if (fSplitAt + dy < kSplitterHeight)
 				dy = kSplitterHeight - fSplitAt;
-			
+
 			if (dy != 0)
 				SplitterMoved(dy);
-			
+
 			where.y += dy;
 		}
-		
+
 		snooze(10000);
 		GetMouse(&p, &btns);
 	}
 	while (btns);
-	
+
 	DoneMovingSplitter();
 } /* PText::SplitterMoved */
 
@@ -1409,9 +1409,9 @@ void PText::SplitterMoved(g_unit_t dy)
 	{
 		fVScrollBar2->ResizeBy(0, -dy);
 		fVScrollBar2->MoveBy(0, dy);
-		
+
 		fSplitter->MoveBy(0, dy);
-		
+
 		fVScrollBar1->ResizeTo(B_V_SCROLL_BAR_WIDTH, ns - kSplitterHeight + 1);
 	}
 	else
@@ -1428,7 +1428,7 @@ void PText::SplitterMoved(g_unit_t dy)
 
 	if (ns > kSplitMinimum)
 		fVScrollBar1->Show();
-	else 
+	else
 	{
 		while (!fVScrollBar1->IsHidden())
 			fVScrollBar1->Hide();
@@ -1463,7 +1463,7 @@ void PText::SplitterMoved(g_unit_t dy)
 	src.top = fSplitAt - kSplitterHeight;
 	dst = src;
 	dst.OffsetBy(0, dy);
-	
+
 	CopyBits(src, dst);
 
 	if (dy > 0)
@@ -1477,24 +1477,24 @@ void PText::SplitterMoved(g_unit_t dy)
 
 	fSplitAt = ns;
 	Window()->UpdateIfNeeded();
-	
+
 	AdjustScrollBars();
-	
+
 	Sync();
 } /* PText::SplitterMoved */
 
 void PText::DoneMovingSplitter()
 {
 	BRect b(Bounds()), f(Frame());
-	
+
 	g_unit_t v = fActivePart == 1 ? fVScrollBar1->Value() : fVScrollBar2->Value();
-	
+
 	if (kSplitMinimum > fSplitAt ||
 		b.Height() - kSplitMinimum < fSplitAt + kSplitterHeight)
 	{
 		fActivePart = 2;
 		fVScrollBar2->SetValue(v);
-		
+
 		fVScrollBar1->ResizeTo(B_V_SCROLL_BAR_WIDTH, 0);
 
 		fSplitter->MoveTo(f.right + 1, f.top);
@@ -1504,7 +1504,7 @@ void PText::DoneMovingSplitter()
 		fVScrollBar2->ResizeTo(B_V_SCROLL_BAR_WIDTH, f.Height() - kSplitterHeight + 1);
 		if (fVScrollBar2->IsHidden())
 			fVScrollBar2->Show();
-		
+
 		fSplitAt = 0;
 
 		TouchLines(floor(v / fLineHeight));
@@ -1515,7 +1515,7 @@ void PText::DoneMovingSplitter()
 void PText::SwitchPart(int newPart)
 {
 	HideCaret();
-	
+
 	fActivePart = newPart;
 	HiliteSelection();
 } /* PText::SwitchPart */
@@ -1523,24 +1523,24 @@ void PText::SwitchPart(int newPart)
 void PText::SplitWindow()
 {
 	BRect b(Bounds()), f(Frame());
-	
+
 	if (b.Height() < kSplitMinimum * 2)
 	{
 		beep();
 		return;
 	}
-	
+
 	float m = b.Height() / 2;
-	
+
 	fSplitAt = floor(m);
-	
+
 	fVScrollBar2->ResizeTo(B_V_SCROLL_BAR_WIDTH, f.Height() - fSplitAt);
 	fVScrollBar2->MoveTo(f.right + 1, f.top + fSplitAt);
 	fSplitter->MoveTo(f.right + 1, f.top + fSplitAt - kSplitterHeight);
 	fVScrollBar1->ResizeTo(B_V_SCROLL_BAR_WIDTH, fSplitAt - kSplitterHeight - 1);
 	if (fVScrollBar1->IsHidden())
 		fVScrollBar1->Show();
-	
+
 	AdjustScrollBars();
 } /* PText::SplitWindow */
 
@@ -1562,10 +1562,10 @@ void PText::FrameMoved(BPoint newPosition)
 	fSplitter->MoveBy(0, -dy);
 	fVScrollBar2->ResizeBy(0, dy);
 	fVScrollBar2->MoveBy(0, -dy);
-	
+
 	if (fSplitAt == 0)
 		fVScrollBar1->ResizeTo(B_V_SCROLL_BAR_WIDTH, 0);
-	
+
 	fSplitter->Invalidate(fSplitter->Bounds());
 //	fStatus->Invalidate(fStatus->Bounds());
 	Window()->UpdateIfNeeded();
@@ -1577,22 +1577,22 @@ void PText::AdjustScrollBars()
 {
 	if (fVScrollBar1 == NULL || fVScrollBar2 == NULL || fHScrollBar == NULL)
 		return;
-	
+
 	g_unit_t h, y;
-	
+
 	int lines = LineCount();
 
 	if (fSplitAt > 0)
 	{
 		h = fBounds.Height() - fSplitAt;
 		y = (lines * fLineHeight - h) / fLineHeight;
-	
+
 		fVScrollBar2->SetRange(0.0, max(y * fLineHeight, (float)0));
 		fVScrollBar2->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
-	
+
 		h = fSplitAt - kSplitterHeight;
 		y = (lines * fLineHeight - h) / fLineHeight;
-	
+
 		fVScrollBar1->SetRange(0.0, max(y * fLineHeight, (float)0));
 		fVScrollBar1->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
 	}
@@ -1600,14 +1600,14 @@ void PText::AdjustScrollBars()
 	{
 		h = fBounds.Height();
 		y = (lines * fLineHeight - h) / fLineHeight;
-	
+
 		fVScrollBar2->SetRange(0.0, max(y * fLineHeight, (float)0));
 		fVScrollBar2->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
-	
+
 		fVScrollBar1->SetRange(0.0, max(y * fLineHeight, (float)0));
 		fVScrollBar1->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
 	}
-	
+
 	if (fSoftWrap)
 	{
 		switch (fWrapType)
@@ -1651,7 +1651,7 @@ void PText::ScrollToSelection(bool keepContext, bool centerVertically)
 {
 	int startOffset = min(fAnchor, fCaret);
 	int endOffset = max(fAnchor, fCaret);
-	VerticallyScrollToSelection(startOffset, endOffset, keepContext, 
+	VerticallyScrollToSelection(startOffset, endOffset, keepContext,
 								centerVertically);
 	HorizontallyScrollToSelection(startOffset, endOffset, keepContext);
 	Window()->UpdateIfNeeded();
@@ -1666,15 +1666,15 @@ bool PText::OffsetIsOutsideOfContextArea(int32 offset)
 	int linesPerPage = (int)floor((fActivePart == 1 ? fSplitAt : h - fSplitAt) / fLineHeight) - 1;
 	int topline = (int)floor(barValue / fLineHeight);
 	int contextLines = gPrefs->GetPrefInt(prf_I_ContextLines, 3);
-	
+
 	// [zooey]:
 	// only keep a context if the cursor is actually outside of the
 	// vertical context area. This avoids unexpected scroll-jumps when the
 	// user clicks into the context area and then navigates via keys.
 	// Of course, this could be done horizontally, too, but it seems to
-	// be less of a problem there (and the code would be a bit more 
+	// be less of a problem there (and the code would be a bit more
 	// complicated), so we only respect vertical contexts here:
-	return line >= topline + contextLines 
+	return line >= topline + contextLines
 			&& line <= topline + 1 + linesPerPage - contextLines;
 }
 
@@ -1691,9 +1691,9 @@ void PText::VerticallyScrollToSelection(int startOffset,
 	int top = Offset2Line(startOffset);
 	int bottom = Offset2Line(endOffset);
 
-	if (centered) 
+	if (centered)
 	{
-		g_unit_t h = (fSplitAt == 0 || fActivePart == 2) 
+		g_unit_t h = (fSplitAt == 0 || fActivePart == 2)
 							? Bounds().bottom - fSplitAt
 							: fSplitAt;
 		int cnt = bottom - top + 1;
@@ -1703,11 +1703,11 @@ void PText::VerticallyScrollToSelection(int startOffset,
 			top -= cnt;
 		}
 		y = top * fLineHeight;
-	} 
+	}
 	else
 	{
-		const int contextLines 
-			= keepContext 
+		const int contextLines
+			= keepContext
 				? gPrefs->GetPrefInt(prf_I_ContextLines, 3)
 				: 0;
 			// number of context lines visible at bottom or top edge
@@ -1715,7 +1715,7 @@ void PText::VerticallyScrollToSelection(int startOffset,
 		g_unit_t endPos = Offset2Position(LineStart(bottom)).y;
 		if (endPos + (1+contextLines)*fLineHeight > b.bottom)
 		{
-			y = MIN(LineCount(), bottom + 1 + contextLines) 
+			y = MIN(LineCount(), bottom + 1 + contextLines)
 					* fLineHeight - b.Height() + 2;
 		}
 		if (startPos < b.top + contextLines*fLineHeight)
@@ -1733,7 +1733,7 @@ void PText::VerticallyScrollToSelection(int startOffset,
 	}
 } /* PText::MakeSelectionVisible */
 
-void PText::HorizontallyScrollToSelection(int startOffset, 
+void PText::HorizontallyScrollToSelection(int startOffset,
 										  int endOffset,
 										  bool keepContext)
 {
@@ -1745,9 +1745,9 @@ void PText::HorizontallyScrollToSelection(int startOffset,
 	BRect b(fBounds);
 	g_unit_t x = -1;
 
-	float contextPixels 
+	float contextPixels
 		= keepContext
-			? gPrefs->GetPrefInt(prf_I_ContextChars, 5) 
+			? gPrefs->GetPrefInt(prf_I_ContextChars, 5)
 				* fDefaultCharWidth
 			: 0.0;
 		// number of context pixels visible at left or right edge
@@ -1756,7 +1756,7 @@ void PText::HorizontallyScrollToSelection(int startOffset,
 		x = endPos + contextPixels - b.Width() + 3;
 	if (startPos - contextPixels < b.left + 3)
 		x = MAX(0, startPos - contextPixels - 3);
-	
+
 	/*
 	 * [zooey]: actually, the way pe implements the split-view is not only
 	 *			cumbersome but also buggy: when one part of the splitview
@@ -1776,14 +1776,14 @@ void PText::FrameResized(float /*w*/, float /*h*/)
 	AdjustScrollBars();
 	fBounds = Bounds();
 	SetupBitmap();
-		
+
 	if (fSoftWrap && fWrapType == 1 &&
 		! Window()->MessageQueue()->FindMessage(B_VIEW_RESIZED, 0))
 	{
 		RecalculateLineBreaks();
 		RedrawDirtyLines();
 	}
-	
+
 	if (fSplitAt > 0)
 		DoneMovingSplitter();
 } /* PText::FrameResized */
@@ -1792,7 +1792,7 @@ void PText::ScrollBarChanged(BScrollBar *bar, g_unit_t dy)
 {
 	BRect src = fBounds & ConvertFromScreen(BScreen().Frame());
 	BRect dst;
-	
+
 	if (bar == fVScrollBar1)
 	{
 		if (dy > 0)
@@ -1802,12 +1802,12 @@ void PText::ScrollBarChanged(BScrollBar *bar, g_unit_t dy)
 		}
 		else
 			src.bottom = fSplitAt + dy - kSplitterHeight - 1;
-		
+
 		dst = src;
 		dst.OffsetBy(0, -dy);
-		
+
 		CopyBits(src, dst);
-		
+
 		if (dy < 0)
 			src.bottom = min(fSplitAt - kSplitterHeight - 1, dst.top);
 		else
@@ -1822,13 +1822,13 @@ void PText::ScrollBarChanged(BScrollBar *bar, g_unit_t dy)
 			src.top = fSplitAt;
 			src.bottom += dy;
 		}
-		
+
 		src.top += 1;
 		dst = src;
 		dst.OffsetBy(0, -dy);
-		
+
 		CopyBits(src, dst);
-		
+
 		if (dy < 0)
 		{
 			src.top = fSplitAt;
@@ -1840,7 +1840,7 @@ void PText::ScrollBarChanged(BScrollBar *bar, g_unit_t dy)
 	}
 
 	BRect dirty(src & fBounds);
-	
+
 	Invalidate(dirty);
 	Window()->UpdateIfNeeded();
 
@@ -1873,15 +1873,15 @@ void PText::MouseDown(BPoint where)
 			TrackSplitter(p);
 			return;
 		}
-		
+
 		long modifiers;
-		
+
 		FailOSErr(Looper()->CurrentMessage()->FindInt32("modifiers", &modifiers));
 		FailOSErr(Looper()->CurrentMessage()->FindInt32("buttons", (long *)&fDragButtons));
-		
+
 		bigtime_t t = system_time(), dbl;
 		get_click_speed(&dbl);
-		
+
 		if ((t - fLastMouseTime <= dbl) &&
 			fabs(where.y - fLastMouseDown.y) < 3 &&
 			fabs(where.x - fLastMouseDown.x) < 3)
@@ -1893,14 +1893,14 @@ void PText::MouseDown(BPoint where)
 			fLastMouseDown = where;
 			fMouseClicks = 1;
 		}
-		
+
 		fLastMouseTime = t;
-		
+
 		int curOffset = Position2Offset(where);
 		int anchor1, anchor2;
 		anchor1 = min(fAnchor, fCaret);
 		anchor2 = max(fAnchor, fCaret);
-		
+
 		if (where.y > fSplitAt && fActivePart == 1)
 			SwitchPart(2);
 		else if (where.y < fSplitAt && fActivePart == 2)
@@ -1920,17 +1920,17 @@ void PText::MouseDown(BPoint where)
 			char *s;
 			GetSelectedText(s);
 			FailNil(s);
-			
+
 			BMessage drag(B_SIMPLE_DATA);
 			FailOSErr(drag.AddData("text/plain", B_MIME_DATA, s, strlen(s)));
 			FailOSErr(drag.AddString("be:clip_name", "Text Snippet"));
-			
+
 			fDragStart = min(fAnchor, fCaret);
 			sfDragSource = this;
 
 			fSavedAnchor = fAnchor;
 			fSavedCaret = fCaret;
-		
+
 			BRegion rgn;
 			Selection2Region(rgn, fActivePart);
 			DragMessage(&drag, rgn.Frame());
@@ -1945,9 +1945,9 @@ void PText::MouseDown(BPoint where)
 		{
 			if (modifiers & B_OPTION_KEY)
 				fBlockSelect = true;
-			
+
 			bool balanced = false;
-			
+
 			switch (fMouseClicks)
 			{
 				case 1:
@@ -1956,10 +1956,10 @@ void PText::MouseDown(BPoint where)
 				case 2:
 				{
 					int subco = 0;
-					
+
 					if (Offset2Position(curOffset).x > where.x)
 						subco = 1;
-					
+
 					switch (fText[curOffset - subco])
 					{
 						case '{':
@@ -1989,7 +1989,7 @@ void PText::MouseDown(BPoint where)
 							}
 							balanced = true;
 							break;
-						
+
 						default:
 							anchor1 = FindWord(curOffset, B_LEFT_ARROW);
 							anchor2 = FindWord(anchor1, B_RIGHT_ARROW);
@@ -2008,16 +2008,16 @@ void PText::MouseDown(BPoint where)
 			}
 
 			ChangeSelection(anchor1, anchor2, fBlockSelect);
-			
+
 			if (balanced)
 				return;
 		}
 
 		fStatus->SetOffset(fCaret);
-		
+
 		g_unit_t v = -1;
 		BPoint cur;
-		
+
 		unsigned long buttons;
 		GetMouse(&cur, &buttons);
 		while (buttons)
@@ -2025,14 +2025,14 @@ void PText::MouseDown(BPoint where)
 			if (where != cur || v != (fActivePart == 1 ? fVScrollBar1->Value() : fVScrollBar2->Value()))
 			{
 				curOffset = Position2Offset(cur, fActivePart);
-				
+
 				if (curOffset < anchor1)
 				{
 					if (fMouseClicks == 2)
 						curOffset = FindWord(curOffset, B_LEFT_ARROW, true);
 					else if (fMouseClicks == 3)
 						curOffset = LineStart(Offset2Line(curOffset));
-					
+
 					ChangeSelection(max(anchor2, curOffset), min(anchor1, curOffset), modifiers & B_OPTION_KEY);
 				}
 				else if (curOffset > anchor2)
@@ -2045,18 +2045,18 @@ void PText::MouseDown(BPoint where)
 						curOffset = line < LineCount() - 1 ?
 							LineStart(line + 1) : fText.Size();
 					}
-					
+
 					ChangeSelection(min(anchor1, curOffset), max(anchor2, curOffset), modifiers & B_OPTION_KEY);
 				}
-				
+
 				v = fActivePart == 1 ? fVScrollBar1->Value() : fVScrollBar2->Value();
 
 				ScrollToCaret(false);
 				fStatus->SetOffset(fCaret);
-				
+
 				where = cur;
 			}
-			
+
 			snooze(20000);
 			GetMouse(&cur, &buttons);
 		}
@@ -2134,15 +2134,15 @@ void PText::TrackDrag(BPoint where)
 	BRect b(Bounds());
 
 	b.InsetBy(0, -10);
-	
+
 	int part = (where.y > fSplitAt) ? 2 : 1;
 	SwitchPart(part);
-	
+
 	if (part == 2)
 		b.top += fSplitAt;
 	else
 		b.bottom = b.top + fSplitAt + 20;
-	
+
 	int offset = Position2Offset(where, part);
 
 	if (offset >= min(fSavedCaret, fSavedAnchor) &&
@@ -2151,7 +2151,7 @@ void PText::TrackDrag(BPoint where)
 		HideCaret();
 		fAnchor = fSavedAnchor;
 		fCaret = fSavedCaret;
-		
+
 		ScrollToOffset(offset, part, false);
 	}
 	else if (offset != fCaret)
@@ -2163,7 +2163,7 @@ void PText::TrackDrag(BPoint where)
 void PText::HandleDrop(BMessage *msg)
 {
 	fWindowActive = Window()->IsActive();
-	
+
 	char *s = NULL;
 	ssize_t sl;
 
@@ -2179,12 +2179,12 @@ void PText::HandleDrop(BMessage *msg)
 	else if (msg->HasRef("refs"))
 	{
 		entry_ref ref;
-		
+
 		FailOSErr(msg->FindRef("refs", &ref));
-		
+
 		BFile file;
 		FailOSErr(file.SetTo(&ref, B_READ_ONLY));
-		
+
 		key_info ki;
 		if (get_key_info(&ki) == B_OK && ki.modifiers & (B_COMMAND_KEY | B_OPTION_KEY))
 			be_app->RefsReceived(msg);
@@ -2192,12 +2192,12 @@ void PText::HandleDrop(BMessage *msg)
 		{
 			char m[B_MIME_TYPE_LENGTH];
 			BNodeInfo(&file).GetType(m);
-			
+
 			if (strncmp(m, "text/", 5) == 0)
 			{
 				sl = file.Seek(0, SEEK_END);
 				file.Seek(0, SEEK_SET);
-				
+
 				s = new char[sl];
 				if (file.Read(s, sl) != sl)
 					THROW(("Read Error"));
@@ -2241,14 +2241,14 @@ void PText::HandleDrop(BMessage *msg)
 			if (sfDragSource == this)
 			{
 				int a, c;
-				
+
 				a = Offset2Line(fSavedAnchor);
 				c = Offset2Line(fSavedCaret);
 				TouchLines(min(a, c), max(a, c));
 			}
 			RegisterCommand(new PDropCmd(this, s, sl, offset, fCaret));
 		}
-		
+
 		if (msg->HasRef("refs"))
 			delete s;
 	}
@@ -2257,22 +2257,22 @@ void PText::HandleDrop(BMessage *msg)
 bool PText::WaitMouseMoved(BPoint where)
 {
 	bigtime_t longEnough = system_time() + 250000;
-	
+
 	do
 	{
 		BPoint p;
 		unsigned long btns;
-		
+
 		GetMouse(&p, &btns);
-		
+
 		if (!btns)
 			return false;
-		
+
 		if (fabs(where.x - p.x) > 2 || fabs(where.y - p.y) > 2)
 			return true;
 	}
 	while (system_time() < longEnough);
-	
+
 	return true;
 } /* PText::WaitMouseMoved */
 
@@ -2281,7 +2281,7 @@ bool PText::WaitMouseMoved(BPoint where)
 class CSeparatorItem : public BMenuItem
 {
 public:
-	CSeparatorItem(const char* label) 
+	CSeparatorItem(const char* label)
 		: BMenuItem(label, NULL)			{ SetEnabled(false); }
 	bool IsUnnamed() const;
 protected:
@@ -2291,7 +2291,7 @@ protected:
 
 bool CSeparatorItem::IsUnnamed() const
 {
-	return Label()==NULL || *Label()=='\0'; 
+	return Label()==NULL || *Label()=='\0';
 }
 
 void CSeparatorItem::Draw()
@@ -2305,7 +2305,7 @@ void CSeparatorItem::DrawContent()
 	float labelWidth = Menu()->StringWidth(Label());
 	const int rightOffset = 15;
 	const int lineDist = labelWidth==0 ? 0 : 2;
-	BPoint labelPT(frame.right - rightOffset - labelWidth - lineDist, 
+	BPoint labelPT(frame.right - rightOffset - labelWidth - lineDist,
 						ContentLocation().y);
 	float width, height;
 	GetContentSize(&width, &height);
@@ -2313,16 +2313,16 @@ void CSeparatorItem::DrawContent()
 	float bottomY = labelPT.y+height/2+1;
 	const rgb_color lightCol = { 245, 245, 245, 255 };
 	Menu()->BeginLineArray(4);
-	Menu()->AddLine(BPoint(0, topY), 
+	Menu()->AddLine(BPoint(0, topY),
 						 BPoint(labelPT.x-lineDist, topY),
 						 gColor[kColorComment1]);
-	Menu()->AddLine(BPoint(labelPT.x+labelWidth+2*lineDist, topY), 
+	Menu()->AddLine(BPoint(labelPT.x+labelWidth+2*lineDist, topY),
 						 BPoint(frame.right, topY),
 						 gColor[kColorComment1]);
-	Menu()->AddLine(BPoint(0, bottomY), 
+	Menu()->AddLine(BPoint(0, bottomY),
 						 BPoint(labelPT.x-lineDist, bottomY),
 						 lightCol);
-	Menu()->AddLine(BPoint(labelPT.x+labelWidth+2*lineDist, bottomY), 
+	Menu()->AddLine(BPoint(labelPT.x+labelWidth+2*lineDist, bottomY),
 						 BPoint(frame.right, bottomY),
 						 lightCol);
 	Menu()->EndLineArray();
@@ -2358,7 +2358,7 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 		BMessage *msg = new BMessage(msg_JumpToProcedure);
 		msg->AddInt32("offset", offset);
 		msg->AddString("function", match);
-	
+
 		BString indName(name);
 		if (nestLevel)
 		{
@@ -2371,7 +2371,7 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 		else
 			functions.AddItem(new BMenuItem(indName.String(), msg));
 	}
-	
+
 	void AddInclude(const char *name, const char *open, bool italic)
 	{
 		if (which != kHeadersOnly)
@@ -2384,7 +2384,7 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 		else
 			includes.AddItem(new BMenuItem(name, msg));
 	}
-	
+
 	void AddSeparator(const char* name)
 	{
 		if (which != kFunctionsOnly)
@@ -2403,7 +2403,7 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 
 	static int CompareFunc(const void *a, const void* b)
 	{
-		return strcasecmp((*(const BMenuItem**)a)->Label(), 
+		return strcasecmp((*(const BMenuItem**)a)->Label(),
 								(*(const BMenuItem**)b)->Label());
 	}
 
@@ -2415,9 +2415,9 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 void PText::ShowFunctionMenu(BPoint where, int which)
 {
 	key_info ki;
-	
+
 	FailOSErr(get_key_info(&ki));
-	
+
 	bool optionDown = (ki.modifiers & (B_OPTION_KEY | B_SHIFT_KEY | B_COMMAND_KEY)) != 0;
 	bool sorted = (optionDown != gPrefs->GetPrefInt(prf_I_SortPopup));
 
@@ -2427,13 +2427,13 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 	BList& functions = handler.functions;
 
 	ScanForFunctions(handler);
-	
+
 	if (sorted)
 	{
 		includes.SortItems(MenuFunctionScanHandler::CompareFunc);
 		functions.SortItems(MenuFunctionScanHandler::CompareFunc);
 	}
-	
+
 #if (B_BEOS_VERSION <= B_BEOS_VERSION_4)
 	// BeOS < R4.5 has no AsyncAutoDestruct, so we simulate that (kind of):
 	static BPopUpMenu * popup = NULL;
@@ -2445,7 +2445,7 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 	popup->SetAsyncAutoDestruct(true);
 #endif
 	popup->SetFont(be_plain_font);
-	
+
 	if (includes.IsEmpty() && functions.IsEmpty())
 	{
 		popup->AddItem(new BMenuItem("Nothing Found", NULL));
@@ -2454,7 +2454,7 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 	{
 		for (int32 i=0; i<includes.CountItems(); ++i)
 			popup->AddItem((BMenuItem *)includes.ItemAt(i));
-		
+
 		if (!includes.IsEmpty() && !functions.IsEmpty()) {
 			// add unnamed separator only if functions do not start with
 			// another separator:
@@ -2463,7 +2463,7 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 			if (!sepItem)
 				popup->AddSeparatorItem();
 		}
-		
+
 		for (int32 i=0; i<functions.CountItems(); ++i)
 			popup->AddItem((BMenuItem *)functions.ItemAt(i));
 	}
@@ -2472,7 +2472,7 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 	popup->SetTargetForItems(this);
 	popup->Go(where, true, true, r, true);
 } /* PText::ShowFunctionMenu */
- 
+
 
 void PText::NavigateOverFunctions(char direction)
 {
@@ -2483,13 +2483,13 @@ void PText::NavigateOverFunctions(char direction)
 		{
 			navMap[offset] = match;
 		}
-		
+
 		NavMap navMap;
 	};
-	
+
 	SimpleFunctionScanHandler handler;
 	ScanForFunctions(handler);
-	
+
 	NavMap::iterator pos = handler.navMap.end();
 	if (direction == B_UP_ARROW)
 	{
@@ -2509,15 +2509,15 @@ void PText::NavigateOverFunctions(char direction)
 		ChangeSelection(a, c);
 		ScrollToSelection(true, true);
 	}
-}	
+}
 
 void PText::ShowContextualMenu(BPoint where)
 {
 	BRect r;
-	
+
 	r.Set(where.x - 4, where.y - 4, where.x + 4, where.y + 4);
 	ConvertToScreen(&r);
-	
+
 	if (fDragButtons & B_SECONDARY_MOUSE_BUTTON)
 	{
 		fMainPopUp->FindItem(msg_ToggleSyntaxColoring)->SetMarked(fSyntaxColoring);
@@ -2552,11 +2552,11 @@ void PText::ShowContextualMenu(BPoint where)
 		BMessage *msg = new BMessage(msg_ToggleFont);
 		msg->AddInt32("fontkind", fontKind);
 		fontItem->SetMessage(msg);
-	
+
 		be_clipboard->Lock();
 		fMainPopUp->FindItem(B_PASTE)->SetEnabled(be_clipboard->Data()->HasData("text/plain", B_MIME_DATA));
 		be_clipboard->Unlock();
-		
+
 		fMainPopUp->Go(ConvertToScreen(where), true, true, r, true);
 	}
 	else
@@ -2574,7 +2574,7 @@ void PText::OffsetLineBreaks(int bytes, int line)
 int PText::DeleteLineBreaks(int from, int to)
 {
 	ASSERT (to > from);
-	
+
 	int lFrom = Offset2Line(from);
 	int lTo = Offset2Line(to);
 
@@ -2585,27 +2585,27 @@ int PText::DeleteLineBreaks(int from, int to)
 	else
 	{
 		VLineInfo::iterator ilf, ilt;
-		
+
 		if (lFrom + 1 >= LineCount())
 			return 0;
-		
+
 		ilf = fLineInfo.begin() + lFrom + 1;
 		if (lTo + 1 > LineCount())
 			ilt = fLineInfo.end();
 		else
 			ilt = fLineInfo.begin() + lTo + 1;
-		
+
 		fLineInfo.erase(ilf, ilt);
 		OffsetLineBreaks(from - to, lFrom + 1);
 	}
-	
+
 	return lTo - lFrom;
 } /* PText::DeleteLineBreaks */
 
 void PText::InsertLinebreaks()
 {
 	int a, c;
-	
+
 	if (fAnchor == fCaret)
 	{
 		a = 0;
@@ -2616,18 +2616,18 @@ void PText::InsertLinebreaks()
 		a = min(fAnchor, fCaret);
 		c = max(fAnchor, fCaret);
 	}
-	
+
 	int i = a;
-	
+
 	while (true)
 	{
 		int line = Offset2Line(i) + 1;
-		
+
 		if (line == LineCount() || LineStart(line) > c)
 			break;
 
 		i = LineStart(line);
-		
+
 		if (! fLineInfo[line].nl)
 		{
 			if (fText[i - 1] == ' ')
@@ -2641,21 +2641,21 @@ void PText::InsertLinebreaks()
 			}
 		}
 	}
-	
+
 	RecalculateLineBreaks();
-	
+
 	if (fAnchor > fCaret)
 		fAnchor = c;
 	else if (fAnchor < fCaret)
 		fCaret = c;
-	
+
 	SetDirty(true);
 } /* PText::InsertLinebreak */
 
 void PText::RemoveLinebreaks()
 {
 	int a, c;
-	
+
 	if (fAnchor == fCaret)
 	{
 		a = 0;
@@ -2666,7 +2666,7 @@ void PText::RemoveLinebreaks()
 		a = min(fAnchor, fCaret);
 		c = max(fAnchor, fCaret);
 	}
-	
+
 	for (int i = a; i < c; i++)
 		if (fText[i] == '\n')
 		{
@@ -2675,7 +2675,7 @@ void PText::RemoveLinebreaks()
 				i++;
 				continue;
 			}
-			
+
 			int d = i + 1;
 			while (d < fText.Size() - 1 && (fText[d] == ' ' || fText[d] == '\t'))
 				d++;
@@ -2684,7 +2684,7 @@ void PText::RemoveLinebreaks()
 			Insert(" ", 1, i);
 			c -= (d - i - 1);
 		}
-	
+
 	if (fAnchor > fCaret)
 		fAnchor = c;
 	else if (fAnchor < fCaret)
@@ -2696,10 +2696,10 @@ void PText::RemoveLinebreaks()
 int PText::Offset2Line(int offset)
 {
 	int l = 0, r = LineCount() - 1, i;
-	
+
 	if (offset > fText.Size())
 		return r;
-	
+
 	while (l <= r)
 	{
 		i = (l + r) / 2;
@@ -2712,20 +2712,20 @@ int PText::Offset2Line(int offset)
 		else
 			l = i + 1;
 	}
-	
+
 	return max(0, r);
 } /* PText::Offset2Line */
 
 BPoint PText::Offset2Position(int offset, int part)
 {
 	int line = Offset2Line(offset);
-	
+
 	if (part < 0) part = fActivePart;
-	
+
 	float x = 0;
 	int o = offset - LineStart(line);
 	int s = LineStart(line);
-	
+
 	while (o > 0)
 	{
 		int cl;
@@ -2751,11 +2751,11 @@ BPoint PText::Offset2Position(int offset, int part)
 			else
 				x += TextWidth(s, cl);
 		}
-		
+
 		s += cl;
 		o -= cl;
 	}
-	
+
 	BPoint p;
 	p.x = x + 2;
 	if (part == 1)
@@ -2770,10 +2770,10 @@ int PText::LinePosition2Offset(int line, g_unit_t position)
 	position -= 3;
 
 	if (position < 0) return 0;
-	
+
 	int l = LineStart(line);
 	int m = (line < LineCount() - 1) ? LineStart(line + 1) - 1 : fText.Size();
-	
+
 	float x = 0, lx = 0;
 	int o = 0;
 	int s = l, cl = 0;
@@ -2806,11 +2806,11 @@ int PText::LinePosition2Offset(int line, g_unit_t position)
 
 			x += lx;
 		}
-		
+
 		s += cl;
 		o += cl;
 	}
-	
+
 	if (x > position)
 	{
 		if (gBlockCursor)
@@ -2829,7 +2829,7 @@ int PText::LinePosition2Offset(int line, g_unit_t position)
 int PText::Position2Offset(BPoint where, int part)
 {
 	int line;
-	
+
 	if (part == -1)
 	{
 		if (where.y >= fSplitAt)
@@ -2837,12 +2837,12 @@ int PText::Position2Offset(BPoint where, int part)
 		else
 			part = 1;
 	}
-	
+
 	if (part == 2)
 		line = max(0, (int)floor((where.y - fSplitAt + fVScrollBar2->Value()) / fLineHeight));
 	else
 		line = max(0, (int)floor((where.y + fVScrollBar1->Value()) / fLineHeight));
-	
+
 	if (line > LineCount() - 1)
 		line = LineCount() - 1;
 
@@ -2867,7 +2867,7 @@ int PText::Offset2Column(int offset)
 			i += fText.CharLen(i);
 		}
 	}
-	
+
 	return col;
 } /* PText::Offset2Column */
 
@@ -2875,12 +2875,12 @@ int PText::Column2Offset(int lineNr, int column)
 {
 	int max, c = 0, result;
 	result = lineNr < LineCount() ? LineStart(lineNr) : fText.Size();
-	
+
 	if (lineNr < LineCount() - 1)
 		max = LineStart(lineNr + 1) - 1;
 	else
 		max = fText.Size();
-	
+
 	while (result < max && c < column)
 	{
 		if (fText[result] == '\t')
@@ -2894,7 +2894,7 @@ int PText::Column2Offset(int lineNr, int column)
 			c++;
 		}
 	}
-	
+
 	return result;
 } // PText::Column2Offset
 
@@ -2903,13 +2903,13 @@ int PText::RealLine2Line(int lineNr)
 	if (fSoftWrap)
 	{
 		int i = 0;
-		
+
 		while (++i < lineNr && i < LineCount())
 		{
 			while (! fLineInfo[i].nl && i < LineCount() - 1)
 				i++, lineNr++;
 		}
-		
+
 		while (lineNr < LineCount() && ! fLineInfo[lineNr].nl)
 			lineNr++;
 	}
@@ -2921,7 +2921,7 @@ g_unit_t PText::TextWidth(int offset, int len) const
 {
 	if (offset + len > fText.Size())
 		len = fText.Size() - offset;
-	
+
 	float w = 0;
 
 	if (len > 0)
@@ -2940,9 +2940,9 @@ void PText::Selection2Region(BRegion& rgn, int part)
 {
 	rgn.MakeEmpty();
 	BRect clip(Bounds());
-	
+
 	if (part < 0) part = fActivePart;
-	
+
 	if (part == 1)
 		clip.bottom = fSplitAt - kSplitterHeight - 1;
 	else
@@ -2954,12 +2954,12 @@ void PText::Selection2Region(BRegion& rgn, int part)
 	int first, last, firstLine, lastLine;
 	first = min(fAnchor, fCaret);
 	last = max(fAnchor, fCaret);
-	
+
 	firstLine = Offset2Line(first);
 	lastLine = Offset2Line(last);
-	
+
 	BPoint p1, p2;
-	
+
 	p1 = Offset2Position(first, part);
 	p1.x = max(3, (int)Round(p1.x));
 	p1.y = Round(p1.y);
@@ -2982,13 +2982,13 @@ void PText::Selection2Region(BRegion& rgn, int part)
 	else
 	{
 		BRect r, b(Bounds());
-		
+
 		int lines = Offset2Line(last) - Offset2Line(first) - 1;
-		
+
 		r.Set(p1.x, p1.y, b.right, p1.y + fLineHeight);
 		if (clip.Intersects(r))
 			rgn.Include(r & clip);
-		
+
 		r.left = 3;
 		r.OffsetBy(0, fLineHeight);
 		while (lines--)
@@ -2997,7 +2997,7 @@ void PText::Selection2Region(BRegion& rgn, int part)
 				rgn.Include(r & clip);
 			r.OffsetBy(0, fLineHeight);
 		}
-		
+
 		r.right = p2.x;
 		if (clip.Intersects(r))
 			rgn.Include(r & clip);
@@ -3008,7 +3008,7 @@ void PText::TouchLine(int lineNr)
 {
 	ASSERT(lineNr >= 0);
 	ASSERT(lineNr < LineCount());
-	
+
 	if (lineNr >= 0 && lineNr < LineCount())
 		fLineInfo[lineNr].dirty = true;
 } /* PText::TouchLine */
@@ -3017,10 +3017,10 @@ void PText::TouchLines(int fromLine, int toLine)
 {
 	if (toLine == -1 || toLine >= LineCount())
 		toLine = LineCount() - 1;
-	
+
 	ASSERT(fromLine >= 0);
 	if (fromLine < 0) fromLine = 0;
-	
+
 	for (int i = fromLine; i <= toLine; i++)
 		fLineInfo[i].dirty = true;
 } /* PText::TouchLines */
@@ -3032,15 +3032,15 @@ void PText::RestyleDirtyLines(int from)
 		if (fLineInfo[i].dirty)
 		{
 			int state = (i > 0 ? fLineInfo[i].state : 0);
-			
+
 			while (fLineInfo[i].dirty && ++i < LineCount())
 			{
 				int len = fLineInfo[i].start - fLineInfo[i - 1].start;
-				
+
 				CAlloca txt(len + 1);
 				fText.Copy(txt, fLineInfo[i - 1].start, len);
 				txt[len] = 0;
-				
+
 				fLangIntf->ColorLine(txt, len, state, NULL, NULL);
 
 				if (state != fLineInfo[i].state)
@@ -3058,10 +3058,10 @@ void PText::SelectParagraph()
 	const char *txt = Text();
 	size_t size = Size();
 	int i, j;
-	
+
 	i = min(fAnchor, fCaret);
 	j = max(fAnchor, fCaret);
-	
+
 	if (fSoftWrap)
 	{
 		while (i > 0)
@@ -3070,7 +3070,7 @@ void PText::SelectParagraph()
 				break;
 			i--;
 		}
-		
+
 		while (j < size - 1)
 		{
 			if (txt[j] == '\n')
@@ -3086,7 +3086,7 @@ void PText::SelectParagraph()
 				break;
 			i--;
 		}
-		
+
 		while (j < size - 1)
 		{
 			if (txt[j] == '\n' && (j > size - 2 || txt[j + 1] == '\n'))
@@ -3094,23 +3094,23 @@ void PText::SelectParagraph()
 			j++;
 		}
 	}
-		
+
 	ChangeSelection(i, j);
 } /* PText::SelectParagraph */
 
 void PText::BlockOffsetsForLine(int lineNr, int& startOffset, int& endOffset)
 {
 	int s, e, c, ls;
-	
+
 	s = Offset2Column(fAnchor);
 	e = Offset2Column(fCaret);
-	
+
 	if (e < s) swap(e, s);
-	
+
 	c = 0;
 	ls = LineStart(lineNr);
 	startOffset = ls;
-	
+
 	while (c < s)
 	{
 		if (fText[startOffset] == '\t')
@@ -3124,9 +3124,9 @@ void PText::BlockOffsetsForLine(int lineNr, int& startOffset, int& endOffset)
 			c++;
 		}
 	}
-	
+
 	endOffset = startOffset;
-	
+
 	while (c < e)
 	{
 		if (fText[endOffset] == '\t')
@@ -3179,7 +3179,7 @@ int PText::FindWord(int i, int key, bool mouseSelect, bool subWord)
 			i -= len;
 		}
 	}
-	
+
 	return i;
 } /* PText::FindWord */
 
@@ -3188,7 +3188,7 @@ int PText::FindTheOther(int offset, int ch)
 	int start, end;
 
 	start = end = offset;
-	
+
 	if (fLangIntf->Balance(*this, start, end))
 	{
 		if (fText[start - 1] == ch)
@@ -3203,7 +3203,7 @@ int PText::FindTheOther(int offset, int ch)
 void PText::Kiss(int ch)
 {
 	int pp = FindTheOther(fCaret - 1, ch);
-	
+
 	if (pp == -1)
 		beep();
 	else
@@ -3245,7 +3245,7 @@ void PText::AutoIndent(int offset)
 		Insert(buf, i, fCaret);
 		fAnchor = fCaret += i;
 		TouchLine(line + 1);
-		
+
 		tc->fInsertedLen += i;
 	}
 } /* PText::AutoIndent */
@@ -3254,15 +3254,15 @@ void PText::SmartBrace()
 {
 	// auto-indent the brace to match its counterpart
 	int open, close;
-	
+
 	close = fCaret - 1;
 	open = FindTheOther(close, '}');
-	
+
 	if (open < 0)
 		return;
 
 	int openLine, closeLine;
-	
+
 	openLine = Offset2Line(open);
 	closeLine = Offset2Line(close);
 
@@ -3354,7 +3354,7 @@ void PText::HashLines(vector<int>& hv, bool ignoreCase, bool ignoreWhite)
 			if (! (ignoreWhite && isspace(c)))
 				h = Hash(h, (unsigned int)(unsigned char)(ignoreCase && isupper(c) ? tolower(c) : c));
 		}
-		
+
 		hv.push_back(h);
 		h = 0;
 	}
@@ -3374,20 +3374,20 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 		FailOSErr(Looper()->CurrentMessage()->FindInt32("modifiers", &modifiers));
 		FailOSErr(Looper()->CurrentMessage()->FindInt32("key", &key));
 		FailOSErr(Looper()->CurrentMessage()->FindInt32("raw_char", &ch));
-		
+
 		if (fIncSearch)
 		{
 			IncSearchKey(bytes, numBytes);
 			return;
 		}
-		
+
 		bool keepContext = OffsetIsOutsideOfContextArea(fCaret);
 
 		switch (bytes[0])
 		{
 			case B_FUNCTION_KEY:
 				if (Doc()->IsReadOnly()) THROW(("Document is read-only"));
-				
+
 				key |= 0x0100;
 
 				if (gGlossary->IsGlossaryShortcut(key, modifiers))
@@ -3396,21 +3396,21 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 					ScrollToCaret(keepContext);
 				}
 				break;
-			
+
 			case B_BACKSPACE:
 				BackspaceKeyDown();
 				ScrollToCaret(keepContext);
 				break;
-			
+
 			case B_DELETE:
 				DeleteKeyDown();
 				ScrollToCaret(keepContext);
 				break;
-			
+
 			case B_ESCAPE:
 			case B_INSERT:
 				break;
-			
+
 			default:
 			{
 				if (Doc()->IsReadOnly()) THROW(("Document is read-only"));
@@ -3431,15 +3431,15 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 				{
 					CharKeyDown(bytes, numBytes);
 				}
-				
+
 				ScrollToCaret(keepContext);
 				break;
 			}
 		}
-		
+
 		if (fCaret == fAnchor)
 			ShowCaret();
-		
+
 		fStatus->SetOffset(fCaret);
 	}
 	catch (HErr& e)
@@ -3468,9 +3468,9 @@ bool PText::DoKeyCommand(BMessage *msg)
 	int linesPerPage = (int)floor((fActivePart == 1 ? fSplitAt : h - fSplitAt) / fLineHeight) - 1;
 	int topline = (int)floor(barValue / fLineHeight);
 	int lastMark = fMark;
-	
+
 	int contextLines = gPrefs->GetPrefInt(prf_I_ContextLines, 3);
-	
+
 	bool scroll = true, handled = true, extend = fCaret != fAnchor, catchOffset = true;
 	bool clearLastCommand = true;
 
@@ -3506,14 +3506,14 @@ bool PText::DoKeyCommand(BMessage *msg)
 		case kmsg_ExtendSelectionToBeginningOfLine:
 		{
 			int ls = LineStart(line);
-			
+
 			if (gPrefs->GetPrefInt(prf_I_AltHome, 1))
 			{
 				int w = ls;
 
 				while (fText[w] == ' ' || fText[w] == '\t')
 					w++;
-				
+
 				if (fCaret > w || fCaret == ls)
 					newCaret = w;
 				else
@@ -3521,7 +3521,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 			}
 			else
 				newCaret = ls;
-				
+
 			if (what == kmsg_MoveToBeginningOfLine)
 				newAnchor = newCaret;
 			else
@@ -3650,16 +3650,16 @@ bool PText::DoKeyCommand(BMessage *msg)
 			break;
 		case kmsg_ExtendSelectionToPreviousLine:
 			extend = true;
-			if (line > 0) 
+			if (line > 0)
 			{
-				if (fAnchor != fCaret) 
+				if (fAnchor != fCaret)
 					// extend selection
 					newCaret = LineStart(line - 1)
 								+ LinePosition2Offset(line - 1, fWalkOffset);
-				else 
+				else
 					// start selection
 					newCaret = Column2Offset(line - 1, Offset2Column(fCaret));
-			} 
+			}
 			else
 				newCaret = 0;
 
@@ -3668,16 +3668,16 @@ bool PText::DoKeyCommand(BMessage *msg)
 			break;
 		case kmsg_ExtendSelectionToNextLine:
 			extend = true;
-			if (line < LineCount() - 1) 
+			if (line < LineCount() - 1)
 			{
-				if (fAnchor != fCaret) 
+				if (fAnchor != fCaret)
 					// extend selection
 					newCaret = LineStart(line + 1)
 								+ LinePosition2Offset(line + 1, fWalkOffset);
-				else 
+				else
 					// start selection
 					newCaret = Column2Offset(line + 1, Offset2Column(fCaret));
-			} 
+			}
 			else
 				newCaret = fText.Size();
 			if (fAnchor != fCaret)
@@ -3687,7 +3687,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 			extend = true;
 			if (line < LineCount() - 1)
 				newCaret = LineStart(line + 1) - fText.PrevCharLen(LineStart(line + 1));
-			else	
+			else
 				newCaret = fText.Size();
 			break;
 		case kmsg_ExtendSelectionToPreviousPage:
@@ -3863,7 +3863,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 		case kmsg_AppendNextCut:
 			fAppendNextCut = true;
 			break;
-			
+
 		default:
 			handled = false;
 			scroll = false;
@@ -3894,7 +3894,7 @@ bool PText::DoKeyCommand(BMessage *msg)
 
 	if (scroll)
 		ScrollToCaret(keepContext);
-	
+
 	if (lastMark != fMark)
 		RedrawDirtyLines();
 
@@ -3907,12 +3907,12 @@ bool PText::DoKeyCommand(BMessage *msg)
 void PText::GlossaryKey(int ch, int modifiers)
 {
 	fLastCommand = NULL;
-	
+
 	char *s, *g, lws[256];
 	GetSelectedText(s);
-	
+
 	int i, j = 0, line, offset;
-	
+
 	offset = min(fAnchor, fCaret);
 	line = Offset2Line(offset);
 	i = LineStart(line);
@@ -3922,29 +3922,29 @@ void PText::GlossaryKey(int ch, int modifiers)
 		lws[j++] = fText[i++];
 	}
 	lws[j] = 0;
-	
+
 	gGlossary->GetGlossary(ch, modifiers, s, Window()->Title(), lws, g, i);
 	i += min(fAnchor, fCaret);
-	
+
 	if (g)
 	{
 		TypeString(g);
 		free(g);
 		SetCaret(i);
 	}
-	
+
 	if (s) free(s);
 } /* PText::GlossaryKey */
 
 void PText::GlossaryButton(const char *glossy)
 {
 	fLastCommand = NULL;
-	
+
 	char *s, *g, lws[256];
 	GetSelectedText(s);
-	
+
 	int i, j = 0, line, offset;
-	
+
 	offset = min(fAnchor, fCaret);
 	line = Offset2Line(offset);
 	i = LineStart(line);
@@ -3954,17 +3954,17 @@ void PText::GlossaryButton(const char *glossy)
 		lws[j++] = fText[i++];
 	}
 	lws[j] = 0;
-	
+
 	gGlossary->ReplaceGlossary(glossy, s, Window()->Title(), lws, g, i);
 	i += min(fAnchor, fCaret);
-	
+
 	if (g)
 	{
 		TypeString(g);
 		free(g);
 		SetCaret(i);
 	}
-	
+
 	if (s) free(s);
 } /* PText::GlossaryButton */
 
@@ -3974,20 +3974,20 @@ void PText::Find(unsigned long msgWhat, void *args)
 {
 	const char *what, *with;
 	bool wrap, ignoreCase, backward, word, regx;
-	
+
 	if (args)
 	{
 		BMessage *msg = (BMessage *)args;
-		
+
 		msg->FindString("what", &what);
 		msg->FindString("with", &with);
-		
+
 		msg->FindBool("wrap", &wrap);
 		msg->FindBool("case", &ignoreCase);
 		msg->FindBool("back", &backward);
 		msg->FindBool("word", &word);
 		msg->FindBool("regx", &regx);
-	
+
 		PDoc *w = (PDoc *)Window();
 		w->Activate(true);
 	}
@@ -4005,14 +4005,14 @@ void PText::Find(unsigned long msgWhat, void *args)
 	if (*what != 0)
 	{
 		int offset;
-		
+
 		switch (msgWhat)
 		{
 			case msg_Find:
 				offset = backward ? min(fCaret, fAnchor) : max(fCaret, fAnchor);
 				FindNext(what, offset, ignoreCase, wrap, backward, word, regx, true);
 				break;
-	
+
 			case msg_FindAgain:
 				offset = backward ? min(fCaret, fAnchor) : max(fCaret, fAnchor);
 				if (gFindDialog->IsInMultiFileState())
@@ -4023,12 +4023,12 @@ void PText::Find(unsigned long msgWhat, void *args)
 				else
 					FindNext(what, offset, ignoreCase, wrap, backward, word, regx, true);
 				break;
-	
+
 			case msg_FindAgainBackward:
 				offset = backward ? max(fCaret, fAnchor) : min(fCaret, fAnchor);
 				FindNext(what, offset, ignoreCase, wrap, !backward, word, regx, true);
 				break;
-				
+
 			case msg_Replace:
 				if (CanReplace(what, ignoreCase, regx))
 					RegisterCommand(new PReplaceCmd(this, min(fCaret, fAnchor), abs(fCaret - fAnchor),
@@ -4036,19 +4036,19 @@ void PText::Find(unsigned long msgWhat, void *args)
 				else
 					Window()->PostMessage(msg_FindCmd);
 				break;
-			
+
 			case msg_ReplaceAndFind:
 				if (CanReplace(what, ignoreCase, regx))
 					RegisterCommand(new PReplaceCmd(this, min(fCaret, fAnchor), abs(fCaret - fAnchor),
 						true, gFindDialog->Backward()));
 				break;
-			
+
 			case msg_ReplaceAndFindBackward:
 				if (CanReplace(what, ignoreCase, regx))
 					RegisterCommand(new PReplaceCmd(this, min(fCaret, fAnchor), abs(fCaret - fAnchor),
 						true, !gFindDialog->Backward()));
 				break;
-			
+
 			case msg_ReplaceAll:
 				RegisterCommand(new PReplaceAllCmd(this));
 				break;
@@ -4059,20 +4059,20 @@ void PText::Find(unsigned long msgWhat, void *args)
 bool PText::CanReplace(const char *what, bool ignoreCase, bool regx)
 {
 	bool result = false;
-	
+
 	if (!what || !*what)
 		return result;
-	
+
 	char *t;
 	GetSelectedText(t, false);
 	if (!t)
 		return result;
-	
+
 	if (regx)
 	{
 		int a = min(fCaret, fAnchor);
 		int options = (a == 0 || fText[a - 1] == '\n') ? 0 : krx_NotBOL;
-		
+
 		CRegex rx;
 		if (rx.SetTo(what, ignoreCase) == B_OK)
 		{
@@ -4085,7 +4085,7 @@ bool PText::CanReplace(const char *what, bool ignoreCase, bool regx)
 		result = strcasecmp(what, t) == 0;
 	else
 		result = strcmp(what, t) == 0;
-	
+
 	free(t);
 
 	return result;
@@ -4096,15 +4096,15 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 {
 	int skip[256], wl = strlen((char *)what);
 	bool wrapped = false;
-	
+
 	ASSERT(what);
-	
+
 	if (fText.Size() == 0)
 	{
 		beep();
 		return false;
 	}
-	
+
 	CRegex* rx = NULL;
 	if (regx)
 	{
@@ -4119,7 +4119,7 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 		else
 			initskip(what, skip, ignoreCase);
 	}
-	
+
 	while (true)
 	{
 		if (regx)
@@ -4128,18 +4128,18 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 			int options = (offset == 0 || fText[offset - 1] == '\n')
 							? 0
 							: krx_NotBOL;
- 
+
 			if (backward)
 				r = rx->Match(fText.Buffer(), offset, 0, options);
 			else
 				r = rx->Match(fText.Buffer(), fText.Size(), offset, options);
-			
+
 			if (r == krx_NoMatch)
 			{
 				offset = (backward ? -1 : fText.Size());
 				wl = 1;
 			}
-			else 
+			else
 			{
 				offset = rx->MatchStart();
 				wl = rx->MatchLen();
@@ -4155,7 +4155,7 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 		{
 			if (offset < fText.Size())
 				offset += mismatchsearch(what, fText.Buffer() + offset,
-										 fText.Size() - offset, skip, 
+										 fText.Size() - offset, skip,
 										 ignoreCase) + 1;
 		}
 
@@ -4165,11 +4165,11 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 		{
 			if ((backward && offset >= 0) || (!backward && offset < fText.Size()))
 			{
-				if (scroll) 
+				if (scroll)
 				{
 					ChangeSelection(offset, offset + wl);
 
-					if (gPrefs->GetPrefInt(prf_I_CenterFound, 0))
+					if (gPrefs->GetPrefInt(prf_I_CenterFoundString, 0))
 						ScrollToSelection(true, true);
 					else
 						ScrollToSelection(true, false);
@@ -4201,7 +4201,7 @@ bool PText::FindNext(const char *what, int& offset, bool ignoreCase,
 		else
 			break;
 	}
-	
+
 	if (!gFindDialog->IsInMultiFileState())
 		beep();
 
@@ -4243,12 +4243,12 @@ void PText::FindNextError(bool backward)
 
 		const char kErrLine[] =
 			"^([^:]+):([0-9]+): (warning: )?(.*)";
-		
+
 		CRegex rx;
 		int r = rx.SetTo(kErrLine, false, false, backward);
 		if (r != B_OK)
 			THROW((rx.ErrorStr().String()));
-		
+
 		text = fText.Buffer();
 		if (backward)
 		{
@@ -4268,7 +4268,7 @@ void PText::FindNextError(bool backward)
 				size = rx.MatchStart();
 			else
 				offset = rx.MatchStart() + rx.MatchLen();
-			
+
 			if (r)
 			{
 				if (r == krx_NoMatch)
@@ -4285,7 +4285,7 @@ void PText::FindNextError(bool backward)
 				file << fCWD << kDirectorySeparator;
 			file << rx.MatchStr(text, 1);
 
-			if (get_ref_for_path(file.String(), &ref) == B_OK 
+			if (get_ref_for_path(file.String(), &ref) == B_OK
 				&& BEntry(&ref).Exists())
 			{
 				line = strtoul(text + rx.MatchStart(2), NULL, 10);
@@ -4299,7 +4299,7 @@ void PText::FindNextError(bool backward)
 		if (found)
 		{
 			PDoc *doc = dynamic_cast<PDoc*>(gApp->OpenWindow(ref, true));
-			
+
 			if (doc)
 			{
 				BMessage msg(msg_SelectError);
@@ -4310,7 +4310,7 @@ void PText::FindNextError(bool backward)
 
 				BMessenger(doc->TextView()).SendMessage(&msg);
 			}
-			
+
 			SelectLine(Offset2Line(text + rx.MatchStart() - fText.Buffer()));
 		}
 	}
@@ -4322,7 +4322,7 @@ void PText::FindNextError(bool backward)
 
 void PText::DoIncSearch(bool forward)
 {
-	bool ignCase = gPrefs->GetPrefInt(prf_I_IsearchIgncase, 1);
+	bool ignCase = gPrefs->GetPrefInt(prf_I_InclSearchIgnoreCase, 1);
 
 	if (fIncSearch)
 	{
@@ -4361,8 +4361,8 @@ void PText::DoIncSearch(bool forward)
 void PText::IncSearchKey(const char *bytes, int numBytes)
 {
 	int ipl = strlen(fIncPat);
-	bool ignCase = gPrefs->GetPrefInt(prf_I_IsearchIgncase, 1);
-	
+	bool ignCase = gPrefs->GetPrefInt(prf_I_InclSearchIgnoreCase, 1);
+
 	if (bytes[0] == B_RETURN || bytes[0] == B_ESCAPE)
 		fIncSearch = 0;
 	else if (bytes[0] == B_BACKSPACE)
@@ -4381,7 +4381,7 @@ void PText::IncSearchKey(const char *bytes, int numBytes)
 	}
 	else
 		fIncSearch = 0;
-	
+
 	if (fIncSearch)
 	{
 		int offset = fIncCaret;
@@ -4398,7 +4398,7 @@ void PText::IncSearchKey(const char *bytes, int numBytes)
 			beep();
 		}
 	}
-	
+
 	if (fIncSearch == 0)
 	{
 		Doc()->ButtonBar()->SetDown(msg_IncSearchBtn, false);
@@ -4444,7 +4444,7 @@ PExec::PExec(PText *txt, const char *cmd, const char *wd)
 		"\necho \"" kPWD "\"$PWD",
 		appDirPath.Path(), settingsDirPath.Path(), cmd);
 	fCmd = strdup(buf);
-	
+
 	fWD = wd ? strdup(wd) : NULL;
 	FailNil(fCmd);
 	fErrorWindow = NULL;
@@ -4460,20 +4460,20 @@ PExec::~PExec()
 long PExec::Execute()
 {
 	int ofd[2], efd[2], pid, err;
-	
+
 	try
 	{
 		FailOSErr(pipe(ofd));
 		if (gRedirectStdErr)
 			FailOSErr(pipe(efd));
-		
+
 		pid = fork();
 		if (pid < 0) FailOSErr(pid);
-		
+
 		if (pid == 0)		// child
 		{
 			setpgid(0, 0);		// Make this a new process group
-			
+
 			fflush(stdout);
 			close(STDOUT_FILENO);
 			err = dup(ofd[1]);		// What will happen if this fails???
@@ -4486,10 +4486,10 @@ long PExec::Execute()
 			else
 				err = dup(ofd[1]);
 			if (err < 0) perror("duplicating stderr"); //THROW((err));
-			
+
 			close(ofd[0]);
 			close(ofd[1]);
-			
+
 			if (gRedirectStdErr)
 			{
 				close(efd[0]);
@@ -4503,7 +4503,7 @@ long PExec::Execute()
 			args[1] = "-c";
 			args[2] = fCmd;
 			args[3] = NULL;
-			
+
 			if (execvp(args[0], args))
 			{
 				beep();		// what else can we do???
@@ -4515,7 +4515,7 @@ long PExec::Execute()
 			fPID = pid;
 
 			close(ofd[1]);
-			
+
 			if (gRedirectStdErr)
 				fErrorWindow = new PErrorWindow(efd, fWD);
 
@@ -4525,15 +4525,15 @@ long PExec::Execute()
 
 			fcntl(ofd[0], F_GETFL, &flags);
 			fcntl(ofd[0], F_SETFL, flags | O_NONBLOCK);
-			
+
 			int rr, state = 0;
-			
+
 			while ((rr = read(ofd[0], buf + state, kBufferSize - 1 - state)) != 0)
 			{
 				if (rr > 0)
 				{
 					buf[rr + state] = 0;
-					
+
 					char *p = buf - 1 + state;
 					while (*++p && state <= kPWDL)
 					{
@@ -4555,15 +4555,15 @@ long PExec::Execute()
 									state = 0;
 						}
 					}
-					
+
 					char sc = 0;
-					
+
 					if (state)
 					{
 						sc = p[-state];
 						p[-state] = 0;
 					}
-					
+
 					if (strlen(buf))
 					{
 						BAutolock lock(fWindow);
@@ -4574,11 +4574,11 @@ long PExec::Execute()
 								fText->PrepareForOutput();
 								prepared = true;
 							}
-							
+
 							fText->TypeString(buf);
 						}
 					}
-					
+
 					if (state)
 					{
 						p[-state] = sc;
@@ -4589,7 +4589,7 @@ long PExec::Execute()
 					snooze(100000);
 				else
 					break;
-				
+
 				if (Cancelled())
 					break;
 			}
@@ -4614,7 +4614,7 @@ long PExec::Execute()
 
 	BMessage msg(msg_ExecFinished);
 	fWindow->PostMessage(&msg, fText);
-		
+
 	return 0;
 } /* PExec::Execute */
 
@@ -4628,7 +4628,7 @@ void PText::ExecuteSelection()
 		a.Go();
 		return;
 	}
-	
+
 	char *s;
 	GetSelectedText(s);
 
@@ -4636,7 +4636,7 @@ void PText::ExecuteSelection()
 	{
 		int line = Offset2Line(fCaret);
 		int from, to;
-		
+
 		from = LineStart(line);
 		to = (line == LineCount() - 1 ? fText.Size() : LineStart(line + 1) - 1);
 		s = (char *)malloc(to - from + 1);
@@ -4648,7 +4648,7 @@ void PText::ExecuteSelection()
 	fExec = new PExec(this, s, fCWD);
 	fExec->Run();
 	Doc()->ButtonBar()->SetDown(msg_Execute, true);
-	
+
 	free(s);
 } /* PText::ExecuteSelection */
 
@@ -4675,7 +4675,7 @@ void PText::PrepareForOutput()
 	}
 
 	ChangeSelection(nc, nc);
-	
+
 	CharKeyDown("\n", 1);
 } /* PText::PrepareForOutput */
 
@@ -4689,15 +4689,15 @@ void PText::Draw(BRect updateRect)
 	float y, v;
 	BRect r;
 	BRegion clip;
-	
+
 	cl = Offset2Line(fCaret);
-	
+
 	SetLowColor(gColor[kColorLow]);
-	
+
 	if (fSplitAt > 0)
 	{
 		v = fVScrollBar1->Value();
-		
+
 		r = fBounds;
 		r.bottom = fSplitAt;
 		clip.Include(r);
@@ -4707,13 +4707,13 @@ void PText::Draw(BRect updateRect)
 			SetHighColor(gColor[kColorLow]);
 			StrokeLine(fBounds.LeftTop(), fBounds.RightTop());
 			ConstrainClippingRegion(&clip);
-			
+
 			start = max(0, (int)floor((updateRect.top + v) / fLineHeight));
 			end = min(LineCount(),
 				(int)ceil((min(updateRect.bottom, fSplitAt - kSplitterHeight) + v) / fLineHeight) + 1);
 
 			y = ceil(fLineHeight * start - v);
-			
+
 			for (i = start; i < end; i++)
 			{
 				DrawLine(i, y, false);
@@ -4734,7 +4734,7 @@ void PText::Draw(BRect updateRect)
 			EndLineArray();
 		}
 	}
-	
+
 	r = fBounds;
 	r.top = fSplitAt;
 	clip.MakeEmpty();
@@ -4745,12 +4745,12 @@ void PText::Draw(BRect updateRect)
 		SetHighColor(gColor[kColorLow]);
 		StrokeLine(BPoint(0, fSplitAt), BPoint(updateRect.right, fSplitAt));
 		ConstrainClippingRegion(&clip);
-	
+
 		v = fVScrollBar2->Value();
-		
+
 		start = max(0, (int)floor((max(updateRect.top - fSplitAt, (float)0) + v) / fLineHeight));
 		end = min(LineCount(), (int)ceil((updateRect.bottom + v - fSplitAt) / fLineHeight) + 1);
-		
+
 		y = ceil(fSplitAt + fLineHeight * start - v);
 
 		for (i = start; i < end; i++)
@@ -4758,7 +4758,7 @@ void PText::Draw(BRect updateRect)
 			DrawLine(i, y, false);
 			y += fLineHeight;
 		}
-		
+
 		SetLowColor(gColor[kColorLow]);
 		r.Set(0, y, updateRect.right, updateRect.bottom);
 		if (updateRect.Intersects(r))
@@ -4781,7 +4781,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 	BView *vw = this;
 	float x = 0, hv;
 	BRect E;
-	
+
 	if (buffer && fLineMap->Lock())
 	{
 		vw = fLineView;
@@ -4799,7 +4799,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 	vw->SetFont(&fFont);
 	vw->SetLowColor(gColor[kColorLow]);
 	vw->FillRect(E, B_SOLID_LOW);
-	
+
 	int s, e, l;
 	s = LineStart(lineNr);
 	if (lineNr < LineCount() - 1)
@@ -4812,13 +4812,13 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 		e = fText.Size();
 		l = e - s;
 	}
-	
+
 	ASSERT(l >= 0);
-	
+
 	CAlloca b(l + 1);
 	int starts[100];
 	rgb_color colors[100];
-	
+
 	if (l)
 	{
 		fText.Copy(b, s, l);
@@ -4852,13 +4852,13 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 			BlockOffsetsForLine(lineNr, a, c);
 			a += s;
 			c += s;
-			
+
 			if (fWindowActive)
 			{
 				r.left = Offset2Position(fAnchor).x - hv;
 				r.right = Offset2Position(fCaret).x - hv;
 				if (r.right < r.left) swap(r.right, r.left);
-				
+
 				vw->SetLowColor(gColor[kColorSelection]);
 				vw->FillRect(r, B_SOLID_LOW);
 			}
@@ -4881,20 +4881,20 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 			else if (a <= e && c > s)
 			{
 				vw->SetHighColor(gColor[kColorSelection]);
-				
+
 				vw->StrokeLine(r.LeftBottom(), r.LeftTop());
 				vw->StrokeLine(r.RightBottom(), r.RightTop());
-				
+
 				if (a >= s)
 					vw->StrokeLine(r.LeftTop(), r.RightTop());
-				
+
 				if (c < e + 1)
 					vw->StrokeLine(r.LeftBottom(), r.RightBottom());
-				
+
 				if (c > e && a >= s)
 				{
 					float x1, x2;
-					
+
 					if (Offset2Line(c) == lineNr + 1)
 					{
 						x1 = max(r.left, Offset2Position(c).x - hv);
@@ -4905,14 +4905,14 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 						x1 = hv ? 0 : 3;
 						x2 = r.left;
 					}
-						
+
 					vw->StrokeLine(BPoint(x1, r.bottom), BPoint(x2, r.bottom));
 				}
-				
+
 				if (a < s && (c < e || (lineNr == LineCount() - 1 && c == fText.Size())))
 				{
 					float x1, x2;
-	
+
 					if (Offset2Line(a) == lineNr - 1)
 					{
 						x1 = hv ? 0 : 3;
@@ -4923,27 +4923,27 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 						x1 = r.right;
 						x2 = fBounds.right;
 					}
-					
+
 					vw->StrokeLine(BPoint(x1, r.top), BPoint(x2, r.top));
 				}
 			}
 		}
-		
+
 		if (a > s)
 			vw->SetLowColor(gColor[kColorLow]);
 	}
-	
+
 	int i, j, ci = 0;
 	bool inSelection;
-	
+
 	if (fShowInvisibles)
 	{
 		i = 0;
 		j = 0;
 		x = 0;
-		
+
 		inSelection = (i >= a - s && i < c - s);
-		
+
 		if (inSelection && fWindowActive)
 		{
 			vw->SetLowColor(gColor[kColorSelection]);
@@ -4991,17 +4991,17 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 					vw->SetHighColor(gColor[kColorInvisibles]);
 				}
 			}
-	
+
 			i++;
 		}
-		
+
 		if (i > j)
 			x += StringWidth(b + j, i - j);
 
 		if (lineNr < LineCount() - 1 && fLineInfo[lineNr + 1].nl)
 			vw->DrawString(gReturnChar, BPoint(x + 3 - hv, y));
 	}
-	
+
 	bool draw = false;
 
 	i = 0;
@@ -5014,18 +5014,18 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 		vw->SetHighColor(gInvColor[kColorText]);
 	else
 		vw->SetHighColor(gColor[kColorText]);
-	
+
 	while (i < l)
 	{
 		if (b[i] == '\t' || i == a - s || i == c - s || (b[i] >= 0 && iscntrl(b[i])))
 			draw = true;
-		
+
 		if (b[i] == '\n')
 			b[i] = 0;
-		
+
 		if (starts[ci] == i)
 			draw = true;
-		
+
 		if (draw)
 		{
 			if (b[i] == '\t')
@@ -5047,9 +5047,9 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 					vw->DrawString(b + j, i - j, BPoint(x + 3 - hv, y));
 					x += StringWidth(b + j, i - j);
 				}
-				
+
 				rgb_color savedColor;
-				
+
 				if (fShowInvisibles)
 				{
 					savedColor = vw->HighColor();
@@ -5059,7 +5059,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 						vw->SetHighColor(gColor[kColorInvisibles]);
 				}
 				vw->DrawString(gControlChar, BPoint(x + 3 - hv, y));
-				
+
 				if (fShowInvisibles)
 					vw->SetHighColor(savedColor);
 
@@ -5072,7 +5072,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 				x += StringWidth(b + j, i - j);
 				j = i;
 			}
-			
+
 			if (a != c && fWindowActive)
 			{
 				if (i == a - s)
@@ -5109,11 +5109,11 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 
 	if (i > j)
 		vw->DrawString(b + j, i - j, BPoint(x + 3 - hv, y));
-	
+
 	if (fMark >= 0 && fMark <= fText.Size() && Offset2Line(fMark) == lineNr)
 	{
 		float x = Offset2Position(fMark).x;
-		
+
 		vw->SetHighColor(gColor[kColorMark]);
 		vw->StrokeLine(BPoint(x, E.top), BPoint(x, E.bottom));
 		vw->SetHighColor(kBlack);
@@ -5137,21 +5137,21 @@ void PText::RedrawDirtyLines()
 
 	BRegion clip1, clip2;
 	BRect r(b);
-	
+
 	r.bottom = fSplitAt - kSplitterHeight;
 	clip1.Include(r);
-	
+
 	r = b;
 	r.top = fSplitAt;
 	clip2.Include(r);
-	
+
 	for (i = 0; i < LineCount(); i++)
 	{
 		if (fLineInfo[i].dirty)
 		{
 			y1 = i * fLineHeight - fVScrollBar1->Value();
 			y2 = i * fLineHeight - fVScrollBar2->Value() + fSplitAt;
-			
+
 			if ((y1 < -fLineHeight || y1 > fSplitAt) &&
 				(y2 < fSplitAt - fLineHeight || y2 > b.bottom))
 			{
@@ -5160,7 +5160,7 @@ void PText::RedrawDirtyLines()
 			}
 
 			DrawLine(i, y1, true);
-			
+
 			if (y1 > -fLineHeight && y1 < fSplitAt)
 			{
 				if (clip1.Frame().IsValid())
@@ -5200,7 +5200,7 @@ void PText::RedrawDirtyLines()
 		SetLowColor(gColor[kColorLow]);
 		FillRect(r, B_SOLID_LOW);
 	}
-	
+
 	y2 = LineCount() * fLineHeight - fVScrollBar2->Value() + fSplitAt + 1;
 	if (y2 < b.bottom)
 	{
@@ -5209,7 +5209,7 @@ void PText::RedrawDirtyLines()
 		SetLowColor(gColor[kColorLow]);
 		FillRect(r, B_SOLID_LOW);
 	}
-	
+
 	if (fSplitAt > 0)
 	{
 		BPoint p1(0, fSplitAt - kSplitterHeight), p2(b.right, fSplitAt - kSplitterHeight);
@@ -5234,13 +5234,13 @@ void PText::RedrawDirtyLines()
 void PText::HiliteSelection()
 {
 	int l1, l2;
-	
+
 	l1 = Offset2Line(min(fAnchor, fCaret));
 	l2 = Offset2Line(max(fAnchor, fCaret));
-	
+
 	for (int i = l1; i <= l2; i++)
 		TouchLine(i);
-	
+
 	RedrawDirtyLines();
 } /* PText::HiliteSelection */
 
@@ -5248,51 +5248,51 @@ void PText::ChangeSelection(int newAnchor, int newCaret, bool block)
 {
 	int na, nc;
 	int oa, oc;
-	
+
 	na = min(newAnchor, newCaret);
 	nc = max(newAnchor, newCaret);
-	
+
 	oa = min(fAnchor, fCaret);
 	oc = max(fAnchor, fCaret);
-	
+
 	int ls, le;
-	
+
 	if (fBlockSelect)
 	{
 		ls = Offset2Line(min(na, oa));
 		le = Offset2Line(max(nc, oc));
-		
+
 		TouchLines(ls, le);
 	}
 	else if (nc < oa || na > oc)
 	{
 		ls = Offset2Line(na);
 		le = Offset2Line(nc);
-		
+
 		TouchLines(ls, le);
-	
+
 		ls = Offset2Line(oa);
 		le = Offset2Line(oc);
-		
+
 		TouchLines(ls, le);
 	}
 	else
 	{
 		ls = Offset2Line(min(oa, na));
 		le = Offset2Line(max(oa, na));
-		
+
 		TouchLines(ls, le);
-	
+
 		ls = Offset2Line(min(oc, nc));
 		le = Offset2Line(max(oc, nc));
-		
+
 		TouchLines(ls, le);
 	}
 
 	fCaret = newCaret;
 	fAnchor = newAnchor;
 	fBlockSelect = block;
-	
+
 	RedrawDirtyLines();
 } /* PText::ChangeSelection */
 
@@ -5327,15 +5327,15 @@ void PText::ToggleCaret()
 {
 	if (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible))
 		return;
-	
+
 	fNextCaret = system_time() + 500000;
-	
+
 	Window()->UpdateIfNeeded();
 	Sync();
 
 	fCaretVisible = !fCaretVisible;
 
-	DrawCaret();	
+	DrawCaret();
 } /* PText::ToggleCaret */
 
 void PText::DrawCaret()
@@ -5344,7 +5344,7 @@ void PText::DrawCaret()
 		|| fCaretVisible == fCaretDrawn) {
 		return;
 	}
-	
+
 	BRegion clip;
 	BRect r(fBounds);
 	if (fActivePart == 1)
@@ -5373,7 +5373,7 @@ void PText::ShiftLines(int first, int dy, int part)
 {
 	BRect b(Bounds()), src, dst;
 	float v, dv = dy * fLineHeight;
-	
+
 	if (part == 1)
 	{
 		v = fVScrollBar1->Value();
@@ -5387,9 +5387,9 @@ void PText::ShiftLines(int first, int dy, int part)
 	}
 
 	int tl = (int)(v / fLineHeight);
-	
+
 	src = b;
-	
+
 	if (dy < 0)
 	{
 		src.top = b.top + max(first * fLineHeight - v, (float)0) - dv;
@@ -5400,19 +5400,19 @@ void PText::ShiftLines(int first, int dy, int part)
 		src.top = max(b.top, b.top + first * fLineHeight - v);
 		src.bottom = b.bottom - dv;
 	}
-	
+
 	if (src.IsValid())
 	{
 		dst = src;
 		dst.OffsetBy(0, dv);
-		
+
 		CopyBits(src, dst);
-		
+
 		if (dy > 0)
 			src.bottom = dst.top;
 		else
 			src.top = dst.bottom;
-		
+
 		Invalidate(src);
 		Window()->UpdateIfNeeded();
 	}
@@ -5431,7 +5431,7 @@ void PText::MessageReceived(BMessage *msg)
 
 		unsigned long what = msg->what;
 		void *args = &msg;
-		
+
 		if (msg->WasDropped())
 			HandleDrop(msg);
 		else switch (what)
@@ -5447,7 +5447,7 @@ void PText::MessageReceived(BMessage *msg)
 			case B_COPY:
 				Copy();
 				break;
-			
+
 			case msg_CopyAppend:
 				Copy(true);
 				break;
@@ -5515,19 +5515,19 @@ void PText::MessageReceived(BMessage *msg)
 			case msg_DlgFind:
 				Find(msg_Find, args);
 				break;
- 
+
 			case msg_DlgReplace:
 				Find(msg_Replace, args);
 				break;
- 
+
 			case msg_DlgReplaceAndFind:
 				Find(msg_ReplaceAndFind, args);
 				break;
- 
+
 			case msg_DlgReplaceAll:
 				Find(msg_ReplaceAll, args);
 				break;
- 
+
 			case msg_EnterSearchString:
 			case msg_EnterReplaceString:
 			case msg_FindSelection:
@@ -5535,7 +5535,7 @@ void PText::MessageReceived(BMessage *msg)
 			{
 				char *s;
 				GetSelectedText(s);
-				
+
 				if (s)
 				{
 					BMessage nmsg(msg->what);
@@ -5555,7 +5555,7 @@ void PText::MessageReceived(BMessage *msg)
 				JumpToFunction(f, l);
 				break;
 			}
-			
+
 			case msg_JumpToMarker:
 			{
 				long l;
@@ -5586,7 +5586,7 @@ void PText::MessageReceived(BMessage *msg)
 				fExec = NULL;
 				Doc()->ButtonBar()->SetDown(msg_Execute, false);
 				break;
- 
+
 			case msg_Twiddle:
 				RegisterCommand(new PTwiddleCmd(this));
 				break;
@@ -5599,7 +5599,7 @@ void PText::MessageReceived(BMessage *msg)
 			case msg_FindInNextFile:
 				gFindDialog->PostMessage(msg_FindInNextFile);
 				break;
-		
+
 			case msg_FindNextError:
 				if (Doc()->IsWorksheet())
 					FindNextError(false);
@@ -5633,28 +5633,28 @@ void PText::MessageReceived(BMessage *msg)
 				RegisterCommand(new PCommentCmd(this, true,
 					fLangIntf->LineCommentStart(), fLangIntf->LineCommentEnd()));
 				break;
-			
+
 			case msg_Uncomment:
 				RegisterCommand(new PCommentCmd(this, false,
 					fLangIntf->LineCommentStart(), fLangIntf->LineCommentEnd()));
 				break;
-			
+
 			case msg_Wrap:
 				RegisterCommand(new PWrapCmd(this));
 				break;
-			
+
 			case msg_Unwrap:
 				RegisterCommand(new PUnwrapCmd(this));
 				break;
-			
+
 			case msg_Justify:
 				RegisterCommand(new PJustifyCmd(this));
 				break;
-			
+
 			case msg_SelectParagraph:
 				SelectParagraph();
 				break;
-			
+
 			case msg_ChangeWorkingDir:
 			{
 				if (!gCwdPanel)
@@ -5665,23 +5665,23 @@ void PText::MessageReceived(BMessage *msg)
 				gCwdPanel->Show();
 				break;
 			}
-			
+
 			case msg_ChangedWorkingDir:
 			{
 				entry_ref ref;
 				BEntry e;
-				
+
 				FailOSErr(msg->FindRef("refs", &ref));
 				FailOSErr(e.SetTo(&ref));
 				if (!e.IsDirectory()) THROW(("This is not a directory!"));
-				
+
 				BPath p;
 				FailOSErr(e.GetPath(&p));
-				
+
 				if (fCWD) free(fCWD);
 				fCWD = strdup(p.Path());
 				FailNil(fCWD);
-				
+
 				SetDirty(true);
 				break;
 			}
@@ -5690,7 +5690,7 @@ void PText::MessageReceived(BMessage *msg)
 				fSyntaxColoring = !fSyntaxColoring;
 				Draw(Bounds());
 				break;
-			
+
 			case msg_DoGoToLine:
 			{
 				long line;
@@ -5704,37 +5704,37 @@ void PText::MessageReceived(BMessage *msg)
 					beep();
 				break;
 			}
-			
+
 			case msg_ChangeCaseLower:
 			{
 				RegisterCommand(new PChangeCaseCmd(this, 1));
 				break;
 			}
-			
+
 			case msg_ChangeCaseUpper:
 			{
 				RegisterCommand(new PChangeCaseCmd(this, 2));
 				break;
 			}
-			
+
 			case msg_ChangeCaseCap:
 			{
 				RegisterCommand(new PChangeCaseCmd(this, 3));
 				break;
 			}
-			
+
 			case msg_ChangeCaseLine:
 			{
 				RegisterCommand(new PChangeCaseCmd(this, 5));
 				break;
 			}
-			
+
 			case msg_ChangeCaseSent:
 			{
 				RegisterCommand(new PChangeCaseCmd(this, 4));
 				break;
 			}
-			
+
 			case msg_DoConvertEncoding:
 			{
 				int32 f, t;
@@ -5748,7 +5748,7 @@ void PText::MessageReceived(BMessage *msg)
 				fShowInvisibles = !fShowInvisibles;
 				Draw(Bounds());
 				break;
-			
+
 			case msg_DoGlossy:
 			{
 				long ch, mod;
@@ -5757,7 +5757,7 @@ void PText::MessageReceived(BMessage *msg)
 				GlossaryKey(ch, mod);
 				break;
 			}
-			
+
 			case msg_HtmlButton:
 			{
 				const char* glossy;
@@ -5765,15 +5765,15 @@ void PText::MessageReceived(BMessage *msg)
 				GlossaryButton(glossy);
 				break;
 			}
-			
+
 			case msg_Execute:
 				ExecuteSelection();
 				break;
-				
+
 			case msg_CancelCommand:
 				KillCurrentJob();
 				break;
-			
+
 			case msg_IncSearchBtn:
 				if (fIncSearch)
 				{
@@ -5783,19 +5783,19 @@ void PText::MessageReceived(BMessage *msg)
 				else
 					DoIncSearch(true);
 				break;
-			
+
 			case msg_IncSearch:
 			case msg_IncSearchBackward:
 				DoIncSearch(what == msg_IncSearch);
 				break;
-				
+
 			case msg_SoftWrap:
 				fSoftWrap = !fSoftWrap;
 				Doc()->ButtonBar()->SetOn(msg_SoftWrap, fSoftWrap);
 				RecalculateLineBreaks();
 				RedrawDirtyLines();
 				break;
-			
+
 			case msg_FuncPopup:
 			{
 				BPoint p;
@@ -5804,7 +5804,7 @@ void PText::MessageReceived(BMessage *msg)
 				Doc()->ButtonBar()->SetDown(msg_FuncPopup, false);
 				break;
 			}
-			
+
 			case msg_HeaderPopup:
 			{
 				BPoint p;
@@ -5813,18 +5813,18 @@ void PText::MessageReceived(BMessage *msg)
 				Doc()->ButtonBar()->SetDown(msg_HeaderPopup, false);
 				break;
 			}
-			
+
 			case kmsg_SwitchActivePart:
 			{
 				if (fSplitAt > 0)
 				{
 					HideCaret();
 					fActivePart = (fActivePart == 1) ? 2 : 1;
-					
+
 					int a, c;
 					a = fAnchor;
 					c = fCaret;
-					
+
 					ChangeSelection(fOPAnchor, fOPCaret);
 					fOPCaret = c;
 					fOPAnchor = a;
@@ -5834,13 +5834,13 @@ void PText::MessageReceived(BMessage *msg)
 					beep();
 				break;
 			}
-			
+
 			case kmsg_SplitWindow:
 			{
 				if (fSplitAt == 0)
 				{
 					SplitWindow();
-					
+
 					fOPAnchor = fAnchor;
 					fOPCaret = fCaret;
 					fOPMark = fMark;
@@ -5852,7 +5852,7 @@ void PText::MessageReceived(BMessage *msg)
 					beep();
 				break;
 			}
-			
+
 			case kmsg_UnsplitWindow:
 			{
 				if (fSplitAt > 0)
@@ -5861,20 +5861,20 @@ void PText::MessageReceived(BMessage *msg)
 					beep();
 				break;
 			}
-			
+
 			case msg_SelectLines:
 			{
 				long from, to;
 
 				FailOSErr(msg->FindInt32("from", &from));
 				FailOSErr(msg->FindInt32("to", &to));
-				
+
 				bool activate = false;
 				msg->FindBool("activate", &activate);
-				
+
 				if (activate)
 					Window()->Activate();
- 
+
 				if (fSoftWrap)
 				{
 					from = RealLine2Line(from);
@@ -5884,12 +5884,12 @@ void PText::MessageReceived(BMessage *msg)
 				}
 				from = from < LineCount() - 1 ? LineStart(from) : fText.Size();
 				to = to < LineCount() - 1 ? LineStart(to) : fText.Size();
-					
+
 				ChangeSelection(from, to);
 				ScrollToSelection(true, false);
 				break;
 			}
-			
+
 			case msg_SelectError:
 			{
 				long line;
@@ -5899,7 +5899,7 @@ void PText::MessageReceived(BMessage *msg)
 				ScrollToSelection(true, false);
 				break;
 			}
-			
+
 			case msg_Select:
 			{
 				bool b;
@@ -5907,23 +5907,23 @@ void PText::MessageReceived(BMessage *msg)
 				long a, c;
 				FailOSErr(msg->FindInt32("anchor", &a));
 				FailOSErr(msg->FindInt32("caret", &c));
-			
+
 				if (msg->FindBool("skipspaces", &b) == B_OK && b)
 				{
 					int s = LineStart(Offset2Line(a));
-					
+
 					while (isspace(fText[s++]) && s < Size())
 						a++, c++;
 				}
 
 				if (msg->FindBool("activate", &b) == B_OK && b)
 					Window()->Activate();
-				
+
 				ChangeSelection(a, c);
 				ScrollToSelection(true, false);
 				break;
 			}
-			
+
 			case msg_SmoothUpdate:
 				TouchLines(0);
 				RedrawDirtyLines();
@@ -5964,7 +5964,7 @@ void PText::MessageReceived(BMessage *msg)
 			case 'test':
 				ASSERT(false);
 				break;
-			
+
 			default:
 				if (!DoKeyCommand(msg))
 					BView::MessageReceived(msg);
@@ -5974,7 +5974,7 @@ void PText::MessageReceived(BMessage *msg)
 	{
 		e.DoError();
 	}
-	
+
 	fStatus->SetOffset(fCaret);
 } /* PText::MessageReceived */
 
@@ -5990,7 +5990,7 @@ void PText::Copy(int append)
 {
 	char *s;
 	int size = abs(fCaret - fAnchor);
-	
+
 	if (append == 0 && fAppendNextCut)
 		append = 1;
 
@@ -6002,16 +6002,16 @@ void PText::Copy(int append)
 		{
 			s = (char *)malloc(size);
 			FailNil(s);
-			
+
 			fText.Copy(s, min(fCaret, fAnchor), size);
-			
+
 			be_clipboard->Lock();
 			if (append && be_clipboard->Data()->HasData("text/plain", B_MIME_DATA))
 			{
 				ssize_t aSize;
 				const char *txt;
 				FailOSErr(be_clipboard->Data()->FindData("text/plain", B_MIME_DATA, (const void **)&txt, &aSize));
-				
+
 				s = (char *)realloc(s, size + aSize);
 				FailNil(s);
 
@@ -6025,12 +6025,12 @@ void PText::Copy(int append)
 
 				size += aSize;
 			}
-			
+
 			be_clipboard->Clear();
 			be_clipboard->Data()->AddData("text/plain", B_MIME_DATA, s, size);
 			be_clipboard->Commit();
 			be_clipboard->Unlock();
-			
+
 			free(s);
 		}
 	}
@@ -6044,7 +6044,7 @@ void PText::Paste()
 {
 	if (Doc()->IsReadOnly()) THROW(("Document is read-only"));
 	be_clipboard->Lock();
-	
+
 	try
 	{
 		int from, to;
@@ -6053,7 +6053,7 @@ void PText::Paste()
 
 		if (fAnchor != fCaret)
 			Delete(from, to);
-		
+
 		ssize_t size;
 		char *text;
 
@@ -6064,14 +6064,14 @@ void PText::Paste()
 			if (fMark >= 0)
 				SetMark(from);
 		}
-		
+
 		TouchLines(Offset2Line(from));
 	}
 	catch (HErr& e)
 	{
 		e.DoError();
 	}
-	
+
 	be_clipboard->Unlock();
 } /* PText::Paste */
 
@@ -6099,14 +6099,14 @@ void PText::MenusBeginning()
 	be_clipboard->Lock();
 	bool hasClip = be_clipboard->Data()->HasData("text/plain", B_MIME_DATA);
 	be_clipboard->Unlock();
-	
+
 	BMenuBar *mbar = dynamic_cast<BMenuBar*>(Window()->FindView("mbar"));
 	FailNil(mbar);
-	
+
 	const char *what, *with;
 	what = gFindDialog->FindString();
 	with = gFindDialog->ReplaceString();
-	
+
 	mbar->FindItem(B_CUT)->SetEnabled(hasSelection);
 	mbar->FindItem(B_COPY)->SetEnabled(hasSelection);
 	mbar->FindItem(B_PASTE)->SetEnabled(hasClip);
@@ -6119,9 +6119,9 @@ void PText::MenusBeginning()
 	mbar->FindItem(msg_FindSelection)->SetEnabled(hasSelection);
 	mbar->FindItem(msg_Comment)->SetEnabled(strlen(fLangIntf->LineCommentStart()));
 	mbar->FindItem(msg_Uncomment)->SetEnabled(strlen(fLangIntf->LineCommentStart()));
-	
+
 	mbar->FindItem(msg_Wrap)->SetEnabled(fSoftWrap);
-	
+
 	bool canReplace = CanReplace(what, gFindDialog->IgnoreCase(), gFindDialog->Grep());
 	mbar->FindItem(msg_ReplaceAndFind)->SetEnabled(canReplace);
 	mbar->FindItem(msg_ReplaceAll)->SetEnabled(what && *what);
@@ -6162,7 +6162,7 @@ void PText::ChangedInfo(BMessage *msg)
 	if (msg->FindString("family", &family) == B_OK &&
 				msg->FindString("style", &style) == B_OK)
 		newFont.SetFamilyAndStyle(family, style);
-	
+
 	if (msg->FindFloat("size", &f) == B_OK)
 		newFont.SetSize(f);
 
@@ -6177,16 +6177,16 @@ void PText::ChangedInfo(BMessage *msg)
 
 	if (msg->FindInt32("tabs", &i) == B_OK)
 		fTabStops = i;
-	
+
 	if (msg->FindBool("syntaxcol", &b) == B_OK)
 		fSyntaxColoring = b;
-	
+
 	if (msg->FindBool("show invisibles", &b) == B_OK)
 		fShowInvisibles = b;
-	
+
 	if (msg->FindBool("show tabs", &b) == B_OK)
 		ShowTabStops(b);
-	
+
 	if (msg->FindInt32("source encoding", &i) == B_OK && Doc()->Encoding() != i)
 		Doc()->ChangeSourceEncoding(i);
 	else if (msg->FindInt32("encoding", &i) == B_OK && Doc()->Encoding() != i)
@@ -6194,25 +6194,25 @@ void PText::ChangedInfo(BMessage *msg)
 		Doc()->SetEncoding(i);
 		dirty = true;
 	}
-	
+
 	if (msg->FindInt32("line breaks", &i) == B_OK && Doc()->LineEndType() != i)
 	{
 		Doc()->SetLineEndType(i);
 		dirty = true;
 	}
-	
+
 	if (msg->FindBool("softwrap", &b) == B_OK)
 	{
 		fSoftWrap = b;
 		Doc()->ButtonBar()->SetOn(msg_SoftWrap, fSoftWrap);
 	}
-	
+
 	if (msg->FindInt32("wraptyp", &i) == B_OK)
 		fWrapType = i;
-	
+
 	if (msg->FindInt32("wrapwidth", &i) == B_OK)
 		fWrapWidth = i;
-	
+
 	if (msg->FindString("mime", &s) == B_OK)
 	{
 		if (strcmp(Doc()->MimeType(), s) != 0) {
@@ -6220,10 +6220,10 @@ void PText::ChangedInfo(BMessage *msg)
 			dirty = true;
 		}
 	}
-	
+
 	if (msg->FindInt32("language", &i) == B_OK)
 		SetLanguage(i);
-	
+
 	if (dirty)
 		SetDirty(dirty);
 

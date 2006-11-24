@@ -72,8 +72,10 @@ private:
 	void UpdateKBCapturer();
 	void AddKeybinding();
 	void DeleteKeybinding();
-	void SetColor(const char* const viewName, int colorId);
-	void GetColor(const char* const viewName, int colorId, const char* const prefName);
+	void CntrlSetColor(const char* const viewName, int colorId);
+	void CntrlGetColor(const char* const viewName, int colorId, const char* const prefName);
+	void CntrlSetChkbx(const char* const viewName, const char* const prefName, bool presetOn);
+	void CntrlGetChkbx(const char* const viewName, const char* const prefName, bool &setVar);
 
 	BMenu *fFont, *fAltFont, *fLanguage, *fState, *fDefLanguage;
 	CMimeBox *fMimetypes;

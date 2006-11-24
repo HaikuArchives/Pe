@@ -1,6 +1,6 @@
 /*
 	Copyright 2005 Oliver Tappe
-	
+
 	Distributed under the MIT License
 */
 
@@ -53,7 +53,7 @@ static void ConvertLinebreaks(BString& str, int fromType, int toType)
 			{
 				pos = posVect[i];
 				len = pos - lastPos;
-				if (len > 0) 
+				if (len > 0)
 				{
 					memcpy(newAdr, oldAdr, len);
 					oldAdr += len;
@@ -87,7 +87,7 @@ static int32 DetermineLineEndType(const BString& str)
 
 static int32 DetermineEncoding(const BString& str)
 {
-	/* HACK: Get the first line and see if there's something like 
+	/* HACK: Get the first line and see if there's something like
 	  "[PE:ENC=<encoding>]" in there. <encoding> is supported encodings
 	  with spaces replaced by "-", eg.: "ISO-8859-15" */
 	int32			pos;
@@ -132,22 +132,22 @@ static void CopyAttributes(BFile& from, BFile& to)
 	try
 	{
 		char name[NAME_MAX];
-		
+
 		while (from.GetNextAttrName(name) == B_OK)
 		{
 			attr_info ai;
-			
+
 			if (strcmp(name, "_trk/_clipping_file_") == 0)
 				continue;
-			
+
 			FailOSErr(from.GetAttrInfo(name, &ai));
-			
+
 			char *buf = new char [ai.size];
 			from.ReadAttr(name, ai.type, 0, buf, ai.size);
 			to.WriteAttr(name, ai.type, 0, buf, ai.size);
 			delete [] buf;
-		}	
-		
+		}
+
 		mode_t perm;
 		from.GetPermissions(&perm);
 		to.SetPermissions(perm);
@@ -301,7 +301,7 @@ bool CDocIO::DoPostEditTextConversions(BString& docText)
 		if (fConv.HadToSubstitute() && fConv.ErrorPos() >= 0)
 		{
 			fDoc->HighlightErrorPos(fConv.ErrorPos());
-			BString err = 
+			BString err =
 				BString("An error occurred when converting the document ")
 					<< "to the requested destination encoding. The first "
 					<< "problematic character is highlighted.\n"
@@ -313,7 +313,7 @@ bool CDocIO::DoPostEditTextConversions(BString& docText)
 		}
 	}
 
-	if (gPrefs->GetPrefInt(prf_I_NlAtEof, 1) && docText.Length() > 0 
+	if (gPrefs->GetPrefInt(prf_I_EndWithNewline, 1) && docText.Length() > 0
 		&& docText[docText.Length() - 1] != '\n')
 	{
 		docText << "\n";
@@ -374,7 +374,7 @@ bool CLocalDocIO::ReadDoc(bool readAttributes)
 
 	off_t size;
 	FailOSErr(file.GetSize(&size));
-	
+
 	BString docText;
 
 	if (size > 0)
@@ -394,7 +394,7 @@ bool CLocalDocIO::ReadDoc(bool readAttributes)
 		if (settingsMsg.FindInt32("line breaks", &lineEndType) != B_OK)
 			lineEndType = DetermineLineEndType(docText);
 		fDoc->SetLineEndType(lineEndType);
-	
+
 		// set the encoding:
 		int32 encoding;
 		if (settingsMsg.FindInt32("encoding", &encoding) != B_OK)
@@ -405,15 +405,15 @@ bool CLocalDocIO::ReadDoc(bool readAttributes)
 			encoding = B_UNICODE_UTF8;
 		fDoc->SetEncoding(encoding);
 	}
-	
+
 	bool result = DoPreEditTextConversions(docText);
 
 	fDoc->SetText(docText);
 	fDoc->SetDirty(false);
-	
+
 	if (readAttributes)
 		fDoc->ApplySettings(settingsMsg);
-		
+
 	if (!result && fConv.ErrorPos() >= 0)
 		fDoc->HighlightErrorPos(fConv.ErrorPos());
 
@@ -440,7 +440,7 @@ bool CLocalDocIO::WriteDoc()
 
 		FailOSErr(e.GetName(name));
 
-		if (existed) 
+		if (existed)
 		{	// Create a backup file
 			if (!CopyFile(e, backup))
 				return false;
@@ -454,16 +454,16 @@ bool CLocalDocIO::WriteDoc()
 		CheckedWrite(file, docText.String(), docText.Length());
 		fDoc->WriteAttr(file, settingsMsg);
 		file.Sync();
-		
+
 		// Remove backup file
-		if (existed && !gPrefs->GetPrefInt(prf_I_Backup))
+		if (existed && !gPrefs->GetPrefInt(prf_I_MakeBackup))
 			FailOSErr(backup.Remove());
 
 		// Update MIME type info
 		e.SetTo(&dir, name);
 		BPath path(&e);
 		if (!strlen(fDoc->MimeType()) && path.InitCheck() == B_OK
-			&& update_mime_info(path.Path(), false, true, false) == B_OK) 
+			&& update_mime_info(path.Path(), false, true, false) == B_OK)
 		{
 			// takeover MIME type from file
 			char s[NAME_MAX];
@@ -506,7 +506,7 @@ void CLocalDocIO::StartWatchingFolder()
 		&& node.SetTo(&entry) == B_OK
 		&& node.GetNodeRef(&directoryNodeRef) == B_OK)
 	{
-		if (sfDocListLock.Lock()) 
+		if (sfDocListLock.Lock())
 		{
 			if (sfWatchedFolderMap[directoryNodeRef]++ == 0)
 				watch_node(&directoryNodeRef, B_WATCH_DIRECTORY, be_app);
@@ -524,7 +524,7 @@ void CLocalDocIO::StopWatchingFolder()
 		&& node.SetTo(&entry) == B_OK
 		&& node.GetNodeRef(&directoryNodeRef) == B_OK)
 	{
-		if (sfDocListLock.Lock()) 
+		if (sfDocListLock.Lock())
 		{
 			if (sfWatchedFolderMap[directoryNodeRef]-- == 1)
 				watch_node(&directoryNodeRef, B_STOP_WATCHING, be_app);
@@ -619,7 +619,7 @@ void CLocalDocIO::HandleNodeMonitorMsg(BMessage* msg)
 bool CLocalDocIO::MatchesNodeMonitorMsg(BMessage* msg)
 {
 	node_ref nref;
-	if (fEntryRef == NULL 
+	if (fEntryRef == NULL
 	|| msg->FindInt64("node", &nref.node) != B_OK
 	|| msg->FindInt32("device", &nref.device) != B_OK)
 		return false;
@@ -632,7 +632,7 @@ bool CLocalDocIO::VerifyFile()
 	bool result = true;
 	try
 	{
-		if (gPrefs->GetPrefInt(prf_I_Verify, 1))
+		if (gPrefs->GetPrefInt(prf_I_VerifyOpenFiles, 1))
 		{
 			BFile file;
 			FailOSErr(file.SetTo(fEntryRef, B_READ_ONLY));
@@ -645,7 +645,7 @@ bool CLocalDocIO::VerifyFile()
 				sprintf(s, "File %s was modified by another application, reload it?", fEntryRef->name);
 				MInfoAlert a(s, "Reload", "Cancel");
 
-				if (a.Go() == 1) 
+				if (a.Go() == 1)
 				{
 					result = false;
 					// restart watching, the file may have changed:
@@ -659,7 +659,7 @@ bool CLocalDocIO::VerifyFile()
 				// in the mean time, only the first one is
 				// considered
 				// the max() takes care of mod-times in the future
-				// (cvs may cause that kind of thing). 
+				// (cvs may cause that kind of thing).
 		}
 	}
 	catch (HErr& e)
@@ -722,7 +722,7 @@ bool CFtpDocIO::ReadDoc(bool readAttributes)
 		// determine and set the type of linebreaks:
 		int32 lineEndType = DetermineLineEndType(docText);
 		fDoc->SetLineEndType(lineEndType);
-	
+
 		// set the encoding:
 		int32 encoding = DetermineEncoding(docText);
 		// [zooey]: For a short period of time (one of my bugs),
@@ -731,17 +731,17 @@ bool CFtpDocIO::ReadDoc(bool readAttributes)
 			encoding = B_UNICODE_UTF8;
 		fDoc->SetEncoding(encoding);
 	}
-	
+
 	bool result = DoPreEditTextConversions(docText);
 
 	fDoc->SetText(docText);
-	
+
 	if (!result && fConv.ErrorPos() >= 0)
 		fDoc->HighlightErrorPos(fConv.ErrorPos());
 
 	return result;
 }
-	
+
 bool CFtpDocIO::WriteDoc()
 {
 	try
@@ -752,8 +752,8 @@ bool CFtpDocIO::WriteDoc()
 		fDoc->GetText(docText);
 		if (!DoPostEditTextConversions(docText))
 			return false;
-	
-		CFtpStream ftp(*fURL, false, 
+
+		CFtpStream ftp(*fURL, false,
 					   gPrefs->GetPrefInt(prf_I_PassiveFtp, 1));
 		CheckedWrite(ftp, docText.String(), docText.Length());
 		ftp.Flush();

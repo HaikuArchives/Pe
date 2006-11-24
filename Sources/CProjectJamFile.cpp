@@ -1,7 +1,7 @@
 /*	$Id$
-	
+
 	Copyright 2005 Oliver Tappe
-	
+
 	Distributed under the MIT License
 */
 
@@ -49,7 +49,7 @@ struct CProjectJamSerializer : public CProjectSerializer
 	BPath fStartPath;
 };
 
-CProjectJamSerializer::CProjectJamSerializer( BString& result, 
+CProjectJamSerializer::CProjectJamSerializer( BString& result,
 															 const char* startPath)
 	:	fResult(result)
 	,	fStartPath(startPath)
@@ -116,7 +116,7 @@ static const char *skip_white(const char *t, bool multiline=true)
 	return t;
 } // skip_white
 
-static const char* skipback_over(const char* ptr, const char* start, 
+static const char* skipback_over(const char* ptr, const char* start,
 											const char* skipChars)
 {
 	if (!ptr)
@@ -166,7 +166,7 @@ static const char *next_path(const char *t, const char *& p, int& pl)
 	}
 	else
 		p = NULL;
-	
+
 	return t;
 } // next_path
 
@@ -218,14 +218,14 @@ const char* CProjectJamFile::_ParseJamPath( const char* t, BString& jamPath)
 	return t;
 }
 
-/* 
+/*
  * _AddGroup()
  *		Tries to extract a group from between the given string-pointers.
  *		A group is expected to have this structure:
  *			<rule> [<group-name> :] (<entry-name>)+ [: (<anything>)+ ] ;
  *		Whitespace inside of a group doesn't matter
  */
-CProjectGroupItem *CProjectJamFile::_AddGroup(const char* s, const char* e, 
+CProjectGroupItem *CProjectJamFile::_AddGroup(const char* s, const char* e,
 															 const char* buftop)
 {
 	const char* groupEnd = NULL;
@@ -237,7 +237,7 @@ CProjectGroupItem *CProjectJamFile::_AddGroup(const char* s, const char* e,
 	t = skip_white(t);
 
 	BString groupHeader(buftop, t-buftop);
-		
+
 	t = next_path(t, p, pl);
 	if (!p)
 		return NULL;
@@ -246,7 +246,7 @@ CProjectGroupItem *CProjectJamFile::_AddGroup(const char* s, const char* e,
 	t = skip_white(t);
 
 	CProjectGroupItem *group = NULL;
-	
+
 	if (isalnum(*t))
 	{
 		const char *n = t;
@@ -254,12 +254,12 @@ CProjectGroupItem *CProjectJamFile::_AddGroup(const char* s, const char* e,
 		t = next_path(t, p, pl);
 		if (!p)
 			return NULL;
-		
+
 		int nl = t - n;
 		BString groupName(n, nl);
-		
+
 		t = skip_white(t);
-		
+
 		if (*t == ':') {
 			t++;
 			group	= new CProjectGroupItem(fParentPath.String(), rule.String(),
@@ -268,32 +268,32 @@ CProjectGroupItem *CProjectJamFile::_AddGroup(const char* s, const char* e,
 			// no groupName available:
 			group	= new CProjectGroupItem(fParentPath.String(), rule.String());
 			// what we have in groupName is in fact the first item, so we add it:
-			group->AddItem(new CProjectItem(fParentPath.String(), 
+			group->AddItem(new CProjectItem(fParentPath.String(),
 													  groupName.String()),
-								gPrefs->GetPrefInt(prf_I_SortProject, 1) != 0);
+								gPrefs->GetPrefInt(prf_I_SortProjectFiles, 1) != 0);
 		}
-		
+
 		group->GroupHeader(groupHeader);
 		fItems.push_back(group);
-		
+
 		groupEnd = t;
 		t = skip_white(t);
 
 		while (*t && *t != ':' && *t != ';')
 		{
-			
+
 			t = skip_white(t);
-		
+
 			t = next_path(t, p, pl);
 			if (p == NULL)
 				break;
 
 			BString name(p, pl);
 			if (name.Length())
-				group->AddItem(new CProjectItem(fParentPath.String(), 
+				group->AddItem(new CProjectItem(fParentPath.String(),
 														  name.String()),
-									gPrefs->GetPrefInt(prf_I_SortProject, 1) != 0);
-			
+									gPrefs->GetPrefInt(prf_I_SortProjectFiles, 1) != 0);
+
 			t = skip_white(t, false);
 			if (*t == '\n')
 				t++;
@@ -330,7 +330,7 @@ void CProjectJamFile::_ParseSources(const BString& contents)
 		groupStart = skip_to(groupStart, '\n');
 		if (*groupStart)
 			groupStart++;
-		
+
 		CProjectGroupItem* group = _AddGroup(groupStart, groupEnd, t);
 		if (!group)
 			break;
@@ -346,7 +346,7 @@ void CProjectJamFile::_ParseSources(const BString& contents)
 		// TODO:
 		// 	nothing found, maybe we should try to look out for some common
 		// 	rules here (Application, SharedLibrary and StaticLibrary)?
-		fErrorMsg 
+		fErrorMsg
 			<< "No project-items could be found in the jamfile\n\n"
 			<< "Maybe you have forgotten to add\n"
 			<< "   # <pe-src> and # </pe-src>\n"
@@ -374,7 +374,7 @@ bool CProjectJamFile::_ParseIncludeStmt(const char*& t)
 	if (!aJamPath.Length())
 		return false;
 	_AddIncludePath(aJamPath);
-	
+
 	t = skip_white(t);
 	if (*t == ';') {
 		t++;
@@ -435,7 +435,7 @@ const char* CProjectJamFile::_ParseSubJamfile(const char* t)
 	CProjectJamFile* subPrj = new CProjectJamFile(aJamPath.String());
 	subPrj->DisplayName(dspName);
 	AddItem(subPrj, false);
-	
+
 	t = skip_white(t);
 	if (*t == ';') {
 		t++;
@@ -518,7 +518,7 @@ void CProjectJamFile::GetText(BString& docText) const
 		(*iter)->SerializeTo(&serializer);
 
 	docText << fFooter;
-}		
+}
 
 void CProjectJamFile::SetText(const BString& docText)
 {

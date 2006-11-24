@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 10/25/97 08:56:58 by Maarten Hekkelman
 */
@@ -90,7 +90,7 @@ PDoc::PDoc(const entry_ref *doc, bool show)
 	fIsWorksheet = false;
 	fWindowMenuLength = -1;
 	fToolBar = NULL;
-	
+
 	InitWindow(doc ? doc->name : "Untitled");
 
 	if (IsReadOnly())
@@ -111,9 +111,9 @@ PDoc::PDoc(const entry_ref *doc, bool show)
 
 		NameChanged();
 	}
-	
+
 	fButtonBar->SetEnabled(msg_Save, false);
-	
+
 	if (!ProjectRoster->IsProjectType(MimeType()))
 		fButtonBar->SetVisible(msg_EditAsProject, false);
 
@@ -129,24 +129,24 @@ PDoc::PDoc(URLData& url)
 	fIsWorksheet = false;
 	fWindowMenuLength = -1;
 	fToolBar = NULL;
-	
+
 	InitWindow("Untitled");
 
 	Read();
-	
+
 	char title[128];
 	if (strlen(url.Path()))
 		sprintf(title, "ftp://%s/%s/%s", url.Server(), url.Path(), url.File());
 	else
 		sprintf(title, "ftp://%s/%s", url.Server(), url.File());
 	SetTitle(title);
-	
+
 	AddRecent(title);
 
 	fText->SetDefaultLanguageByExtension(url.File());
-	
+
 	fButtonBar->SetEnabled(msg_Save, false);
-	
+
 	if (!ProjectRoster->IsProjectType(MimeType()))
 		fButtonBar->SetVisible(msg_EditAsProject, false);
 
@@ -159,7 +159,7 @@ PDoc::~PDoc()
 
 const char* PDoc::DocWindowType()
 {
-	return "";	
+	return "";
 		// default window type
 }
 
@@ -178,8 +178,8 @@ void PDoc::InitWindow(const char *name)
 	SetSizeLimits(100, 100000, 100, 100000);
 
 	BRect b(Bounds()), r;
-	bool showIde = gPrefs->GetPrefInt(prf_I_IdeMenu, 1);
-	
+	bool showIde = gPrefs->GetPrefInt(prf_I_ShowBeIdeMenu, 1);
+
 	r = b;
 	fMBar = HResources::GetMenuBar(r, rid_Mbar_DocumentWin);
 
@@ -192,7 +192,7 @@ void PDoc::InitWindow(const char *name)
 	}
 
 	AddChild(fMBar);
-	
+
 	BMenu *file = fMBar->SubmenuAt(0);
 	int i = 0;
 	while (i < file->CountItems())
@@ -201,7 +201,7 @@ void PDoc::InitWindow(const char *name)
 			fRecent = file->ItemAt(i)->Submenu();
 		i++;
 	}
-	
+
 	if (!fRecent) THROW(("Resources damaged?"));
 
 	b.top += fMBar->Frame().bottom + 1;
@@ -210,11 +210,11 @@ void PDoc::InitWindow(const char *name)
 
 	fToolBar = new PToolBar(r, "ToolBar");
 	AddChild(fToolBar);
-	
+
 	r.OffsetTo(0, 0);
 	r.bottom -= 2;
 	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "ButtonBar", rid_Tbar_DocumentWin));
-	
+
 	r.left = fButtonBar->Frame().right + 4;
 	fToolBar->AddChild(fError = new BStringView(r, "error", "", B_FOLLOW_LEFT_RIGHT));
 	fError->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -224,7 +224,7 @@ void PDoc::InitWindow(const char *name)
 	b.top += kToolBarHeight;
 
 	BScrollBar *bars[4] = { NULL, NULL, NULL, NULL };
-	
+
 	r.Set(b.right - B_V_SCROLL_BAR_WIDTH + 1, b.top + kSplitterHeight,
 		b.right + 1, b.bottom + 1 - B_H_SCROLL_BAR_HEIGHT);
 	bars[1] = new PScrollBar(r, "v scrollbar 2", NULL, 0, 100, B_VERTICAL);
@@ -241,7 +241,7 @@ void PDoc::InitWindow(const char *name)
 		b.right + 1 - B_V_SCROLL_BAR_WIDTH, b.bottom + 1);
 	bars[2] = new BScrollBar(r, "h scrollbar", NULL, 0, 100000, B_HORIZONTAL);
 	AddChild(bars[2]);
-	
+
 	r = b;
 	r.right -= B_V_SCROLL_BAR_WIDTH;
 	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
@@ -249,14 +249,14 @@ void PDoc::InitWindow(const char *name)
 	fText = new PText(r, fTextBuffer, bars, name);
 	AddChild(fText);
 	fText->MakeFocus(true);
-	
+
 	fButtonBar->SetTarget(fText);
 
 	r = b;
 	r.left = r.right - B_V_SCROLL_BAR_WIDTH + 1;
 	r.bottom = r.top + kSplitterHeight;
 	AddChild(new PSplitter(r, fText));
-	
+
 	r = b;
 	r.right = r.left + kStatusWidth;
 	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT + 1;
@@ -322,7 +322,7 @@ void PDoc::NameChanged()
 
 void PDoc::HighlightErrorPos(int errorPos)
 {
-	fText->Select(errorPos, errorPos+mcharlen(fText->Text()+errorPos), 
+	fText->Select(errorPos, errorPos+mcharlen(fText->Text()+errorPos),
 				  true, false);
 	fText->ScrollToSelection(true, false);
 }
@@ -361,20 +361,20 @@ void PDoc::ReadAttr(BFile& file, BMessage& settingsMsg)
 		{
 			p = (char *)malloc(ai.size);
 			FailNil(p);
-			
+
 			FailIOErr(file.ReadAttr("pe-info", ai.type, 0, p, ai.size));
-			
+
 			settingsMsg.Unflatten(p);
 		}
 		else if (file.GetAttrInfo("FontPrefs", &ai) == B_NO_ERROR)
 		{
 			p = (char *)malloc(ai.size);
 			FailNil(p);
-			
+
 			FailIOErr(file.ReadAttr("FontPrefs", ai.type, 0, p, ai.size));
-			
+
 			BMemoryIO mem(p, ai.size);
-			
+
 			fText->SetSettingsMW(mem);
 		}
 	}
@@ -413,7 +413,7 @@ void PDoc::WriteAttr(BFile& file, const BMessage& settingsMsg)
 		FailIOErr(file.WriteAttr("pe-info", 'info', 0, p, s));
 	}
 	catch (...) {}
-	
+
 	free(p);
 } /* PDoc::WriteAttr */
 
@@ -423,7 +423,7 @@ void PDoc::SaveRequested(entry_ref& directory, const char *name)
 	{
 		BWindow *w = fSavePanel->Window();
 		BAutolock lock(w);
-		
+
 		if (lock.IsLocked())
 		{
 			BMenu *m = static_cast<BMenuField*>(w->FindView("mime"))->Menu();
@@ -438,7 +438,7 @@ void PDoc::SaveRequested(entry_ref& directory, const char *name)
 			}
 		}
 	}
-	
+
 	inherited::SaveRequested(directory, name);
 
 } /* PDoc::SaveRequested */
@@ -460,9 +460,9 @@ void PDoc::WindowActivated(bool active)
 	}
 
 	if (active && gPrefs->GetPrefInt(prf_I_ShowHtmlPalette, 1)
-		&& gPrefs->GetPrefInt(prf_I_ShowHtmlpaletteForHtml, 1)) {
+		&& gPrefs->GetPrefInt(prf_I_ShowPaletteForHtml, 1)) {
 			BMessage msg(strcmp(MimeType(), "text/html") == 0
-								? msg_ShowHtmlPalette 
+								? msg_ShowHtmlPalette
 								: msg_HideHtmlPalette);
 			be_app->PostMessage(&msg);
 	}
@@ -485,21 +485,21 @@ void PDoc::OpenInclude(const char *incl)
 			uo->Run();
 			return;
 		}
-		
+
 		if (! found && fText->GetCWD())
 		{
 			FailOSErr(d.SetTo(fText->GetCWD()));
-			
+
 			if (d.Contains(incl, B_FILE_NODE | B_SYMLINK_NODE))
 			{
 				FailOSErr(d.FindEntry(incl, &e, true));
 				if (!e.IsFile()) THROW((0));
-		
+
 				FailOSErr(e.GetRef(&doc));
 				found = true;
 			}
 		}
-		
+
 		if (!found && EntryRef())
 		{
 			BPath path;
@@ -520,7 +520,7 @@ void PDoc::OpenInclude(const char *incl)
 			}
 		}
 
-		if (URL() && gPrefs->GetPrefInt(prf_I_Parent))
+		if (URL() && gPrefs->GetPrefInt(prf_I_SearchParent))
 		{
 			URLData url(*URL());
 			url += incl;
@@ -531,33 +531,33 @@ void PDoc::OpenInclude(const char *incl)
 				return;
 			}
 		}
-		
-		if (EntryRef() && gPrefs->GetPrefInt(prf_I_Parent))
+
+		if (EntryRef() && gPrefs->GetPrefInt(prf_I_SearchParent))
 		{
 			FailOSErr(e.SetTo(EntryRef()));
 			FailOSErr(e.GetParent(&d));
-			
+
 			if (d.Contains(incl, B_FILE_NODE | B_SYMLINK_NODE))
 			{
 				FailOSErr(d.FindEntry(incl, &e, true));
 				if (!e.IsFile()) THROW((0));
-		
+
 				FailOSErr(e.GetRef(&doc));
 				found = true;
 			}
 		}
-		
+
 		if (!found && gPrefs->GetPrefInt(prf_I_BeIncludes))
 		{
 			bi = strdup(getenv("BEINCLUDES"));
 			char *ip = bi;
 			char *p = ip;
-			
+
 			while (p && !found)
 			{
 				char *pe = strchr(p, ';');
 				if (pe) *pe = 0;
-				
+
 				FailOSErr(d.SetTo(p));
 				if (d.Contains(incl, B_FILE_NODE | B_SYMLINK_NODE))
 				{
@@ -566,11 +566,11 @@ void PDoc::OpenInclude(const char *incl)
 					FailOSErr(e.GetRef(&doc));
 					found = true;
 				}
-				
+
 				p = (pe && pe[1]) ? pe + 1 : NULL;
 			}
 		}
-		
+
 		if (!found)
 		{
 			const char *p;
@@ -591,7 +591,7 @@ void PDoc::OpenInclude(const char *incl)
 				}
 			}
 		}
-		
+
 		if (found)
 			gApp->OpenWindow(doc);
 		else
@@ -601,7 +601,7 @@ void PDoc::OpenInclude(const char *incl)
 	{
 		beep();
 	}
-	
+
 	if (bi) free(bi);
 } /* PDoc::OpenInclude */
 
@@ -625,7 +625,7 @@ void PDoc::OpenSelection()
 			int backSpace = 0;
 			int end = fText->Size();
 			const char * text = fText->Text();
-			
+
 			// push forward until (a) end of file (b) end of line
 			//                    (c) double quote (d) greater-than sign
 			while ((front < end) && (text[front] != '\n')
@@ -639,11 +639,11 @@ void PDoc::OpenSelection()
 				// fall back to the first space if one exists
 				front = (frontSpace ? frontSpace : front);
 			}
-			
+
 			// push back until (a) start of file (b) end of line
 			//                 (d) double quote (e) less-than sign
 			if (back > 0) back--;
-			while ((back >= 0) && (text[back] != '\n') 
+			while ((back >= 0) && (text[back] != '\n')
 					&& (text[back] != '"') && (text[back] != '<')) {
 				if ((text[back] == ' ') || (text[back] == '\t')) {
 					backSpace = (backSpace ? backSpace : back);
@@ -654,7 +654,7 @@ void PDoc::OpenSelection()
 				// fall back to the first space if one exists
 				back = (backSpace ? backSpace : back);
 			}
-			
+
 			if ((back >= 0) && (front < end)) {
 				if ((text[back] == '"') && (text[front] != '"') ||
 					(text[back] != '"') && (text[front] == '"')) {
@@ -667,7 +667,7 @@ void PDoc::OpenSelection()
 					back = (backSpace ? backSpace : back);
 				}
 			}
-						
+
 			int filenameFront = front;
 			// check to ensure matching double quote or angle brackets
 			// otherwise fall back to whitespace marker if possible
@@ -708,7 +708,7 @@ void PDoc::OpenSelection()
 				fText->Select(back+1,front,true,false);
 			}
 		}
-		
+
 		if (s)
 			OpenInclude(s);
 		else
@@ -760,28 +760,28 @@ void PDoc::OpenPartner()
 		BEntry e;
 		entry_ref doc;
 		FailOSErr(e.SetTo(EntryRef()));
-		
+
 		BDirectory d;
 		FailOSErr(e.GetParent(&d));
-		
+
 		if (IsSourceFile())
 		{
 			char *t = strdup(Title());
 			FailNil(t);
 			char *x = strrchr(t, '.');
-			
+
 			if (strcpy(x, ".h"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
-			
+
 			else if (strcpy(x, ".H"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
-			
+
 			else if (strcpy(x, ".hh"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
-			
+
 			else if (strcpy(x, ".hpp"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
-			
+
 			free(t);
 		}
 		else if (IsHeaderFile())
@@ -790,28 +790,28 @@ void PDoc::OpenPartner()
 			FailNil(t);
 			strcpy(t, Title());
 			char *x = strrchr(t, '.');
-			
+
 			if (strcpy(x, ".c"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
-			
+
 			else if (strcpy(x, ".C"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
-			
+
 			else if (strcpy(x, ".cp"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
-			
+
 			else if (strcpy(x, ".cpp"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
-			
+
 			else if (strcpy(x, ".cc"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
 				FailOSErr(d.FindEntry(t, &e, true));
-			
+
 			free(t);
 		}
 
 		if (!e.IsFile()) THROW((0));
 		FailOSErr(e.GetRef(&doc));
-		
+
 		gApp->OpenWindow(doc);
 	}
 	catch (HErr& e)
@@ -822,11 +822,11 @@ void PDoc::OpenPartner()
 
 void PDoc::SetDirty(bool dirty)
 {
-	if (LockLooper()) 
+	if (LockLooper())
 	{
 		inherited::SetDirty(dirty);
 		if (!dirty)
-			// if the new state is non-dirty, we propagate this info to the 
+			// if the new state is non-dirty, we propagate this info to the
 			// undo-stack, such that the non-dirty state is updated accordingly:
 			fText->ResetUndo();
 		fButtonBar->SetEnabled(msg_Save, dirty);
@@ -837,41 +837,41 @@ void PDoc::SetDirty(bool dirty)
 void PDoc::CreateFilePanel()
 {
 	inherited::CreateFilePanel();
-	
+
 	BWindow *w = fSavePanel->Window();
 	BAutolock lock(w);
-	
+
 	if (lock.IsLocked())
 	{
 		BView *vw = w->ChildAt(0);
 		FailNilMsg(vw, "Error building FilePanel");
-		
+
 		BMenu *m = HResources::GetMenu(rid_Menu_FpMimetypes, true);
 		FailNilMsg(m, "Error building FilePanel");
 		m->SetFont(be_plain_font);
 		m->SetRadioMode(true);
-		
+
 		BView *v = vw->FindView("text view");
 		FailNilMsg(v, "Error building FilePanel");
 		BRect r = v->Frame();
 		v->ResizeTo(r.Width() - 50, r.Height());
-		
+
 		r.left = r.right - 45;
 		r.right = r.left + 100;
 		r.top += (r.Height() - 20) / 2;
-		
+
 		BMenuField *mf = new BMenuField(r, "mime", "Type:",
 			m, B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
 		FailNilMsg(mf, "Error building FilePanel");
 		vw->AddChild(mf);
 		mf->SetDivider(be_plain_font->StringWidth("Type:") + 4);
-		
+
 		int i = 0;
 		const char *p;
-		
+
 		while ((p = gPrefs->GetIxPrefString(prf_X_Mimetype, i++)) != NULL)
 			m->AddItem(new BMenuItem(p, NULL));
-		
+
 		BMenuItem *item = m->FindItem(MimeType());
 		if (item)
 			item->SetMarked(true);
@@ -889,28 +889,28 @@ void PDoc::CreateFilePanel()
 PDoc* PDoc::TopWindow()
 {
 	PDoc *doc = NULL;
-	
+
 	doclist::iterator di;
-	
+
 	for (di = sfDocList.begin(); di != sfDocList.end() && doc == NULL; di++)
 		doc = dynamic_cast<PDoc*>((*di));
-	
+
 	return doc;
 } /* PDoc::TopWindow */
 
 PDoc* PDoc::GetWorksheet()
 {
 	PDoc *doc = NULL;
-	
+
 	doclist::iterator di;
-	
+
 	for (di = sfDocList.begin();
 		di != sfDocList.end() && (doc == NULL || ! doc->IsWorksheet());
 		di++)
 	{
 		doc = dynamic_cast<PDoc*>((*di));
 	}
-	
+
 	return doc;
 } // PDoc::GetWorksheet
 
@@ -952,7 +952,7 @@ static int GetExtensionMenuIndexByHash(uint16 hash)
 	int idx = -1;
 	int skipped = 0;
 	for (uint16 i = 0; i < sExtensions.size(); i++) {
-		if ((gPrefs->GetPrefInt(prf_I_SkipHtmlExt, 1) 
+		if ((gPrefs->GetPrefInt(prf_I_SkipHtmlExt, 1)
 				&& sExtensions[i].type == ExtensionInfo::E_HTML)
 			|| sExtensions[i].type == ExtensionInfo::E_PE)
 		{
@@ -1026,7 +1026,7 @@ static void LoadAddOnsFromPath(const char *path)
 void PDoc::LoadAddOns()
 {
 	char path[PATH_MAX];
-	
+
 	BPath p;
 	BEntry e;
 	gAppDir.GetEntry(&e);
@@ -1034,11 +1034,11 @@ void PDoc::LoadAddOns()
 	strcpy(path, p.Path());
 
 	strcat(path, "/Extensions/");
-	
+
 	LoadAddOnsFromPath(path);
-	
+
 	char *bt = getenv("BETOOLS");
-	if (gPrefs->GetPrefInt(prf_I_MwPlugins, 1) && bt)
+	if (gPrefs->GetPrefInt(prf_I_LoadBeIdeExt, 1) && bt)
 	{
 		strcpy(path, bt);
 		char *e = strrchr(path, '/');
@@ -1085,7 +1085,7 @@ void PDoc::PerformExtension(int nr)
 	{
 		UpdateIfNeeded();
 
-		thread_id tid = spawn_thread(perform_extension, sExtensions[nr].name, 
+		thread_id tid = spawn_thread(perform_extension, sExtensions[nr].name,
 									 B_NORMAL_PRIORITY, (void*)&sExtensions[nr]);
 		if (tid >= B_OK)
 		{
@@ -1098,16 +1098,16 @@ void PDoc::PerformExtension(int nr)
 		if (modifiers() & B_OPTION_KEY)
 		{
 			char path[PATH_MAX];
-			
+
 			BPath p;
 			BEntry e;
 			gAppDir.GetEntry(&e);
 			e.GetPath(&p);
 			strcpy(path, p.Path());
-		
+
 			strcat(path, "/Extensions/");
 			strcat(path, sExtensions[nr].name);
-			
+
 			entry_ref ref;
 			if (get_ref_for_path(path, &ref) == B_OK)
 				gApp->OpenWindow(ref);
@@ -1175,11 +1175,11 @@ void PDoc::MessageReceived(BMessage *msg)
 			{
 				doclist lst = sfDocList;
 				doclist::reverse_iterator di;
-				
+
 				for (di = lst.rbegin(); di != lst.rend(); di++)
 				{
 					PDoc *doc = dynamic_cast<PDoc*>(*di);
-					
+
 					if (doc && ! doc->IsWorksheet() && doc->Lock())
 					{
 						if (doc->QuitRequested())
@@ -1193,11 +1193,11 @@ void PDoc::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
-			
+
 			case msg_OpenSelected:
 				OpenSelection();
 				break;
-			
+
 			case msg_OpenRecent:
 				if (msg->HasRef("refs"))
 					gApp->RefsReceived(msg);
@@ -1214,30 +1214,30 @@ void PDoc::MessageReceived(BMessage *msg)
 			{
 				BWindow *w;
 				FailOSErr(msg->FindPointer("window", (void**)&w));
-				if (w) 
+				if (w)
 				{
-					if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
+					if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 						w->SetWorkspaces(1 << current_workspace());
 
 					w->Activate(true);
 				}
 				break;
 			}
-			
+
 			case msg_FindCmd:
 			{
 				int c = 1 << current_workspace();
-				
-				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
+
+				if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 					pa->FindDialog()->SetWorkspaces(c);
-				
+
 				pa->FindDialog()->SetCaller(this);
 				pa->FindDialog()->Show();
-				
+
 				pa->FindDialog()->Activate(true);
 				break;
 			}
-			
+
 			case msg_OpenInclude:
 			{
 				const char *f;
@@ -1245,7 +1245,7 @@ void PDoc::MessageReceived(BMessage *msg)
 				OpenInclude(f);
 				break;
 			}
-			
+
 			case msg_PrefsChanged:
 				rgb_color viewColor = gPrefs->GetPrefColor(
 					prf_C_Low, ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -1260,11 +1260,11 @@ void PDoc::MessageReceived(BMessage *msg)
 				ResetMenuShortcuts();
 				NameChanged();
 				break;
-			
+
 			case msg_SwitchHeaderSource:
 				OpenPartner();
 				break;
-			
+
 			case msg_PerformExtension:
 			{
 				BMenuItem *sender;
@@ -1286,36 +1286,36 @@ void PDoc::MessageReceived(BMessage *msg)
 				new(nothrow) PFindFunctionDialogController(fText);
 				break;
 			}
-			
+
 			case msg_About:
 				new PAboutBox();
 				break;
-			
+
 			case msg_ShowInBrowser:
 			{
 				if (fText->IsDirty() || EntryRef() == NULL)
 				{
 					MAlert *a;
-					
+
 					if (URL())
 						a  = new MInfoAlert("In order to display this page in a browser you need to "
 						"save this document on a local disk first.\n\n"
 						"Save changes to this document first?", "Save", "Cancel");
 					else
 						a = new MInfoAlert("Save changes to this document first?", "Save", "Cancel");
-					
+
 					if (a->Go() == 1)
 					{
 						SetDocIO(new CLocalDocIO(this, EntryRef(), NULL));
 						Save();
 					}
 				}
-				
+
 				if (!fText->IsDirty() && EntryRef())
 					gApp->DisplayInBrowser(*EntryRef());
 				break;
 			}
-			
+
 			case msg_AddDialog:
 			{
 				HDialog *dlog;
@@ -1324,7 +1324,7 @@ void PDoc::MessageReceived(BMessage *msg)
 				AddDialog(dlog, modal);
 				break;
 			}
-			
+
 			case msg_RemoveDialog:
 			{
 				HDialog *dlog;
@@ -1332,40 +1332,40 @@ void PDoc::MessageReceived(BMessage *msg)
 				RemoveDialog(dlog);
 				break;
 			}
-			
+
 			case msg_GoToLine:
 			{
 				DialogCreator<CGoToLine>::CreateDialog("Go To Line", this);
 				break;
 			}
-			
+
 			case msg_Info:
 			{
 				CInfoDialog *d;
 				GetDialog(d);
 				break;
 			}
-			
+
 			case msg_IdeAdd:
 				IDEAddFile();
 				break;
-				
+
 			case msg_IdeRemove:
 				IDERemoveFile();
 				break;
-			
+
 			case msg_IdeMake:
 				IDEMake();
 				break;
-			
+
 			case msg_IdeBringToFront:
 				IDEBringToFront();
 				break;
-			
+
 			case msg_IdeProjectToGroup:
 				IDEProject2Group();
 				break;
-			
+
 			case msg_New:
 			case msg_Open:
 			case msg_NewGroup:
@@ -1374,7 +1374,7 @@ void PDoc::MessageReceived(BMessage *msg)
 			case msg_Preferences:
 				be_app->PostMessage(msg);
 				break;
-			
+
 			case msg_ReadOnly:
 				try
 					{ SetReadOnly(! IsReadOnly());}
@@ -1382,43 +1382,43 @@ void PDoc::MessageReceived(BMessage *msg)
 					{ e.DoError(); }
 				fButtonBar->SetOn(msg_ReadOnly, IsReadOnly());
 				break;
-			
+
 			case msg_BtnOpen:
 			{
 				BPoint p;
 				bool b;
-				
+
 				FailOSErr(msg->FindPoint("where", &p));
 				FailOSErr(msg->FindBool("showalways", &b));
-				
+
 				ShowRecentMenu(p, b);
 				break;
 			}
-			
+
 			case msg_HtmlNew:
 			{
 				entry_ref doc;
 				BEntry e;
-				
+
 				FailOSErr(gPrefsDir.FindEntry("Template.html", &e, true));
 				FailOSErr(e.GetRef(&doc));
-				
+
 				PDoc *hDoc = NULL;
-				
+
 				{
 					BAutolock lock(be_app);
 					if (lock.IsLocked())
 						hDoc = dynamic_cast<PDoc*>(pa->OpenWindow(doc, false));
 				}
-				
+
 				if (hDoc)
 				{
 					BAutolock lock2(hDoc);
-					
+
 					if (lock2.IsLocked())
 					{
 						hDoc->SetEntryRef(NULL);
-	
+
 						hDoc->SetTitle("Untitled");
 						hDoc->SetReadOnly(false);
 						hDoc->fButtonBar->SetOn(msg_ReadOnly, false);
@@ -1426,34 +1426,34 @@ void PDoc::MessageReceived(BMessage *msg)
 						BRect r = NextPosition(false);
 						hDoc->MoveTo(r.left, r.top);
 						hDoc->ResizeTo(r.Width(), r.Height());
-	
+
 						hDoc->Show();
 					}
 				}
 				break;
 			}
-			
+
 			case msg_FindDifferences:
 			{
 				BRect r = NextPosition();
 				r.right = r.left + 400;
 				r.bottom = r.top + 150;
-				
+
 				new CDiffWindow(r, "Differences");
 				break;
 			}
-			
+
 			case msg_FtpOpen:
 			{
-				CFtpDialog *ftpo 
+				CFtpDialog *ftpo
 					= DialogCreator<CFtpDialog>::CreateDialog("FtpDialog", NULL, this);
 				ftpo->Show();
 				break;
 			}
-			
+
 			case msg_FtpSave:
 			{
-				CFtpDialog *ftps 
+				CFtpDialog *ftps
 					= DialogCreator<CFtpDialog>::CreateDialog("FtpDialog", NULL, this);
 				ftps->MakeItSave(Title());
 				ftps->Show();
@@ -1461,10 +1461,10 @@ void PDoc::MessageReceived(BMessage *msg)
 			}
 
 			case msg_EditAsProject:
-			{	
+			{
 				if (IsDirty() || fText->IsDirty())
 					Save();
-				PProjectWindow* prjWin 
+				PProjectWindow* prjWin
 					= PProjectWindow::Create(EntryRef(), MimeType());
 				if (prjWin->InitCheck() == B_OK)
 				{
@@ -1478,7 +1478,7 @@ void PDoc::MessageReceived(BMessage *msg)
 				}
 				break;
 			}
-			
+
 			default:
 			{
 				if ((msg->what & 0xffff0000) == 0x65780000)	// that's 'ex..'
@@ -1488,7 +1488,7 @@ void PDoc::MessageReceived(BMessage *msg)
 					BMenuItem *item = NULL;
 					if (nr>=0)
 						item = fMBar->SubmenuAt(4)->ItemAt(nr);
-					
+
 					if (item)
 						PerformExtension(item->Label());
 				}
@@ -1536,7 +1536,7 @@ void PDoc::MenusBeginning()
 		msg->AddPointer("window", w);
 		// Sort alphabetically; TODO: utf-8 compare?!
 		int32 insertId = fWindowMenuLength-1;
-		while (++insertId<fWindows->CountItems() && 
+		while (++insertId<fWindows->CountItems() &&
 			   strcmp(fWindows->ItemAt(insertId)->Label(), w->Title()) < 0) ;
 		// Finally insert
 		fWindows->AddItem(new BMenuItem(w->Title(), msg,
@@ -1567,9 +1567,9 @@ void PDoc::MenusBeginning()
 		delete fRecent->RemoveItem(i--);
 
 	int cnt = sfTenLastDocs.size();
-	char **p = (char **)malloc(cnt * sizeof(char *));	
-	const char **s = (const char **)malloc(cnt * sizeof(char *));	
-	
+	char **p = (char **)malloc(cnt * sizeof(char *));
+	const char **s = (const char **)malloc(cnt * sizeof(char *));
+
 	for (i = 0; i < cnt; i++)
 	{
 		s[i] = sfTenLastDocs[i];
@@ -1578,11 +1578,11 @@ void PDoc::MenusBeginning()
 
 	float w = BScreen().Frame().Width() / 3;
 	be_bold_font->GetTruncatedStrings(s, cnt, B_TRUNCATE_SMART, w, p);
-	
+
 	for (i = 0; i < cnt; i++)
 	{
 		BMessage *msg = new BMessage(msg_OpenRecent);
-		
+
 		entry_ref ref;
 		if (get_ref_for_path(s[i], &ref) == B_OK)
 		{
@@ -1599,7 +1599,7 @@ void PDoc::MenusBeginning()
 
 		free(p[i]);
 	}
-	
+
 	free(s);
 	free(p);
 
@@ -1610,10 +1610,10 @@ void PDoc::UpdateShortCuts()
 {
 	int used = 0, i;
 	PDoc *doc;
-	
+
 	doclist unassigned;
 	doclist::iterator di;
-	
+
 	for (di = sfDocList.begin(); di != sfDocList.end(); di++)
 	{
 		doc = dynamic_cast<PDoc*>(*di);
@@ -1625,9 +1625,9 @@ void PDoc::UpdateShortCuts()
 		else
 			used |= 1 << doc->fShortcut;
 	}
-	
+
 	used ^= ~0;
-	
+
 	for (i = 1; i < 10 && unassigned.size(); i++)
 	{
 		if (used & (1 << i))
@@ -1643,11 +1643,11 @@ static void RemoveShortcuts(BMenu *menu)
 {
 	BMenuItem *item;
 	int cnt = menu->CountItems();
-	
+
 	while (cnt--)
 	{
 		item = menu->ItemAt(cnt);
-		
+
 		if (item->Submenu())
 			RemoveShortcuts(item->Submenu());
 		else
@@ -1666,13 +1666,13 @@ void PDoc::ResetMenuShortcuts()
 	char *charMap;
 
 	get_key_map(&keyMap, &charMap);
-	
+
 	for (ki = km.begin(); ki != km.end(); ki++)
 	{
 		if ((*ki).first.prefix == 0)
 		{
 			BMenuItem *item = NULL;
-			
+
 			if (((*ki).second & 0xffff0000) == 0x65780000)	// that's 'ex..'
 			{
 				uint16 extHash = (*ki).second & 0xffff;
@@ -1699,22 +1699,22 @@ void PDoc::ShowRecentMenu(BPoint where, bool showalways)
 		BPoint Where;
 		unsigned long btns;
 		bigtime_t longEnough = system_time() + 250000;
-	
+
 		fText->GetMouse(&Where, &btns);
-	
+
 		do
 		{
 			BPoint p;
-			
+
 			fText->GetMouse(&p, &btns);
-	
+
 			if (!btns)
 			{
 				be_app->PostMessage(msg_Open);
 				fButtonBar->SetDown(msg_BtnOpen, false);
 				return;
 			}
-			
+
 			if (fabs(Where.x - p.x) > 2 || fabs(Where.y - p.y) > 2)
 				break;
 		}
@@ -1723,23 +1723,23 @@ void PDoc::ShowRecentMenu(BPoint where, bool showalways)
 
 	BPopUpMenu popup("Recent");
 	BMenuItem *item;
-	
+
 	MenusBeginning();
-	
+
 	for (int i = 0; i < fRecent->CountItems(); i++)
 	{
 		item = fRecent->ItemAt(i);
-		
+
 		popup.AddItem(new BMenuItem(item->Label(), new BMessage(*item->Message())));
 	}
-	
+
 	popup.SetFont(be_plain_font);
-	
+
 	if (popup.CountItems() == 0)
 		popup.AddItem(new BMenuItem("Empty", NULL));
 
 	BRect r;
-	
+
 	r.Set(where.x - 4, where.y - 20, where.x + 24, where.y + 4);
 
 	popup.SetTargetForItems(this);
@@ -1765,16 +1765,16 @@ void PDoc::IDEBringToFront()
 void PDoc::IDEAddFile()
 {
 	BMessage msg(kCreateVerb), reply;
-	
+
 	PropertyItem item;
 	item.form = formDirect;
 	strcpy(item.property, "file");
 	msg.AddData("target", PROPERTY_TYPE, &item, sizeof(item));
 	strcpy(item.property, "project");
 	msg.AddData("target", PROPERTY_TYPE, &item, sizeof(item));
-	
+
 	msg.AddRef("data", EntryRef());
-	
+
 	IDEBringToFront();
 	SendToIDE(msg, &reply);
 	if (reply.HasInt32("error"))
@@ -1784,16 +1784,16 @@ void PDoc::IDEAddFile()
 void PDoc::IDERemoveFile()
 {
 	BMessage msg(kDeleteVerb), reply;
-	
+
 	PropertyItem item;
 	item.form = formDirect;
 	strcpy(item.property, "file");
 	msg.AddData("target", PROPERTY_TYPE, &item, sizeof(item));
 	strcpy(item.property, "project");
 	msg.AddData("target", PROPERTY_TYPE, &item, sizeof(item));
-	
+
 	msg.AddRef("data", EntryRef());
-	
+
 	IDEBringToFront();
 	SendToIDE(msg, &reply);
 	if (reply.HasInt32("error"))
@@ -1809,7 +1809,7 @@ void PDoc::IDEMake()
 	item.form = formDirect;
 	strcpy(item.property, "project");
 	msg.AddData("target", PROPERTY_TYPE, &item, sizeof(item));
-	
+
 	entry_ref ide;
 	if (be_roster->FindApp("application/x-mw-BeIDE", &ide))
 		THROW(("BeIDE was not found"));
@@ -1820,7 +1820,7 @@ void PDoc::IDEMake()
 		msgr.SendMessage(&msg);
 	}
 	else
-		THROW(("BeIDE is not running"));	
+		THROW(("BeIDE is not running"));
 } /* PDoc::IDEMake */
 
 void PDoc::IDEProject2Group()
@@ -1832,7 +1832,7 @@ void PDoc::IDEProject2Group()
 	msg.AddData("target", PROPERTY_TYPE, &item, sizeof(item));
 	strcpy(item.property, "project");
 	msg.AddData("target", PROPERTY_TYPE, &item, sizeof(item));
-	
+
 	SendToIDE(msg, &reply);
 
 	if (reply.HasInt32("error"))
@@ -1840,9 +1840,9 @@ void PDoc::IDEProject2Group()
 	else
 	{
 		PGroupWindow *gw = new PGroupWindow;
-		
+
 		BMessage msg(B_REFS_RECEIVED);
-		
+
 		int32 c = 0;
 		entry_ref ref;
 #if (B_BEOS_VERSION > B_BEOS_VERSION_5)
@@ -1852,12 +1852,12 @@ void PDoc::IDEProject2Group()
 		char *name;
 #endif
 		type_code type;
-		
+
 		FailOSErr(reply.GetInfo(B_REF_TYPE, 0, &name, &type));
-		
+
 		while (reply.FindRef(name, c++, &ref) == B_OK)
 			msg.AddRef("refs", &ref);
-		
+
 		gw->PostMessage(&msg);
 	}
 } /* PDoc::IDEProject2Group */
@@ -1875,18 +1875,18 @@ bool PDoc::IDEOpenSourceHeader(entry_ref& ref)
 	if (be_roster->IsRunning(&ide))
 	{
 		BMessage msg(cmd_AndyFeature);
-		
+
 		msg.AddRef(kTextFileRef, &ref);
 		msg.AddString(kFileName, ref.name);
 
 		BMessenger msgr(NULL, be_roster->TeamFor(&ide));
 		msgr.SendMessage(&msg);
-		
+
 		return true;
 	}
 	else
 		return false;
-} 
+}
 */
 /* PDoc::IDEOpenSourceHeader */
 
@@ -1896,34 +1896,34 @@ void PDoc::Stack()
 {
 	BRect r;
 	int c;
-	
+
 	c = 1 << current_workspace();
-	
+
 	{
 		BScreen s;
 		r = s.Frame();
 	}
-	
+
 	r.top += 15;
 	r.InsetBy(14, 9);
-	
+
 	doclist::iterator di;
-	
+
 	for (di = sfDocList.begin(); di != sfDocList.end(); di++)
 	{
 		PDoc *w = dynamic_cast<PDoc*>(*di);
-		
+
 		if (w == NULL || w->IsWorksheet())
 			continue;
-		
+
 		w->SetWorkspaces(c);
 
 		w->MoveTo(r.left, r.top);
 		w->ResizeTo(r.right - r.left, r.bottom - r.top);
-		
+
 		r.top += 20;
 		r.left += 5;
-		
+
 		w->Activate(true);
 	}
 } /* PDoc::Stack */
@@ -1932,9 +1932,9 @@ void PDoc::Tile()
 {
 	BRect r;
 	int cnt, ws, ch, cv, ww, wh;
-	
+
 	ws = 1 << current_workspace();
-	
+
 	{
 		BScreen s;
 		r = s.Frame();
@@ -1943,19 +1943,19 @@ void PDoc::Tile()
 	r.InsetBy(9, 9);
 
 	cnt = 0;
-	
+
 	doclist::iterator di;
-	
+
 	for (di = sfDocList.begin(); di != sfDocList.end(); di++)
 		{
 		PDoc *w = dynamic_cast<PDoc *>(*di);
 		if (w && !w->IsWorksheet())
 			cnt++;
 	}
-	
+
 	ch = cnt;
 	cv = 1;
-	
+
 	while (cv < ch)
 	{
 		cv++;
@@ -1964,10 +1964,10 @@ void PDoc::Tile()
 		else
 			ch = (cnt / cv);
 	}
-	
+
 	ww = (int)r.Width() / ch;
 	wh = (int)r.Height() / cv;
-	
+
 	cnt = 0;
 	for (di = sfDocList.begin(); di != sfDocList.end(); di++)
 	{
@@ -1975,10 +1975,10 @@ void PDoc::Tile()
 		if (w && !w->IsWorksheet())
 		{
 		w->SetWorkspaces(ws);
-		
+
 			w->MoveTo(r.left + (cnt % ch) * ww, 20.0 + r.top + (cnt / ch) * wh);
 		w->ResizeTo(ww - 8.0, wh - 15.0);
-		
+
 		w->Activate();
 			cnt++;
 		}
@@ -1993,7 +1993,7 @@ BHandler* PDoc::ResolveSpecifier(BMessage *msg, int32 index,
 	if (strcmp(property, "Line") == 0)
 	{
 		long indx, range;
-		
+
 		if (form == B_INDEX_SPECIFIER &&
 			specifier->FindInt32("index", &indx) == B_OK &&
 			indx > 0 && indx <= fText->LineCount())
@@ -2014,7 +2014,7 @@ BHandler* PDoc::ResolveSpecifier(BMessage *msg, int32 index,
 	else if (strcmp(property, "Char") == 0 || strcmp(property, "Character") == 0)
 	{
 		long indx, range;
-		
+
 		if (form == B_INDEX_SPECIFIER &&
 			specifier->FindInt32("index", &indx) == B_OK &&
 			indx > 0 && indx <= fText->Size())

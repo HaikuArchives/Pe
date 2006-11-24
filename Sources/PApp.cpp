@@ -196,31 +196,31 @@ PApp::PApp()
 		SetColor(kColorText,			prf_C_Text,				0x00, 0x00, 0x00);
 		SetColor(kColorSelection,		prf_C_Selection,		0xff, 0xec, 0x7c);
 		SetColor(kColorMark,			prf_C_Mark,				0x00, 0x00, 0xFF);
-		SetColor(kColorKeyword1,		prf_C_Keyword,			0x39, 0x74, 0x79);
-		SetColor(kColorKeyword2,		prf_C_AltKeyword,		0x39, 0x74, 0x79);
-		SetColor(kColorComment1,		prf_C_Comment,			0xA1, 0x64, 0x0E);
-		SetColor(kColorComment2,		prf_C_AltComment,		0xA1, 0x64, 0x0E);
-		SetColor(kColorString1,			prf_C_String,			0x3f, 0x48, 0x84);
-		SetColor(kColorString2,			prf_C_Tagstring,		0x3f, 0x48, 0x84);
-		SetColor(kColorNumber1,			prf_C_Number,			0x85, 0x19, 0x19);
-		SetColor(kColorNumber2,			prf_C_AltNumber,		0x85, 0x19, 0x19);
-		SetColor(kColorOperator1,		prf_C_Operator,			0x44, 0x8a, 0x00);
-		SetColor(kColorOperator2,		prf_C_AltOperator,		0x44, 0x8a, 0x00);
-		SetColor(kColorSeparator1,		prf_C_Separator,		0x44, 0x8a, 0x00);
-		SetColor(kColorSeparator2,		prf_C_AltSeparator,		0x44, 0x8a, 0x00);
-		SetColor(kColorPreprocessor1,	prf_C_Preprocessor,		0x00, 0x64, 0x00);
-		SetColor(kColorPreprocessor2,	prf_C_AltProcessor,		0x00, 0x64, 0x00);
-		SetColor(kColorError1,			prf_C_Error,			0xFF, 0x00, 0x00);
-		SetColor(kColorError2,			prf_C_AltError,			0xFF, 0x00, 0x00);
-		SetColor(kColorIdentifierSystem,prf_C_SystemIdentifier,	0x39, 0x74, 0x79);
-		SetColor(kColorCharConst,		prf_C_CharConstant,		0x85, 0x19, 0x19);
-		SetColor(kColorIdentifierUser,	prf_C_UserIdentifier,	0x44, 0x8a, 0x00);
+		SetColor(kColorKeyword1,		prf_C_Keyword1,			0x39, 0x74, 0x79);
+		SetColor(kColorKeyword2,		prf_C_Keyword2,			0x39, 0x74, 0x79);
+		SetColor(kColorComment1,		prf_C_Comment1,			0xA1, 0x64, 0x0E);
+		SetColor(kColorComment2,		prf_C_Comment2,			0xA1, 0x64, 0x0E);
+		SetColor(kColorString1,			prf_C_String1,			0x3f, 0x48, 0x84);
+		SetColor(kColorString2,			prf_C_String2,			0x3f, 0x48, 0x84);
+		SetColor(kColorNumber1,			prf_C_Number1,			0x85, 0x19, 0x19);
+		SetColor(kColorNumber2,			prf_C_Number2,			0x85, 0x19, 0x19);
+		SetColor(kColorOperator1,		prf_C_Operator1,		0x44, 0x8a, 0x00);
+		SetColor(kColorOperator2,		prf_C_Operator2,		0x44, 0x8a, 0x00);
+		SetColor(kColorSeparator1,		prf_C_Separator1,		0x44, 0x8a, 0x00);
+		SetColor(kColorSeparator2,		prf_C_Separator2,		0x44, 0x8a, 0x00);
+		SetColor(kColorPreprocessor1,	prf_C_Preprocessor1,	0x00, 0x64, 0x00);
+		SetColor(kColorPreprocessor2,	prf_C_Preprocessor2,	0x00, 0x64, 0x00);
+		SetColor(kColorError1,			prf_C_Error1,			0xFF, 0x00, 0x00);
+		SetColor(kColorError2,			prf_C_Error2,			0xFF, 0x00, 0x00);
+		SetColor(kColorIdentifierSystem,prf_C_IdentifierSystem,	0x39, 0x74, 0x79);
+		SetColor(kColorCharConst,		prf_C_CharConst,		0x85, 0x19, 0x19);
+		SetColor(kColorIdentifierUser,	prf_C_IdentifierUser,	0x44, 0x8a, 0x00);
 		SetColor(kColorTag,				prf_C_Tag,				0x88, 0x88, 0x88);
 		SetColor(kColorAttribute,		prf_C_Attribute,		0xff, 0x00, 0x00);
-		SetColor(kColorUserSet1,		prf_C_User1,			0x44, 0x8a, 0x00);
-		SetColor(kColorUserSet2,		prf_C_User2,			0x44, 0x8a, 0x00);
-		SetColor(kColorUserSet3,		prf_C_User3,			0x44, 0x8a, 0x00);
-		SetColor(kColorUserSet4,		prf_C_User4,			0x44, 0x8a, 0x00);
+		SetColor(kColorUserSet1,		prf_C_UserSet1,			0x44, 0x8a, 0x00);
+		SetColor(kColorUserSet2,		prf_C_UserSet2,			0x44, 0x8a, 0x00);
+		SetColor(kColorUserSet3,		prf_C_UserSet3,			0x44, 0x8a, 0x00);
+		SetColor(kColorUserSet4,		prf_C_UserSet4,			0x44, 0x8a, 0x00);
 		SetColor(kColorInvisibles,		prf_C_Invisibles,		0xC8, 0x64, 0x64);
 
 		DefineInvColors(gColor[kColorSelection]);
@@ -228,13 +228,13 @@ PApp::PApp()
 		gAutoIndent			= gPrefs->GetPrefInt(prf_I_AutoIndent,			1);
 		gSyntaxColoring		= gPrefs->GetPrefInt(prf_I_SyntaxColoring,		1);
 		gSpacesPerTab		= gPrefs->GetPrefInt(prf_I_SpacesPerTab,		4);
-		gBalance			= gPrefs->GetPrefInt(prf_I_Balance,				1);
+		gBalance			= gPrefs->GetPrefInt(prf_I_BalanceWhileTyping,	1);
 		gBlockCursor		= gPrefs->GetPrefInt(prf_I_BlockCursor,			0);
 		gFlashCursor		= gPrefs->GetPrefInt(prf_I_FlashCursor,			1);
 		gSmartBrace			= gPrefs->GetPrefInt(prf_I_SmartBraces,			1);
-		gPopupIncludes		= gPrefs->GetPrefInt(prf_I_Includes,			1);
-		gPopupProtos		= gPrefs->GetPrefInt(prf_I_Protos,				1);
-		gPopupFuncs			= gPrefs->GetPrefInt(prf_I_Types,				1);
+		gPopupIncludes		= gPrefs->GetPrefInt(prf_I_ShowIncludes,		1);
+		gPopupProtos		= gPrefs->GetPrefInt(prf_I_ShowPrototypes,		1);
+		gPopupFuncs			= gPrefs->GetPrefInt(prf_I_ShowTypes,			1);
 		gRedirectStdErr		= gPrefs->GetPrefInt(prf_I_RedirectStdErr,		1);
 		gUseWorksheet		= gPrefs->GetPrefInt(prf_I_Worksheet,			1);
 		gRestorePosition	= gPrefs->GetPrefInt(prf_I_RestorePosition,		1);
@@ -276,7 +276,7 @@ PApp::PApp()
 		fPrefOpener = prefOpener->Thread();
 
 		if (gPrefs->GetPrefInt(prf_I_ShowHtmlPalette, 1)
-		&& !gPrefs->GetPrefInt(prf_I_ShowHtmlpaletteForHtml, 1))
+		&& !gPrefs->GetPrefInt(prf_I_ShowPaletteForHtml, 1))
 			CHtmlBar::Instance()->Show();
 
 		try
@@ -462,7 +462,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 			PGroupWindow *w = dynamic_cast<PGroupWindow*>(CDoc::FindDoc(doc));
 			if (w)
 			{
-				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
+				if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 					w->SetWorkspaces(1 << current_workspace());
 				if (show)
 					w->Activate(true);
@@ -476,7 +476,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 			BWindow *w = dynamic_cast<BWindow*>(CDoc::FindDoc(doc));
 			if (w)
 			{
-				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
+				if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 					w->SetWorkspaces(1 << current_workspace());
 				if (show)
 					w->Activate(true);
@@ -502,7 +502,7 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 			PDoc *d = dynamic_cast<PDoc*>(CDoc::FindDoc(doc));
 			if (d)
 			{
-				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
+				if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 					d->SetWorkspaces(1 << current_workspace());
 				if (show)
 					d->Activate(true);
@@ -760,7 +760,7 @@ void PApp::MessageReceived(BMessage *msg)
 			{
 				int c = 1 << current_workspace();
 
-				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
+				if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 					FindDialog()->SetWorkspaces(c);
 
 				FindDialog()->SetCaller(PDoc::TopWindow());
@@ -824,7 +824,7 @@ void PApp::MessageReceived(BMessage *msg)
 					fOpenPanel->SetPanelDirectory(&ref);
 					fOpenPanel->Window()->SetWorkspaces(1 << current_workspace());
 
-					if (gPrefs->GetPrefInt(prf_I_ZoomOpen, 0))
+					if (gPrefs->GetPrefInt(prf_I_ZoomOpenPanel, 0))
 					{
 						BRect r = BScreen().Frame();
 
@@ -941,7 +941,7 @@ void PApp::MessageReceived(BMessage *msg)
 
 					int c = 1 << current_workspace();
 
-					if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
+					if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 						fPrefsDialog->SetWorkspaces(c);
 
 					if (fPrefsDialog->IsHidden()) {
@@ -958,7 +958,7 @@ void PApp::MessageReceived(BMessage *msg)
 			case msg_ShowGlossary:
 				if (gGlossyWindow)
 				{
-					if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
+					if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 						gGlossyWindow->SetWorkspaces(1 << current_workspace());
 					gGlossyWindow->Activate(true);
 				}
@@ -971,7 +971,7 @@ void PApp::MessageReceived(BMessage *msg)
 				BWindow *w = CHtmlBar::Instance();
 				BAutolock lock(w);
 
-				if (gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1))
+				if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 					w->SetWorkspaces(1 << current_workspace());
 
 				if (w->IsHidden())

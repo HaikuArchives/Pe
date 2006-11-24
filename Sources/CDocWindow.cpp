@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "pe.h"
@@ -52,7 +52,7 @@
 int CDocWindow::sfNewCount = -1;
 
 CDocWindow::CDocWindow(const entry_ref *doc)
-	: inheritedWindow(BRect(0,0,0,0), doc ? doc->name : "Untitled", B_DOCUMENT_WINDOW, 
+	: inheritedWindow(BRect(0,0,0,0), doc ? doc->name : "Untitled", B_DOCUMENT_WINDOW,
 				 			B_ASYNCHRONOUS_CONTROLS)
 	, inheritedDoc("", this, doc)
 	, fCloseWinAfterSave(false)
@@ -63,7 +63,7 @@ CDocWindow::CDocWindow(const entry_ref *doc)
 }
 
 CDocWindow::CDocWindow(URLData& url)
-	: inheritedWindow(BRect(0,0,0,0), url.File(), B_DOCUMENT_WINDOW, 
+	: inheritedWindow(BRect(0,0,0,0), url.File(), B_DOCUMENT_WINDOW,
 							B_ASYNCHRONOUS_CONTROLS)
 	, inheritedDoc(url)
 	, fCloseWinAfterSave(false)
@@ -147,18 +147,18 @@ bool CDocWindow::QuitRequested()
 	{
 		char title[256];
 		sprintf(title, "Save changes to '%s' before closing?", inheritedDoc::Name());
-		
+
 		MInfoAlert alert(title, "Save", "Cancel", "Don't save");
-		
+
 		switch (alert.Go())
 		{
 			case 3:
 				break;
-				
+
 			case 2:
 				result = false;
 				break;
-				
+
 			default:
 				if (EntryRef() || URL())
 				{
@@ -242,45 +242,45 @@ void CDocWindow::MessageReceived(BMessage *msg)
 			case msg_SaveAll:
 				PostToAll(msg_Save, false);
 				break;
-			
+
 			case msg_Save:
 				Save();
 				break;
-			
+
 			case msg_SaveAs:
 				SaveAs();
 				break;
-			
+
 			case msg_Revert:
 				Revert();
 				break;
-			
+
 			case B_SAVE_REQUESTED:
 			{
 				entry_ref dir;
 				const char *name;
-				
+
 				FailOSErr(msg->FindRef("directory", &dir));
 				FailOSErr(msg->FindString("name", &name));
 				SaveRequested(dir, name);
 				break;
 			}
-			
+
 			case msg_SaveCopy:
 				SaveACopy();
 				break;
-			
+
 			case msg_DoSaveCopy:
 			{
 				entry_ref dir;
 				const char *name;
-				
+
 				FailOSErr(msg->FindRef("directory", &dir));
 				FailOSErr(msg->FindString("name", &name));
 				DoSaveACopy(dir, name);
 				break;
 			}
-			
+
 			case msg_DoFtpSave:
 			{
 				URLData *url;
@@ -289,7 +289,7 @@ void CDocWindow::MessageReceived(BMessage *msg)
 				delete url;
 				break;
 			}
-			
+
 			default:
 			{
 				inheritedWindow::MessageReceived(msg);
@@ -305,7 +305,7 @@ void CDocWindow::MessageReceived(BMessage *msg)
 void CDocWindow::SetDirty(bool dirty)
 {
 	inheritedDoc::SetDirty(dirty);
-	
+
 	if (!dirty && fCloseWinAfterSave) {
 		if (fCloseAppAfterSave) {
 			gApp->PostMessage(B_QUIT_REQUESTED);
@@ -324,7 +324,7 @@ void CDocWindow::NameChanged()
 		BPath path;
 		entry.GetPath(&path);
 
-		if (gPrefs->GetPrefInt(prf_I_FullPath, 1))
+		if (gPrefs->GetPrefInt(prf_I_FullPathInTitle, 1))
 			SetTitle(path.Path());
 		else
 			SetTitle(EntryRef()->name);
@@ -333,7 +333,7 @@ void CDocWindow::NameChanged()
 	{
 		char title[B_PATH_NAME_LENGTH+20];
 		if (strlen(URL()->Path()))
-			sprintf(title, "ftp://%s/%s/%s", 
+			sprintf(title, "ftp://%s/%s/%s",
 					  URL()->Server(), URL()->Path(), URL()->File());
 		else
 			sprintf(title, "ftp://%s/%s", URL()->Server(), URL()->File());
@@ -354,21 +354,21 @@ BRect CDocWindow::NextPosition(bool inc)
 
 	BRect initialDefaultRect(
 		40, 25,
-		40 + 80*textFont.StringWidth("m") + B_V_SCROLL_BAR_WIDTH + 5, 
+		40 + 80*textFont.StringWidth("m") + B_V_SCROLL_BAR_WIDTH + 5,
 		25 + 40*lh + B_H_SCROLL_BAR_HEIGHT
 	);
 	BString prefsName = prf_R_DefaultDocumentRect;
 		prefsName << DocWindowType();
-	BRect defaultFrame 
+	BRect defaultFrame
 		= gPrefs->GetPrefRect(prefsName.String(), initialDefaultRect);
 
 	if (inc)
 		sfNewCount++;
 	else if (sfNewCount < 0)
 		sfNewCount = 0;
-	defaultFrame.OffsetBy( -(sfNewCount % 8) * 4 + (sfNewCount / 8) * 8, 
+	defaultFrame.OffsetBy( -(sfNewCount % 8) * 4 + (sfNewCount / 8) * 8,
 						   (sfNewCount % 8) * 20);
-	
+
 	return defaultFrame;
 }
 

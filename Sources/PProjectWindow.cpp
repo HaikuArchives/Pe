@@ -378,7 +378,7 @@ void PProjectWindow::AddRef(const entry_ref& ref)
 	if (parentModelItem && parentItem) {
 		int32 pos 
 			= parentModelItem->AddItem(modelItem, 
-												gPrefs->GetPrefInt(prf_I_SortProject, 1));
+												gPrefs->GetPrefInt(prf_I_SortProjectFiles, 1));
 		int32 parentIdx = fList->FullListIndexOf(parentItem);
 		fList->AddItem( item, parentIdx + pos + 1);
 	} else {

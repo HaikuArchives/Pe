@@ -1,3 +1,4 @@
+
 /*	$Id$
 
 	Copyright 1996, 1997, 1998, 2002
@@ -57,6 +58,7 @@
 #include "PGlossyWindow.h"
 #include "ResourcesBindings.h"
 #include "Prefs.h"
+#include "PrefControls.h"
 
 typedef BStringItem CStringItem;
 
@@ -104,7 +106,7 @@ CPrefsDialog::CPrefsDialog(BRect frame, const char *name, window_type type, int 
 	strcpy(fFontStyle, gPrefs->GetPrefString(prf_S_FontStyle, fs));
 	fFontSize = gPrefs->GetPrefDouble(prf_D_FontSize, be_fixed_font->Size());
 
-	BMenuField *mf = dynamic_cast<BMenuField*>(FindView("font"));
+	BMenuField *mf = dynamic_cast<BMenuField*>(FindView(pnm_Edi_P_Font1Face));
 	FailNil(mf);
 
 	fFont = mf->Menu();
@@ -137,7 +139,7 @@ CPrefsDialog::CPrefsDialog(BRect frame, const char *name, window_type type, int 
 	strcpy(fAltFontStyle, gPrefs->GetPrefString(prf_S_AltFontStyle, fs));
 	fAltFontSize = gPrefs->GetPrefDouble(prf_D_AltFontSize, be_fixed_font->Size());
 
-	mf = dynamic_cast<BMenuField*>(FindView("alfo"));
+	mf = dynamic_cast<BMenuField*>(FindView(pnm_Edi_P_Font2Face));
 	FailNil(mf);
 
 	fAltFont = mf->Menu();
@@ -164,10 +166,10 @@ CPrefsDialog::CPrefsDialog(BRect frame, const char *name, window_type type, int 
 
 	fAltFont->SetRadioMode(true);
 
-	fLanguage = static_cast<BMenuField*>(FindView("lang"))->Menu();
+	fLanguage = static_cast<BMenuField*>(FindView(pnm_Lng_P_Language))->Menu();
 	fLanguage->SetRadioMode(true);
 
-	mf = dynamic_cast<BMenuField*>(FindView("dela"));
+	mf = dynamic_cast<BMenuField*>(FindView(pnm_Lng_P_DefaultLanguage));
 	FailNil(mf);
 	fDefLanguage = mf->Menu();
 	FailNil(fDefLanguage);
@@ -180,13 +182,13 @@ CPrefsDialog::CPrefsDialog(BRect frame, const char *name, window_type type, int 
 		fDefLanguage->AddItem(new BMenuItem(intf->Name(), new BMessage(msg_FieldChanged)));
 	}
 
-	fLang = -1; // mark as unitialized, will be initialized when "lang" is set
-	SetValue("lang", 1);
+	fLang = -1; // mark as unitialized, will be initialized when pnm_Lng_P_Language is set
+	SetValue(pnm_Lng_P_Language, 1);
 
-	BTextControl *c = static_cast<BTextControl*>(FindView("sufx"));
+	BTextControl *c = static_cast<BTextControl*>(FindView(pnm_Lng_T_Suffixes));
 	c->SetModificationMessage(new BMessage(msg_StoreSuffix));
 
-	fState = static_cast<BMenuField*>(FindView("sast"))->Menu();
+	fState = static_cast<BMenuField*>(FindView(pnm_Sta_P_UseStateFormat))->Menu();
 	fState->SetRadioMode(true);
 	fState->ItemAt(gSavedState)->SetMarked(true);
 
@@ -201,7 +203,7 @@ CPrefsDialog::CPrefsDialog(BRect frame, const char *name, window_type type, int 
 	fStdErrBox = dynamic_cast<CStdErrBox*>(FindView("StEb"));
 	FailNil(fStdErrBox);
 
-	fMimetypes = dynamic_cast<CMimeBox*>(FindView("mimetypes"));
+	fMimetypes = dynamic_cast<CMimeBox*>(FindView(pnm_Typ_L_Mimetypes));
 
 	fKBCommands = dynamic_cast<BOutlineListView*>(FindView("kact"));
 	fKBKeys = dynamic_cast<BListView*>(FindView("keys"));
@@ -245,6 +247,7 @@ bool CPrefsDialog::QuitRequested()
 
 bool CPrefsDialog::OkClicked()
 {
+	bool dummy;
 	BMenuItem *item = fFont->FindMarked();
 	if (item)
 	{
@@ -253,7 +256,7 @@ bool CPrefsDialog::OkClicked()
 		if (item) strcpy(fFontStyle, item->Label());
 	}
 
-	fFontSize = atof(GetText("fons"));
+	fFontSize = atof(GetText(pnm_Edi_T_Font1Size));
 
 	item = fAltFont->FindMarked();
 	if (item)
@@ -263,38 +266,38 @@ bool CPrefsDialog::OkClicked()
 		if (item) strcpy(fAltFontStyle, item->Label());
 	}
 
-	fAltFontSize = atof(GetText("alfs"));
+	fAltFontSize = atof(GetText(pnm_Edi_T_Font2Size));
 
-	GetColor("lowc", kColorLow,				prf_C_Low);
-	GetColor("txtc", kColorText,			prf_C_Text);
-	GetColor("selc", kColorSelection,		prf_C_Selection);
-	GetColor("mrkc", kColorMark,			prf_C_Mark);
-	GetColor("keyc", kColorKeyword1,		prf_C_Keyword);
-	GetColor("ke2c", kColorKeyword2,		prf_C_AltKeyword);
-	GetColor("cmtc", kColorComment1,		prf_C_Comment);
-	GetColor("cm2c", kColorComment2,		prf_C_AltComment);
-	GetColor("strc", kColorString1,			prf_C_String);
-	GetColor("tgsc", kColorString2,			prf_C_Tagstring);
-	GetColor("numc", kColorNumber1,			prf_C_Number);
-	GetColor("nu2c", kColorNumber2,			prf_C_AltNumber);
-	GetColor("opec", kColorOperator1,		prf_C_Operator);
-	GetColor("op2c", kColorOperator2,		prf_C_AltOperator);
-	GetColor("sepc", kColorSeparator1,		prf_C_Separator);
-	GetColor("se2c", kColorSeparator2,		prf_C_AltSeparator);
-	GetColor("proc", kColorPreprocessor1,	prf_C_Preprocessor);
-	GetColor("pr2c", kColorPreprocessor2,	prf_C_AltProcessor);
-	GetColor("errc", kColorError1,			prf_C_Error);
-	GetColor("er2c", kColorError2,			prf_C_AltError);
-	GetColor("sidc", kColorIdentifierSystem,prf_C_SystemIdentifier);
-	GetColor("chcc", kColorCharConst,		prf_C_CharConstant);
-	GetColor("uidc", kColorIdentifierUser,	prf_C_UserIdentifier);
-	GetColor("tagc", kColorTag,				prf_C_Tag);
-	GetColor("attr", kColorAttribute,		prf_C_Attribute);
-	GetColor("us1c", kColorUserSet1,		prf_C_User1);
-	GetColor("us2c", kColorUserSet2,		prf_C_User2);
-	GetColor("us3c", kColorUserSet3,		prf_C_User3);
-	GetColor("us4c", kColorUserSet4,		prf_C_User4);
-	GetColor("invc", kColorInvisibles,		prf_C_Invisibles);
+	CntrlGetColor(pnm_Col_C_Low,				kColorLow,				prf_C_Low);
+	CntrlGetColor(pnm_Col_C_Text,				kColorText,				prf_C_Text);
+	CntrlGetColor(pnm_Col_C_Selection,			kColorSelection,		prf_C_Selection);
+	CntrlGetColor(pnm_Col_C_Mark,				kColorMark,				prf_C_Mark);
+	CntrlGetColor(pnm_Col_C_Keyword1,			kColorKeyword1,			prf_C_Keyword1);
+	CntrlGetColor(pnm_Col_C_Keyword2,			kColorKeyword2,			prf_C_Keyword2);
+	CntrlGetColor(pnm_Col_C_Comment1,			kColorComment1,			prf_C_Comment1);
+	CntrlGetColor(pnm_Col_C_Comment2,			kColorComment2,			prf_C_Comment2);
+	CntrlGetColor(pnm_Col_C_String1,			kColorString1,			prf_C_String1);
+	CntrlGetColor(pnm_Col_C_String2,			kColorString2,			prf_C_String2);
+	CntrlGetColor(pnm_Col_C_Number1,			kColorNumber1,			prf_C_Number1);
+	CntrlGetColor(pnm_Col_C_Number2,			kColorNumber2,			prf_C_Number2);
+	CntrlGetColor(pnm_Col_C_Operator1,			kColorOperator1,		prf_C_Operator1);
+	CntrlGetColor(pnm_Col_C_Operator2,			kColorOperator2,		prf_C_Operator2);
+	CntrlGetColor(pnm_Col_C_Separator1,			kColorSeparator1,		prf_C_Separator1);
+	CntrlGetColor(pnm_Col_C_Separator2,			kColorSeparator2,		prf_C_Separator2);
+	CntrlGetColor(pnm_Col_C_Preprocessor1,		kColorPreprocessor1,	prf_C_Preprocessor1);
+	CntrlGetColor(pnm_Col_C_Preprocessor2,		kColorPreprocessor2,	prf_C_Preprocessor2);
+	CntrlGetColor(pnm_Col_C_Error1,				kColorError1,			prf_C_Error1);
+	CntrlGetColor(pnm_Col_C_Error2,				kColorError2,			prf_C_Error2);
+	CntrlGetColor(pnm_Col_C_IdentifierSystem,	kColorIdentifierSystem,	prf_C_IdentifierSystem);
+	CntrlGetColor(pnm_Col_C_CharConst,			kColorCharConst,		prf_C_CharConst);
+	CntrlGetColor(pnm_Col_C_IdentifierUser,		kColorIdentifierUser,	prf_C_IdentifierUser);
+	CntrlGetColor(pnm_Col_C_Tag,				kColorTag,				prf_C_Tag);
+	CntrlGetColor(pnm_Col_C_Attribute,			kColorAttribute,		prf_C_Attribute);
+	CntrlGetColor(pnm_Col_C_UserSet1,			kColorUserSet1,			prf_C_UserSet1);
+	CntrlGetColor(pnm_Col_C_UserSet2,			kColorUserSet2,			prf_C_UserSet2);
+	CntrlGetColor(pnm_Col_C_UserSet3,			kColorUserSet3,			prf_C_UserSet3);
+	CntrlGetColor(pnm_Col_C_UserSet4,			kColorUserSet4,			prf_C_UserSet4);
+	CntrlGetColor(pnm_Inv_C_Invisibles,			kColorInvisibles,		prf_C_Invisibles);
 
 	DefineInvColors(gColor[kColorSelection]);
 
@@ -306,54 +309,77 @@ bool CPrefsDialog::OkClicked()
 	gPrefs->SetPrefString(prf_S_AltFontStyle, fAltFontStyle);
 	gPrefs->SetPrefDouble(prf_D_AltFontSize, fAltFontSize);
 
-	strcpy(gTabChar, GetText("stca"));
+	strcpy(gTabChar, GetText(pnm_Inv_T_TabChar));
 	gPrefs->SetPrefString(prf_S_TabChar, gTabChar);
-	strcpy(gSpaceChar, GetText("ssca"));
+	strcpy(gSpaceChar, GetText(pnm_Inv_T_SpaceChar));
 	gPrefs->SetPrefString(prf_S_SpaceChar, gSpaceChar);
-	strcpy(gReturnChar, GetText("srca"));
+	strcpy(gReturnChar, GetText(pnm_Inv_T_ReturnChar));
 	gPrefs->SetPrefString(prf_S_ReturnChar, gReturnChar);
-	strcpy(gControlChar, GetText("scca"));
+	strcpy(gControlChar, GetText(pnm_Inv_T_ControlChar));
 	gPrefs->SetPrefString(prf_S_ControlChar, gControlChar);
 
-	gPrefs->SetPrefInt(prf_I_AutoIndent, gAutoIndent = IsOn("auin"));
-	gPrefs->SetPrefInt(prf_I_SyntaxColoring, gSyntaxColoring = IsOn("syco"));
-	gPrefs->SetPrefInt(prf_I_SpacesPerTab, gSpacesPerTab = atoi(GetText("tabs")));
-	gPrefs->SetPrefInt(prf_I_Balance, gBalance = IsOn("baty"));
-	gPrefs->SetPrefInt(prf_I_BlockCursor, gBlockCursor = IsOn("blcu"));
-	gPrefs->SetPrefInt(prf_I_FlashCursor, gFlashCursor = IsOn("flcu"));
-	gPrefs->SetPrefInt(prf_I_SmartBraces, gSmartBrace = IsOn("smbr"));
-	gPrefs->SetPrefInt(prf_I_AltHome, IsOn("alho"));
-	gPrefs->SetPrefInt(prf_I_ShowTabs, IsOn("stab"));
-	gPrefs->SetPrefInt(prf_I_WindowToWorkspace, IsOn("smwo"));
+	gPrefs->SetPrefInt(prf_I_SpacesPerTab, gSpacesPerTab = atoi(GetText(pnm_Edi_T_SpacesPerTab)));
 
-	gPrefs->SetPrefInt(prf_I_DiffCase, IsOn("dica"));
-	gPrefs->SetPrefInt(prf_I_DiffWhite, IsOn("diwh"));
+	CntrlGetChkbx(pnm_Edi_X_AutoIndent,				prf_I_AutoIndent,				gAutoIndent);
+	CntrlGetChkbx(pnm_Edi_X_SyntaxColoring,			prf_I_SyntaxColoring,			gSyntaxColoring);
+	CntrlGetChkbx(pnm_Edi_X_BalanceWhileTyping,		prf_I_BalanceWhileTyping,		gBalance);
+	CntrlGetChkbx(pnm_Edi_X_BlockCursor,			prf_I_BlockCursor,				gBlockCursor);
+	CntrlGetChkbx(pnm_Edi_X_FlashingCursor,			prf_I_FlashCursor,				gFlashCursor);
+	CntrlGetChkbx(pnm_Edi_X_SmartBraces,			prf_I_SmartBraces,				gSmartBrace);
+	CntrlGetChkbx(pnm_Edi_X_AlternateHome,			prf_I_AltHome,					dummy);
+	CntrlGetChkbx(pnm_Edi_X_ShowTabs,				prf_I_ShowTabs,					dummy);
+	CntrlGetChkbx(pnm_Edi_X_SmartWorkspaces,		prf_I_SmartWorkspaces,			dummy);
+	CntrlGetChkbx(pnm_Dif_X_DiffCaseInsensitive,	prf_I_DiffCaseInsensitive,		dummy);
+	CntrlGetChkbx(pnm_Dif_X_IgnoreWhiteSpace,		prf_I_DiffIgnoreWhiteSpace,		dummy);
+	CntrlGetChkbx(pnm_Wrp_X_SoftWrapFiles,			prf_I_SoftWrap,					dummy);
+	CntrlGetChkbx(pnm_Lng_X_ShowIncludes,			prf_I_ShowIncludes,				gPopupIncludes);
+	CntrlGetChkbx(pnm_Lng_X_ShowPrototypes,			prf_I_ShowPrototypes,			gPopupProtos);
+	CntrlGetChkbx(pnm_Lng_X_ShowTypes,				prf_I_ShowTypes,				gPopupFuncs);
+	CntrlGetChkbx(pnm_Lng_X_SortPopup,				prf_I_SortPopup,				dummy);
+	CntrlGetChkbx(pnm_Wor_X_RedirectStderr,			prf_I_RedirectStdErr,			gRedirectStdErr);
+	CntrlGetChkbx(pnm_Wor_X_KeepWorksheetOpen,		prf_I_Worksheet,				gUseWorksheet);
+	CntrlGetChkbx(pnm_Sta_X_RestorePosition,		prf_I_RestorePosition,			gRestorePosition);
+	CntrlGetChkbx(pnm_Sta_X_RestoreFont,			prf_I_RestoreFont,				gRestoreFont);
+	CntrlGetChkbx(pnm_Sta_X_RestoreSelection,		prf_I_RestoreSelection,			gRestoreSelection);
+	CntrlGetChkbx(pnm_Sta_X_RestoreScrollbar,		prf_I_RestoreScrollbar,			gRestoreScrollbar);
+	CntrlGetChkbx(pnm_Sta_X_RestoreCwd,				prf_I_RestoreCwd,				gRestoreCWD);
+	CntrlGetChkbx(pnm_Fil_X_SkipTmpFiles,			prf_I_SkipTmpFiles, 			dummy);
+	CntrlGetChkbx(pnm_Fil_X_ZoomOpenPanel,			prf_I_ZoomOpenPanel,			dummy);
+	CntrlGetChkbx(pnm_Fil_X_FullPathInTitle,		prf_I_FullPathInTitle, 			dummy);
+	CntrlGetChkbx(pnm_Inc_X_SearchParent,			prf_I_SearchParent, 			dummy);
+	CntrlGetChkbx(pnm_Inc_X_BeIncludes,				prf_I_BeIncludes,		 		dummy);
+	CntrlGetChkbx(pnm_Fil_X_MakeBackup,				prf_I_MakeBackup, 				dummy);
+	CntrlGetChkbx(pnm_Fil_X_EndWithNewline,			prf_I_EndWithNewline, 			dummy);
+	CntrlGetChkbx(pnm_Fil_X_VerifyOpenFiles,		prf_I_VerifyOpenFiles, 			dummy);
+	CntrlGetChkbx(pnm_Con_X_ShowBeIdeMenu,			prf_I_ShowBeIdeMenu,			dummy);
+	CntrlGetChkbx(pnm_Con_X_LoadBeIdeExt,			prf_I_LoadBeIdeExt,				dummy);
+	CntrlGetChkbx(pnm_Con_X_PassiveFtp,				prf_I_PassiveFtp, 				dummy);
+	CntrlGetChkbx(pnm_Glo_X_ShowGlossary,			prf_I_ShowGlossary, 			dummy);
+	CntrlGetChkbx(pnm_Glo_X_SingleClickGlossary, 	prf_I_SingleClickGlossary, 		dummy);
+	CntrlGetChkbx(pnm_Sup_X_ShowHtmlPalette,		prf_I_ShowHtmlPalette, 			dummy);
+	CntrlGetChkbx(pnm_Sup_X_ShowPaletteForHtml,		prf_I_ShowPaletteForHtml,		dummy);
+	CntrlGetChkbx(pnm_Src_X_InclSearchIgnoreCase,	prf_I_InclSearchIgnoreCase,		dummy);
+	CntrlGetChkbx(pnm_Src_X_CenterFoundString,		prf_I_CenterFoundString,		dummy);
+	CntrlGetChkbx(pnm_Grp_X_RelativeGroupPaths,		prf_I_RelativeGroupPaths, 		dummy);
+	CntrlGetChkbx(pnm_Grp_X_SortGroup,				prf_I_SortGroup, 				dummy);
+	CntrlGetChkbx(pnm_Prj_X_SortProjectFiles,		prf_I_SortProjectFiles,			dummy);
+	CntrlGetChkbx(pnm_Prj_X_AutodetectProjects,		prf_I_AutodetectProjects, 		dummy);
 
-	gPrefs->SetPrefInt(prf_I_SoftWrap, IsOn("sowr"));
-
-	if (IsOn("wrwi"))
+	if (IsOn(pnm_Wrp_R_WindowWidth))
 		gPrefs->SetPrefInt(prf_I_WrapType, 1);
-	else if (IsOn("wrpa"))
+	else if (IsOn(pnm_Wrp_R_PaperWidth))
 		gPrefs->SetPrefInt(prf_I_WrapType, 2);
 	else
 		gPrefs->SetPrefInt(prf_I_WrapType, 3);
 
-	gPrefs->SetPrefInt(prf_I_WrapCol, atoi(GetText("wrft")));
+	gPrefs->SetPrefInt(prf_I_WrapCol, atoi(GetText(pnm_Wrp_T_FixedColumn)));
 
-	gPrefs->SetPrefInt(prf_I_Includes, gPopupIncludes = IsOn("shin"));
-	gPrefs->SetPrefInt(prf_I_Protos, gPopupProtos = IsOn("shpr"));
-	gPrefs->SetPrefInt(prf_I_Types, gPopupFuncs = IsOn("shty"));
-	gPrefs->SetPrefInt(prf_I_SortPopup, IsOn("sopo"));
-
-	if (IsOn("swne"))
+	if (IsOn(pnm_Sup_R_CreateNewDocument))
 		gPrefs->SetPrefInt(prf_I_Startup, 1);
-	else if (IsOn("swop"))
+	else if (IsOn(pnm_Sup_R_ShowOpenDialog))
 		gPrefs->SetPrefInt(prf_I_Startup, 2);
 	else
 		gPrefs->SetPrefInt(prf_I_Startup, 3);
-
-	gPrefs->SetPrefInt(prf_I_RedirectStdErr, gRedirectStdErr = IsOn("rdse"));
-	gPrefs->SetPrefInt(prf_I_Worksheet, gUseWorksheet = IsOn("wosh"));
 
 	int cookie = 0;
 	CLanguageInterface *intf;
@@ -364,45 +390,10 @@ bool CPrefsDialog::OkClicked()
 	gPrefs->SetPrefString(prf_S_DefLang, item ? item->Label() : "None");
 	CLanguageInterface::ChooseDefault();
 
-	gPrefs->SetPrefInt(prf_I_RestorePosition, gRestorePosition = IsOn("repo"));
-	gPrefs->SetPrefInt(prf_I_RestoreFont, gRestoreFont = IsOn("refo"));
-	gPrefs->SetPrefInt(prf_I_RestoreSelection, gRestoreSelection = IsOn("rese"));
-	gPrefs->SetPrefInt(prf_I_RestoreScrollbar, gRestoreScrollbar = IsOn("resc"));
-	gPrefs->SetPrefInt(prf_I_RestoreCwd, gRestoreCWD = IsOn("recw"));
 
 	gPrefs->SetPrefInt(prf_I_SavedState, gSavedState = fState->IndexOf(fState->FindMarked()));
 
-	gPrefs->SetPrefInt(prf_I_RecentSize, gRecentBufferSize = atoi(GetText("resi")));
-	gPrefs->SetPrefInt(prf_I_SkipTmp, IsOn("sktm"));
-	gPrefs->SetPrefInt(prf_I_ZoomOpen, IsOn("zoop"));
-	gPrefs->SetPrefInt(prf_I_FullPath, IsOn("fupa"));
-
-	gPrefs->SetPrefInt(prf_I_Parent, IsOn("sepa"));
-	gPrefs->SetPrefInt(prf_I_BeIncludes, IsOn("incl"));
-
-	gPrefs->SetPrefInt(prf_I_Backup, IsOn("maba"));
-	gPrefs->SetPrefInt(prf_I_NlAtEof, IsOn("fonl"));
-	gPrefs->SetPrefInt(prf_I_Verify, IsOn("vofm"));
-
-	gPrefs->SetPrefInt(prf_I_IdeMenu, IsOn("idmn"));
-	gPrefs->SetPrefInt(prf_I_MwPlugins, IsOn("mwpl"));
-
-	gPrefs->SetPrefInt(prf_I_PassiveFtp, IsOn("pftp"));
-
-	gPrefs->SetPrefInt(prf_I_ShowGlossary, IsOn("shgl"));
-	gPrefs->SetPrefInt(prf_I_SingleClickGlossary, IsOn("sigl"));
-
-	gPrefs->SetPrefInt(prf_I_ShowHtmlPalette, IsOn("shtp"));
-	gPrefs->SetPrefInt(prf_I_ShowHtmlpaletteForHtml, IsOn("shtP"));
-
-	gPrefs->SetPrefInt(prf_I_IsearchIgncase, IsOn("isic"));
-	gPrefs->SetPrefInt(prf_I_CenterFound, IsOn("cesf"));
-
-	gPrefs->SetPrefInt(prf_I_RelativeGroupPaths, IsOn("rlgp"));
-	gPrefs->SetPrefInt(prf_I_SortGroup, IsOn("sogr"));
-
-	gPrefs->SetPrefInt(prf_I_SortProject, IsOn("prso"));
-	gPrefs->SetPrefInt(prf_I_AutodetectProjects, IsOn("prad"));
+	gPrefs->SetPrefInt(prf_I_RecentSize, gRecentBufferSize = atoi(GetText(pnm_Fil_T_NrOfRecentDocs)));
 
 	fSearchPaths->DoOK();
 	fIncludePaths->DoOK();
@@ -421,14 +412,14 @@ bool CPrefsDialog::OkClicked()
 	return false;
 } /* CPrefsDialog::OkClicked */
 
-void CPrefsDialog::SetColor(const char* const viewName, int colorId)
+void CPrefsDialog::CntrlSetColor(const char* const viewName, int colorId)
 {
 	HColorControl *cc;
 	if ((cc = dynamic_cast<HColorControl*>(FindView(viewName))))
 		cc->SetColor(gColor[colorId]);
-} /* CPrefsDialog::SetColor */
+} /* CPrefsDialog::CntrlSetColor */
 
-void CPrefsDialog::GetColor(const char* const viewName, int colorId, const char* const prefName)
+void CPrefsDialog::CntrlGetColor(const char* const viewName, int colorId, const char* const prefName)
 {
 	HColorControl *cc;
 	if ((cc = dynamic_cast<HColorControl*>(FindView(viewName))))
@@ -436,7 +427,18 @@ void CPrefsDialog::GetColor(const char* const viewName, int colorId, const char*
 		gColor[colorId] = cc->Color();
 		gPrefs->SetPrefColor(prefName, gColor[colorId]);
 	}
-} /* CPrefsDialog::GetColor */
+} /* CPrefsDialog::CntrlGetColor */
+
+void CPrefsDialog::CntrlSetChkbx(const char* const viewName, const char* const prefName, bool presetOn)
+{
+	SetOn(viewName, gPrefs->GetPrefInt(prefName, presetOn ? 1 : 0));
+} /* CPrefsDialog::CntrlSetChkbx */
+
+void CPrefsDialog::CntrlGetChkbx(const char* const viewName, const char* const prefName, bool &setVar)
+{
+	setVar = IsOn(viewName);
+	gPrefs->SetPrefInt(prefName, setVar);
+} /* CPrefsDialog::CntrlGetChkbx */
 
 bool CPrefsDialog::CancelClicked()
 {
@@ -474,96 +476,120 @@ bool CPrefsDialog::CancelClicked()
 
 	char s[32];
 	sprintf(s, "%d", gPrefs->GetPrefInt(prf_I_FontSize, 9));
-	SetText("fons", s);
+	SetText(pnm_Edi_T_Font1Size, s);
 
 	sprintf(s, "%d", gPrefs->GetPrefInt(prf_I_AltFontSize, 10));
-	SetText("alfs", s);
+	SetText(pnm_Edi_T_Font2Size, s);
 
 //	if (fPageSetup) free(fPageSetup);
 //	fPageSetup = (char *)Hex2Bin(gPrefs->GetPrefString(prf_S_DefaultPageSetup, ""), fPageSetupSize);
 
-	SetColor("lowc", kColorLow);
-	SetColor("txtc", kColorText);
-	SetColor("selc", kColorSelection);
-	SetColor("mrkc", kColorMark);
-	SetColor("keyc", kColorKeyword1);
-	SetColor("ke2c", kColorKeyword2);
-	SetColor("cmtc", kColorComment1);
-	SetColor("cm2c", kColorComment2);
-	SetColor("strc", kColorString1);
-	SetColor("tgsc", kColorString2);
-	SetColor("numc", kColorNumber1);
-	SetColor("nu2c", kColorNumber2);
-	SetColor("opec", kColorOperator1);
-	SetColor("op2c", kColorOperator2);
-	SetColor("sepc", kColorSeparator1);
-	SetColor("se2c", kColorSeparator2);
-	SetColor("proc", kColorPreprocessor1);
-	SetColor("pr2c", kColorPreprocessor2);
-	SetColor("errc", kColorError1);
-	SetColor("er2c", kColorError2);
-	SetColor("sidc", kColorIdentifierSystem);
-	SetColor("chcc", kColorCharConst);
-	SetColor("uidc", kColorIdentifierUser);
-	SetColor("tagc", kColorTag);
-	SetColor("attr", kColorAttribute);
-	SetColor("us1c", kColorUserSet1);
-	SetColor("us2c", kColorUserSet2);
-	SetColor("us3c", kColorUserSet3);
-	SetColor("us4c", kColorUserSet4);
-	SetColor("invc", kColorInvisibles);
+	CntrlSetColor(pnm_Col_C_Low,				kColorLow);
+	CntrlSetColor(pnm_Col_C_Text,				kColorText);
+	CntrlSetColor(pnm_Col_C_Selection,			kColorSelection);
+	CntrlSetColor(pnm_Col_C_Mark,				kColorMark);
+	CntrlSetColor(pnm_Col_C_Keyword1,			kColorKeyword1);
+	CntrlSetColor(pnm_Col_C_Keyword2,			kColorKeyword2);
+	CntrlSetColor(pnm_Col_C_Comment1,			kColorComment1);
+	CntrlSetColor(pnm_Col_C_Comment2,			kColorComment2);
+	CntrlSetColor(pnm_Col_C_String1,			kColorString1);
+	CntrlSetColor(pnm_Col_C_String2,			kColorString2);
+	CntrlSetColor(pnm_Col_C_Number1,			kColorNumber1);
+	CntrlSetColor(pnm_Col_C_Number2,			kColorNumber2);
+	CntrlSetColor(pnm_Col_C_Operator1,			kColorOperator1);
+	CntrlSetColor(pnm_Col_C_Operator2,			kColorOperator2);
+	CntrlSetColor(pnm_Col_C_Separator1,			kColorSeparator1);
+	CntrlSetColor(pnm_Col_C_Separator2,			kColorSeparator2);
+	CntrlSetColor(pnm_Col_C_Preprocessor1,		kColorPreprocessor1);
+	CntrlSetColor(pnm_Col_C_Preprocessor2,		kColorPreprocessor2);
+	CntrlSetColor(pnm_Col_C_Error1,				kColorError1);
+	CntrlSetColor(pnm_Col_C_Error2,				kColorError2);
+	CntrlSetColor(pnm_Col_C_IdentifierSystem,	kColorIdentifierSystem);
+	CntrlSetColor(pnm_Col_C_CharConst,			kColorCharConst);
+	CntrlSetColor(pnm_Col_C_IdentifierUser,		kColorIdentifierUser);
+	CntrlSetColor(pnm_Col_C_Tag,				kColorTag);
+	CntrlSetColor(pnm_Col_C_Attribute,			kColorAttribute);
+	CntrlSetColor(pnm_Col_C_UserSet1,			kColorUserSet1);
+	CntrlSetColor(pnm_Col_C_UserSet2,			kColorUserSet2);
+	CntrlSetColor(pnm_Col_C_UserSet3,			kColorUserSet3);
+	CntrlSetColor(pnm_Col_C_UserSet4,			kColorUserSet4);
+	CntrlSetColor(pnm_Inv_C_Invisibles,			kColorInvisibles);
 
-	SetOn("auin", gPrefs->GetPrefInt(prf_I_AutoIndent, 1));
-	SetOn("syco", gPrefs->GetPrefInt(prf_I_SyntaxColoring, 1));
-	SetOn("baty", gPrefs->GetPrefInt(prf_I_Balance, 1));
-	SetOn("blcu", gPrefs->GetPrefInt(prf_I_BlockCursor, 0));
-	SetOn("flcu", gPrefs->GetPrefInt(prf_I_FlashCursor, 1));
-	SetOn("smbr", gPrefs->GetPrefInt(prf_I_SmartBraces, 1));
-	SetOn("alho", gPrefs->GetPrefInt(prf_I_AltHome, 0));
-	SetOn("stab", gPrefs->GetPrefInt(prf_I_ShowTabs, 1));
-	SetOn("smwo", gPrefs->GetPrefInt(prf_I_WindowToWorkspace, 1));
+	CntrlSetChkbx(pnm_Edi_X_AutoIndent,				prf_I_AutoIndent,			true);
+	CntrlSetChkbx(pnm_Edi_X_SyntaxColoring,			prf_I_SyntaxColoring,		true);
+	CntrlSetChkbx(pnm_Edi_X_BalanceWhileTyping,		prf_I_BalanceWhileTyping,	true);
+	CntrlSetChkbx(pnm_Edi_X_BlockCursor,			prf_I_BlockCursor,			false);
+	CntrlSetChkbx(pnm_Edi_X_FlashingCursor,			prf_I_FlashCursor,			true);
+	CntrlSetChkbx(pnm_Edi_X_SmartBraces,			prf_I_SmartBraces,			true);
+	CntrlSetChkbx(pnm_Edi_X_AlternateHome,			prf_I_AltHome,				false);
+	CntrlSetChkbx(pnm_Edi_X_ShowTabs,				prf_I_ShowTabs,				true);
+	CntrlSetChkbx(pnm_Edi_X_SmartWorkspaces,		prf_I_SmartWorkspaces,		true);
+	CntrlSetChkbx(pnm_Dif_X_DiffCaseInsensitive,	prf_I_DiffCaseInsensitive,	false);
+	CntrlSetChkbx(pnm_Dif_X_IgnoreWhiteSpace,		prf_I_DiffIgnoreWhiteSpace,	false);
+	CntrlSetChkbx(pnm_Lng_X_ShowIncludes,			prf_I_ShowIncludes,			true);
+	CntrlSetChkbx(pnm_Lng_X_ShowPrototypes,			prf_I_ShowPrototypes,		false);
+	CntrlSetChkbx(pnm_Lng_X_ShowTypes,				prf_I_ShowTypes,			true);
+	CntrlSetChkbx(pnm_Lng_X_SortPopup,				prf_I_SortPopup,			false);
+	CntrlSetChkbx(pnm_Wor_X_RedirectStderr,			prf_I_RedirectStdErr,		true);
+	CntrlSetChkbx(pnm_Wor_X_KeepWorksheetOpen,		prf_I_Worksheet,			true);
+	CntrlSetChkbx(pnm_Sta_X_RestorePosition,		prf_I_RestorePosition,		true);
+	CntrlSetChkbx(pnm_Sta_X_RestoreFont,			prf_I_RestoreFont,			true);
+	CntrlSetChkbx(pnm_Sta_X_RestoreSelection,		prf_I_RestoreSelection,		true);
+	CntrlSetChkbx(pnm_Sta_X_RestoreScrollbar,		prf_I_RestoreScrollbar,		true);
+	CntrlSetChkbx(pnm_Sta_X_RestoreCwd,				prf_I_RestoreCwd,			true);
+	CntrlSetChkbx(pnm_Fil_X_SkipTmpFiles,			prf_I_SkipTmpFiles,			true);
+	CntrlSetChkbx(pnm_Fil_X_ZoomOpenPanel,			prf_I_ZoomOpenPanel,		false);
+	CntrlSetChkbx(pnm_Fil_X_FullPathInTitle,		prf_I_FullPathInTitle,		true);
+	CntrlSetChkbx(pnm_Inc_X_SearchParent,			prf_I_SearchParent,			true);
+	CntrlSetChkbx(pnm_Inc_X_BeIncludes,				prf_I_BeIncludes,			true);
+	CntrlSetChkbx(pnm_Fil_X_MakeBackup,				prf_I_MakeBackup,			false);
+	CntrlSetChkbx(pnm_Fil_X_EndWithNewline,			prf_I_EndWithNewline,		true);
+	CntrlSetChkbx(pnm_Fil_X_VerifyOpenFiles,		prf_I_VerifyOpenFiles,		true);
+	CntrlSetChkbx(pnm_Con_X_ShowBeIdeMenu,			prf_I_ShowBeIdeMenu,		true);
+	CntrlSetChkbx(pnm_Con_X_LoadBeIdeExt,			prf_I_LoadBeIdeExt,			true);
+	CntrlSetChkbx(pnm_Con_X_PassiveFtp,				prf_I_PassiveFtp,			true);
+	CntrlSetChkbx(pnm_Glo_X_ShowGlossary,			prf_I_ShowGlossary,			false);
+	CntrlSetChkbx(pnm_Glo_X_SingleClickGlossary,	prf_I_SingleClickGlossary,	false);
+	CntrlSetChkbx(pnm_Sup_X_ShowHtmlPalette,		prf_I_ShowHtmlPalette,		true);
+	CntrlSetChkbx(pnm_Sup_X_ShowPaletteForHtml,		prf_I_ShowPaletteForHtml,	true);
+	CntrlSetChkbx(pnm_Src_X_InclSearchIgnoreCase,	prf_I_InclSearchIgnoreCase,	true);
+	CntrlSetChkbx(pnm_Src_X_CenterFoundString,		prf_I_CenterFoundString,	false);
+	CntrlSetChkbx(pnm_Grp_X_SortGroup,				prf_I_SortGroup,			true);
+	CntrlSetChkbx(pnm_Grp_X_RelativeGroupPaths,		prf_I_RelativeGroupPaths,	false);
+	CntrlSetChkbx(pnm_Prj_X_SortProjectFiles,		prf_I_SortProjectFiles,		true);
+	CntrlSetChkbx(pnm_Prj_X_AutodetectProjects,		prf_I_AutodetectProjects,	true);
 
 	sprintf(s, "%d", gSpacesPerTab);
-	SetText("tabs", s);
-
-	SetOn("dica", gPrefs->GetPrefInt(prf_I_DiffCase, false));
-	SetOn("diwh", gPrefs->GetPrefInt(prf_I_DiffWhite, false));
+	SetText(pnm_Edi_T_SpacesPerTab, s);
 
 	bool sw;
-	SetOn("sowr", sw = gPrefs->GetPrefInt(prf_I_SoftWrap, false));
+	SetOn(pnm_Wrp_X_SoftWrapFiles,	sw = gPrefs->GetPrefInt(prf_I_SoftWrap, false));
 
 	int wrap = gPrefs->GetPrefInt(prf_I_WrapType, 3);
 	switch (wrap)
 	{
-		case 1:		SetOn("wrwi", true); break;
-		case 2:		SetOn("wrpa", true); break;
-		default:	SetOn("wrfi", true); break;
+		case 1:		SetOn(pnm_Wrp_R_WindowWidth, true); break;
+		case 2:		SetOn(pnm_Wrp_R_PaperWidth, true); break;
+		default:	SetOn(pnm_Wrp_R_FixedColumn, true); break;
 	}
 
 	sprintf(s, "%d", gPrefs->GetPrefInt(prf_I_WrapCol, 80));
-	SetText("wrft", s);
+	SetText(pnm_Wrp_T_FixedColumn, s);
 
-	SetEnabled("wrft", /*sw && */wrap == 3);
+	SetEnabled(pnm_Wrp_T_FixedColumn, /*sw && */wrap == 3);
 
-	SetText("stca", gTabChar);
-	SetText("ssca", gSpaceChar);
-	SetText("srca", gReturnChar);
-	SetText("scca", gControlChar);
-
-	SetOn("shin", gPrefs->GetPrefInt(prf_I_Includes, 1));
-	SetOn("shpr", gPrefs->GetPrefInt(prf_I_Protos, 0));
-	SetOn("shty", gPrefs->GetPrefInt(prf_I_Types, 1));
-	SetOn("sopo", gPrefs->GetPrefInt(prf_I_SortPopup, 0));
+	SetText(pnm_Inv_T_TabChar, gTabChar);
+	SetText(pnm_Inv_T_SpaceChar, gSpaceChar);
+	SetText(pnm_Inv_T_ReturnChar, gReturnChar);
+	SetText(pnm_Inv_T_ControlChar, gControlChar);
 
 	switch (gPrefs->GetPrefInt(prf_I_Startup))
 	{
-		default: SetOn("swne", true); break;
-		case 2: SetOn("swop", true); break;
-		case 3: SetOn("swno", true); break;
+		default: SetOn(pnm_Sup_R_CreateNewDocument, true); break;
+		case 2: SetOn(pnm_Sup_R_ShowOpenDialog, true); break;
+		case 3: SetOn(pnm_Sup_R_DoNothing, true); break;
 	}
 
-	SetOn("rdse", gPrefs->GetPrefInt(prf_I_RedirectStdErr, 1));
-	SetOn("wosh", gPrefs->GetPrefInt(prf_I_Worksheet, 1));
 
 	fSuffixes.erase(fSuffixes.begin(), fSuffixes.end());
 
@@ -575,52 +601,17 @@ bool CPrefsDialog::CancelClicked()
 	{
 		fSuffixes.push_back(intf->Extensions());
 		if (strcmp(intf->Name(), defLang) == 0)
-			SetValue("dela", i + 3);
+			SetValue(pnm_Lng_P_DefaultLanguage, i + 3);
 		i++;
 	}
 
-	SetText("sufx", fSuffixes.size() ? fSuffixes[GetValue("lang") - 1].c_str() : "");
+	SetText(pnm_Lng_T_Suffixes, fSuffixes.size() ? fSuffixes[GetValue(pnm_Lng_P_Language) - 1].c_str() : "");
 
-	SetOn("repo", gPrefs->GetPrefInt(prf_I_RestorePosition, 1));
-	SetOn("refo", gPrefs->GetPrefInt(prf_I_RestoreFont, 1));
-	SetOn("rese", gPrefs->GetPrefInt(prf_I_RestoreSelection, 1));
-	SetOn("resc", gPrefs->GetPrefInt(prf_I_RestoreScrollbar, 1));
-	SetOn("recw", gPrefs->GetPrefInt(prf_I_RestoreCwd, 1));
 
 	sprintf(s, "%d", gRecentBufferSize);
-	SetText("resi", s);
-	SetOn("sktm", gPrefs->GetPrefInt(prf_I_SkipTmp, 1));
-	SetOn("zoop", gPrefs->GetPrefInt(prf_I_ZoomOpen, 0));
-	SetOn("fupa", gPrefs->GetPrefInt(prf_I_FullPath, 1));
+	SetText(pnm_Fil_T_NrOfRecentDocs, s);
 
-	SetOn("sepa", gPrefs->GetPrefInt(prf_I_Parent, 1));
-	SetOn("incl", gPrefs->GetPrefInt(prf_I_BeIncludes, 1));
-
-	SetOn("maba", gPrefs->GetPrefInt(prf_I_Backup, 0));
-	SetOn("fonl", gPrefs->GetPrefInt(prf_I_NlAtEof, 1));
-	SetOn("vofm", gPrefs->GetPrefInt(prf_I_Verify, 1));
-
-	SetOn("idmn", gPrefs->GetPrefInt(prf_I_IdeMenu, 1));
-	SetOn("mwpl", gPrefs->GetPrefInt(prf_I_MwPlugins, 1));
-
-	SetOn("pftp", gPrefs->GetPrefInt(prf_I_PassiveFtp, 1));
-
-	SetOn("shgl", gPrefs->GetPrefInt(prf_I_ShowGlossary, 0));
-	SetOn("sigl", gPrefs->GetPrefInt(prf_I_SingleClickGlossary, 0));
-
-	SetOn("shtp", gPrefs->GetPrefInt(prf_I_ShowHtmlPalette, 1));
-	SetOn("shtP", gPrefs->GetPrefInt(prf_I_ShowHtmlpaletteForHtml, 1));
-
-	SetEnabled("shtP", IsOn("shtp"));
-
-	SetOn("isic", gPrefs->GetPrefInt(prf_I_IsearchIgncase, 1));
-	SetOn("cesf", gPrefs->GetPrefInt(prf_I_CenterFound, 0));
-
-	SetOn("sogr", gPrefs->GetPrefInt(prf_I_SortGroup, 1));
-	SetOn("rlgp", gPrefs->GetPrefInt(prf_I_RelativeGroupPaths, 0));
-
-	SetOn("prso", gPrefs->GetPrefInt(prf_I_SortProject, 1));
-	SetOn("prad", gPrefs->GetPrefInt(prf_I_AutodetectProjects, 1));
+	SetEnabled(pnm_Sup_X_ShowPaletteForHtml,	IsOn(pnm_Sup_X_ShowHtmlPalette));
 
 	fSearchPaths->DoCancel();
 	fIncludePaths->DoCancel();
@@ -688,9 +679,9 @@ void CPrefsDialog::UpdateFields()
 	SetEnabled("restore scrollbar", statePe);
 	SetEnabled("restore cwd", statePe);
 
-	SetEnabled("wrft", IsOn("wrfi"));
+	SetEnabled(pnm_Wrp_T_FixedColumn, IsOn(pnm_Wrp_R_FixedColumn));
 
-	SetEnabled("shtP", IsOn("shtp"));
+	SetEnabled(pnm_Sup_X_ShowPaletteForHtml, IsOn(pnm_Sup_X_ShowHtmlPalette));
 
 	UpdateKBPage();
 
@@ -765,7 +756,7 @@ void CPrefsDialog::MessageReceived(BMessage *msg)
 
 		case msg_StoreSuffix:
 			if (fSuffixes.size()) {
-				fSuffixes[GetValue("lang") - 1] = GetText("sufx");
+				fSuffixes[GetValue(pnm_Lng_P_Language) - 1] = GetText(pnm_Lng_T_Suffixes);
 			}
 			if (fCurrentSuffix != 0) {
 				if (strcmp(fCurrentSuffix,fSuffixes[fLang].c_str()) != 0) {
@@ -776,7 +767,7 @@ void CPrefsDialog::MessageReceived(BMessage *msg)
 			break;
 
 		case msg_LanguageSelected:
-			fLang = GetValue("lang") - 1;
+			fLang = GetValue(pnm_Lng_P_Language) - 1;
 			{
 				int cookie = 0, i = 0;
 				CLanguageInterface *intf = NULL;
@@ -789,7 +780,7 @@ void CPrefsDialog::MessageReceived(BMessage *msg)
 				}
 			}
 			if (fSuffixes.size()) {
-				SetText("sufx", fSuffixes[fLang].c_str());
+				SetText(pnm_Lng_T_Suffixes, fSuffixes[fLang].c_str());
 			}
 			break;
 

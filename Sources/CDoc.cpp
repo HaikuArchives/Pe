@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 09/10/97 13:20:21
 */
@@ -73,8 +73,8 @@ CDoc::CDoc(const char* mimetype, BLooper *target, const entry_ref *doc)
 		struct stat st;
 		FailOSErr(node.GetStat(&st));
 
-		fReadOnly = !((gUid == st.st_uid && (S_IWUSR & st.st_mode)) 
-						||	(gGid == st.st_gid && (S_IWGRP & st.st_mode)) 
+		fReadOnly = !((gUid == st.st_uid && (S_IWUSR & st.st_mode))
+						||	(gGid == st.st_gid && (S_IWGRP & st.st_mode))
 						||	(S_IWOTH & st.st_mode));
 
 		char s[NAME_MAX];
@@ -98,7 +98,7 @@ CDoc::CDoc(const URLData& url)
 CDoc::~CDoc()
 {
 	StopWatchingFile();
-	
+
 	sfDocList.remove(this);
 	be_app->PostMessage(msg_DocClosed);
 }
@@ -169,13 +169,13 @@ void CDoc::SaveAs()
 	BWindow *w = fSavePanel->Window();
 	FailNil(w);
 	w->Lock();
-	
+
 	char s[256];
 	sprintf(s, "Save %s as:", Name());
-	
+
 	w->SetTitle(s);
 	fSavePanel->SetSaveText(Name());
-	
+
 	if (EntryRef())
 	{
 		BEntry e(EntryRef()), p;
@@ -217,9 +217,9 @@ void CDoc::SaveRequested(entry_ref& directory, const char *name)
 		if (e.Exists())
 		{
 			entry_ref xr;
-			
+
 			e.GetRef(&xr);
-			
+
 			if (EntryRef() && xr == *EntryRef())	// its me, help!!!
 			{
 				BFile file;
@@ -229,23 +229,23 @@ void CDoc::SaveRequested(entry_ref& directory, const char *name)
 			else
 				e.Remove();
 		}
-		
+
 		fReadOnly = false;
-		
+
 		entry_ref eref;
 		FailOSErr(e.GetRef(&eref));
 		fDocIO->SetEntryRef(&eref);
-		
+
 		Save();
 		NameChanged();
-		
+
 		if (EntryRef())
 		{
 			BPath p;
 			FailOSErr(e.GetPath(&p));
 			AddRecent(p.Path());
 		}
-		
+
 		if (fSavePanel)
 		{
 			delete fSavePanel;
@@ -262,18 +262,18 @@ void CDoc::SaveACopy()
 {
 	if (!fSavePanel)
 		fSavePanel = new BFilePanel(B_SAVE_PANEL);
-	
+
 	FailNil(fSavePanel);
 
 	BWindow *w = fSavePanel->Window();
 	w->Lock();
-	
+
 	char s[256];
 	sprintf(s, "Save a copy of %s as:", Name());
-	
+
 	w->SetTitle(s);
 	fSavePanel->SetSaveText(Name());
-	
+
 	if (EntryRef())
 	{
 		BEntry e(EntryRef()), p;
@@ -306,7 +306,7 @@ void CDoc::DoSaveACopy(entry_ref& directory, const char *name)
 		FailOSErr(e.InitCheck());
 		if (e.Exists())
 			e.Remove();
-		
+
 		entry_ref eref;
 		FailOSErr(e.GetRef(&eref));
 		CLocalDocIO writer(this, &eref, NULL);
@@ -336,7 +336,7 @@ void CDoc::Revert()
 {
 	char title[256];
 	sprintf(title, "Revert to the last saved version of %s?", Name());
-	
+
 	MInfoAlert a(title, "Cancel", "OK");
 	if (a == 2)
 	{
@@ -360,10 +360,10 @@ void CDoc::SetReadOnly(bool readOnly)
 			FailOSErr(e.SetTo(EntryRef(), true));
 			BPath p;
 			FailOSErr(e.GetPath(&p));
-			
+
 			struct stat st;
 			FailOSErr(stat(p.Path(), &st));
-			
+
 			if (readOnly)
 				st.st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 			else
@@ -373,7 +373,7 @@ void CDoc::SetReadOnly(bool readOnly)
 				umask(t);				// and reset it.
 				st.st_mode |= (S_IWUSR | S_IWGRP | S_IWOTH) & ~t;
 			}
-			
+
 			FailOSErr(chmod(p.Path(), st.st_mode));
 
 			fReadOnly = readOnly;
@@ -388,7 +388,7 @@ void CDoc::SetReadOnly(bool readOnly)
 void CDoc::SetMimeType(const char *type, bool updateOnDisk)
 {
 	fMimeType = type;
-	
+
 	if (updateOnDisk && EntryRef())
 	{
 		BNode node;
@@ -462,11 +462,11 @@ void CDoc::StopWatchingFile(bool stopDirectory)
 void CDoc::AddRecent(const char *path)
 {
 	char *s;
-	if ((s = strstr(path, "/config/settings/pe/Worksheet")) != NULL && 
+	if ((s = strstr(path, "/config/settings/pe/Worksheet")) != NULL &&
 		strlen(s) == 29 /*strlen("/config/settings/pe/Worksheet")*/)
 		return; // don't add the worksheet
-	
-	if (gPrefs->GetPrefInt(prf_I_SkipTmp, 1))
+
+	if (gPrefs->GetPrefInt(prf_I_SkipTmpFiles, 1))
 	{
 		BPath tp;
 		try
@@ -479,7 +479,7 @@ void CDoc::AddRecent(const char *path)
 	}
 
 	vector<char*>::iterator di;
-	
+
 	for (di = sfTenLastDocs.begin(); di != sfTenLastDocs.end(); di++)
 	{
 		char *p = *di;
@@ -500,7 +500,7 @@ void CDoc::AddRecent(const char *path)
 		sfTenLastDocs.erase(sfTenLastDocs.end() - 1);
 		free(p);
 	}
-	
+
 	sfTenLastDocs.insert(sfTenLastDocs.begin(), strdup(path));
 }
 
@@ -511,9 +511,9 @@ bool CDoc::GetNextRecent(char *path, int& indx)
 	else
 	{
 		vector<char*>::iterator li;
-		
+
 		li = sfTenLastDocs.begin() + indx++;
-		
+
 		strcpy(path, *(li));
 		return true;
 	}
@@ -524,7 +524,7 @@ bool CDoc::GetNextRecent(char *path, int& indx)
 CDoc* CDoc::FindDoc(const entry_ref& doc)
 {
 	doclist::iterator di;
-	
+
 	for (di = sfDocList.begin(); di != sfDocList.end(); di++)
 	{
 		if ((*di)->EntryRef() && *(*di)->EntryRef() == doc)
@@ -536,9 +536,9 @@ CDoc* CDoc::FindDoc(const entry_ref& doc)
 void CDoc::PostToAll(unsigned long msg, bool async)
 {
 	doclist::iterator di;
-	
+
 	doclist lst = sfDocList;
-	
+
 	BLooper *me = BLooper::LooperForThread(find_thread(NULL));
 
 	for (di = lst.begin(); di != lst.end(); di++)
@@ -547,7 +547,7 @@ void CDoc::PostToAll(unsigned long msg, bool async)
 		if (w)
 		{
 			BMessage reply;
-			
+
 			if (async || w == dynamic_cast<BWindow*>(me))
 				w->PostMessage(msg);
 			else
@@ -562,9 +562,9 @@ void CDoc::PostToAll(unsigned long msg, bool async)
 void CDoc::HandleFolderNodeMonitorMsg(BMessage* msg)
 {
 	doclist::iterator di;
-	
+
 	doclist lst = sfDocList;
-	
+
 	for (di = lst.begin(); di != lst.end(); di++)
 	{
 		if ((*di)->fDocIO && (*di)->fDocIO->MatchesNodeMonitorMsg(msg))

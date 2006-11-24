@@ -1,7 +1,7 @@
 /*	$Id$
-	
+
 	Copyright 2005 Oliver Tappe
-	
+
 	Distributed under the MIT License
 */
 
@@ -13,7 +13,7 @@
  *		#%{
  * 	#%}
  * and interpretes anything between those comments as a list of named
- * groups of source-files. Instead of opening such files as text, Pe 
+ * groups of source-files. Instead of opening such files as text, Pe
  * opens a project-window, containing all source-files found.
  * This project-window can then be used to easily open the sources, and
  * add/remove sources, too.
@@ -24,7 +24,7 @@
  * 	SRCS = sourcefile1.cpp sourcefile2.cpp
  * 	RSRCS = resfile.rsrc
  * 	#%}
- * 
+ *
  * A second markup format (from Eddie) is support as well:
  *
  * 	# @src->@
@@ -60,8 +60,7 @@ struct CProjectMakeSerializer : public CProjectSerializer
 	BPath fStartPath;
 };
 
-CProjectMakeSerializer::CProjectMakeSerializer( BString& result, 
-															 	const char* startPath)
+CProjectMakeSerializer::CProjectMakeSerializer( BString& result, const char* startPath)
 	:	fResult(result)
 	,	fStartPath(startPath)
 {
@@ -143,7 +142,7 @@ static const char *skip_white(const char *t)
 	return t;
 } // skip_white
 
-static const char* skipback_over(const char* ptr, const char* start, 
+static const char* skipback_over(const char* ptr, const char* start,
 											const char* skipChars)
 {
 	if (!ptr)
@@ -190,7 +189,7 @@ static const char *next_path(const char *t, const char *& p, int& pl)
 	}
 	else
 		p = NULL;
-	
+
 	return t;
 } // next_path
 
@@ -210,32 +209,32 @@ const char *CProjectMakeFile::_AddGroup(const char *t)
 
 		while (isalnum(*t) || *t == '_')
 			t++;
-		
+
 		int nl = t - n;
-		
+
 		t = skip_white(t);
-		
+
 		if (*t == ':')
 			t++;
 		if (*t != '=')
 			return skip_to(t, '\n');
 
 		t++;
-		
+
 		BString s(n, nl);
 
 		CProjectGroupItem *group
 			= new CProjectGroupItem(fParentPath.String(), s.String());
 		group->GroupHeader(groupHeader);
 		fItems.push_back(group);
-		
+
 		groupStart = NULL;
 
 		while (true)
 		{
 			const char *p;
 			int pl;
-			
+
 			t = skip_white(t);
 
 			t = next_path(t, p, pl);
@@ -249,8 +248,8 @@ const char *CProjectMakeFile::_AddGroup(const char *t)
 
 			if (s.Length())
 				group->AddItem(new CProjectItem(fParentPath.String(), s.String()),
-									gPrefs->GetPrefInt(prf_I_SortProject, 1) != 0);
-			
+									gPrefs->GetPrefInt(prf_I_SortProjectFiles, 1) != 0);
+
 			t = skip_white(t);
 
 			if (*t == '\n')
@@ -280,7 +279,7 @@ status_t CProjectMakeFile::Parse(const BString& contents)
 	const char* t = contents.String();
 	int32 size = contents.Length();
 	const char *s, *e;
-	
+
 	s = strstr(t, "%{");
 	if (s) {
 		s = skipback_over(s, t, " \t#");
@@ -294,17 +293,17 @@ status_t CProjectMakeFile::Parse(const BString& contents)
 		e = s ? strstr(s, "@<-src@") : s;
 		e = skipback_over(e, t, " \t#");
 	}
-	
+
 	if (s < e)
 	{
 		s = skip_to(s + 3, '\n') + 1;
-		
+
 		int l = s - t;
 		fHeader.SetTo(t, l);
-		
+
 		l = t + size - e;
 		fFooter.SetTo(e, l);
-		
+
 		while (s < e)
 			s = _AddGroup(s);
 
@@ -313,7 +312,7 @@ status_t CProjectMakeFile::Parse(const BString& contents)
 
 	}
 	if (fItems.empty()) {
-		fErrorMsg 
+		fErrorMsg
 			<< "No project-items could be found in the makefile\n\n"
 			<< "Maybe you have forgotten to add\n"
 			<< "   # @src->@ and # @src<-@\n"
@@ -338,7 +337,7 @@ void CProjectMakeFile::GetText(BString& docText) const
 		(*iter)->SerializeTo(&serializer);
 
 	docText << fFooter;
-}		
+}
 
 void CProjectMakeFile::SetText(const BString& docText)
 {
