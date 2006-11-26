@@ -2437,16 +2437,8 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 		functions.SortItems(MenuFunctionScanHandler::CompareFunc);
 	}
 
-#if (B_BEOS_VERSION <= B_BEOS_VERSION_4)
-	// BeOS < R4.5 has no AsyncAutoDestruct, so we simulate that (kind of):
-	static BPopUpMenu * popup = NULL;
-	if (popup)
-		delete popup;
-	popup = new BPopUpMenu("Funcs");
-#else
 	BPopUpMenu *popup = new BPopUpMenu("Funcs");
 	popup->SetAsyncAutoDestruct(true);
-#endif
 	popup->SetFont(be_plain_font);
 
 	if (includes.IsEmpty() && functions.IsEmpty())

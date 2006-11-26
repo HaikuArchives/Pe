@@ -872,9 +872,7 @@ void PApp::MessageReceived(BMessage *msg)
 				break;
 			}
 
-#if (B_BEOS_VERSION > B_BEOS_VERSION_4)
 			case B_SILENT_RELAUNCH:
-#endif
 			case msg_New:
 				NewWindow();
 				break;
