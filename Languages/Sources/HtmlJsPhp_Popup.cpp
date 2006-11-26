@@ -35,20 +35,74 @@
 
 /* TODO:
 	- AddInclude() for include, include_once, require and require_once
-	- Support for x='attribute'
 	- PHP class support
 */
-#include "CLanguageAddOn.h"
 #include <string>
+#include "CLanguageAddOn.h"
 
 const long kMaxNameSize = 256;
 
+const char* const SORT_PREFIX_PHP	= "PHP:  ";
+const char* const SORT_PREFIX_JS	= "JS:  ";
+const char* const SORT_PREFIX_NAME	= "A:  ";
+const char* const SORT_PREFIX_HREF	= "HREF:  ";
+const char* const SORT_PREFIX_HEAD1	= "H";
+const char* const SORT_PREFIX_HEAD2	= ":  ";
+
+struct PopupMenu
+{
+	BString label;
+	BString text;
+	const char * position;
+	bool italic;
+	
+//	PopupMenu (const char *lab, const char *txt, const char * pos)
+//		: label(lab), text(txt), position(pos) {}
+	
+	PopupMenu (BString &lab, BString &txt, const char * pos, bool ita=false)
+		: label(lab), text(txt), position(pos), italic(ita) {}
+};
+typedef vector<PopupMenu> PopupList;
+
+void add_to_popup(const char* name, PopupList &pul, CLanguageProxy& proxy);
+bool isident(char ch);
 const char *skip(const char *txt, int ch);
 const char *skip_nc(const char *txt, int ch);
-const char *Anchor(const char *txt, CLanguageProxy& ao);
-const char *Heading(const char *txt, CLanguageProxy& ao);
-const char *JavaScript(const char *txt, CLanguageProxy& ao);
-const char *PhpScript(const char *txt, CLanguageProxy& ao);
+void skip_string(const char *&txt);
+const char *skip_block(const char *txt, char open, char close);
+const char *skip_whitespace(const char *txt);
+void skip_attributes(const char *&ptr);
+const char *anchor(const char *txt, CLanguageProxy& proxy, PopupList &pul, bool sorted);
+const char *heading(const char *txt, PopupList &pul, bool sorted);
+bool get_attribute(const char *&ptr, const char *&namBeg, int& namLen, const char *&valBeg, int& valLen);
+void php_function(const char *&txt, PopupList &pul, BString &className, bool sorted);
+void php_class(const char *&txt, PopupList &pul, BString &className, bool sorted);
+const char *JavaScript(const char *txt, PopupList &lstJsFunctions, PopupList &lstJsClasses, bool sorted);
+const char *PhpScript(const char *txt, PopupList &lstPhpFunctions, PopupList &lstPhpClasses, bool sorted);
+
+
+#pragma mark Support Functions
+
+
+void add_to_popup(const char* name, PopupList &pul, CLanguageProxy& proxy)
+{
+	if (pul.size() > 0)
+	{
+		proxy.AddSeparator(name);
+		for (uint i=0; i<pul.size(); i++)
+		{
+			proxy.AddFunction(pul[i].label.String(), pul[i].text.String(),
+				pul[i].position - proxy.Text(), pul[i].italic);
+		}
+	}
+}
+
+
+bool isident(char ch)
+{
+	return isalnum(ch) || ch == '_';
+} /* isident */
+
 
 const char *skip(const char *txt, int ch)
 {
@@ -64,6 +118,7 @@ const char *skip(const char *txt, int ch)
 
 	return txt;
 } /* skip */
+
 
 const char *skip_nc(const char *txt, int ch)
 {
@@ -83,58 +138,70 @@ const char *skip_nc(const char *txt, int ch)
 	return txt;
 } /* skip_nc */
 
-const char *block(const char *txt, int open)
+
+void skip_string(const char *&txt)
 {
-	int close = 0;
-	switch (open)
-	{
-		case '(':
-			close = ')';
-			break;
-		case '{':
-			close = '}';
-			break;
-		default:
-			assert(false);
-	}
-	
+	char quote = *txt;
+
+	while (*++txt && *txt != quote)
+		if (*txt == '\\')
+			txt++;
+} /* skip_string */
+
+
+const char *skip_block(const char *txt, char open, char close)
+{
 	while (*txt)
 	{
 		if (*txt == open)
-			txt = block(txt + 1, open);
+			txt = skip_block(txt + 1, open, close);
+
 		else if (*txt == close)
 			return txt + 1;
-		else if (*txt == '"')
+
+		else if (*txt == '"' || *txt == '\'')
 		{
-			while (*++txt)
-			{
-				if (*txt == '\\')
-					++txt;
-				else if (*txt == '"')
-					break;
-			}
+			skip_string(txt);
 			++txt;
 		}
 		else
 			++txt;
 	}
-	
 	return txt;
-}
+} /* block */
 
-inline const char *skip_white(const char *txt)
+
+inline const char *skip_whitespace(const char *txt)
 {
 	while (isspace(*txt))
 		txt++;
 	return txt;
 } /* skip_white */
 
+
+void skip_attributes(const char *&ptr)
+{
+	const char *nam = 0, *val = 0;
+	int namLen = 0, valLen = 0;
+
+	// Skip tagname
+	if (*(++ptr) != 0 && *ptr == '/')
+		ptr++;
+	while (*ptr != 0 && isalnum(*ptr))
+		ptr++;
+	// Skip attributes
+	while (get_attribute(ptr, nam, namLen, val, valLen)) ;
+	// skip ">"
+	ptr++;
+}
+
+
 bool get_attribute(const char *&ptr, const char *&namBeg, int& namLen, const char *&valBeg, int& valLen)
 {
 	const char *namEnd=0, *valEnd=0;
 
 	namBeg = valBeg = 0;
-	ptr = skip_white(ptr);
+	ptr = skip_whitespace(ptr);
 	if (*ptr != 0 && *ptr != '>')
 	{
 		// Search for attribue name
@@ -142,10 +209,10 @@ bool get_attribute(const char *&ptr, const char *&namBeg, int& namLen, const cha
 		// Gracefully also accept non alphanumeric characters
 		while (*namEnd != 0 && *namEnd != '=' && !isspace(*namEnd))
 			namEnd++;
-		ptr = skip_white(namEnd);
+		ptr = skip_whitespace(namEnd);
 		// Search for attribue value
 		if (*ptr == '=') {
-			ptr = skip_white(ptr+1);
+			ptr = skip_whitespace(ptr+1);
 			if (*ptr == '"' || *ptr == '\'')
 			{
 				// Value is enclosed
@@ -171,25 +238,71 @@ bool get_attribute(const char *&ptr, const char *&namBeg, int& namLen, const cha
 	} else {
 		return false;
 	}
-}
+} /* get_attribute */
 
-void skip_attributes(const char *&ptr)
+
+void php_function(const char *&txt, PopupList &pul, BString &className, bool sorted)
 {
-	const char *nam, *val;
-	int namLen, valLen, len;
+	BString label, function, params;
+	txt = skip_whitespace(txt+8);
 
-	// Skip tagname
-	if (*(++ptr) != 0 && *ptr == '/')
-		ptr++;
-	while (*ptr != 0 && isalnum(*ptr))
-		ptr++;
-	// Skip attributes
-	while (get_attribute(ptr, nam, namLen, val, valLen)) ;
-	// skip ">"
-	ptr++;
-}
+	const char *beg = txt;
+	while (isident(*++txt)) ;
+	function.SetTo(beg, txt-beg);
 
-const char *Anchor(const char *txt, CLanguageProxy& ao)
+	txt = skip_whitespace(txt);
+	if (*txt == '(') {
+		const char* ptr = txt;
+		txt = skip_block(txt+1, '(', ')');
+		params.SetTo(ptr+1, txt-ptr-2);
+		params.Prepend("  (");
+		params.Append(")");
+	}
+	if (sorted)
+	{
+		label << SORT_PREFIX_PHP;
+		if (className != "")
+		{
+			label << className << "::";
+		}
+	}
+	else
+	{
+		if (className != "")
+		{
+			label << "• ";
+		}
+	}
+	label << function << params;
+	pul.insert(pul.end(), PopupMenu(label, function, beg));
+} /* php_function */
+
+
+void php_class(const char *&txt, PopupList &pul, BString &className, bool sorted)
+{
+	BString label;
+
+	txt = skip_whitespace(txt+5);
+	const char *beg = txt;
+	while (isident(*++txt)) ;
+	className.SetTo(beg, txt-beg);
+
+	while (*++txt && *txt != '{') ;
+
+//	txt = skip_whitespace(txt);
+//	if (*txt == '(') {
+//		const char* beg = txt;
+//		txt = skip_block(txt+1, '(', ')');
+//		params.SetTo(beg+1, txt-beg-2);
+//		params.Prepend("  (");
+//		params.Append(")");
+//	}
+	if (!sorted)
+		pul.insert(pul.end(), PopupMenu(className, className, beg, true));
+} /* php_class */
+
+
+const char *anchor(const char *txt, CLanguageProxy& proxy, PopupList &pul, bool sorted)
 {
 	const char *nam, *val;
 	int namLen, valLen, len;
@@ -202,16 +315,17 @@ const char *Anchor(const char *txt, CLanguageProxy& ao)
 			{
 				if (*val != '#')
 				{
-					BString label("HREF:  "), include(val, valLen);
+					BString label(SORT_PREFIX_HREF), include(val, valLen);
 					label << include;
-					ao.AddInclude(label.String(), include.String());
+					proxy.AddInclude(label.String(), include.String());
 				}
 			}
 			else if (strncasecmp(nam, "NAME", 4) == 0)
 			{
-				BString label("A:  "), function(val, valLen);
+				BString function(val, valLen);
+				BString label(sorted ? SORT_PREFIX_NAME : "");
 				label << function;
-				ao.AddFunction(label.String(), function.String(), txt - ao.Text());
+				pul.insert(pul.end(), PopupMenu(label, function, txt));
 			}
 		}
 
@@ -219,14 +333,26 @@ const char *Anchor(const char *txt, CLanguageProxy& ao)
 	return txt;
 } /* Anchor */
 
-const char *Heading(const char *txt, CLanguageProxy& ao)
+
+const char *heading(const char *txt, PopupList &pul, bool sorted)
 {
 	char endTag[6];
 	bool wasSpace = false;
 	const char *ptr = txt;
-	BString label("H"), heading;
+	BString label, heading;
+	int level = (*txt - '0');
 
-	label << (*txt - '0') << ":  ";
+	if (sorted)
+	{
+		label << SORT_PREFIX_HEAD1 << level << SORT_PREFIX_HEAD2;
+	}
+	else
+	{
+		for (int i=1; i<level; i++)
+			label << "       ";
+		label << "(" << level << ")  ";
+	}
+	
 	skip_attributes(ptr);
 	sprintf(endTag, "</h%c>", *txt);
 	txt = ptr;
@@ -258,12 +384,17 @@ const char *Heading(const char *txt, CLanguageProxy& ao)
 		label << "…";
 	}
 	heading.SetTo(txt, ptr-txt);
-	ao.AddFunction(label.String(), heading.String(), txt - ao.Text());
+
+	pul.insert(pul.end(), PopupMenu(label, heading, txt));
 
 	return ptr;
 } /* Heading */
 
-const char *JavaScript(const char *txt, CLanguageProxy& ao)
+
+#pragma mark Main Functions
+
+
+const char *JavaScript(const char *txt, PopupList &lstJsFunctions, PopupList &lstJsClasses, bool sorted)
 {
 	txt = skip_nc(txt, '>');
 	
@@ -275,58 +406,43 @@ const char *JavaScript(const char *txt, CLanguageProxy& ao)
 				if (*(txt + 1) == '/')
 					txt = skip(txt, '\n') - 1;
 				break;
+
 			case '"':
-			{
-				while (*++txt)
-				{
-					if (*txt == '\\')
-						txt++;
-					else if (*txt == '"')
-						break;
-				}
-				break;
-			}
 			case '\'':
-			{
-				while (*++txt)
-				{
-					if (*txt == '\\')
-						txt++;
-					else if (*txt == '\'')
-						break;
-				}
+				skip_string(txt);
 				break;
-			}
-			case '{':
+
 			case '(':
-				txt = block(txt + 1, *txt);
+				txt = skip_block(txt + 1, '(', ')');
 				break;
+
+			case '{':
+				txt = skip_block(txt + 1, '{', '}');
+				break;
+
 			case '<':
 				if (strncasecmp(txt, "</script", 8) == 0)
 					return txt + 9;
 				break;
+
 			default:
 				if (strncasecmp(txt, "function", 8) == 0)
 				{
 					txt += 8;
 					while (isspace(*txt)) txt++;
 					
-					int offset = txt - ao.Text();
-					
-					char name[kMaxNameSize];
-					char *n = name;
-					while ((isalnum(*txt) || *txt == '.' || *txt == '_') &&
-							(n - name) < kMaxNameSize - 1)
+					const char *beg = txt;
+					while ((isalnum(*txt) || *txt == '.' || *txt == '_'))
 					{
-						*n++ = *txt++;
+						txt++;
 					}
-					*n = 0;
-					
-					char label[kMaxNameSize + 3];
-					strcpy(label, "JS:  ");
-					strcat(label, name);
 
-					ao.AddFunction(label, name, offset);
+					BString label, function(beg, txt-beg);
+					if (sorted)
+						label << SORT_PREFIX_JS;
+					label << function;
+
+					lstJsFunctions.insert(lstJsFunctions.end(), PopupMenu(label, function, beg));
 				}
 				break;
 		}
@@ -334,136 +450,150 @@ const char *JavaScript(const char *txt, CLanguageProxy& ao)
 	}
 	
 	return txt;
-} // JavaScript
+} /* JavaScript */
 
-const char *PhpScript(const char *txt, CLanguageProxy& ao)
+
+const char *PhpScript(const char *txt, PopupList &lstPhpFunctions, PopupList &lstPhpClasses, bool sorted)
 {
+	map <int,int,int> headings;
+	BString class_name;
 	while (*txt)
 	{
+//printf("%c", *txt);
 		switch (*txt)
 		{
 			case '/':
+				// Comment: "//..."
 				if (*(txt + 1) == '/')
 					txt = skip(txt + 2, '\n') - 1;
+				// Comment: "/*..."
 				else if (*(txt + 1) == '*')
 				{
-					++txt;
-					
+					txt++;
 					while ( *++txt &&
 							!(*txt == '?' && *(txt + 1) == '>') &&
 							!(*txt == '*' && *(txt + 1) == '/'))
 						;
-					++txt;
+					txt++;
 				}
 				break;
+
 			case '"':
-			{
-				while (*++txt)
-				{
-					if (*txt == '\\')
-						txt++;
-					else if (*txt == '"')
-						break;
-				}
-				break;
-			}
 			case '\'':
-			{
-				while (*++txt)
-				{
-					if (*txt == '\\')
-						txt++;
-					else if (*txt == '\'')
-						break;
-				}
+				skip_string(txt);
 				break;
-			}
+
+			case '}':
+				//printf("\nCLASSEND FOUND\n");
+				class_name = "";
+				break;
+
 			case '{':
-			case '(':
-				txt = block(txt + 1, *txt);
+				txt = skip_block(txt + 1, '{', '}');
 				break;
+
+			case '(':
+				txt = skip_block(txt + 1, '(', ')');
+				break;
+
 			case '?':
 				if (*++txt == '>')
 					return txt + 1;
 				break;
-			default:
-				if (strncasecmp(txt, "function", 8) == 0)
-				{
-					txt += 8;
-					while (isspace(*txt)) txt++;
-					
-					int offset = txt - ao.Text();
-					
-					char name[kMaxNameSize];
-					char *n = name;
-					while ((isalnum(*txt) || *txt == '_') && (n - name) < kMaxNameSize)
-						*n++ = *txt++;
-					*n = 0;
-					
-					char label[kMaxNameSize + 6];
-					strcpy(label, "PHP:  ");
-					strcat(label, name);
 
-					ao.AddFunction(label, name, offset);
+			default:
+//printf(" <%c%c%c%c> ", *(txt+0), *(txt+1), *(txt+2), *(txt+3));
+				if (isident(*txt)) {
+					const char *ptr = txt-1;
+					while (*++ptr && isident(*ptr)) ;
+					int len = ptr - txt;
+
+					if (len == 8 && strncasecmp(txt, "function", 8) == 0)
+					{
+						php_function(txt, class_name == "" ? lstPhpFunctions : lstPhpClasses, class_name, sorted);
+					}
+					else if (len == 5 && strncasecmp(txt, "class", 5) == 0)
+					{
+						php_class(txt, lstPhpClasses, class_name, sorted);
+					}
+					else
+					{
+						//printf("[[");for (const char* p=txt; p<ptr; p++)printf("%c", *p);printf(":%li]]", ptr - txt);
+						txt = ptr;
+					}
 				}
 				break;
 		}
 		txt++;
 	}
-	
+//printf("\n");
 	return txt;
-} // PhpScript
+} /* PhpScript */
+
 
 void ScanForFunctions(CLanguageProxy& proxy)
 {
+	bool sorted = proxy.Sorted();
+	PopupList lstHeadings, lstAnchors, lstPhpFunctions, lstPhpClasses, lstJsFunctions, lstJsClasses;
+
 	const char *text = proxy.Text(), *max = text + proxy.Size();
 	if (*max != 0)
 		return;
 
 	if (strncasecmp(text, "<!--:javascript", 15) == 0)
-		text = JavaScript(text, proxy);
+		text = JavaScript(text, lstJsFunctions, lstJsClasses, sorted);
 	else if (strncasecmp(text, "<!--:php", 8) == 0)
-		text = PhpScript(text + 11, proxy);
+		text = PhpScript(text + 11, lstPhpFunctions, lstPhpClasses, sorted);
 
-	while (text < max)
+	while (*text && text < max)
 	{
 		text = skip(text, '<');
-		text = skip_white(text);
+		text = skip_whitespace(text);
 		
 		switch (toupper(*text))
 		{
-			case 0:
-				return;
 			case '?':
-				text = PhpScript(text, proxy);
+				text = PhpScript(text, lstPhpFunctions, lstPhpClasses, sorted);
 				break;
+
 			case 'A':
 				if (isspace(*++text))
-					text = Anchor(text, proxy);
+					text = anchor(text, proxy, lstAnchors, sorted);
 				else
 					text = skip_nc(text, '>');
 				break;
+
 			case 'L':
 				if (strncasecmp(text, "LINK", 4) == 0)
-					text = Anchor(text + 4, proxy);
+					text = anchor(text + 4, proxy, lstAnchors, sorted);
 				else
 					text = skip_nc(text, '>');
 				break;
+
 			case 'H':
 				if (*++text >= '1' && *text <= '6')
 				{
-					text = Heading(text, proxy);
+					text = heading(text, lstHeadings, sorted);
 				}
 				else
 					text = skip_nc(text, '>');
 				break;
+
 			case 'S':
 				if (strncasecmp(text, "SCRIPT", 6) == 0)
-					text = JavaScript(text, proxy);
+					text = JavaScript(text, lstJsFunctions, lstJsClasses, sorted);
 				break;
+
 			default:
 				text = skip_nc(text + 1, '>');
 				break;
 		}
 	}
+
+	add_to_popup("PHP-Classes",   lstPhpClasses,   proxy);
+	add_to_popup("PHP-Functions", lstPhpFunctions, proxy);
+	add_to_popup("JS-Classes",    lstJsClasses,    proxy);
+	add_to_popup("JS-Functions",  lstJsFunctions,  proxy);
+	add_to_popup("HTML-Anchors",  lstAnchors,      proxy);
+	add_to_popup("HTML-Headings", lstHeadings,     proxy);
 } /* ScanForFunctions */
