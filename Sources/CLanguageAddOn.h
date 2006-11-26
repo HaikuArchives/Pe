@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 12/07/97 21:46:44 by Maarten Hekkelman
 */
@@ -62,23 +62,23 @@ class CLanguageProxy {
 public:
 		CLanguageProxy(CLanguageInterface& intf, const char *text, int size, int *starts = NULL, rgb_color *colors = NULL);
 		CLanguageProxy(CLanguageInterface& intf, PText& text, CFunctionScanHandler* handler = NULL);
-		
+
 /*
 	Use the next two methods to recognize keywords in the text.
-	Move is used to walk through a DFA (deterministic finite automaton)
-	and reports back the state it is currently in. Always start with a state 1 (one).
+	Move is used to walk through a keyword map and reports back the state it is
+	currently in. Always start with a state 1 (one).
 	If the result of a Move is 0 (zero), than you haven't fed it a keyword.
 	If the state is not zero, you can test if it's a valid keyword by calling IsKeyword.
 	IsKeyword returns the set the keyword is in, or zero if it's not a keyword.
 	A value of 1 (one) corresponds to a standard keyword, a value of 2 means a
 	keyword from user set 1 and so on.
-	
+
 	You can always call these functions but I think they are only useful when doing
-	syntax colouring.	
+	syntax colouring.
 */
 virtual	int Move(int ch, int state);
 virtual	int IsKeyword(int state, int32 inSets=0);
-		
+
 /*
 	The next pair of calls return the text to colour or parse and it's size.
 	When doing syntax colouring Pe guarantees to return only one line of
@@ -105,15 +105,15 @@ virtual	void SetColor(int start, int color);
 	Offset should be the nr of characters match can be found from the beginning of the
 	text. This value may be incorrect but should be 'near by', preferrably before.
 	The open parameter is of course the name of the include file.
-*/		
-virtual	void AddFunction(const char *name, const char *match, int offset, 
+*/
+virtual	void AddFunction(const char *name, const char *match, int offset,
 	bool italic = false, const char *params = "");
 virtual	void AddInclude(const char *name, const char *open, bool italic = false);
 virtual	void AddSeparator(const char* name = NULL);
 
 /*
 	These report the status of the corresponding checkboxes
-*/		
+*/
 virtual	bool Includes() const;
 virtual	bool Prototypes() const;
 virtual	bool Types() const;
@@ -130,11 +130,11 @@ virtual	bool isspace_uc(int unicode) const;
 virtual	void IncNestLevel();
 virtual	void DecNestLevel();
 virtual	void SetNestLevel(uint32 nestLevel);
-		
+
 private:
 		const char *fText;
 		int fSize;
-		int fDeprecated_was_Encoding;		// deprecated, is always set to 0
+//////		int fDeprecated_was_Encoding;		// deprecated, is always set to 0
 		CLanguageInterface& fInterface;
 		int fCIndx;
 		int *fStarts;

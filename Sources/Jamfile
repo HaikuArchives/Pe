@@ -64,7 +64,6 @@ Application pe :
 	CInfoDialog.cpp
 	CKeyCapturer.cpp
 	CKeyMapper.cpp
-	CKeywords.cpp
 	CLanguageInterface.cpp
 	CLanguageAddOn.cpp
 	CLineObject.cpp

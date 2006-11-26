@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 09/19/97 10:49:36
 */
@@ -56,13 +56,13 @@ public:
 
 		const char *Text() const;
 		int Size() const;
-		
+
 		const char *Name() const;
 		const char *Extensions() const;
 		void SetExtensions(const char *ext);
-		
+
 static	void ChooseDefault();
-		
+
 		int *Starts() const;
 		rgb_color *Colors() const;
 
@@ -73,26 +73,21 @@ static CLanguageInterface* FindByName(const char *language);
 
 static CLanguageInterface* NextIntf(int& cookie);
 static int GetIndex(const CLanguageInterface* intf);
-			
+
 		const char* LineCommentStart() const;
 		const char* LineCommentEnd() const;
-		
+
 protected:
 		CLanguageInterface();
 		CLanguageInterface(const char *path, image_id image);
 
 		void InitTables(const char *kwFile);
 		void RegisterExtension(const char *ext);
+		void GenerateKeywordMap(const char *ext) const;
 
 static	unsigned char *sfWordBreakTable;
 
-		// data members for old (DFA-based) keyword implementation, needed to 
-		// support binary-only language-addons that use this implementation
-		// (like phpext):
-		unsigned char ec[128];
-		unsigned short *accept, *base, *nxt, *chk;
-
-		const char *fLanguage, *fExtensions, *fKeywordFile;		
+		const char *fLanguage, *fExtensions, *fKeywordFile;
 		const char *fLineCommentStart, *fLineCommentEnd;
 		bool (*fBalance)(CLanguageProxy& proxy, int& start, int& end);
 		void (*fScanForFunctions)(CLanguageProxy& proxy);
@@ -103,7 +98,7 @@ static	unsigned char *sfWordBreakTable;
 		// member introduced for proper interface version detection:
 		int16 fInterfaceVersion;
 
-		// members for new (map-based) keyword implementation:
+		// members for map-based keyword implementation:
 public:
 		int AddToCurrentKeyword(int ch, int state);
 		int LookupCurrentKeyword(int state, int32 inSets=0) const;
@@ -140,7 +135,7 @@ public:
 		CFunctionScanHandler();
 virtual	~CFunctionScanHandler();
 
-virtual	void AddFunction(const char *name, const char *match, int offset, 
+virtual	void AddFunction(const char *name, const char *match, int offset,
 	bool italic, uint32 nestLevel, const char *params);
 virtual	void AddInclude(const char *name, const char *open, bool italic);
 virtual	void AddSeparator(const char* name);
