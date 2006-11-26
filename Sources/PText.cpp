@@ -39,7 +39,7 @@
 #include <String.h>
 
 #include "PText.h"
-#include "FontStyle.h"
+#include "CFontStyle.h"
 #include "Utils.h"
 #include "PStatus.h"
 #include "PApp.h"

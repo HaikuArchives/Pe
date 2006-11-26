@@ -40,7 +40,7 @@ typedef float g_unit_t;
 #include <View.h>
 
 #include "PTextBuffer.h"
-#include "FontStyle.h"
+#include "CFontStyle.h"
 
 #include <stack>
 

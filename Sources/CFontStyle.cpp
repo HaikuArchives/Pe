@@ -34,7 +34,7 @@
 */
 
 #include "pe.h"
-#include "FontStyle.h"
+#include "CFontStyle.h"
 #include "utf-support.h"
 #include "HError.h"
 

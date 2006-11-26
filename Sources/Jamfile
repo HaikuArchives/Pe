@@ -83,7 +83,7 @@ Application pe :
 	CStdErrBox.cpp
 	CStdErrParser.cpp
 	CUrlOpener.cpp
-	FontStyle.cpp
+	CFontStyle.cpp
 	MTextAddOnImpl.cpp
 	PAbout.cpp
 	PAddOn.cpp
