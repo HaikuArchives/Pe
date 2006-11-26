@@ -67,7 +67,7 @@ BDirectory gAppDir, gCWD, gPrefsDir;
 BFile gAppFile;
 PApp *gApp;
 bool gAutoIndent, gSyntaxColoring, gBalance, gBlockCursor, gFlashCursor, gSmartBrace;
-bool gPopupIncludes, gPopupProtos, gPopupFuncs;
+bool gPopupIncludes, gPopupProtos, gPopupFuncs, gPopupSorted;
 int gSpacesPerTab;
 bool gUseWorksheet;
 bool gRestorePosition, gRestoreFont, gRestoreSelection, gRestoreScrollbar, gRestoreCWD;
@@ -235,6 +235,7 @@ PApp::PApp()
 		gPopupIncludes		= gPrefs->GetPrefInt(prf_I_ShowIncludes,		1);
 		gPopupProtos		= gPrefs->GetPrefInt(prf_I_ShowPrototypes,		1);
 		gPopupFuncs			= gPrefs->GetPrefInt(prf_I_ShowTypes,			1);
+		gPopupSorted		= gPrefs->GetPrefInt(prf_I_SortPopup,			0);
 		gRedirectStdErr		= gPrefs->GetPrefInt(prf_I_RedirectStdErr,		1);
 		gUseWorksheet		= gPrefs->GetPrefInt(prf_I_Worksheet,			1);
 		gRestorePosition	= gPrefs->GetPrefInt(prf_I_RestorePosition,		1);

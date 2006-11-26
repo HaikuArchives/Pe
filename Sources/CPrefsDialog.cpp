@@ -335,7 +335,7 @@ bool CPrefsDialog::OkClicked()
 	CntrlGetChkbx(pnm_Lng_X_ShowIncludes,			prf_I_ShowIncludes,				gPopupIncludes);
 	CntrlGetChkbx(pnm_Lng_X_ShowPrototypes,			prf_I_ShowPrototypes,			gPopupProtos);
 	CntrlGetChkbx(pnm_Lng_X_ShowTypes,				prf_I_ShowTypes,				gPopupFuncs);
-	CntrlGetChkbx(pnm_Lng_X_SortPopup,				prf_I_SortPopup,				dummy);
+	CntrlGetChkbx(pnm_Lng_X_SortPopup,				prf_I_SortPopup,				gPopupSorted);
 	CntrlGetChkbx(pnm_Wor_X_RedirectStderr,			prf_I_RedirectStdErr,			gRedirectStdErr);
 	CntrlGetChkbx(pnm_Wor_X_KeepWorksheetOpen,		prf_I_Worksheet,				gUseWorksheet);
 	CntrlGetChkbx(pnm_Sta_X_RestorePosition,		prf_I_RestorePosition,			gRestorePosition);

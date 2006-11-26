@@ -117,6 +117,7 @@ virtual	void AddSeparator(const char* name = NULL);
 virtual	bool Includes() const;
 virtual	bool Prototypes() const;
 virtual	bool Types() const;
+virtual	bool Sorted() const;
 
 /*
 	These methods are used for wrapping, they classify the characters in the text

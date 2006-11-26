@@ -159,6 +159,11 @@ bool CLanguageProxy::Types() const
 	return gPopupFuncs;
 } /* CLanguageProxy::Types */
 
+bool CLanguageProxy::Sorted() const
+{
+	return gPopupSorted;
+} /* CLanguageProxy::Sorted */
+
 void CLanguageProxy::CharInfo(const char *txt, int& unicode, int& len) const
 {
 	len = mcharlen(txt);

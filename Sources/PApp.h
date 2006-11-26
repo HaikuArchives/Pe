@@ -108,7 +108,7 @@ extern PApp *gApp;
 
 extern bool gAutoIndent, gSyntaxColoring, gBalance, gBlockCursor, gFlashCursor, gSmartBrace;
 extern int gSpacesPerTab;
-extern bool gPopupIncludes, gPopupProtos, gPopupFuncs;
+extern bool gPopupIncludes, gPopupProtos, gPopupFuncs, gPopupSorted;
 extern bool gRedirectStdErr, gUseWorksheet;
 extern bool gRestorePosition, gRestoreFont, gRestoreSelection, gRestoreScrollbar, gRestoreCWD;
 extern int gSavedState, gRecentBufferSize;

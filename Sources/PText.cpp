@@ -2426,7 +2426,10 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 	BList& includes = handler.includes;
 	BList& functions = handler.functions;
 
+	// Little hack to make CLanguageProxy::Sorted() acknowledge the mode switch
+	gPopupSorted = sorted;
 	ScanForFunctions(handler);
+	gPopupSorted = gPrefs->GetPrefInt(prf_I_SortPopup);
 
 	if (sorted)
 	{
