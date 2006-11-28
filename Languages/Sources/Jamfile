@@ -66,10 +66,10 @@ PeLanguage HtmlJSExt
 # </pe-src>
 
 # <pe-src>
-PeLanguage HtmlJsPhpExt 
-	: HtmlJsPhp_Language.cpp HtmlJsPhp_Popup.cpp 
+PeLanguage HtmlCssJsPhpExt 
+	: HtmlCssJsPhp_Language.cpp HtmlCssJsPhp_Popup.cpp 
 	: be $(STDC++LIB) 
-	: keywords.html-js-php.rsrc 
+	: keywords.html-css-js-php.rsrc 
 	;
 # </pe-src>
 
