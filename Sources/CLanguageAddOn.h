@@ -134,7 +134,6 @@ virtual	void SetNestLevel(uint32 nestLevel);
 private:
 		const char *fText;
 		int fSize;
-//////		int fDeprecated_was_Encoding;		// deprecated, is always set to 0
 		CLanguageInterface& fInterface;
 		int fCIndx;
 		int *fStarts;
