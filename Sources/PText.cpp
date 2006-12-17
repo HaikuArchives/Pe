@@ -1578,6 +1578,8 @@ void PText::AdjustScrollBars()
 	if (fVScrollBar1 == NULL || fVScrollBar2 == NULL || fHScrollBar == NULL)
 		return;
 
+	fBounds = Bounds();
+
 	g_unit_t h, y;
 
 	int lines = LineCount();
@@ -1774,7 +1776,6 @@ void PText::HorizontallyScrollToSelection(int startOffset,
 void PText::FrameResized(float /*w*/, float /*h*/)
 {
 	AdjustScrollBars();
-	fBounds = Bounds();
 	SetupBitmap();
 
 	if (fSoftWrap && fWrapType == 1 &&

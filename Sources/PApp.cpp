@@ -614,7 +614,7 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 					{
 						BMessage m(msg_SelectLines);
 						m.AddInt32("from", lineNr);
-						m.AddInt32("to", lineNr + 1);
+						m.AddInt32("to", lineNr - 1);
 						d->PostMessage(&m, d->PreferredHandler());
 					}
 					break;
@@ -644,7 +644,7 @@ void PApp::RefsReceived(BMessage	*inMessage)
 			FailOSErr (inMessage->FindRef("refs", i, &doc));
 			PDoc *d = dynamic_cast<PDoc*>(OpenWindow(doc));
 			if (!d) continue;
-
+			
 			if (inMessage->HasData(kTokenIdentifier, kTokenIDType))
 			{
 				TokenIdentifier *ident;
@@ -681,7 +681,7 @@ void PApp::RefsReceived(BMessage	*inMessage)
 
 				BMessage msg(msg_SelectLines);
 				FailOSErr(msg.AddInt32("from", line));
-				FailOSErr(msg.AddInt32("to", line));
+				FailOSErr(msg.AddInt32("to", line - 1));
 
 				BMessenger msgr(d->TextView());
 				FailOSErr(msgr.SendMessage(&msg));
@@ -858,8 +858,8 @@ void PApp::MessageReceived(BMessage *msg)
 				if (w && msg->FindInt32("line", &lineNr) == B_OK)
 				{
 					BMessage m(msg_SelectLines);
-					FailOSErr(m.AddInt32("from", lineNr - 1));
-					FailOSErr(m.AddInt32("to", lineNr));
+					FailOSErr(m.AddInt32("from", lineNr));
+					FailOSErr(m.AddInt32("to", lineNr - 1));
 					w->PostMessage(&m, w->PreferredHandler());
 				}
 
