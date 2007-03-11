@@ -196,7 +196,7 @@ inline void CDoc::SetErrorMsg(const char* errorMsg)
 
 inline void CDoc::ClearErrorMsg()
 {
-	fErrorMsg.clear();
+	fErrorMsg.erase();
 }
 
 inline const char *CDoc::MimeType() const

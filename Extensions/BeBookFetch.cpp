@@ -80,7 +80,7 @@ OpenDoc(const char* fileName)
 	if (messenger.IsValid())
 		messenger.SendMessage(&msg);
 	else
-		be_roster->Launch(kTrackerSig, 1, &const_cast<char*>(fileName));
+		be_roster->Launch(kTrackerSig, 1, const_cast<char**>(&fileName));
 }
 
 
