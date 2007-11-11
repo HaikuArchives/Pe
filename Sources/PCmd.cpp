@@ -537,7 +537,7 @@ PReplaceCmd::PReplaceCmd(PText *txt, int offset, int size, bool findNext, bool b
 	
 	if (fGrep)
 	{
-		fWith = gFindDialog->RxReplaceString(fWhat, size);
+		fWith = gFindDialog->RxReplaceString(txt->Text(), txt->Size());
 		fExpr = strdup(gFindDialog->FindString());
 	}
 	else
@@ -636,12 +636,14 @@ void PReplaceAllCmd::Do()
 	while (fText->FindNext(fFind, offset, fIgnoreCase,	false, false, 
 		fEntireWord, fGrep, false, &matchLen))
 	{
+		BString originalText(fText->Text(), fText->Size());
+
 		what.SetTo(fText->Text() + offset, matchLen);
 		fText->Delete(offset, offset + matchLen);
 		if (fGrep)
 		{
 			char* repStr 
-				= gFindDialog->RxReplaceString(what.String(), what.Length());
+				= gFindDialog->RxReplaceString(originalText.String(), originalText.Length());
 			if (repStr)
 			{
 				rl = strlen(repStr);

@@ -58,7 +58,9 @@ const unsigned long
 	msg_YASD			= 'SYAD',
 	msg_ChangedMFKind	= 'MFKn',
 	msg_FindPopup		= 'FnPp',
-	msg_Collapse		= 'clps';
+	msg_Collapse		= 'clps',
+	msg_FlagBackward	= 'FnBk',
+	msg_FlagRegex		= 'FnRx';
 
 enum {
 	METHOD_IDX_DIR	= 0,
@@ -316,9 +318,11 @@ void CFindDialog::Create(void)
 	// Add Settings
 	fChkCase = new HCheckBox(fMainView, "case", NULL, H_FOLLOW_LEFT_BOTTOM);
 	fChkWrap = new HCheckBox(fMainView, "wrap", NULL, H_FOLLOW_LEFT_BOTTOM);
-	fChkBack = new HCheckBox(fMainView, "back", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkBack = new HCheckBox(fMainView, "back", new BMessage(msg_FlagBackward), 
+		H_FOLLOW_LEFT_BOTTOM);
 	fChkWord = new HCheckBox(fMainView, "word", NULL, H_FOLLOW_LEFT_BOTTOM);
-	fChkGrep = new HCheckBox(fMainView, "regx", NULL, H_FOLLOW_LEFT_BOTTOM);
+	fChkGrep = new HCheckBox(fMainView, "regx", new BMessage(msg_FlagRegex), 
+		H_FOLLOW_LEFT_BOTTOM);
 	fChkBtch = new HCheckBox(fMainView, "btch", NULL, H_FOLLOW_LEFT_BOTTOM);
 	fChkCase->SetOn(gPrefs->GetPrefInt(prf_I_SearchIgnoreCase, 1));
 	fChkWrap->SetOn(gPrefs->GetPrefInt(prf_I_SearchWrap, 1));
@@ -788,6 +792,20 @@ void CFindDialog::MessageReceived(BMessage *msg)
 			case msg_PrefsChanged:
 				UpdateSearchDirMenu();
 				break;
+
+			case msg_FlagBackward:
+			{
+				fChkGrep->SetOn(false);
+				UpdateFields();
+				break;
+			}
+
+			case msg_FlagRegex:
+			{
+				fChkBack->SetOn(false);
+				UpdateFields();
+				break;
+			}
 
 			default:
 				HDialog::MessageReceived(msg);

@@ -118,19 +118,22 @@ char* CRegex::ReplaceString(const char* subject, int32 len, const char* repl)
 	for(int i=0; i<rl; ++i)
 	{
 		c = repl[i];
-		if (c == '\\')
+		if (c == '\\' || c == '$')
 		{
 			c = repl[++i];
 			if (c >= '1' && c <= '9')
 				replStr << MatchStr(subject, c-'0');
-			else if (c == 'n')
-				replStr << '\n';
-			else if (c == 'r')
-				replStr << '\r';
-			else if (c == 't')
-				replStr << '\t';
-			else if (c == '\\')
-				replStr << '\\';
+			else if (c == '\\') 
+			{	// de-escape newline, carriage-return, tab and backslash:
+				if (c == 'n')
+					replStr << '\n';
+				else if (c == 'r')
+					replStr << '\r';
+				else if (c == 't')
+					replStr << '\t';
+				else if (c == '\\')
+					replStr << '\\';
+			}
 		}
 		else
 			replStr << c;
