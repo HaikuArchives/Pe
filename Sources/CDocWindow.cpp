@@ -148,9 +148,19 @@ bool CDocWindow::QuitRequested()
 		char title[256];
 		sprintf(title, "Save changes to '%s' before closing?", inheritedDoc::Name());
 
+		if (IsMinimized())
+			Minimize(false);
+		Activate();
+
+		UnlockLooper();
+
 		MInfoAlert alert(title, "Save", "Cancel", "Don't save");
 
-		switch (alert.Go())
+		int32 alertResult = alert.Go();
+
+		LockLooper();
+
+		switch (alertResult)
 		{
 			case 3:
 				break;
