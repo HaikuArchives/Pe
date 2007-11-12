@@ -552,8 +552,6 @@ void CLocalDocIO::StopWatchingFile(bool stopDirectory)
 	if (fEntryRef == NULL || fTarget == NULL)
 		return;
 
-
-
 	watch_node(&fNodeRef, B_STOP_WATCHING, fTarget);
 
 	// if we get late messages, we don't want to deal with them
@@ -618,13 +616,35 @@ void CLocalDocIO::HandleNodeMonitorMsg(BMessage* msg)
 
 bool CLocalDocIO::MatchesNodeMonitorMsg(BMessage* msg)
 {
-	node_ref nref;
-	if (fEntryRef == NULL
-	|| msg->FindInt64("node", &nref.node) != B_OK
-	|| msg->FindInt32("device", &nref.device) != B_OK)
-		return false;
+	int32 opcode = msg->FindInt32("opcode");
 
-	return nref == fNodeRef;
+	if (opcode == B_ENTRY_REMOVED)
+	{
+		// the message is for us if it refers to our node-ref:
+		node_ref nref;
+		if (msg->FindInt64("node", &nref.node) == B_OK
+			&& msg->FindInt32("device", &nref.device) == B_OK
+			&& nref == fNodeRef)
+			return true;
+	}
+	else if (opcode == B_ENTRY_CREATED || opcode == B_ENTRY_MOVED)
+	{
+		// the message is for us if it refers to our parent folder and carries
+		// our name:
+		node_ref pref;
+		BString name;
+		if (fEntryRef != NULL
+			&& (msg->FindInt64("directory", &pref.node) == B_OK
+				|| msg->FindInt64("to directory", &pref.node) == B_OK)
+			&& msg->FindInt32("device", &pref.device) == B_OK
+			&& msg->FindString("name", &name) == B_OK
+			&& pref.device == fEntryRef->device
+			&& pref.node == fEntryRef->directory
+			&& name == fEntryRef->name)
+			return true;
+	}
+		
+	return false;
 }
 
 bool CLocalDocIO::VerifyFile()

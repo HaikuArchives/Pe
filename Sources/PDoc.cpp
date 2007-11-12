@@ -329,7 +329,11 @@ void PDoc::HighlightErrorPos(int errorPos)
 
 void PDoc::SetText(const BString& docText)
 {
-	fText->SetText(docText.String(), docText.Length());
+	if (LockLooper())
+	{
+		fText->SetText(docText.String(), docText.Length());
+		UnlockLooper();
+	}
 }
 
 void PDoc::ChangeSourceEncoding(int encoding)
