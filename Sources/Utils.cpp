@@ -140,17 +140,19 @@ void OpenInTracker(const entry_ref& ref)
 	BMessage msg(B_REFS_RECEIVED);
 	msg.AddRef("refs", &ref);
 
-	entry_ref app;
-	if (be_roster->FindApp("application/x-vnd.Be-TRAK", &app))
-		THROW((0));
-
-	if (be_roster->IsRunning(&app))
+	const char* trackerSignature = "application/x-vnd.Be-TRAK";
+	team_id trackerTeam = be_roster->TeamFor(trackerSignature);
+	if (trackerTeam < 0)
 	{
-		BMessenger msr(NULL, be_roster->TeamFor(&app));
-		msr.SendMessage(&msg);
+		// tracker is not running and we pass the message trough launching it
+		if (be_roster->Launch(trackerSignature, &msg) < B_OK)
+			THROW(("Tracker not running???"));
 	}
-	else if (be_roster->Launch(&app, &msg))
-		THROW(("Tracker not running???"));
+	else
+	{
+		BMessenger messenger(NULL, trackerTeam);
+		messenger.SendMessage(&msg);
+	}
 } /* OpenInTracker */
 
 void SendToIDE(const BMessage& msg, BMessage *reply)
