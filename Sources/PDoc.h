@@ -37,6 +37,7 @@
 #define PDOC_H
 
 #include <algorithm>
+#include <typeinfo>
 
 #include "CDocWindow.h"
 
@@ -48,6 +49,7 @@ class HDialog;
 class HButtonBar;
 class PToolBar;
 class HDialog;
+class BMenu;
 class BStringView;
 
 template <class T>

@@ -35,6 +35,8 @@
 #ifndef CDOC_WINDOW_H
 #define CDOC_WINDOW_H
 
+#include <Window.h>
+
 #include "CDoc.h"
 
 class HDialog;

@@ -38,7 +38,10 @@
 
 #include <list>
 #include <string>
+#include <vector>
 
+class BFile;
+class BFilePanel;
 class CDoc;
 class URLData;
 
