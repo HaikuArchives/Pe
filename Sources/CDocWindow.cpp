@@ -110,8 +110,8 @@ void CDocWindow::ApplySettings(const BMessage& settingsMsg)
 		fLastStoredFrame.OffsetTo(newLeft, newTop);
 		float newWidth = MIN(sw-newLeft-5, fLastStoredFrame.Width());
 		float newHeight = MIN(sh-newTop-5, fLastStoredFrame.Height());
-		fLastStoredFrame.right = fLastStoredFrame.left + newWidth - 1;
-		fLastStoredFrame.bottom = fLastStoredFrame.top + newHeight - 1;
+		fLastStoredFrame.right = fLastStoredFrame.left + newWidth;
+		fLastStoredFrame.bottom = fLastStoredFrame.top + newHeight;
 		MoveTo(fLastStoredFrame.left, fLastStoredFrame.top);
 		ResizeTo(fLastStoredFrame.Width(), fLastStoredFrame.Height());
 	}
