@@ -29,6 +29,12 @@ if $(OSPLAT) = X86 {
 	if $(haveZeta)	{
 		LINKLIBS += -lzeta ;
 	}
+	# check for pcre...
+	local haveHeadersPcre = [ GLOB /boot/develop/headers/pcre : pcre.h ] ;
+	if $(haveHeadersPcre)	{
+		CCFLAGS += -isystem /boot/develop/headers/pcre ;
+		C++FLAGS += -isystem /boot/develop/headers/pcre ;
+	}
 }
 
 # Use copyattr for copying.
