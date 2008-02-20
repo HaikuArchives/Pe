@@ -248,13 +248,13 @@ void PText::ReInit()
 	fLineHeight = ceil(fFH.ascent + fFH.descent + fFH.leading);
 	fMetrics = CFontStyle::Locate(ff, fs, fFont.Size());
 
-	fTabWidth = fTabStops * StringWidth(" ", 1);
+	fTabWidth = TabStops() * StringWidth(" ", 1);
 	fDefaultCharWidth = StringWidth("m", 1);
 
 	if (Window())
 	{
 		PToolBar *toolBar = Doc()->ToolBar();
-		if (toolBar) toolBar->SetTabWidth(fTabWidth, fTabStops);
+		if (toolBar) toolBar->SetTabWidth(fTabWidth, TabStops());
 	}
 
 	RecalculateLineBreaks();
@@ -424,7 +424,7 @@ void PText::SetStatus(PStatus *status)
 {
 	fStatus = status;
 //	fStatus->SetHScroll(3);
-//	fStatus->SetTabWidth(fTabWidth, fTabStops);
+//	fStatus->SetTabWidth(fTabWidth, TabStops());
 } /* PText::SetStatus */
 
 void PText::WindowActivated(bool active)
@@ -447,10 +447,11 @@ void PText::ApplySettings(const BMessage& msg)
 	const char *s1, *s2;
 	bool b;
 
+	if (msg.FindInt32("tabstop", &i) == B_OK)
+		fTabStops = i;
+
 	if (gRestoreFont)
 	{
-		if (msg.FindInt32("tabstop", &i) == B_OK)
-			fTabStops = i;
 		if (msg.FindBool("show tabs", &b) == B_OK)
 			ShowTabStops(b);
 
@@ -522,7 +523,8 @@ void PText::ApplySettings(const BMessage& msg)
 
 void PText::CollectSettings(BMessage& msg)
 {
-	FailOSErr(msg.AddInt32("tabstop", fTabStops));
+	if (TabStops() != gPrefs->GetPrefInt(prf_I_SpacesPerTab, 4))
+		FailOSErr(msg.AddInt32("tabstop", TabStops()));
 	FailOSErr(msg.AddBool("show tabs", Doc()->ToolBar()->ShowsTabs()));
 
 	FailOSErr(msg.AddInt32("fontkind", fFontKind));
@@ -566,7 +568,7 @@ void PText::GetSettingsMW(BPositionIO& set)
 
 	anchor = min(fAnchor, fCaret);
 	caret = max(fAnchor, fCaret);
-	tabs = fTabStops;
+	tabs = TabStops();
 	flags = 0x01000000;
 	fontsize = (long)fFont.Size();
 	fFont.GetFamilyAndStyle(&font, &style);
@@ -725,7 +727,7 @@ void PText::ShowTabStops(bool show)
 			MoveBy(0, -kTabStopHeight);
 		}
 
-		toolBar->SetTabWidth(fTabWidth, fTabStops);
+		toolBar->SetTabWidth(fTabWidth, TabStops());
 		toolBar->SetShowsTabs(show);
 		toolBar->Draw(toolBar->Bounds());
 	}
@@ -794,7 +796,7 @@ int PText::FindLineBreak(int offset, bool hard)
 				}
 				else if (fText[nb] == '\t')
 				{
-					nw = (((w + sw) / fTabStops) + 1) * fTabStops;
+					nw = (((w + sw) / TabStops()) + 1) * TabStops();
 					w = nw;
 
 					if (w > fWrapWidth)
@@ -1622,7 +1624,7 @@ void PText::AdjustScrollBars()
 	else
 		fHScrollBar->SetRange(0, 100000);
 
-	fHScrollBar->SetSteps(fTabWidth/fTabStops, fBounds.Width() / 2);
+	fHScrollBar->SetSteps(fTabWidth / TabStops(), fBounds.Width() / 2);
 } /* PText::AdjustScrollBars */
 
 void PText::ScrollToCaret(bool keepContext)
@@ -2854,7 +2856,7 @@ int PText::Offset2Column(int offset)
 	{
 		if (fText[i] == '\t')
 		{
-			col = ((col / fTabStops) + 1) * fTabStops;
+			col = ((col / TabStops()) + 1) * TabStops();
 			i++;
 		}
 		else
@@ -2882,7 +2884,7 @@ int PText::Column2Offset(int lineNr, int column)
 		if (fText[result] == '\t')
 		{
 			result++;
-			c = ((c / fTabStops) + 1) * fTabStops;
+			c = ((c / TabStops()) + 1) * TabStops();
 		}
 		else
 		{
@@ -3112,7 +3114,7 @@ void PText::BlockOffsetsForLine(int lineNr, int& startOffset, int& endOffset)
 		if (fText[startOffset] == '\t')
 		{
 			startOffset += 1;
-			c = ((c / fTabStops) + 1) * fTabStops;
+			c = ((c / TabStops()) + 1) * TabStops();
 		}
 		else
 		{
@@ -3128,7 +3130,7 @@ void PText::BlockOffsetsForLine(int lineNr, int& startOffset, int& endOffset)
 		if (fText[endOffset] == '\t')
 		{
 			endOffset += 1;
-			c = ((c / fTabStops) + 1) * fTabStops;
+			c = ((c / TabStops()) + 1) * TabStops();
 		}
 		else
 		{
