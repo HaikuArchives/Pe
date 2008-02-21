@@ -237,7 +237,7 @@ PApp::PApp()
 		gPopupFuncs			= gPrefs->GetPrefInt(prf_I_ShowTypes,			1);
 		gPopupSorted		= gPrefs->GetPrefInt(prf_I_SortPopup,			0);
 		gRedirectStdErr		= gPrefs->GetPrefInt(prf_I_RedirectStdErr,		1);
-		gUseWorksheet		= gPrefs->GetPrefInt(prf_I_Worksheet,			1);
+		gUseWorksheet		= gPrefs->GetPrefInt(prf_I_Worksheet,			0);
 		gRestorePosition	= gPrefs->GetPrefInt(prf_I_RestorePosition,		1);
 		gRestoreFont		= gPrefs->GetPrefInt(prf_I_RestoreFont,			1);
 		gRestoreSelection	= gPrefs->GetPrefInt(prf_I_RestoreSelection,	1);
