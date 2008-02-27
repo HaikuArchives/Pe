@@ -21,6 +21,13 @@ PeExtension BeBookFetch
 # </pe-src>
 
 # <pe-src>
+PeExtension BeHappy 
+	: BeHappy.cpp 
+	: libhekkel.so be $(STDC++LIB) 
+	;
+# </pe-src>
+
+# <pe-src>
 PeExtension Copy\ Lines\ Containing 
 	: CopyContaining.cpp 
 	: libhekkel.so pcreposix $(RX_LIB) be $(STDC++LIB) 
@@ -32,6 +39,20 @@ PeExtension Copy\ Lines\ Containing
 PeExtension Cut\ Lines\ Containing 
 	: CutContaining.cpp 
 	: libhekkel.so pcreposix $(RX_LIB) be $(STDC++LIB) 
+	;
+# </pe-src>
+
+# <pe-src>
+PeExtension Expand\ Tabs
+	: ConvertTabs.cpp 
+	: libhekkel.so be $(STDC++LIB) 
+	;
+# </pe-src>
+
+# <pe-src>
+PeExtension Replace\ As\ Tabs
+	: ConvertTabs.cpp 
+	: libhekkel.so be $(STDC++LIB) 
 	;
 # </pe-src>
 
