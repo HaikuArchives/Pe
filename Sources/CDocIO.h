@@ -9,6 +9,7 @@
 
 #include <map>
 
+#include <BeBuild.h>
 #include <Locker.h>
 
 #include "CFtpStream.h"
@@ -53,7 +54,9 @@ inline time_t CDocIO::LastSaved() const
 	return fLastSaved;
 }
 
+#ifndef B_ZETA_VERSION_1_2_0 // maybe even B_ZETA_VERSION_1_1_0
 bool operator< (const node_ref& left, const node_ref& right);
+#endif
 
 class CLocalDocIO : public CDocIO
 {
