@@ -8,7 +8,8 @@
 
 #include "PeAddOn.h"
 
-#define kBeHappySig		"application/x.vnd-STertois.BeHappy"
+#define kBeHappySig		"application/x-vnd.STertois.BeHappy"
+#define kBeHappySigAlt	"application/x.vnd-STertois.BeHappy"
 
 static team_id gBeHappyTeam = -1;
 
@@ -20,18 +21,23 @@ TellBeHappy(const char *topic)
 	status_t err;
 	int32 lastWindow = 0;
 	
-	BMessenger msgr(kBeHappySig, gBeHappyTeam);
+	BMessenger msgr(NULL, gBeHappyTeam);
 	// if we didn't start it yet or it's gone...
 	if (gBeHappyTeam < 0 || !msgr.IsValid()) {
 		// start it
 		err = be_roster->Launch(kBeHappySig, (BMessage *)NULL, &gBeHappyTeam);
 		if (err < B_OK) {
-			MStopAlert("Can't launch BeHappy!").Go();
-			return err;
+			err = be_roster->Launch(kBeHappySigAlt, (BMessage *)NULL, &gBeHappyTeam);
+			if (err < B_OK)
+				return B_LAUNCH_FAILED;
 		}
 		// leave it some time to start
-		snooze(100000);
-		msgr = BMessenger(kBeHappySig, gBeHappyTeam);
+		for(int i=0; i<10; ++i) {
+			snooze(100000);
+			msgr = BMessenger(NULL, gBeHappyTeam);
+			if (msgr.IsValid())
+				break;
+		}
 	}
 	
 	// XXX: lastWindow = (hey count Window) -1
@@ -144,6 +150,11 @@ perform_edit(MTextAddOn* addon)
 	if (err >= B_OK)
 		return B_OK;
 
+	if (err == B_LAUNCH_FAILED) {
+		MStopAlert("Can't launch BeHappy!").Go();
+		return B_OK;
+	}
+	
 	BString message("Nothing was found by BeHappy for: ");
 	message += selection.String();
 	MInfoAlert(message.String()).Go();
