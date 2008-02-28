@@ -25,7 +25,7 @@ if $(OSPLAT) = X86 {
 		LINKLIBS += -lnet ;
 	}
 	# check for Zeta...
-	local haveZeta = [ GLOB /boot/beos/system/lib : libzeta.so ] ;
+	local haveZeta = [ GLOB /boot/develop/lib/x86 : libzeta.so ] ;
 	if $(haveZeta)	{
 		LINKLIBS += -lzeta ;
 	}
