@@ -152,7 +152,7 @@ void PStatus::MouseDown(BPoint where)
 		
 		where.y = Bounds().bottom + 1;
 		BMenuItem *i = popup.Go(ConvertToScreen(where), true, false, ConvertToScreen(Bounds()));
-		
+
 		if (i)
 		{
 			free(s);
