@@ -287,7 +287,7 @@ void CStdErrBox::DoCancel()
 	{
 		gPrefs->SetIxPrefString(prf_X_StdErrPattern, 0, "1;2;4;3;^([^:]+):([0-9]+): (warning: )?(.*)\\n");
 		gPrefs->SetIxPrefString(prf_X_StdErrPattern, 1, "4;5;2;1;^### [^ ]+ (.*)\\n(#[ \\t](.*\\n))+#-+\\n[ \\t]*File \"([^\"]+)\"; Line ([0-9]+)\\n(#.*\\n)*#-+\\n");
-		gPrefs->GetPrefInt(prf_I_StdErrInitEd, 1);
+		gPrefs->SetPrefInt(prf_I_StdErrInitEd, 1);
 	}
 
 	i = 0;
