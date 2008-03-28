@@ -318,6 +318,9 @@ bool CPrefsDialog::OkClicked()
 	strcpy(gControlChar, GetText(pnm_Inv_T_ControlChar));
 	gPrefs->SetPrefString(prf_S_ControlChar, gControlChar);
 
+	gPrefs->SetPrefInt(prf_I_ContextLines, atoi(GetText(pnm_Edi_T_ContextLines)));
+	gPrefs->SetPrefInt(prf_I_ContextChars, atoi(GetText(pnm_Edi_T_ContextChars)));
+
 	gPrefs->SetPrefInt(prf_I_SpacesPerTab, gSpacesPerTab = atoi(GetText(pnm_Edi_T_SpacesPerTab)));
 
 	CntrlGetChkbx(pnm_Edi_X_AutoIndent,				prf_I_AutoIndent,				gAutoIndent);
@@ -561,6 +564,12 @@ bool CPrefsDialog::CancelClicked()
 
 	sprintf(s, "%d", gSpacesPerTab);
 	SetText(pnm_Edi_T_SpacesPerTab, s);
+
+	sprintf(s, "%d", gPrefs->GetPrefInt(prf_I_ContextLines, 3));
+	SetText(pnm_Edi_T_ContextLines, s);
+
+	sprintf(s, "%d", gPrefs->GetPrefInt(prf_I_ContextChars, 5));
+	SetText(pnm_Edi_T_ContextChars, s);
 
 	bool sw;
 	SetOn(pnm_Wrp_X_SoftWrapFiles,	sw = gPrefs->GetPrefInt(prf_I_SoftWrap, false));

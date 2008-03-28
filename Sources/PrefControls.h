@@ -59,6 +59,8 @@
 #define pnm_Edi_X_SmartWorkspaces		"smwo"
 #define pnm_Edi_X_AlternateHome			"alho"
 #define pnm_Edi_T_SpacesPerTab			"tabs"	/* TODO: Check other occurences */
+#define pnm_Edi_T_ContextLines			"ctxl"
+#define pnm_Edi_T_ContextChars			"ctxc"
 #define pnm_Edi_T_Font1Size				"fons"
 #define pnm_Edi_T_Font2Size				"alfs"
 #define pnm_Edi_P_Font1Face				"font"	/* TODO: Check other occurences */

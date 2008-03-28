@@ -141,13 +141,20 @@ resource 'DLOG' (132, "Preferences") {
 				CheckBox		{{   0,  80, 140,  96 }, pnm_Edi_X_SmartWorkspaces,		"Smart Workspaces"					},
 				CheckBox		{{ 150,  80, 290,  96 }, pnm_Edi_X_AlternateHome,		"Alternate Home"					},
 
-				Line			{{   0, 103, 290, 104 }},
+				Edit			{{   0, 100, 290, 117 }, pnm_Edi_T_ContextLines,		
+									"Context Lines at Top/Bottom Edge:",	"", "0123456789", 2, 240
+								},
 
-				PopupMenu		{{   0, 111, 190, 127 }, pnm_Edi_P_Font1Face,			"Font:",				rid_Popu_PrfFont, 50		},
-				Edit			{{ 200, 111, 290, 127 }, pnm_Edi_T_Font1Size,			"Size:",				"", "0123456789", 2, 40		},
+				Edit			{{   0, 120, 290, 137 }, pnm_Edi_T_ContextChars,
+									"Context Chars at Left/Right Edge:",	"", "0123456789", 2, 240		},
 
-				PopupMenu		{{   0, 131, 190, 147 }, pnm_Edi_P_Font2Face,			"Alt. Font:",			rid_Popu_PrfFont, 50		},
-				Edit			{{ 200, 131, 290, 147 }, pnm_Edi_T_Font2Size,			"Size:",				"", "0123456789", 2, 40		},
+				Line			{{   0, 143, 290, 144 }},
+
+				PopupMenu		{{   0, 151, 190, 167 }, pnm_Edi_P_Font1Face,			"Font:",				rid_Popu_PrfFont, 50		},
+				Edit			{{ 200, 151, 290, 167 }, pnm_Edi_T_Font1Size,			"Size:",				"", "0123456789", 2, 40		},
+
+				PopupMenu		{{   0, 171, 190, 187 }, pnm_Edi_P_Font2Face,			"Alt. Font:",			rid_Popu_PrfFont, 50		},
+				Edit			{{ 200, 171, 290, 187 }, pnm_Edi_T_Font2Size,			"Size:",				"", "0123456789", 2, 40		},
 
 			TabSheetEnd			{																							},
 
