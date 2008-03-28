@@ -186,9 +186,13 @@ void PDoc::InitWindow(const char *name)
 	// add the BeIDE menu, if desired
 	if (showIde)
 	{
-		BMenu *menu = HResources::GetMenu(rid_Menu_DwBeide);
-		BMenuItem *ideMenuItem = new CMenuItem(menu);
-		fMBar->AddItem(ideMenuItem);
+		BMimeType mime("application/x-mw-BeIDE");
+		if (mime.IsInstalled())
+		{
+			BMenu *menu = HResources::GetMenu(rid_Menu_DwBeide);
+			BMenuItem *ideMenuItem = new CMenuItem(menu);
+			fMBar->AddItem(ideMenuItem);
+		}
 	}
 
 	AddChild(fMBar);
