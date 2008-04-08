@@ -5,6 +5,10 @@
 // written by François Revol, 2008.
 //
 
+// TODO:
+// Someone said http://pastebin.ca/ handles UTF-8 correctly (unline rafb.net)
+// maybe later add configurable multiple handlers ?
+
 #include "PeAddOn.h"
 #include <stdio.h>
 
@@ -13,32 +17,7 @@
 #define COPY_TO_CLIPBOARD 1
 
 //------------------------------------------------------------------------------
-
-#if 0
-class StdDataIO : public BDataIO {
-public:
-	StdDataIO(FILE *f, bool closeOnDelete=true);
-	virtual ~StdDataIO();
-	virtual ssize_t Read(void *buffer, size_t size);
-	virtual ssize_t Write(const void *buffer, size_t size);
-private:
-	FILE *fFile;
-	bool fCloDelete;
-}
-
-StdDataIO::StdDataIO(FILE *f, bool closeOnDelete)
-{
-	fFile = f;
-	fCloDelete = closeOnDelete;
-}
-
-StdDataIO::~StdDataIO()
-{
-	if (fCloDelete)
-		fclose(fFile);
-}
-
-#endif
+//	#pragma mark - class StdIOInString
 
 class StdIOInString : public BString {
 public:
@@ -76,6 +55,7 @@ StdIOInString::~StdIOInString()
 
 
 //------------------------------------------------------------------------------
+//	#pragma mark - Helper functions
 
 static const char *PeLangToPasteLang(const char *lang);
 static status_t UrlEscape(BString &str);
@@ -216,13 +196,6 @@ RunWgetPaste(const char *language, const char *nick, const char *desc, const cha
 	be_roster->Launch(B_URL_HTTP, 1, args);
 #endif
 
-	
-/*
-	BString message("Error running wget.\n");
-	message << pasteUrl;
-	MInfoAlert(message.String()).Go();
-*/
-	
 	return B_OK;
 }
 
@@ -255,11 +228,11 @@ perform_edit(MTextAddOn* addon)
 
 	int length = selEnd - selStart;
 
-	// Do NOT run the query if we have less than 3 chars. It works, but takes
-	// ages and produces an useless giant popup menu.
-	if (length < 3) {
+	// Do NOT paste anything if we have less than 5 chars.
+	// It's probably unwanted action.
+	if (length < 5) {
 		MIdeaAlert("The text selection is too short.\n"
-					"Please select at least three characters.").Go();
+					"Please select at least five characters.").Go();
 		return B_ERROR;
 	}
 
