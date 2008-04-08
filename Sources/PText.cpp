@@ -5423,6 +5423,86 @@ void PText::ShiftLines(int first, int dy, int part)
 
 #pragma mark - Printing
 
+struct PrintFunctionRef {
+	int32 offset;
+	int32 line;
+	int32 page;
+	int32 level;
+	bool italic;
+	bool separator;
+	BString name;
+	BString params;
+};
+
+struct PrintFunctionScanHandler : public CFunctionScanHandler {
+	PrintFunctionScanHandler(bool sorted, int whichVal)
+		: sorted(sorted)
+		, which(whichVal)
+		, functionLevel(0)
+	{
+	}
+
+	void AddFunction(const char *name, const char *match, int offset,
+		bool italic, uint32 nestLevel, const char *params)
+	{
+		if (which != kFunctionsOnly)
+			return;
+
+		struct PrintFunctionRef *ref = new struct PrintFunctionRef;
+		ref->offset = offset;
+		ref->line = -1;//Offset2Line(offset);
+		ref->page = -1;
+		ref->level = functionLevel;
+		ref->italic = italic;
+		ref->separator = false;
+		ref->name = name;
+
+		functions.AddItem(ref);
+	}
+
+	void AddInclude(const char *name, const char *open, bool italic)
+	{
+		// we don't care
+	}
+
+	void AddSeparator(const char* name)
+	{
+		if (which != kFunctionsOnly)
+			return;
+
+		struct PrintFunctionRef *ref = new struct PrintFunctionRef;
+		ref->offset = -1;
+		ref->line = -1;
+		ref->page = -1;
+		ref->level = 0;
+		ref->italic = false;
+		ref->separator = false;
+		ref->name = name;
+
+		if (!sorted) {
+			// strip unnamed separators if followed by other separators:
+			struct PrintFunctionRef *last = static_cast<struct PrintFunctionRef *>(functions.LastItem());
+			if (last && last->separator /*&& last->name.Length() == 0*/) {
+				if (functions.RemoveItem(last))
+					delete last;
+			}
+			functions.AddItem(ref);
+		}
+		functionLevel = 1;
+	}
+
+	static int CompareFunc(const void *a, const void* b)
+	{
+		return strcasecmp((*(const struct PrintFunctionRef **)a)->name.String(),
+								(*(const struct PrintFunctionRef **)b)->name.String());
+	}
+
+	BList functions;
+	bool sorted;
+	int which;
+	int32 functionLevel;
+};
+
 status_t PText::PageSetup()
 {
 	BPrintJob printJob(Window()->Title());
@@ -5459,6 +5539,20 @@ status_t PText::Print()
 	printJob.SetSettings(new BMessage(*fPrintSettings));
 	result = printJob.ConfigJob();
 	FailOSErr(result);
+
+	// for later use (by PDF Writer)
+	/*
+	PrintFunctionScanHandler bookmarkHandler(false, kFunctionsOnly);
+	ScanForFunctions(bookmarkHandler);
+
+	for (int32 i = 0; i < bookmarkHandler.functions.CountItems(); i++) {
+		struct PrintFunctionRef *ref;
+		ref = (struct PrintFunctionRef *)bookmarkHandler.functions.ItemAt(i);
+		fprintf(stderr, "ref[%ld]: {%d, %d, %d, %d, %d, %d, '%s'}\n", i, 
+			ref->offset, ref->line, ref->page, ref->level, ref->italic, ref->separator, ref->name.String());
+
+	}
+	*/
 
 	// information from printJob
 	BRect printableRect = printJob.PrintableRect();	
@@ -5511,7 +5605,10 @@ fprintf(stderr, "currentLine = %d\n", currentLine);
 	
 fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
 fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
+
+	// let's do it!
 	printJob.BeginJob();
+	
 	if (LineCount() > 0 && Size() > 0) {
 		int32 printLine = firstLine;
 		while (printLine <= lastLine) {
