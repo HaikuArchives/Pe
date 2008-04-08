@@ -118,3 +118,10 @@ PeExtension drieuxCaps
 	: libhekkel.so be $(STDC++LIB) 
 	;
 # </pe-src>
+
+# <pe-src>
+PeExtension WebPaste 
+	: WebPaste.cpp 
+	: libhekkel.so be
+	;
+# </pe-src>
