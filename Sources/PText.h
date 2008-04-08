@@ -163,6 +163,9 @@ virtual		void FrameResized(float w, float h);
 			void HideCaret();
 			void ShowCaret();
 			
+			status_t PageSetup();
+			status_t Print();
+
 			int FindWord(int key, bool subWord = false);
 			int FindWord(int indx, int key, bool mouseSelect = false, bool subWord = false);
 			int FindNextWord(int offset);
@@ -345,6 +348,7 @@ private:
 			bool fAppendNextCut;
 			PCmd* fLastSavedStateCmd;
 			float fDefaultCharWidth;
+			BMessage *fPrintSettings;
 		
 static		PText *sfDragSource;
 

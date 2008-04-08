@@ -36,6 +36,7 @@
 #include "pe.h"
 
 #include <signal.h>
+#include <PrintJob.h>
 #include <String.h>
 
 #include "PText.h"
@@ -201,6 +202,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fAppendNextCut = false;
 	fLastKillPoint = -1;
 	fLastSavedStateCmd = NULL;
+	fPrintSettings = NULL;
 
 	fSoftWrap = gPrefs->GetPrefInt(prf_I_SoftWrap, false);
 	fWrapType = gPrefs->GetPrefInt(prf_I_WrapType, 3);
@@ -273,6 +275,7 @@ PText::~PText()
 	free(fCWD);
 	delete fMainPopUp;
 	delete fLineMap;
+	delete fPrintSettings;
 } /* PText::~PText */
 
 void PText::SetDefaultLanguageByExtension(const char *extension)
@@ -5418,6 +5421,130 @@ void PText::ShiftLines(int first, int dy, int part)
 		Draw(b);
 } /* PText::ShiftLinesPart2 */
 
+#pragma mark - Printing
+
+status_t PText::PageSetup()
+{
+	BPrintJob printJob(Window()->Title());
+
+	if (fPrintSettings) {
+		printJob.SetSettings(new BMessage(*fPrintSettings));
+	}
+
+	status_t result = printJob.ConfigPage();
+	if (result >= B_OK) {
+		delete fPrintSettings;
+		fPrintSettings = printJob.Settings();
+		//fPrintSettings->PrintToStream();
+	} else
+		FailOSErr(result);
+	return result;
+} /* PText::PageSetup */
+
+status_t PText::Print()
+{
+	status_t result;
+
+	if (fPrintSettings == NULL) {
+		result = PageSetup();
+		if (result < B_OK)
+			return result;
+	}
+
+	BPrintJob printJob(Window()->Title());
+	
+	// 
+	//fPrintSettings->PrintToStream();
+
+	printJob.SetSettings(new BMessage(*fPrintSettings));
+	result = printJob.ConfigJob();
+	FailOSErr(result);
+
+	// information from printJob
+	BRect printableRect = printJob.PrintableRect();	
+	int32 firstPage = printJob.FirstPage();
+	int32 lastPage = printJob.LastPage();
+   
+	// lines eventually to be used to compute pages to print
+	int32 firstLine = 0;
+	int32 lastLine = LineCount();
+
+	// values to be computed
+	int32 pagesInDocument = 1;
+	int32 linesInDocument = LineCount();
+
+	if (!printableRect.IsValid()) {
+		//FailOSErr(B_INVALID_PRINT_SETTINGS);
+		FailOSErr(B_BAD_VALUE);
+	}
+
+fprintf(stderr, "printableRect = {%f, %f, %f, %f}\n", printableRect.left, printableRect.top, printableRect.right, printableRect.bottom);
+fprintf(stderr, "firstLine = %d\n", firstLine);
+fprintf(stderr, "lastLine = %d\n", lastLine);
+fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
+fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
+
+	int32 currentLine = 0;
+	while (currentLine < linesInDocument) {
+		float currentHeight = 0;
+//fprintf(stderr, "currentLine = %d\n", currentLine);
+		while (currentHeight < printableRect.Height() && currentLine < linesInDocument) {
+fprintf(stderr, "currentHeight = %d\n", currentHeight);
+			currentHeight += fLineHeight;
+			if (currentHeight < printableRect.Height())
+				currentLine++;
+		}
+		if (pagesInDocument == lastPage)
+			lastLine = currentLine;
+
+		if (currentHeight >= printableRect.Height()) {
+			pagesInDocument++;
+			if (pagesInDocument == firstPage)
+				firstLine = currentLine;
+		}
+	}
+
+	if (lastPage > pagesInDocument - 1) {
+		lastPage = pagesInDocument - 1;
+		lastLine = currentLine - 1;
+	}
+
+	
+fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
+fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
+	printJob.BeginJob();
+	if (LineCount() > 0 && Size() > 0) {
+		int32 printLine = firstLine;
+		while (printLine <= lastLine) {
+fprintf(stderr, "printLine = %d\n", printLine);
+			float currentHeight = 0;
+			int32 firstLineOnPage = printLine;
+			while (currentHeight < printableRect.Height() && printLine <= lastLine) {
+fprintf(stderr, "currentHeight = %d\n", currentHeight);
+				currentHeight += fLineHeight;
+				if (currentHeight < printableRect.Height())
+					printLine++;
+			}
+
+			float top = 0;
+			if (firstLineOnPage != 0)
+				top = fLineHeight * firstLineOnPage;
+
+#define TEXT_INSET 3.0
+			float bottom = fLineHeight * printLine;
+			BRect textRect(0.0, top + TEXT_INSET, printableRect.Width(), bottom + TEXT_INSET);
+			printJob.DrawView(this, textRect, B_ORIGIN);
+			printJob.SpoolPage();
+		}
+	}
+	
+
+	printJob.CommitJob();
+
+	//FailOSErr(B_UNSUPPORTED);
+	return B_OK;
+} /* PText::Print */
+
 #pragma mark - Commands
 
 BFilePanel *gCwdPanel = NULL;
@@ -5958,6 +6085,13 @@ void PText::MessageReceived(BMessage *msg)
 					BView::MessageReceived(msg);
 				break;
 			}
+
+			case msg_PageSetup:
+				PageSetup();
+				break;
+			case msg_Print:
+				Print();
+				break;
 
 			case 'test':
 				ASSERT(false);

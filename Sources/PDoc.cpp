@@ -1487,6 +1487,18 @@ void PDoc::MessageReceived(BMessage *msg)
 				break;
 			}
 
+			case msg_PageSetup:
+			{
+				fText->PageSetup();
+				break;
+			}
+
+			case msg_Print:
+			{
+				fText->Print();
+				break;
+			}
+
 			default:
 			{
 				if ((msg->what & 0xffff0000) == 0x65780000)	// that's 'ex..'

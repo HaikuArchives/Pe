@@ -55,9 +55,9 @@ resource rtyp_Menu (rid_Menu_DwFile, "File Menu") {
 		Item		{ "Save All",				msg_SaveAll,					none,	noKey	},
 		Item		{ "Revert…",				msg_Revert,						none,	noKey	},
 		Separator	{																			},
-//		Item		{ "Page Setup…",			msg_PageSetup,					none,	noKey	},
-//		Item		{ "Print…",					msg_Print,						none,	'P'		},
-//		Separator	{																			},
+		Item		{ "Page Setup…",			msg_PageSetup,					none,	noKey	},
+		Item		{ "Print…",					msg_Print,						none,	'P'		},
+		Separator	{																			},
 		Item		{ "Quit",					msg_Quit,						none,	'Q'		}
 	}
 };

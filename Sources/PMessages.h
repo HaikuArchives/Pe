@@ -47,6 +47,8 @@
 #define msg_Save						'Save'
 #define msg_SaveAs						'SvAs'
 #define msg_Revert						'Rvrt'
+#define msg_PageSetup					'PagS'
+#define msg_Print						'Prin'
 #define msg_Close						'Clse'
 #define msg_Quit						'Quit'
 #define msg_Undo						'Undo'
