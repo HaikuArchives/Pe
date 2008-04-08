@@ -5487,13 +5487,12 @@ fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
 	int32 currentLine = 0;
 	while (currentLine < linesInDocument) {
 		float currentHeight = 0;
-//fprintf(stderr, "currentLine = %d\n", currentLine);
-		while (currentHeight < printableRect.Height() && currentLine < linesInDocument) {
-fprintf(stderr, "currentHeight = %d\n", currentHeight);
-			currentHeight += fLineHeight;
-			if (currentHeight < printableRect.Height())
-				currentLine++;
-		}
+fprintf(stderr, "currentLine = %d\n", currentLine);
+		// smallest of remaining lines or number of lines fitting the page
+		int32 lines = (int32)(MIN((1 + linesInDocument - currentLine), printableRect.Height() / fLineHeight));
+		currentHeight += fLineHeight * lines;
+		currentLine += lines;
+
 		if (pagesInDocument == lastPage)
 			lastLine = currentLine;
 
@@ -5516,15 +5515,13 @@ fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
 	if (LineCount() > 0 && Size() > 0) {
 		int32 printLine = firstLine;
 		while (printLine <= lastLine) {
-fprintf(stderr, "printLine = %d\n", printLine);
+fprintf(stderr, "printLine = %d, lastLine = %d\n", printLine, lastLine);
 			float currentHeight = 0;
 			int32 firstLineOnPage = printLine;
-			while (currentHeight < printableRect.Height() && printLine <= lastLine) {
-fprintf(stderr, "currentHeight = %d\n", currentHeight);
-				currentHeight += fLineHeight;
-				if (currentHeight < printableRect.Height())
-					printLine++;
-			}
+			// smallest of remaining lines or number of lines fitting the page
+			int32 lines = (int32)(MIN((1 + lastLine - printLine), printableRect.Height() / fLineHeight));
+			currentHeight += fLineHeight * lines;
+			printLine += lines;
 
 			float top = 0;
 			if (firstLineOnPage != 0)
