@@ -5507,16 +5507,17 @@ status_t PText::PageSetup()
 {
 	BPrintJob printJob(Window()->Title());
 
-	if (fPrintSettings) {
+	if (fPrintSettings)
 		printJob.SetSettings(new BMessage(*fPrintSettings));
-	}
 
 	status_t result = printJob.ConfigPage();
-	if (result >= B_OK) {
+	if (result >= B_OK)
+	{
 		delete fPrintSettings;
 		fPrintSettings = printJob.Settings();
 		//fPrintSettings->PrintToStream();
-	} else
+	}
+	else
 		FailOSErr(result);
 	return result;
 } /* PText::PageSetup */
@@ -5525,7 +5526,8 @@ status_t PText::Print()
 {
 	status_t result;
 
-	if (fPrintSettings == NULL) {
+	if (fPrintSettings == NULL)
+	{
 		result = PageSetup();
 		if (result < B_OK)
 			return result;
@@ -5545,7 +5547,8 @@ status_t PText::Print()
 	PrintFunctionScanHandler bookmarkHandler(false, kFunctionsOnly);
 	ScanForFunctions(bookmarkHandler);
 
-	for (int32 i = 0; i < bookmarkHandler.functions.CountItems(); i++) {
+	for (int32 i = 0; i < bookmarkHandler.functions.CountItems(); i++)
+	{
 		struct PrintFunctionRef *ref;
 		ref = (struct PrintFunctionRef *)bookmarkHandler.functions.ItemAt(i);
 		fprintf(stderr, "ref[%ld]: {%d, %d, %d, %d, %d, %d, '%s'}\n", i, 
@@ -5567,21 +5570,23 @@ status_t PText::Print()
 	int32 pagesInDocument = 1;
 	int32 linesInDocument = LineCount();
 
-	if (!printableRect.IsValid()) {
+	if (!printableRect.IsValid())
+	{
 		//FailOSErr(B_INVALID_PRINT_SETTINGS);
 		FailOSErr(B_BAD_VALUE);
 	}
 
-fprintf(stderr, "printableRect = {%f, %f, %f, %f}\n", printableRect.left, printableRect.top, printableRect.right, printableRect.bottom);
-fprintf(stderr, "firstLine = %d\n", firstLine);
-fprintf(stderr, "lastLine = %d\n", lastLine);
-fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
-fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
+	fprintf(stderr, "printableRect = {%f, %f, %f, %f}\n", printableRect.left, printableRect.top, printableRect.right, printableRect.bottom);
+	fprintf(stderr, "firstLine = %d\n", firstLine);
+	fprintf(stderr, "lastLine = %d\n", lastLine);
+	fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
+	fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
 
 	int32 currentLine = 0;
-	while (currentLine < linesInDocument) {
+	while (currentLine < linesInDocument)
+	{
 		float currentHeight = 0;
-fprintf(stderr, "currentLine = %d\n", currentLine);
+		fprintf(stderr, "currentLine = %d\n", currentLine);
 		// smallest of remaining lines or number of lines fitting the page
 		int32 lines = (int32)(MIN((1 + linesInDocument - currentLine), printableRect.Height() / fLineHeight));
 		currentHeight += fLineHeight * lines;
@@ -5590,29 +5595,33 @@ fprintf(stderr, "currentLine = %d\n", currentLine);
 		if (pagesInDocument == lastPage)
 			lastLine = currentLine;
 
-		if (currentHeight >= printableRect.Height()) {
+		if (currentHeight >= printableRect.Height())
+		{
 			pagesInDocument++;
 			if (pagesInDocument == firstPage)
 				firstLine = currentLine;
 		}
 	}
 
-	if (lastPage > pagesInDocument - 1) {
+	if (lastPage > pagesInDocument - 1)
+	{
 		lastPage = pagesInDocument - 1;
 		lastLine = currentLine - 1;
 	}
 
 	
-fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
-fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
+	fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
+	fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
 
 	// let's do it!
 	printJob.BeginJob();
 	
-	if (LineCount() > 0 && Size() > 0) {
+	if (LineCount() > 0 && Size() > 0)
+	{
 		int32 printLine = firstLine;
-		while (printLine <= lastLine) {
-fprintf(stderr, "printLine = %d, lastLine = %d\n", printLine, lastLine);
+		while (printLine <= lastLine)
+		{
+			fprintf(stderr, "printLine = %d, lastLine = %d\n", printLine, lastLine);
 			float currentHeight = 0;
 			int32 firstLineOnPage = printLine;
 			// smallest of remaining lines or number of lines fitting the page
