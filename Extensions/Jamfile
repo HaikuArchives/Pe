@@ -122,6 +122,6 @@ PeExtension drieuxCaps
 # <pe-src>
 PeExtension WebPaste 
 	: WebPaste.cpp 
-	: libhekkel.so be
+	: libhekkel.so <nogrist>pe be $(STDC++LIB)
 	;
 # </pe-src>

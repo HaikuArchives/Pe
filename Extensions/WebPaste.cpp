@@ -10,11 +10,55 @@
 // maybe later add configurable multiple handlers ?
 
 #include "PeAddOn.h"
+#include "PDoc.h"
+#include "PText.h"
+#include "CLanguageInterface.h"
 #include <stdio.h>
 
 #define PASTE_URL "http://rafb.net/paste/paste.php"
 #define OPEN_IN_BROWSER 1
 #define COPY_TO_CLIPBOARD 1
+
+struct {
+	const char *pe_name;
+	const char *cgi_name;
+} kLanguageNamesMap[] = {
+/*
+	{ "Antlr",	""	},
+	{ "ASM-x86",	""	},
+	{ "D",	""	},
+	{ "Diff",	""	},
+	{ "HTML-CSS-JS-PHP",	""	},
+	{ "HTML-JS",	""	},
+	{ "HTML",	""	},
+	{ "Jam",	""	},
+	{ "Lout",	""	},
+	{ "Lua",	""	},
+	{ "Mathematica",	""	},
+	{ "Oberon-2",	""	},
+	{ "Rez",	""	},
+	{ "Shell",	""	},
+	{ "TeX",	""	},
+*/
+	//{ ,	"C89"	/*C (C89)*/ }
+	//{ ,	"C"	/*C (C99)*/ },
+	{ "C/C++",	"C++"	},
+	//{ ,	"C#"	},
+	{ "Java",	"Java"	},
+	{ "Pascal",	"Pascal"	},
+	{ "Perl",	"Perl"	},
+	//{ ,	"PHP"	},
+	//{ ,	"PL/I"	},
+	{ "Python",	"Python"	},
+	//{ ,	"Ruby"	},
+	//{ ,	"Scheme"	},
+	{ "SQL",	"SQL"	},
+	//{ ,	"VB"	},
+	//{ ,	"XML"	},
+	/*{ ,	"Plain Text Wrap"	},
+	{ ,	"Plain Text"	},*/
+	{ NULL, NULL }
+};
 
 //------------------------------------------------------------------------------
 //	#pragma mark - class StdIOInString
@@ -60,23 +104,22 @@ StdIOInString::~StdIOInString()
 static const char *PeLangToPasteLang(const char *lang);
 static status_t UrlEscape(BString &str);
 status_t POpenOut(const char *cmd, BString &output);
-static status_t RunWgetPaste(const char *language, const char *nick, const char *desc, const char *text);
+static status_t RunWgetPaste(const char *language, const char *nick, const char *desc, int tabstops, const char *text);
 
 //------------------------------------------------------------------------------
 
 const char *
 PeLangToPasteLang(const char *lang)
 {
+	int i;
 	BString l(lang);
-	if (l == "C")
-		return "C (99)";
-	if (l == "C++")
-		return "C++";
-	if (l == "Java")
-		return "Java";
-	//XXX
+	for (i = 0; kLanguageNamesMap[i].pe_name; i++)
+	{
+		if (l == kLanguageNamesMap[i].pe_name)
+			return kLanguageNamesMap[i].cgi_name;
+	}
 	return "Plain Text";
-	
+	//return "Plain Text Wrap";
 }
 
 status_t
@@ -123,21 +166,28 @@ POpenOut(const char *cmd, BString &output)
 // http://rafb.net/p/ngZGZU48.html
 
 status_t
-RunWgetPaste(const char *language, const char *nick, const char *desc, const char *text)
+RunWgetPaste(const char *language, const char *nick, const char *desc, int tabstops, const char *text)
 {
 	BString langStr(PeLangToPasteLang(language));
 	BString nickStr(nick);
 	BString descStr(desc);
 	BString textStr(text);
+	BString tabsStr;
+	nickStr.Truncate(30);
+	descStr.Truncate(50);
 	UrlEscape(langStr);
 	UrlEscape(nickStr);
 	UrlEscape(descStr);
 	UrlEscape(textStr);
+	if (tabstops)
+		tabsStr << tabstops;
+	else
+		tabsStr << "No";
 	BString postStr;
 	postStr << "lang=" << langStr << "&";
 	postStr << "nick=" << nickStr << "&";
 	postStr << "desc=" << descStr << "&";
-	postStr << "cvt_tabs=No" << "&";
+	postStr << "cvt_tabs=" << tabsStr << "&";
 	postStr << "text=" << textStr;
 	
 	BString command("wget");
@@ -240,13 +290,29 @@ perform_edit(MTextAddOn* addon)
 	selection.SetTo(addon->Text() + selStart, length);
 	
 	BString description;
-	if (addon->Window()) {
+	BString language("C++");
+	BString nickname("unknown");
+	int tabstops = 0;
+	if (addon->Window())
+	{
 		description = addon->Window()->Title();
+		PDoc *doc = dynamic_cast<PDoc *>(addon->Window());
+		if (doc && doc->TextView())
+		{
+			CLanguageInterface *langintf;
+			langintf = CLanguageInterface::FindIntf(doc->TextView()->Language());
+			if (langintf)
+				language = langintf->Name();
+			tabstops = doc->TextView()->TabStops();
+		}
 	}
+	
+	
 
-	err = RunWgetPaste("C++", 
-		"unknown", 
+	err = RunWgetPaste(language.String(), 
+		nickname.String(), 
 		description.String(), 
+		tabstops,
 		selection.String());
 	if (err >= B_OK)
 		return B_OK;
@@ -262,3 +328,4 @@ perform_edit(MTextAddOn* addon)
 
 	return B_OK;
 }
+
