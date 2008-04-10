@@ -299,8 +299,10 @@ perform_edit(MTextAddOn* addon)
 		PDoc *doc = dynamic_cast<PDoc *>(addon->Window());
 		if (doc && doc->TextView())
 		{
-			CLanguageInterface *langintf;
-			langintf = CLanguageInterface::FindIntf(doc->TextView()->Language());
+			CLanguageInterface *langintf = NULL;
+			int lang = doc->TextView()->Language();
+			if (lang > -1)
+				langintf = CLanguageInterface::FindIntf(lang);
 			if (langintf)
 				language = langintf->Name();
 			tabstops = doc->TextView()->TabStops();
