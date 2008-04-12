@@ -56,6 +56,10 @@ struct PopupMenu
 	const char * position;
 	bool italic;
 	
+#ifdef __MWERKS__
+	PopupMenu () {};
+#endif
+
 //	PopupMenu (const char *lab, const char *txt, const char * pos)
 //		: label(lab), text(txt), position(pos) {}
 	
@@ -455,7 +459,7 @@ const char *JavaScript(const char *txt, PopupList &lstJsFunctions, PopupList &ls
 
 const char *PhpScript(const char *txt, PopupList &lstPhpFunctions, PopupList &lstPhpClasses, bool sorted)
 {
-	map <int,int,int> headings;
+	map <int,int> headings;
 	BString class_name;
 	while (*txt)
 	{

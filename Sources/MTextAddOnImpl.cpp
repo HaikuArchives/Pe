@@ -112,7 +112,7 @@ void MTextAddOnImpl::Delete()
 		action.aOffset = start;
 		action.aText = (char *)malloc(end - start + 1);
 		FailNil(action.aText);
-		fText.TextBuffer().Copy(action.aText, start, end - start);
+		fText.CopyText(action.aText, start, end - start);
 		action.aText[end - start] = 0;
 		fCmd->Actions().push_back(action);
 		

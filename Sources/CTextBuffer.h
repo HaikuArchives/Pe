@@ -31,20 +31,20 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
-#ifndef PTEXTBUFFER_H
-#define PTEXTBUFFER_H
+#ifndef CTEXTBUFFER_H
+#define CTEXTBUFFER_H
 
 #include <Debug.h>
 #include "utf-support.h"
 
-class PTextBuffer {
+class CTextBuffer {
 public:
-		PTextBuffer();
-virtual	~PTextBuffer();
+		CTextBuffer();
+virtual	~CTextBuffer();
 
 		void Insert(const char *bytes, int numBytes, int index);
 		void Delete(int from, int to);
-		void Replace(int offset, const char *txt);
+		void Overwrite(int offset, const char *txt);
 
 		char operator[] (int indx) const;
 		
@@ -55,17 +55,13 @@ virtual	~PTextBuffer();
 		int PrevCharLen(int offset) const;
 		void CharInfo(int offset, int& unicode, int& len) const;
 		
-		void Copy(char *buf, int indx, int len) const;
+		void CopyText(char *buf, int indx, int len) const;
 		
 		void PrintToStream();
 		
-		void ChangeToNL(int indx);
-		
-		PTextBuffer& operator=(const PTextBuffer& b);
-		
-protected:
-		void MoveGap(int offset);
-		void ResizeGap(int size);
+private:
+		void _MoveGap(int offset);
+		void _ResizeGap(int size);
 		
 		char *fText;
 		int fLogicalSize;
@@ -74,7 +70,7 @@ protected:
 		int fGapSize;
 };
 
-inline char PTextBuffer::operator[] (int indx) const
+inline char CTextBuffer::operator[] (int indx) const
 {
 	ASSERT(indx >= 0);
 	ASSERT(indx < fLogicalSize);
@@ -84,8 +80,8 @@ inline char PTextBuffer::operator[] (int indx) const
 		return fText[indx < fGap ? indx : indx + fGapSize];
 }
 
-inline int PTextBuffer::Size() const {
+inline int CTextBuffer::Size() const {
 	return fLogicalSize;
 }
 
-#endif // PTEXTBUFFER_H
+#endif // CTEXTBUFFER_H

@@ -32,14 +32,15 @@
 */
 
 #include "pe.h"
-#include "PTextBuffer.h"
-#include "Utils.h"
+
+#include "CTextBuffer.h"
+
 #include "HError.h"
 
 const int
 	kBlockSize = 2048;
 
-PTextBuffer::PTextBuffer()
+CTextBuffer::CTextBuffer()
 	: fText(strdup(""))
 	, fLogicalSize(0)
 	, fPhysicalSize(0)
@@ -47,14 +48,14 @@ PTextBuffer::PTextBuffer()
 	, fGapSize(0)
 {
 	FailNil(fText);
-} /* PTextBuffer::PTextBuffer */
+} /* CTextBuffer::CTextBuffer */
 
-PTextBuffer::~PTextBuffer()
+CTextBuffer::~CTextBuffer()
 {
 	free(fText);
-} /* PTextBuffer::~PTextBuffer */
+} /* CTextBuffer::~CTextBuffer */
 
-void PTextBuffer::Insert(const char *bytes, int numBytes, int index)
+void CTextBuffer::Insert(const char *bytes, int numBytes, int index)
 {
 	ASSERT(numBytes >= 0);
 	ASSERT(index >= 0 && index <= fLogicalSize);
@@ -64,10 +65,10 @@ void PTextBuffer::Insert(const char *bytes, int numBytes, int index)
 	index = max(min(fLogicalSize, index), 0);
 	
 	if (index != fGap)
-		MoveGap(index);
+		_MoveGap(index);
 	
 	if (fGapSize < numBytes)
-		ResizeGap(numBytes + kBlockSize);
+		_ResizeGap(numBytes + kBlockSize);
 
 	ASSERT(numBytes <= fGapSize);
 	memcpy(fText + fGap, bytes, numBytes);
@@ -75,11 +76,9 @@ void PTextBuffer::Insert(const char *bytes, int numBytes, int index)
 	fGapSize -= numBytes;
 	fGap += numBytes;
 	fLogicalSize += numBytes;
+} /* CTextBuffer::Insert */
 
-//	PrintToStream();
-} /* PTextBuffer::Insert */
-
-void PTextBuffer::Delete(int from, int to)
+void CTextBuffer::Delete(int from, int to)
 {
 	int index = from;
 	int cnt = to - from;
@@ -92,29 +91,142 @@ void PTextBuffer::Delete(int from, int to)
 		return;
 	
 	index = max(min(fLogicalSize - 1, index), 0);
-	MoveGap(index);
+	_MoveGap(index);
 	
 	fGapSize += cnt;
 	fLogicalSize -= cnt;
 	
 	if (fGapSize > kBlockSize)
-		ResizeGap(kBlockSize);
+		_ResizeGap(kBlockSize);
+} /* CTextBuffer::Delete */
 
-//	PrintToStream();
-} /* PTextBuffer::Delete */
-
-const char* PTextBuffer::Buffer()
+void CTextBuffer::Overwrite(int offset, const char *txt)
 {
-	MoveGap(fLogicalSize);
+	int len = strlen(txt);
+
+	ASSERT(offset >= 0);
+	ASSERT(offset + len <= fLogicalSize);
+	ASSERT(len >= 0);
+
+	if (offset < 0) offset = 0;
+	if (offset + len > fLogicalSize) len = fLogicalSize - offset;
+	if (len <= 0) return;
+
+	if (offset + len <= fGap)
+	{
+		memcpy(fText + offset, txt, len);
+	}
+	else if (offset >= fGap)
+	{
+		memcpy(fText + fGapSize + offset, txt, len);
+	}
+	else
+	{
+		int p1, p2;
+		p1 = fGap - offset;
+		p2 = len - p1;
+		
+		memcpy(fText + offset, txt, p1);
+		memcpy(fText + fGap + fGapSize, txt + p1, p2);
+	}
+} /* CTextBuffer::Replace */
+
+const char* CTextBuffer::Buffer()
+{
+	_MoveGap(fLogicalSize);
 	if (fGapSize < 1)
-		ResizeGap(kBlockSize);
+		_ResizeGap(kBlockSize);
 	fText[fLogicalSize] = 0;
 
-//	PrintToStream();
 	return fText;
-} /* PTextBuffer::Buffer */
+}
 
-void PTextBuffer::MoveGap(int offset)
+void CTextBuffer::CopyText(char *buf, int index, int len) const
+{
+	ASSERT(index >= 0);
+	ASSERT(index + len <= fLogicalSize);
+	ASSERT(len >= 0);
+
+	if (index < 0) index = 0;
+	if (index + len > fLogicalSize) len = fLogicalSize - index;
+	if (len <= 0) return;
+
+	if (index + len <= fGap)
+	{
+		memcpy(buf, fText + index, len);
+	}
+	else if (index >= fGap)
+	{
+		memcpy(buf, fText + fGapSize + index, len);
+	}
+	else
+	{
+		int p1, p2;
+		p1 = fGap - index;
+		p2 = len - p1;
+		
+		memcpy(buf, fText + index, p1);
+		memcpy(buf + p1, fText + fGap + fGapSize, p2);
+	}
+} /* CTextBuffer::Copy */
+
+int CTextBuffer::CharLen(int index) const
+{
+	ASSERT(index >= 0);
+	ASSERT(index <= fLogicalSize);
+
+	if (index < fLogicalSize && index >= 0)
+	{
+		char b[8];
+		CopyText(b, index, min(7, fLogicalSize - index));
+		b[7] = 0;
+	
+		return mcharlen(b);
+	}
+	else
+		return 1;
+} /* CTextBuffer::CharLen */
+
+int CTextBuffer::PrevCharLen(int index) const
+{
+	ASSERT(index <= fLogicalSize);
+	ASSERT(index >= 0);
+
+	if (index > 0 && index <= fLogicalSize)
+	{
+		char b[8];
+		int cnt = max(0, min(7, index));
+		CopyText(b, index - cnt, cnt);
+		b[cnt] = 0;
+	
+		return mprevcharlen(b + cnt);
+	}
+	else
+		return 1;
+} /* CTextBuffer::PrevCharLen */
+
+void CTextBuffer::CharInfo(int offset, int& unicode, int& len) const
+{
+	ASSERT(offset >= 0);
+//	ASSERT(index <= fLogicalSize);
+
+	if (offset >= fLogicalSize || offset < 0)
+	{
+		unicode = 0;
+		len = 1;
+	}
+	else
+	{
+		char b[8];
+		CopyText(b, offset, min(7, fLogicalSize - offset));
+		b[7] = 0;
+	
+		len = mcharlen(b);
+		unicode = municode(b);
+	}
+} /* CTextBuffer::CharInfo */
+
+void CTextBuffer::_MoveGap(int offset)
 {
 	if (fGap == offset) return;
 	
@@ -145,11 +257,9 @@ void PTextBuffer::MoveGap(int offset)
 	}
 	
 	fGap = offset;
+} /* CTextBuffer::_MoveGap */
 
-//	PrintToStream();
-} /* PTextBuffer::MoveGap */
-
-void PTextBuffer::ResizeGap(int gapSize)
+void CTextBuffer::_ResizeGap(int gapSize)
 {
 	if (fGapSize == gapSize) return;
 	
@@ -180,158 +290,5 @@ void PTextBuffer::ResizeGap(int gapSize)
 		fText = t;
 		throw;
 	}
+} /* CTextBuffer::_ResizeGap */
 
-//	PrintToStream();
-} /* PTextBuffer::ResizeGap */
-
-void PTextBuffer::Copy(char *buf, int index, int len) const
-{
-	ASSERT(index >= 0);
-	ASSERT(index + len <= fLogicalSize);
-	ASSERT(len >= 0);
-
-	if (index < 0) index = 0;
-	if (index + len > fLogicalSize) len = fLogicalSize - index;
-	if (len <= 0) return;
-
-	if (index + len <= fGap)
-	{
-		memcpy(buf, fText + index, len);
-	}
-	else if (index >= fGap)
-	{
-		memcpy(buf, fText + fGapSize + index, len);
-	}
-	else
-	{
-		int p1, p2;
-		p1 = fGap - index;
-		p2 = len - p1;
-		
-		memcpy(buf, fText + index, p1);
-		memcpy(buf + p1, fText + fGap + fGapSize, p2);
-	}
-} /* PTextBuffer::Copy */
-
-void PTextBuffer::PrintToStream()
-{
-	char t[4];
-	memcpy(t, fText + fPhysicalSize, 4);
-	printf("logical size: %d, physical size: %d, gap: %d, gapsize: %d, trailer: %4.4s\n",
-		fLogicalSize, fPhysicalSize, fGap, fGapSize, t);
-} /* PTextBuffer::PrintToStream */
-
-int PTextBuffer::CharLen(int index) const
-{
-	ASSERT(index >= 0);
-	ASSERT(index <= fLogicalSize);
-
-	if (index < fLogicalSize && index >= 0)
-	{
-		char b[8];
-		Copy(b, index, min(7, fLogicalSize - index));
-		b[7] = 0;
-	
-		return mcharlen(b);
-	}
-	else
-		return 1;
-} /* PTextBuffer::CharLen */
-
-int PTextBuffer::PrevCharLen(int index) const
-{
-	ASSERT(index <= fLogicalSize);
-	ASSERT(index >= 0);
-
-	if (index > 0 && index <= fLogicalSize)
-	{
-		char b[8];
-		int cnt = max(0, min(7, index));
-		Copy(b, index - cnt, cnt);
-		b[cnt] = 0;
-	
-		return mprevcharlen(b + cnt);
-	}
-	else
-		return 1;
-} /* PTextBuffer::PrevCharLen */
-
-void PTextBuffer::ChangeToNL(int index)
-{
-	int i = index < fGap ? index : index + fGapSize;
-	if (fText[i] == '\r')
-	{
-		fText[i] = '\n';
-		index++;
-		if (operator[](index) == '\n')	// check if it is a CR/LF
-			Delete(index, index + 1);
-	}
-} /* PTextBuffer::ChangeToNL */
-
-PTextBuffer& PTextBuffer::operator=(const PTextBuffer& b)
-{
-	if (fText) free(fText);
-	
-	fText = (char *)malloc(b.fPhysicalSize);
-	FailNil(fText);
-	memcpy(fText, b.fText, b.fPhysicalSize);
-	
-	fLogicalSize = b.fLogicalSize;
-	fPhysicalSize = b.fPhysicalSize;
-	fGap = b.fGap;
-	fGapSize = b.fGapSize;
-	
-	return *this;
-} /* PTextBuffer::operator= */
-
-void PTextBuffer::CharInfo(int offset, int& unicode, int& len) const
-{
-	ASSERT(offset >= 0);
-//	ASSERT(index <= fLogicalSize);
-
-	if (offset >= fLogicalSize || offset < 0)
-	{
-		unicode = 0;
-		len = 1;
-	}
-	else
-	{
-		char b[8];
-		Copy(b, offset, min(7, fLogicalSize - offset));
-		b[7] = 0;
-	
-		len = mcharlen(b);
-		unicode = municode(b);
-	}
-} /* PTextBuffer::CharInfo */
-
-void PTextBuffer::Replace(int offset, const char *txt)
-{
-	int len = strlen(txt);
-
-	ASSERT(offset >= 0);
-	ASSERT(offset + len <= fLogicalSize);
-	ASSERT(len >= 0);
-
-	if (offset < 0) offset = 0;
-	if (offset + len > fLogicalSize) len = fLogicalSize - offset;
-	if (len <= 0) return;
-
-	if (offset + len <= fGap)
-	{
-		memcpy(fText + offset, txt, len);
-	}
-	else if (offset >= fGap)
-	{
-		memcpy(fText + fGapSize + offset, txt, len);
-	}
-	else
-	{
-		int p1, p2;
-		p1 = fGap - offset;
-		p2 = len - p1;
-		
-		memcpy(fText + offset, txt, p1);
-		memcpy(fText + fGap + fGapSize, txt + p1, p2);
-	}
-} /* PTextBuffer::Replace */

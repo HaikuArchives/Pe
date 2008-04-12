@@ -250,7 +250,7 @@ void PDoc::InitWindow(const char *name)
 	r.right -= B_V_SCROLL_BAR_WIDTH;
 	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
 
-	fText = new PText(r, fTextBuffer, bars, name);
+	fText = new PText(r, bars, name);
 	AddChild(fText);
 	fText->MakeFocus(true);
 

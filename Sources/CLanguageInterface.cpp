@@ -46,6 +46,7 @@
 #include "HColorUtils.h"
 #include "ResourcesMisc.h"
 #include "Prefs.h"
+#include "utf-support.h"
 #include <algorithm>
 
 unsigned char *CLanguageInterface::sfWordBreakTable = NULL;
@@ -474,7 +475,7 @@ int CLanguageInterface::FindNextWord(PText& text, int offset, int& mlen)
 				size = min(text.LineStart(line + 1) - offset, 1024);
 
 			CAlloca txt(size + 1);
-			text.TextBuffer().Copy(txt, offset, size);
+			text.CopyText(txt, offset, size);
 			txt[size] = 0;
 
 			CLanguageProxy proxy(*this, txt, size);
@@ -496,7 +497,7 @@ int CLanguageInterface::FindNextWord(PText& text, int offset, int& mlen)
 
 			while (state > 0 && i < text.Size())
 			{
-				text.TextBuffer().CharInfo(i, unicode, len);
+				text.CharInfo(i, unicode, len);
 
 				int cl = 0;
 
@@ -780,7 +781,7 @@ void CLanguageInterface::GenerateKeywordMap(const char *ext) const
 						end = start + strcspn(start, "\n");
 					}
 				} else {
-					fKeywordMap.insert(pair<BString, int>(word, currType));
+					fKeywordMap.insert(pair<const BString, int>(word, currType));
 				}
 				start = end + strspn(end, white);
 				end = start + strcspn(start, white);

@@ -42,6 +42,7 @@
 #include "PLongAction.h"
 #include "PApp.h"
 #include "PErrorWindow.h"
+#include "utf-support.h"
 
 PCmd::PCmd(const char *str, PText *txt)
 {
@@ -174,7 +175,7 @@ void PPasteCmd::Do()
 	int cnt = fTo - fWhere;
 	fPasted = (char *)malloc(cnt + 1);
 	FailNil(fPasted);
-	fText->TextBuffer().Copy(fPasted, fWhere, cnt);
+	fText->CopyText(fPasted, fWhere, cnt);
 	fPasted[cnt] = 0;
 	
 	Update();
@@ -228,13 +229,13 @@ void PTypingCmd::Do()
 	fDeletedIndx = min(fText->Caret(), fText->Anchor());
 	fDeletedLen = abs(fText->Caret() - fText->Anchor());
 		
-	if (fDeletedIndx + fDeletedLen >= fText->TextBuffer().Size())
-		fDeletedLen = max(fText->TextBuffer().Size() - fDeletedIndx, 0);
+	if (fDeletedIndx + fDeletedLen >= fText->Size())
+		fDeletedLen = max(fText->Size() - fDeletedIndx, 0);
 		
 	fDeleted = (char *)malloc(fDeletedLen);
 		
 	if (fDeletedLen)
-		fText->TextBuffer().Copy(fDeleted, fDeletedIndx, fDeletedLen);
+		fText->CopyText(fDeleted, fDeletedIndx, fDeletedLen);
 		
 	fInsertedLen = 0;
 } /* PTypingCmd::Do */
@@ -256,7 +257,7 @@ void PTypingCmd::Undo()
 	{
 		pt = (char *)malloc(fInsertedLen + 1);
 		FailNil(pt);
-		fText->TextBuffer().Copy(pt, fDeletedIndx, fInsertedLen);
+		fText->CopyText(pt, fDeletedIndx, fInsertedLen);
 	}
 	
 	if (fInsertedLen)
@@ -526,7 +527,7 @@ PReplaceCmd::PReplaceCmd(PText *txt, int offset, int size, bool findNext, bool b
 
 	fWhat = (char *)malloc(size + 1);
 	FailNil(fWhat);
-	txt->TextBuffer().Copy(fWhat, offset, size);
+	txt->CopyText(fWhat, offset, size);
 	fWhat[size] = 0;
 
 	fWrap = gFindDialog->Wrap();
@@ -737,7 +738,7 @@ void PScriptCmd::Do()
 		fAnchor = fCaret = min(fText->Anchor(), fText->Caret());
 		fOldText = (char *)malloc(fOldTextSize);
 		FailNil(fOldText);
-		fText->TextBuffer().Copy(fOldText, fAnchor, fOldTextSize);
+		fText->CopyText(fOldText, fAnchor, fOldTextSize);
 	}
 	else
 		fCaret = fAnchor = fText->Caret();
@@ -874,7 +875,7 @@ void PScriptCmd::Undo()
 	{
 		t = (char *)malloc(size);
 		FailNil(t);
-		fText->TextBuffer().Copy(t, fAnchor, size);
+		fText->CopyText(t, fAnchor, size);
 		fText->Delete(fAnchor, fCaret);
 	}
 	
@@ -977,7 +978,7 @@ PShiftLeftCmd::PShiftLeftCmd(PText *txt)
 	for (int i = firstLine; i < lastLine; i++)
 	{
 		if (!fText->SoftStart(i)) {
-			char c = fText->TextBuffer()[fText->LineStart(i)];
+			char c = (*fText)[fText->LineStart(i)];
 			if (c == '\t' || c == ' ')
 			{
 				fFirstChars[hardIndex] = c;
@@ -1123,23 +1124,22 @@ PTwiddleCmd::PTwiddleCmd(PText *txt)
 		
 		if (fFrom == fText->LineStart(line))
 		{
-			fTo += txt->TextBuffer().CharLen(fTo);
-			fTo += txt->TextBuffer().CharLen(fTo);
+			fTo += txt->CharLen(fTo);
+			fTo += txt->CharLen(fTo);
 		}
 		else if (fFrom == fText->Size() || fFrom == fText->LineStart(line + 1) - 1)
 		{
-			fFrom -= txt->TextBuffer().PrevCharLen(fFrom);
-			fFrom -= txt->TextBuffer().PrevCharLen(fFrom);
+			fFrom -= txt->PrevCharLen(fFrom);
+			fFrom -= txt->PrevCharLen(fFrom);
 		}
 		else
 		{
-			fTo += txt->TextBuffer().CharLen(fTo);
-			fFrom -= txt->TextBuffer().PrevCharLen(fFrom);
+			fTo += txt->CharLen(fTo);
+			fFrom -= txt->PrevCharLen(fFrom);
 		}
 	}
 	
-	if (fText->TextBuffer()[fFrom] == '\n' ||
-		fText->TextBuffer()[fTo - 1] == '\n' ||
+	if ((*fText)[fFrom] == '\n' || (*fText)[fTo - 1] == '\n' ||
 		fTo > fText->Size() || fFrom < 0)
 	{
 		THROW((0));
@@ -1285,7 +1285,7 @@ bool PCommentCmd::UncommentLine(int line)
 	
 	b[j] = 0;
 	while (j--)
-		b[j] = fText->TextBuffer()[ix + j];
+		b[j] = (*fText)[ix + j];
 
 	if (strcmp(b, fBefore) == 0)
 	{
@@ -1299,7 +1299,7 @@ bool PCommentCmd::UncommentLine(int line)
 			
 			b[j] = 0;
 			while (j--)
-				b[j] = fText->TextBuffer()[ix + j];
+				b[j] = (*fText)[ix + j];
 	
 			if (strcmp(b, fAfter) == 0)
 				fText->Delete(ix, ix + strlen(fAfter));
@@ -1620,7 +1620,7 @@ PEncodingCmd::PEncodingCmd(PText *txt, int from, int to)
 	fSrcLen = fCaret - fAnchor;
 	
 	FailNil(fSaved);
-	txt->TextBuffer().Copy(fSaved, fAnchor, fSrcLen);
+	txt->CopyText(fSaved, fAnchor, fSrcLen);
 	
 	fPrevEncoding = txt->Doc()->Encoding();
 } /* PEncodingCmd::PEncodingCmd */

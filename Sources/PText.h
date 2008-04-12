@@ -36,10 +36,11 @@
 
 typedef float g_unit_t;
 
+#include <Debug.h>
 #include <Messenger.h>
 #include <View.h>
 
-#include "PTextBuffer.h"
+#include "CTextEditor.h"
 #include "CFontStyle.h"
 
 #include <stack>
@@ -76,9 +77,8 @@ typedef vector<LineInfo> VLineInfo;
 
 class PText
 	: public BView
+	, public CTextEditor	// temporarily, will eventually become a member!
 {
-
-//friend class PFontTabsCmd;	// lets keep life simple
 
 enum {
 	kNormalFont			= 0,
@@ -87,8 +87,7 @@ enum {
 };
 
 public:
-			PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], 
-				  const char *ext);
+			PText(BRect frame, BScrollBar *bars[], const char *ext);
 			~PText();
 
 			void ReInit();
@@ -270,7 +269,6 @@ virtual		void FrameResized(float w, float h);
 			void UnsplitWindow();
 			void SwitchPart(int toPart);
 		
-			const PTextBuffer& TextBuffer() const;
 			const char* FindString() const;
 			const char* ReplaceString() const;
 			bool IsExecuting() const;
@@ -316,7 +314,7 @@ private:
 			bool fUsingDefaultLanguage;
 			CLanguageInterface *fLangIntf;
 			BRect fBounds;
-			PTextBuffer& fText;
+			CTextEditor& fText;
 			VLineInfo fLineInfo;
 			CFontStyle *fMetrics;
 			int fAnchor, fCaret, fStoredCaret;
@@ -380,10 +378,6 @@ inline int PText::Anchor() {
 
 inline int PText::Caret() {
 	return fCaret;
-}
-
-inline const PTextBuffer& PText::TextBuffer() const {
-	return fText;
 }
 
 inline bool PText::IsExecuting() const {

@@ -29,7 +29,6 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
-
 #include "PAddOn.h"
 
 #include "HError.h"
@@ -213,7 +212,7 @@ void PEditText::Delete()
 	action.aOffset = start;
 	action.aText = (char *)malloc(end - start + 1);
 	FailNil(action.aText);
-	fText.TextBuffer().Copy(action.aText, start, end - start);
+	fText.CopyText(action.aText, start, end - start);
 	action.aText[end - start] = 0;
 	fCommand->Actions().push_back(action);
 	

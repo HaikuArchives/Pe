@@ -46,9 +46,9 @@
 const char
 	kAboutText[] =
 #if __INTEL__
-		"Pe 2.4.1 (x86) Open Source Version\n\n"
+		"Pe devel (x86) Open Source Version\n\n"
 #else
-		"Pe 2.4.1 (PPC) Open Source Version\n\n"
+		"Pe devel (PPC) Open Source Version\n\n"
 #endif
 		"a high performance editor\n"
 		"created by Maarten Hekkelman.\n"

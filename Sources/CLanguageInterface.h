@@ -69,10 +69,10 @@ static	void ChooseDefault();
 static	void SetupLanguageInterfaces();
 static	CLanguageInterface* FindIntf(int index)	{ return fInterfaces[index]; }
 static	CLanguageInterface* FindByExtension(const char *filename);
-static CLanguageInterface* FindByName(const char *language);
+static  CLanguageInterface* FindByName(const char *language);
 
-static CLanguageInterface* NextIntf(int& cookie);
-static int GetIndex(const CLanguageInterface* intf);
+static  CLanguageInterface* NextIntf(int& cookie);
+static  int GetIndex(const CLanguageInterface* intf);
 
 		const char* LineCommentStart() const;
 		const char* LineCommentEnd() const;

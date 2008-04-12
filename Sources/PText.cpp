@@ -66,9 +66,10 @@
 #include "HColorUtils.h"
 #include "ResourcesMenus.h"
 #include "Prefs.h"
+#include "utf-support.h"
 
 #if defined(__BEOS__) && defined(__INTEL__)
-	// [zooey]: BeOS' glib is messing up iscntrl, as it reports all values>127 as
+	// [zooey]: BeOS' glibc is messing up iscntrl, as it reports all values>127 as
 	// being control-chars, too (but they are *not*). We fix that:
 	#undef iscntrl
 	#define iscntrl(c)	((((unsigned char)(c))<128) && __isctype((c), _IScntrl))
@@ -171,10 +172,10 @@ class WordState {
 //	#pragma mark - class PText
 
 
-PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
+PText::PText(BRect frame, BScrollBar *bars[], const char *ext)
 	: BView(frame, "text view", B_FOLLOW_ALL_SIDES, B_ASYNCHRONOUS_CONTROLS |
 		B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED | B_FRAME_EVENTS)
-	, fText(txt)
+	, fText(*static_cast<CTextEditor*>(this))
 	, fSplitCursorShown(false)
 	, fFontKind(kNormalFont)
 {
@@ -399,7 +400,7 @@ void PText::GetSelectedText(char*& s, bool extend)
 			int size = abs(fCaret - fAnchor);
 			s = (char *)malloc(size + 1);
 			FailNil(s);
-			fText.Copy(s, min(fCaret, fAnchor), size);
+			fText.CopyText(s, min(fCaret, fAnchor), size);
 			s[size] = 0;
 		}
 	}
@@ -1127,7 +1128,7 @@ void PText::CopyBlock(char*& s, int from, int to)
 		l = o2 - o1;
 
 		CAlloca txt(o2 - o1 + 2);
-		fText.Copy(txt, o1, l);
+		fText.CopyText(txt, o1, l);
 		txt[l] = '\n';
 		txt[l + 1] = 0;
 
@@ -2632,7 +2633,7 @@ void PText::InsertLinebreaks()
 		if (! fLineInfo[line].nl)
 		{
 			if (fText[i - 1] == ' ')
-				fText.Replace(i - 1, "\n");
+				fText.Overwrite(i - 1, "\n");
 			else
 			{
 				fText.Insert("\n", 1, i);
@@ -2928,7 +2929,7 @@ g_unit_t PText::TextWidth(int offset, int len) const
 	if (len > 0)
 	{
 		CAlloca txt(len + 1);
-		fText.Copy(txt, offset, len);
+		fText.CopyText(txt, offset, len);
 		txt[len] = 0;
 
 		w = StringWidth(txt, len);
@@ -3039,7 +3040,7 @@ void PText::RestyleDirtyLines(int from)
 				int len = fLineInfo[i].start - fLineInfo[i - 1].start;
 
 				CAlloca txt(len + 1);
-				fText.Copy(txt, fLineInfo[i - 1].start, len);
+				fText.CopyText(txt, fLineInfo[i - 1].start, len);
 				txt[len] = 0;
 
 				fLangIntf->ColorLine(txt, len, state, NULL, NULL);
@@ -4643,7 +4644,7 @@ void PText::ExecuteSelection()
 		s = (char *)malloc(to - from + 1);
 		s[to - from] = 0;
 		FailNil(s);
-		fText.Copy(s, from, to - from);
+		fText.CopyText(s, from, to - from);
 	}
 
 	fExec = new PExec(this, s, fCWD);
@@ -4822,7 +4823,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 
 	if (l)
 	{
-		fText.Copy(b, s, l);
+		fText.CopyText(b, s, l);
 		b[l] = 0;
 
 		int state = LineState(lineNr);
@@ -6238,7 +6239,7 @@ void PText::Copy(int append)
 			s = (char *)malloc(size);
 			FailNil(s);
 
-			fText.Copy(s, min(fCaret, fAnchor), size);
+			fText.CopyText(s, min(fCaret, fAnchor), size);
 
 			be_clipboard->Lock();
 			if (append && be_clipboard->Data()->HasData("text/plain", B_MIME_DATA))

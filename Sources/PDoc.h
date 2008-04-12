@@ -41,8 +41,6 @@
 
 #include "CDocWindow.h"
 
-#include "PTextBuffer.h"
-
 class PText;
 class PStatus;
 class HDialog;
@@ -169,7 +167,6 @@ private:
 
 			HButtonBar *fButtonBar;
 			PText *fText;
-			PTextBuffer fTextBuffer;
 			PToolBar *fToolBar;
 			BMenu *fMBar;
 			BMenu *fRecent;

@@ -42,7 +42,6 @@
 
 
 class PText;
-class PTextBuffer;
 
 class PCmd {
 public:
