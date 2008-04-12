@@ -47,6 +47,7 @@ actions MakeDistro
 	cp -a $(TOP)/doc/*.html $(DISTRO_DIR)/Documentation/ ;
 	mkdir $(DISTRO_DIR)/Documentation/gifs ;
 	cp -a $(TOP)/doc/gifs/*.gif $(DISTRO_DIR)/Documentation/gifs/ ;
+	ln -sf Documentation/index.html $(DISTRO_DIR)/Documentation.html ;
 	ln -sf /boot/home/config/bin/ $(DISTRO_DIR)/\(drag\ lpe\ here\ to\ install\) ;
 	cp -a /boot/home/config/lib/libpcre*.so $(DISTRO_DIR)/lib/ ;
 }
