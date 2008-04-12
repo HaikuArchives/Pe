@@ -2170,93 +2170,65 @@ void PText::HandleDrop(BMessage *msg)
 {
 	fWindowActive = Window()->IsActive();
 
-	char *s = NULL;
-	ssize_t sl;
-
 	if (msg->HasData("text/plain", B_MIME_TYPE))
 	{
-		char *t;
+		char *s;
+		ssize_t sl;
 
-		FailOSErr(msg->FindData("text/plain", B_MIME_TYPE, (const void**)&t, &sl));
-		s = new char[sl];
-		FailNil(s);
-		memcpy(s, t, sl);
+		FailOSErr(msg->FindData("text/plain", B_MIME_TYPE, (const void**)&s, &sl));
+		if (s)
+		{
+			int offset;
+			if (msg->IsSourceRemote() || msg->IsSystem() || sfDragSource != this)
+				offset = -1;
+			else if (fDragButtons & B_TERTIARY_MOUSE_BUTTON)
+				offset = -1;
+			else if (fDragButtons & B_SECONDARY_MOUSE_BUTTON)
+			{
+				BPopUpMenu popup("copy or move");
+				popup.SetFont(be_plain_font);
+				popup.AddItem(new BMenuItem("Move", NULL));
+				popup.AddItem(new BMenuItem("Copy", NULL));
+				BMenuItem *item = popup.Go(msg->DropPoint(), false, true);
+	
+				if (!item)
+				{
+					HideCaret();
+					fAnchor = fSavedAnchor;
+					fCaret = fSavedCaret;
+					return;
+				}
+	
+				if (popup.IndexOf(item) == 0)
+					offset = fDragStart;
+				else
+					offset = -1;
+			}
+			else
+				offset = fDragStart;
+	
+			if (offset == -1 || fCaret < offset || fCaret > offset + sl)
+			{
+				if (sfDragSource == this)
+				{
+					int a, c;
+	
+					a = Offset2Line(fSavedAnchor);
+					c = Offset2Line(fSavedCaret);
+					TouchLines(min(a, c), max(a, c));
+				}
+				RegisterCommand(new PDropCmd(this, s, sl, offset, fCaret));
+			}
+		}
 	}
 	else if (msg->HasRef("refs"))
 	{
+		// open all dropped files as documents:
+		BMessage openMsg(B_REFS_RECEIVED);
 		entry_ref ref;
-
-		FailOSErr(msg->FindRef("refs", &ref));
-
-		BFile file;
-		FailOSErr(file.SetTo(&ref, B_READ_ONLY));
-
-		key_info ki;
-		if (get_key_info(&ki) == B_OK && ki.modifiers & (B_COMMAND_KEY | B_OPTION_KEY))
-			be_app->RefsReceived(msg);
-		else
-		{
-			char m[B_MIME_TYPE_LENGTH];
-			BNodeInfo(&file).GetType(m);
-
-			if (strncmp(m, "text/", 5) == 0)
-			{
-				sl = file.Seek(0, SEEK_END);
-				file.Seek(0, SEEK_SET);
-
-				s = new char[sl];
-				if (file.Read(s, sl) != sl)
-					THROW(("Read Error"));
-			}
-		}
-	}
-
-	if (s)
-	{
-		int offset;
-		if (msg->IsSourceRemote() || msg->IsSystem() || sfDragSource != this)
-			offset = -1;
-		else if (fDragButtons & B_TERTIARY_MOUSE_BUTTON)
-			offset = -1;
-		else if (fDragButtons & B_SECONDARY_MOUSE_BUTTON)
-		{
-			BPopUpMenu popup("copy or move");
-			popup.SetFont(be_plain_font);
-			popup.AddItem(new BMenuItem("Move", NULL));
-			popup.AddItem(new BMenuItem("Copy", NULL));
-			BMenuItem *item = popup.Go(msg->DropPoint(), false, true);
-
-			if (!item)
-			{
-				HideCaret();
-				fAnchor = fSavedAnchor;
-				fCaret = fSavedCaret;
-				return;
-			}
-
-			if (popup.IndexOf(item) == 0)
-				offset = fDragStart;
-			else
-				offset = -1;
-		}
-		else
-			offset = fDragStart;
-
-		if (offset == -1 || fCaret < offset || fCaret > offset + sl)
-		{
-			if (sfDragSource == this)
-			{
-				int a, c;
-
-				a = Offset2Line(fSavedAnchor);
-				c = Offset2Line(fSavedCaret);
-				TouchLines(min(a, c), max(a, c));
-			}
-			RegisterCommand(new PDropCmd(this, s, sl, offset, fCaret));
-		}
-
-		if (msg->HasRef("refs"))
-			delete s;
+		for(int32 i=0; msg->FindRef("refs", i, &ref) == B_OK; ++i)
+			openMsg.AddRef("refs", &ref);
+		be_app_messenger.SendMessage(&openMsg);
 	}
 } /* PText::HandleDrop */
 
