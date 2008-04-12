@@ -5577,16 +5577,16 @@ status_t PText::Print()
 	}
 
 	fprintf(stderr, "printableRect = {%f, %f, %f, %f}\n", printableRect.left, printableRect.top, printableRect.right, printableRect.bottom);
-	fprintf(stderr, "firstLine = %d\n", firstLine);
-	fprintf(stderr, "lastLine = %d\n", lastLine);
-	fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
-	fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
+	fprintf(stderr, "firstLine = %ld\n", firstLine);
+	fprintf(stderr, "lastLine = %ld\n", lastLine);
+	fprintf(stderr, "pagesInDocument = %ld\n", pagesInDocument);
+	fprintf(stderr, "linesInDocument = %ld\n", linesInDocument);
 
 	int32 currentLine = 0;
 	while (currentLine < linesInDocument)
 	{
 		float currentHeight = 0;
-		fprintf(stderr, "currentLine = %d\n", currentLine);
+		fprintf(stderr, "currentLine = %ld\n", currentLine);
 		// smallest of remaining lines or number of lines fitting the page
 		int32 lines = (int32)(MIN((1 + linesInDocument - currentLine), printableRect.Height() / fLineHeight));
 		currentHeight += fLineHeight * lines;
@@ -5610,8 +5610,8 @@ status_t PText::Print()
 	}
 
 	
-	fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
-	fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
+	fprintf(stderr, "pagesInDocument = %ld\n", pagesInDocument);
+	fprintf(stderr, "linesInDocument = %ld\n", linesInDocument);
 
 	// let's do it!
 	printJob.BeginJob();
@@ -5621,7 +5621,7 @@ status_t PText::Print()
 		int32 printLine = firstLine;
 		while (printLine <= lastLine)
 		{
-			fprintf(stderr, "printLine = %d, lastLine = %d\n", printLine, lastLine);
+			fprintf(stderr, "printLine = %ld, lastLine = %ld\n", printLine, lastLine);
 			float currentHeight = 0;
 			int32 firstLineOnPage = printLine;
 			// smallest of remaining lines or number of lines fitting the page
