@@ -126,6 +126,125 @@ static const char *sIdMeFullMITRevisedCreatedHeaderTemplate = \
 
 
 //------------------------------------------------------------------------------
+//	#pragma mark - class PanelHandler
+
+class PanelHandler : public BHandler {
+	public:
+		PanelHandler();
+		~PanelHandler();
+	virtual void	MessageReceived(BMessage *message);
+
+	status_t	Wait();
+	BMessage*	Message() const { return fMessage; };
+	private:
+		sem_id fSem;
+		BMessage *fMessage;
+};
+
+
+PanelHandler::PanelHandler()
+{
+	fSem = create_sem(0, "PanelHandlerTrigger");
+	fMessage = NULL;
+}
+
+
+PanelHandler::~PanelHandler()
+{
+	delete_sem(fSem);
+	delete fMessage;
+}
+
+
+void
+PanelHandler::MessageReceived(BMessage *message)
+{
+	delete fMessage;
+	fMessage = new BMessage(*message);
+	release_sem(fSem);
+}
+
+
+status_t
+PanelHandler::Wait()
+{
+	return acquire_sem(fSem);
+}
+
+
+//------------------------------------------------------------------------------
+//	#pragma mark - class MimeRefFilter
+
+class MimeRefFilter : public BRefFilter {
+	public:
+			MimeRefFilter(const char *mime);
+			MimeRefFilter(const char *mimes[]);
+			//MimeRefFilter(BList *mimes);
+	virtual	~MimeRefFilter();
+
+	virtual	bool	Filter(const entry_ref *ref, BNode *node, 
+							struct stat *st, const char *filetype);
+	private:
+		BList	*fMimes;
+};
+
+MimeRefFilter::MimeRefFilter(const char *mime)
+{
+	fMimes = new BList;
+	fMimes->AddItem(new BString(mime));
+}
+
+
+MimeRefFilter::MimeRefFilter(const char *mimes[])
+{
+	int i;
+	fMimes = new BList;
+	for (i = 0; mimes[i]; i++)
+	{
+		fMimes->AddItem(new BString(mimes[i]));
+	}
+}
+
+
+MimeRefFilter::~MimeRefFilter()
+{
+	int i;
+	for (i = fMimes->CountItems() - 1; i > -1; i--)
+	{
+		delete (BString *)fMimes->ItemAt(i);
+	}
+	delete fMimes;
+}
+
+
+bool
+MimeRefFilter::Filter(const entry_ref *ref, BNode *node, 
+					struct stat *st, const char *filetype)
+{
+	int i;
+	// allow folders else it's quite hard to navigate :)
+	if (node->IsDirectory())
+		return true;
+	//BNode target;
+	if (node->IsSymLink())
+	{
+		// init target 
+		// node = &target;
+		// if
+		return true;
+	}
+	
+	for (i = fMimes->CountItems() - 1; i > -1; i--)
+	{
+		BString *mime = (BString *)fMimes->ItemAt(i);
+		if (filetype == *mime)
+			return true;
+	}
+	return false;
+}
+
+
+//------------------------------------------------------------------------------
 //	#pragma mark - implementation
 
 
@@ -361,9 +480,48 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName,
 			break;
 		}
 		case 'seta':
-			// TODO
-			//BFilePanel *panel = new ;
+		{
+			MimeRefFilter filter("application/x-person");
+			BPath path;
+			entry_ref people;
+
+			if (find_directory(B_USER_DIRECTORY, &path) == B_OK)
+			{
+				path.Append("people");
+				get_ref_for_path(path.Path(), &people);
+			}
+
+			BFilePanel panel(B_OPEN_PANEL,
+							NULL, 
+							&people,
+							B_FILE_NODE,
+							false,
+							NULL,
+							&filter);
+			// trick to synchronously use BFilePanel
+			PanelHandler *handler = new PanelHandler;
+			if (panel.Window()->Lock())
+			{
+				panel.Window()->AddHandler(handler);
+				panel.Window()->Unlock();
+			}
+			panel.SetTarget(BMessenger(handler));
+			panel.Show();
+			if (handler->Wait() < B_OK)
+				break;
+			if (!handler->Message())
+				break;
+			if (handler->Message()->what == B_CANCEL)
+				break;
+			entry_ref ref;
+			//panel.Message()->PrintToStream();
+			if (panel.GetNextSelectedRef(&ref) == B_OK)
+			{
+				printf("ref:%s\n", ref.name);
+				// TODO
+			}
 			break;
+		}
 		case 0:
 			err = B_CANCELED;
 			break;
