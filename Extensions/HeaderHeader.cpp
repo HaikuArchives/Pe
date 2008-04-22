@@ -3,6 +3,9 @@
  */
 
 #include "PeAddOn.h"
+#include "PDoc.h"
+#include "PText.h"
+#include "CLanguageInterface.h"
 #include <ctype.h>
 #include <time.h>
 #include <FilePanel.h>
@@ -148,7 +151,10 @@ GetSettingsDir(BDirectory &dir, BPath &path)
 }
 
 void
-AddTemplateItem(BPopUpMenu *menu, const char *name, const char *tmpl, const char *match=NULL)
+AddTemplateItem(BPopUpMenu *menu, 
+	const char *name, 
+	const char *tmpl, 
+	const char *match=NULL)
 {
 	BMessage *msg;
 	BMenuItem *item;
@@ -195,7 +201,8 @@ BuildPopUp(BDirectory &dir)
 		return menu;
 
 	entry_ref ref;
-	while (dir.GetNextRef(&ref) == B_OK) {
+	while (dir.GetNextRef(&ref) == B_OK)
+	{
 		BFile file(&ref, B_READ_ONLY);
 		if (file.InitCheck() < B_OK)
 			continue;
@@ -217,7 +224,8 @@ BuildPopUp(BDirectory &dir)
 
 
 status_t
-RunPopUpMenu(BPoint where, BString &header, BString &fileName)
+RunPopUpMenu(BPoint where, BString &header, BString &fileName, 
+	CLanguageInterface *languageInterface)
 {
 	status_t err;
 	BPath path;
@@ -232,7 +240,8 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName)
 	//if (item && item->Message())
 	//	item->Message()->PrintToStream();
 
-	switch ((item && item->Message()) ? item->Message()->what : 0) {
+	switch ((item && item->Message()) ? item->Message()->what : 0)
+	{
 		case 'head':
 		{
 			if (item->Message()->FindString("template", &header) < B_OK)
@@ -284,15 +293,60 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName)
 			tmp.Truncate(0);
 			*/
 
-			// TODO: depend on language
+			// better values for C++
+			BString language("C/C++");
+			BString commentLineStart("/*");
+			BString commentLineEnd("");
+			BString commentBlockStart("/*");
+			BString commentBlockCont(" *");
+			BString commentBlockLazy("");
+			BString commentBlockLineEnd("");
+			BString commentBlockEnd(" */");
+			if (languageInterface)
+			{
+				// if not C++
+				if (language != languageInterface->Name())
+				{
+					language = languageInterface->Name();
+					commentLineStart = languageInterface->LineCommentStart();
+					commentLineEnd = languageInterface->LineCommentEnd();
+					// I'd miss a CommentCanSpanLines()
+					// let's assume line end means can span
+					if (commentLineEnd.Length())
+					{
+						commentBlockStart = commentLineStart;
+						commentBlockCont = "";
+						commentBlockLazy = "";
+						commentBlockLineEnd = "";
+						commentBlockEnd = commentLineEnd;
+					}
+					else
+					{
+						commentBlockStart = commentLineStart;
+						commentBlockCont = commentLineStart;
+						commentBlockLazy = commentLineStart;
+						commentBlockLineEnd = commentLineEnd;
+						commentBlockEnd = commentLineStart;
+					}
+					/*
+					printf("LANG:'%s' CS:'%s' CE:'%s'\n", 
+						language.String(), 
+						commentLineStart.String(), 
+						commentLineEnd.String());
+					*/
+				}
+			}
 			// comment start
-			header.ReplaceAll("%COMMS%", "/*");
+			header.ReplaceAll("%COMMS%", commentBlockStart.String());
 			// comment cont'd
-			header.ReplaceAll("%COMMC%", " *");
+			header.ReplaceAll("%COMMC%", commentBlockCont.String());
 			// comment cont'd lazy (blank if possible)
-			header.ReplaceAll("%COMML%", "");
+			header.ReplaceAll("%COMML%", commentBlockLazy.String());
 			// comment end
-			header.ReplaceAll("%COMME%", " */");
+			header.ReplaceAll("%COMME%", commentBlockEnd.String());
+			// comment line end
+			commentBlockLineEnd << "\n";
+			header.ReplaceAll("\n", commentBlockLineEnd.String());
 
 
 			err = B_OK;
@@ -339,7 +393,8 @@ long perform_edit(MTextAddOn *addon)
 	entry_ref headerFile;
 	BPoint where(0,0);
 
-	if (addon->Window() && addon->Window()->Lock()) {
+	if (addon->Window() && addon->Window()->Lock())
+	{
 		uint32 buttons;
 		addon->Window()->ChildAt(0)->GetMouse(&where, &buttons);
 		addon->Window()->ChildAt(0)->ConvertToScreen(&where);
@@ -352,8 +407,20 @@ long perform_edit(MTextAddOn *addon)
 	if (result >= B_OK)
 		fileName = headerFile.name;
 
+	CLanguageInterface *languageInterface = NULL;
+	if (addon->Window())
+	{
+		PDoc *doc = dynamic_cast<PDoc *>(addon->Window());
+		if (doc && doc->TextView())
+		{
+			int lang = doc->TextView()->Language();
+			if (lang > -1)
+				languageInterface = CLanguageInterface::FindIntf(lang);
+		}
+	}
+
 	BString header;
-	result = RunPopUpMenu(where, header, fileName);
+	result = RunPopUpMenu(where, header, fileName, languageInterface);
 	//printf("result %s\n", strerror(result));
 	if (result == B_CANCELED)
 		return B_OK;
