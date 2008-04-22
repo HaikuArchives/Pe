@@ -11,13 +11,13 @@
 
 static const char *sTrackerSig = "application/x-vnd.Be-TRAK";
 
-static const char *sHaikuHeaderTemplate = "/*
- * Copyright %YEAR%, Haiku.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		%AUTHOR% <%AUTHORMAIL%>
- */
+static const char *sHaikuHeaderTemplate = "%COMMS%
+%COMMC% Copyright %YEAR%, Haiku.
+%COMMC% Distributed under the terms of the MIT License.
+%COMMC%
+%COMMC% Authors:
+%COMMC%		%AUTHOR% <%AUTHORMAIL%>
+%COMME%
 ";
 
 static const char *sHaikuAddMeHeaderMatch = \
@@ -28,11 +28,11 @@ static const char *sHaikuAddMeHeaderTemplate = \
 ";
 
 
-static const char *sHaikuMeHeaderTemplate = "/*
- * Copyright %YEAR%, %AUTHOR%, <%AUTHORMAIL%>.
- * Distributed under the terms of the MIT License.
- *		
- */
+static const char *sHaikuMeHeaderTemplate = "%COMMS%
+%COMMC% Copyright %YEAR%, %AUTHOR%, <%AUTHORMAIL%>.
+%COMMC% Distributed under the terms of the MIT License.
+%COMMC%	
+%COMME%
 ";
 
 /*
@@ -42,83 +42,83 @@ static const char *sHaikuMeAddMeHeaderTemplate = \
 */
 
 static const char *sIdMeMITCreatedHeaderTemplate = \
-"/*	$Id: %FILENAME% $
-
-	Copyright %YEAR% %AUTHOR%
-
-	Distributed under the MIT License
-
-	Created: %DATE%
-*/
+"%COMMS%	$Id: %FILENAME% $
+%COMML%
+%COMML%	Copyright %YEAR% %AUTHOR%
+%COMML%
+%COMML%	Distributed under the MIT License
+%COMML%
+%COMML%	Created: %DATE%
+%COMME%
 ";
 
 static const char *sIdMeFullMITCreatedHeaderTemplate = \
-"/*	$Id: %FILENAME% $
-	
-	Copyright %YEAR%
-	        %AUTHOR%  All rights reserved.
-	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-	2. Redistributions in binary form must reproduce the above copyright notice,
-	   this list of conditions and the following disclaimer in the documentation
-	   and/or other materials provided with the distribution.
-	3. All advertising materials mentioning features or use of this software
-	   must display the following acknowledgement:
-	   
-	    This product includes software developed by %AUTHOR%.
-	
-	4. The name of %AUTHOR% may not be used to endorse or
-	   promote products derived from this software without specific prior
-	   written permission.
-	
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
-	AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
-
-	Created: %DATE% %TIME%
-*/
+"%COMMS%	$Id: %FILENAME% $
+%COMML%	
+%COMML%	Copyright %YEAR%
+%COMML%	        %AUTHOR%  All rights reserved.
+%COMML%	
+%COMML%	Redistribution and use in source and binary forms, with or without
+%COMML%	modification, are permitted provided that the following conditions are met:
+%COMML%	1. Redistributions of source code must retain the above copyright notice,
+%COMML%	   this list of conditions and the following disclaimer.
+%COMML%	2. Redistributions in binary form must reproduce the above copyright notice,
+%COMML%	   this list of conditions and the following disclaimer in the documentation
+%COMML%	   and/or other materials provided with the distribution.
+%COMML%	3. All advertising materials mentioning features or use of this software
+%COMML%	   must display the following acknowledgement:
+%COMML%	   
+%COMML%	    This product includes software developed by %AUTHOR%.
+%COMML%	
+%COMML%	4. The name of %AUTHOR% may not be used to endorse or
+%COMML%	   promote products derived from this software without specific prior
+%COMML%	   written permission.
+%COMML%	
+%COMML%	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+%COMML%	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+%COMML%	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+%COMML%	AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+%COMML%	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+%COMML%	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+%COMML%	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+%COMML%	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+%COMML%	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+%COMML%	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+%COMML%
+%COMML%	Created: %DATE% %TIME%
+%COMME%
 ";
 
 static const char *sIdMeFullMITRevisedCreatedHeaderTemplate = \
-"/*	$Id: %FILENAME% $
-	
-	Copyright %YEAR%
-	        %AUTHOR%  All rights reserved.
-	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-	2. Redistributions in binary form must reproduce the above copyright notice,
-	   this list of conditions and the following disclaimer in the documentation
-	   and/or other materials provided with the distribution.
-	4. The name of %AUTHOR% may not be used to endorse or
-	   promote products derived from this software without specific prior
-	   written permission.
-	
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
-	AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
-
-	Created: %DATE% %TIME%
-*/
+"%COMMS%	$Id: %FILENAME% $
+%COMML%	
+%COMML%	Copyright %YEAR%
+%COMML%	        %AUTHOR%  All rights reserved.
+%COMML%	
+%COMML%	Redistribution and use in source and binary forms, with or without
+%COMML%	modification, are permitted provided that the following conditions are met:
+%COMML%	1. Redistributions of source code must retain the above copyright notice,
+%COMML%	   this list of conditions and the following disclaimer.
+%COMML%	2. Redistributions in binary form must reproduce the above copyright notice,
+%COMML%	   this list of conditions and the following disclaimer in the documentation
+%COMML%	   and/or other materials provided with the distribution.
+%COMML%	4. The name of %AUTHOR% may not be used to endorse or
+%COMML%	   promote products derived from this software without specific prior
+%COMML%	   written permission.
+%COMML%	
+%COMML%	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+%COMML%	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+%COMML%	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+%COMML%	AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+%COMML%	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+%COMML%	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+%COMML%	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+%COMML%	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+%COMML%	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+%COMML%	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+%COMML%
+%COMML%	Created: %DATE% %TIME%
+%COMME%
 ";
 
 
@@ -200,7 +200,9 @@ BuildPopUp(BDirectory &dir)
 		if (file.InitCheck() < B_OK)
 			continue;
 		BString str;
-		if (file.Read(str.LockBuffer(1024), 1024) <= 0)
+		char *p = str.LockBuffer(1024);
+		memset(p, 0, 1024);
+		if (file.Read(p, 1024) <= 0)
 			continue;
 		str.UnlockBuffer();
 		
@@ -239,18 +241,25 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName)
 			time_t now = time(NULL);
 			struct tm *tim = localtime(&now);
 			// date
-			strftime(tmp.LockBuffer(100), 100, "%F", tim);
+			char *p;
+			p = tmp.LockBuffer(100);
+			memset(p, 0, 100);
+			strftime(p, 100, "%F", tim);
 			tmp.UnlockBuffer();
 			header.ReplaceAll("%DATE%", tmp.String());
 			tmp.Truncate(0);
 			
-			strftime(tmp.LockBuffer(100), 100, "%T", tim);
+			p = tmp.LockBuffer(100);
+			memset(p, 0, 100);
+			strftime(p, 100, "%T", tim);
 			tmp.UnlockBuffer();
 			header.ReplaceAll("%TIME%", tmp.String());
 			tmp.Truncate(0);
 
 			// year
-			strftime(tmp.LockBuffer(20), 20, "%Y", tim);
+			p = tmp.LockBuffer(10);
+			memset(p, 0, 10);
+			strftime(p, 10, "%Y", tim);
 			tmp.UnlockBuffer();
 			header.ReplaceAll("%YEAR%", tmp.String());
 			tmp.Truncate(0);
@@ -274,6 +283,17 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName)
 			header.ReplaceAll("%PROJECT%", tmp.String());
 			tmp.Truncate(0);
 			*/
+
+			// TODO: depend on language
+			// comment start
+			header.ReplaceAll("%COMMS%", "/*");
+			// comment cont'd
+			header.ReplaceAll("%COMMC%", " *");
+			// comment cont'd lazy (blank if possible)
+			header.ReplaceAll("%COMML%", "");
+			// comment end
+			header.ReplaceAll("%COMME%", " */");
+
 
 			err = B_OK;
 			break;

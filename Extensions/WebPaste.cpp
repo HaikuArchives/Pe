@@ -80,6 +80,7 @@ StdIOInString::StdIOInString(FILE *f, bool closeOnDelete)
 	do {
 		len = Length();
 		char *buf = LockBuffer(len + 4096);
+		memset(buf + len, 0, 4096);
 		buf += len;
 		int got = fread(buf, 1, 4096, fFile);
 		//fprintf(stderr, "got %d\n", got);
