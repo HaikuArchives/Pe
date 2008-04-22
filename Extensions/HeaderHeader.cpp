@@ -392,14 +392,42 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName,
 			header.ReplaceAll("%YEAR%", tmp.String());
 			tmp.Truncate(0);
 
-			// TODO fetch from query on META:email==**
-			// or specific people file
-			tmp << "François Revol";
+			// fetch from query on META:email==** ?
+			p = tmp.LockBuffer(B_PATH_NAME_LENGTH);
+			memset(p, 0, B_PATH_NAME_LENGTH);
+			err = dir.ReadAttr("pe:author_people", B_STRING_TYPE, 0LL, p, 
+				B_PATH_NAME_LENGTH);
+			tmp.UnlockBuffer();
+			//printf("ppl:%s\n", tmp.String());
+			BNode people;
+			if (err > 0)
+				people.SetTo(tmp.String());
+			tmp.Truncate(0);
+			
+			BString attr;
+
+			p = attr.LockBuffer(256);
+			memset(p, 0, 256);
+			err = people.ReadAttr("META:name", B_ANY_TYPE, 0LL, p, 256);
+			//printf("ReadAttr: %d, %s\n", err, attr.String());
+			attr.UnlockBuffer();
+
+			tmp << attr;
 			header.ReplaceAll("%AUTHOR%", tmp.String());
 			tmp.Truncate(0);
-			tmp << "revol@free.fr";
+			
+			attr.Truncate(0);
+			p = attr.LockBuffer(256);
+			memset(p, 0, 256);
+			err = people.ReadAttr("META:email", B_ANY_TYPE, 0LL, p, 256);
+			//printf("ReadAttr: %d, %s\n", err, attr.String());
+			attr.UnlockBuffer();
+			
+			tmp << attr;
 			header.ReplaceAll("%AUTHORMAIL%", tmp.String());
 			tmp.Truncate(0);
+
+			attr.Truncate(0);
 
 			BString fileNameNoExt(fileName);
 			if (fileNameNoExt.FindLast('.') > -1)
@@ -517,8 +545,10 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName,
 			//panel.Message()->PrintToStream();
 			if (panel.GetNextSelectedRef(&ref) == B_OK)
 			{
-				printf("ref:%s\n", ref.name);
-				// TODO
+				//printf("ref:%s\n", ref.name);
+				path.SetTo(&ref);
+				dir.WriteAttr("pe:author_people", B_STRING_TYPE, 0LL, 
+					path.Path(), strlen(path.Path()));
 			}
 			break;
 		}
