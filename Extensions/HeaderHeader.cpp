@@ -556,22 +556,18 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName,
 				get_ref_for_path(path.Path(), &people);
 			}
 
-			BFilePanel panel(B_OPEN_PANEL,
-							NULL, 
-							&people,
-							B_FILE_NODE,
-							false,
-							NULL,
-							&filter);
+			BFilePanel *panel;
+			panel = new BFilePanel(B_OPEN_PANEL, NULL, &people,
+				B_FILE_NODE, false, NULL, &filter);
 			// trick to synchronously use BFilePanel
 			PanelHandler *handler = new PanelHandler;
-			if (panel.Window()->Lock())
+			if (panel->Window()->Lock())
 			{
-				panel.Window()->AddHandler(handler);
-				panel.Window()->Unlock();
+				panel->Window()->AddHandler(handler);
+				panel->Window()->Unlock();
 			}
-			panel.SetTarget(BMessenger(handler));
-			panel.Show();
+			panel->SetTarget(BMessenger(handler));
+			panel->Show();
 			if (handler->Wait() < B_OK)
 				break;
 			if (!handler->Message())
@@ -579,14 +575,16 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName,
 			if (handler->Message()->what == B_CANCEL)
 				break;
 			entry_ref ref;
-			//panel.Message()->PrintToStream();
-			if (panel.GetNextSelectedRef(&ref) == B_OK)
+			//panel->Message()->PrintToStream();
+			if (panel->GetNextSelectedRef(&ref) == B_OK)
 			{
 				//printf("ref:%s\n", ref.name);
 				path.SetTo(&ref);
 				dir.WriteAttr("pe:author_people", B_STRING_TYPE, 0LL, 
 					path.Path(), strlen(path.Path()));
 			}
+			delete panel;
+			delete handler;
 			err = B_CANCELED;
 			break;
 		}
