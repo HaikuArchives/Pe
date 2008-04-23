@@ -14,6 +14,35 @@
 
 static const char *sTrackerSig = "application/x-vnd.Be-TRAK";
 
+static const char *sAboutText = "HeaderHeader Extension for Pe
+
+This extension prepends a chooseable licence header the current file, 
+using the appropriate comment characters for the language used, 
+and informations from a selected People file as author.
+
+First select your own People file from \"Set Author"B_UTF8_ELLIPSIS"\", 
+then just select the header you want to use.
+You can also add your own templates in the settings folder. 
+Use the \"Open Template Folder"B_UTF8_ELLIPSIS"\" menu, 
+create text files there which contain the licence or informations you want. 
+
+Keywords from the list below will be replaced by the corresponding value:
+%COMMS%		Start of comment block string
+%COMMC%		Comment block continuation string
+%COMML%		Comment block continuation string (blank if possible)
+%COMME%		End of comment block string
+%FILENAME%		Filename
+%FILENAMENOEXT%	Filename without extension
+%YEAR%		Current year
+%DATE%		Current date (YYYY-mm-dd)
+%TIME%		Current time (HH:MM:SS)
+(from the people file)
+%AUTHOR%		Your name
+%AUTHORMAIL%	Your email
+%COMPANY%		Company name
+%AUTHORURL%		Your url
+";
+
 static const char *sHaikuHeaderTemplate = "%COMMS%
 %COMMC% Copyright %YEAR%, Haiku.
 %COMMC% Distributed under the terms of the MIT License.
@@ -336,8 +365,12 @@ BuildPopUp(BDirectory &dir)
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Open Template Folder", new BMessage('optf')));
-	menu->AddItem(new BMenuItem("Set Author", new BMessage('seta')));
+	menu->AddItem(new BMenuItem("Open Template Folder"B_UTF8_ELLIPSIS, 
+		new BMessage('optf')));
+	menu->AddItem(new BMenuItem("Set Author"B_UTF8_ELLIPSIS, 
+		new BMessage('seta')));
+	menu->AddItem(new BMenuItem("About"B_UTF8_ELLIPSIS, 
+		new BMessage(B_ABOUT_REQUESTED)));
 	return menu;
 }
 
@@ -406,28 +439,32 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName,
 			
 			BString attr;
 
-			p = attr.LockBuffer(256);
-			memset(p, 0, 256);
-			err = people.ReadAttr("META:name", B_ANY_TYPE, 0LL, p, 256);
-			//printf("ReadAttr: %d, %s\n", err, attr.String());
-			attr.UnlockBuffer();
+			static struct {
+				const char *tmplName;
+				const char *attrName;
+			} attrMap[] = {
+				{ "%AUTHOR%", "META:name" },
+				{ "%AUTHORMAIL%", "META:email" },
+				{ "%COMPANY%", "META:company" },
+				{ "%AUTHORURL%", "META:url" },
+				{ NULL, NULL }
+			};
+			int i;
 
-			tmp << attr;
-			header.ReplaceAll("%AUTHOR%", tmp.String());
-			tmp.Truncate(0);
-			
-			attr.Truncate(0);
-			p = attr.LockBuffer(256);
-			memset(p, 0, 256);
-			err = people.ReadAttr("META:email", B_ANY_TYPE, 0LL, p, 256);
-			//printf("ReadAttr: %d, %s\n", err, attr.String());
-			attr.UnlockBuffer();
-			
-			tmp << attr;
-			header.ReplaceAll("%AUTHORMAIL%", tmp.String());
-			tmp.Truncate(0);
+			for (i = 0; attrMap[i].tmplName; i++)
+			{
+				p = attr.LockBuffer(256);
+				memset(p, 0, 256);
+				err = people.ReadAttr(attrMap[i].attrName, B_ANY_TYPE, 
+					0LL, p, 256);
+				//printf("ReadAttr: %d, %s\n", err, attr.String());
+				attr.UnlockBuffer();
 
-			attr.Truncate(0);
+				tmp << attr;
+				header.ReplaceAll(attrMap[i].tmplName, tmp.String());
+				tmp.Truncate(0);
+				attr.Truncate(0);
+			}
 
 			BString fileNameNoExt(fileName);
 			if (fileNameNoExt.FindLast('.') > -1)
@@ -504,7 +541,7 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName,
 			const char *args[] = {path.Path(), NULL};
 			err = be_roster->Launch(sTrackerSig, 1, (char **)args);
 			//printf("err %s\n", strerror(err));
-			err = B_OK;
+			err = B_CANCELED;
 			break;
 		}
 		case 'seta':
@@ -550,6 +587,27 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName,
 				dir.WriteAttr("pe:author_people", B_STRING_TYPE, 0LL, 
 					path.Path(), strlen(path.Path()));
 			}
+			err = B_CANCELED;
+			break;
+		}
+		case B_ABOUT_REQUESTED:
+		{
+			BString tmpPath("/tmp/Pe-HeaderHeader-About-");
+			tmpPath << system_time() << "-" << getpid() << ".txt";
+			entry_ref ref;
+			get_ref_for_path(tmpPath.String(), &ref);
+			{
+				BFile f(&ref, B_CREATE_FILE | B_WRITE_ONLY);
+				err = f.InitCheck();
+				if (err < 0)
+					break;
+				f.Write(sAboutText, strlen(sAboutText));
+				f.SetPermissions(0444);
+			}
+			BMessage msg(B_REFS_RECEIVED);
+			msg.AddRef("refs", &ref);
+			err = be_app_messenger.SendMessage(&msg);
+			err = B_CANCELED;
 			break;
 		}
 		case 0:
