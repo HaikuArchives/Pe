@@ -63,7 +63,6 @@ static const char *sHaikuAddMeHeaderTemplate = \
 static const char *sHaikuMeHeaderTemplate = "%COMMS%
 %COMMC% Copyright %YEAR%, %AUTHOR%, <%AUTHORMAIL%>.
 %COMMC% Distributed under the terms of the MIT License.
-%COMMC%	
 %COMME%
 ";
 
