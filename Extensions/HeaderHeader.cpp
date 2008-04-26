@@ -72,6 +72,12 @@ static const char *sHaikuMeAddMeHeaderTemplate = \
 ";
 */
 
+static const char *sHaikuMeRightsHeaderTemplate = "%COMMS%
+%COMMC% Copyright %YEAR%, %AUTHOR%, <%AUTHORMAIL%>. All rights reserved.
+%COMMC% Distributed under the terms of the MIT License.
+%COMME%
+";
+
 static const char *sIdMeMITCreatedHeaderTemplate = \
 "%COMMS%	$Id: %FILENAME% $
 %COMML%
@@ -334,6 +340,9 @@ BuildPopUp(BDirectory &dir)
 
 	AddTemplateItem(menu, B_UTF8_COPYRIGHT " Me (Haiku)", 
 		sHaikuMeHeaderTemplate);
+
+	AddTemplateItem(menu, B_UTF8_COPYRIGHT " Me (Haiku) + Rights Reserved", 
+		sHaikuMeRightsHeaderTemplate);
 
 	AddTemplateItem(menu, "Id + " B_UTF8_COPYRIGHT "Me + MIT + Created", 
 		sIdMeMITCreatedHeaderTemplate);
