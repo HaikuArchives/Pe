@@ -46,9 +46,15 @@
 #ifdef BONE_BUILD
 	#define closesocket(X)	close(X)
 	#include <arpa/inet.h>
+	#include <sys/socket.h>
+#else
+	#include <socket.h>
 #endif
-#include <socket.h>
 #include <netdb.h>
+
+#ifndef __HAIKU__
+typedef int socklen_t;
+#endif
 
 static string sfPassword;
 
@@ -610,7 +616,7 @@ void CFtpDialog::ListDirectory()
 
 		memset(&saData, 0, sizeof(saData));
 		saData.sin_family = AF_INET;
-		int size = sizeof(saData);
+		socklen_t size = sizeof(saData);
 
 		bool passive = IsOn("pssv");
 		if (passive) {

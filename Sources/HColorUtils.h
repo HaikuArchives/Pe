@@ -104,7 +104,7 @@ rgb_color DistinctColor(rgb_color highColor, rgb_color lowColor);
 IMPEXP_LIBHEKKEL void DefineInvColors(rgb_color selectionColor);
 IMPEXP_LIBHEKKEL rgb_color LookupDistinctColor(rgb_color highColor);
 
-#ifndef B_BEOS_VERSION_DANO
+#if !defined(B_BEOS_VERSION_DANO) && !defined(__HAIKU__)
 IMPEXP_LIBHEKKEL bool operator==(const rgb_color& a, const rgb_color& b);
 IMPEXP_LIBHEKKEL bool operator!=(const rgb_color& a, const rgb_color& b);
 #endif

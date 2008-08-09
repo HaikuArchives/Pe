@@ -3,38 +3,52 @@
 # Setup global variables.
 
 # C and C++ flags
-if $(OSPLAT) = PPC {
-	# filter out -nosyspath
-	CFLAGS = [ FFilter $(CFLAGS) : -nosyspath ] ;
-	C++FLAGS = [ FFilter $(C++FLAGS) : -nosyspath ] ;
-	LINKFLAGS += -warn -export pragma ;
+if $(OS) = HAIKU {
+	CCFLAGS += -DBONE_BUILD ;
+	C++FLAGS += -DBONE_BUILD ;
+	LINKLIBS += -lnetwork ;
+} else {
+	# BeOS
 
-	# set file containing preprocessed headers:
-	PREFIX_FILE ?= [ FDirName $(LOCATE_TARGET) pe.headers ] ;
-}
+	if $(OSPLAT) = PPC {
+		# filter out -nosyspath
+		CFLAGS = [ FFilter $(CFLAGS) : -nosyspath ] ;
+		C++FLAGS = [ FFilter $(C++FLAGS) : -nosyspath ] ;
+		LINKFLAGS += -warn -export pragma ;
 
-if $(OSPLAT) = X86 {
-	# check for BONE...
-	local haveBone = [ GLOB /boot/develop/headers/be/bone/arpa : inet.h ] ;
-	if $(haveBone)	{
-		CCFLAGS += -DBONE_BUILD ;
-		C++FLAGS += -DBONE_BUILD ;
-		SYSHDRS += /boot/develop/headers/be/bone /boot/develop/headers/be/bone/sys ;
-		LINKLIBS += -lsocket -lbind ;
-	} else {
-		LINKLIBS += -lnet ;
+		# set file containing preprocessed headers:
+		PREFIX_FILE ?= [ FDirName $(LOCATE_TARGET) pe.headers ] ;
 	}
+
+	if $(OSPLAT) = X86 {
+		# check for BONE...
+		local haveBone = [ GLOB /boot/develop/headers/be/bone/arpa : inet.h ] ;
+		Echo $(OS) ;
+		Echo $(OSPLAT) ;
+		if $(haveBone)	{
+			CCFLAGS += -DBONE_BUILD ;
+			C++FLAGS += -DBONE_BUILD ;
+			SYSHDRS += /boot/develop/headers/be/bone /boot/develop/headers/be/bone/sys ;
+			LINKLIBS += -lsocket -lbind ;
+		} else {
+			LINKLIBS += -lnet ;
+		}
+	}
+
 	# check for Zeta...
 	local haveZeta = [ GLOB /boot/develop/lib/x86 : libzeta.so ] ;
 	if $(haveZeta)	{
 		LINKLIBS += -lzeta ;
 	}
-	# check for pcre...
-	local haveHeadersPcre = [ GLOB /boot/develop/headers/pcre : pcre.h ] ;
-	if $(haveHeadersPcre)	{
-		CCFLAGS += -isystem /boot/develop/headers/pcre ;
-		C++FLAGS += -isystem /boot/develop/headers/pcre ;
-	}
+}
+
+# check for pcre...
+local haveHeadersPcre = [ GLOB /boot/develop/headers/pcre : pcre.h ] ;
+if $(haveHeadersPcre)	{
+	CCFLAGS += -isystem /boot/develop/headers/pcre ;
+	C++FLAGS += -isystem /boot/develop/headers/pcre ;
+} else {
+	Exit "You need to have pcre installed on your system." ;
 }
 
 # Use copyattr for copying.

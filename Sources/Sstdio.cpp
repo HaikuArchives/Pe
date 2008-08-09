@@ -37,7 +37,12 @@
 #include "Sstdio.h"
 #include <stdarg.h>
 #include <ctype.h>
-#include <socket.h>
+#ifdef BONE_BUILD
+	#include <sys/socket.h>
+	#include <sys/select.h>
+#else
+	#include <socket.h>
+#endif
 #include <netdb.h>
 
 struct SOCK *s_open(int sock, const char *type)

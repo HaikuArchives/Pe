@@ -43,9 +43,15 @@
 #ifdef BONE_BUILD
 	#define closesocket(X)	close(X)
 	#include <arpa/inet.h>
+	#include <sys/socket.h>
+#else
+	#include <socket.h>
 #endif
-#include <socket.h>
 #include <netdb.h>
+
+#ifndef __HAIKU__
+typedef int socklen_t;
+#endif
 
 URLData::URLData(const char *server, const char *username, const char *password,
 	const char *path, const char *file)
@@ -351,7 +357,7 @@ void CFtpStream::Automaton(int action)
 						// why this code worked for R5 but didn't work for BONE).
 						// In order to fix this problem, we simply use the IP-address of the
 						// command-socket for the PORT-command:
-						int size = sizeof(saData);
+						socklen_t size = sizeof(saData);
 						// fetch port from data-socket:
 						FailSockErr(getsockname(data, (struct sockaddr *)&saData, &size));
 						unsigned char *pap = (unsigned char *)&saData.sin_port;
@@ -403,7 +409,7 @@ void CFtpStream::Automaton(int action)
 					if ((r / 100) == 1)
 					{
 						int ds;
-						int size = sizeof(sa);
+						socklen_t size = sizeof(sa);
 						if (fPassive)
 							ds = data;
 						else
@@ -437,7 +443,7 @@ void CFtpStream::Automaton(int action)
 					if ((r / 100) == 1)
 					{
 						int ds;
-						int size = sizeof(sa);
+						socklen_t size = sizeof(sa);
 						if (fPassive)
 							ds = data;
 						else

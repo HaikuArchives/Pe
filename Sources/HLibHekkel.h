@@ -4,10 +4,14 @@
 #include <BeBuild.h>
 
 /* import-/export-declarations for the libhekkel shared-lib */
-#ifdef H_BUILDING_LIBHEKKEL
-#define IMPEXP_LIBHEKKEL _EXPORT
+#ifdef __HAIKU__
+#	define IMPEXP_LIBHEKKEL
 #else
-#define IMPEXP_LIBHEKKEL _IMPORT
-#endif
+#	ifdef H_BUILDING_LIBHEKKEL
+#		define IMPEXP_LIBHEKKEL _EXPORT
+#	else
+#		define IMPEXP_LIBHEKKEL _IMPORT
+#	endif
+#endif	// __HAIKU__
 
 #endif

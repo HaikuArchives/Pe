@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Pe Development Team. All Rights Reserved.
+ * Copyright 2005-2008, Pe Development Team. All Rights Reserved.
  * Licensed under the terms of the MIT license.
  */
 #ifndef PADDON_H
@@ -8,9 +8,10 @@
 
 #include <Handler.h>
 
-class BView;
 class BBitmap;
+class BString;
 class BMenuItem;
+class BView;
 
 class PDoc;
 class PText;
