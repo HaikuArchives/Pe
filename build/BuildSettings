@@ -44,11 +44,15 @@ if $(OS) = HAIKU {
 
 # check for pcre...
 local haveHeadersPcre = [ GLOB /boot/develop/headers/pcre : pcre.h ] ;
-if $(haveHeadersPcre)	{
+if $(haveHeadersPcre) {
+	Echo Have ;
 	CCFLAGS += -isystem /boot/develop/headers/pcre ;
 	C++FLAGS += -isystem /boot/develop/headers/pcre ;
 } else {
-	Exit "You need to have pcre installed on your system." ;
+	haveHeadersPcre = [ GLOB /boot/home/config/include : pcre.h ] ;
+	if ! $(haveHeadersPcre) {
+		Exit "You need to have pcre installed on your system." ;
+	}
 }
 
 # Use copyattr for copying.
