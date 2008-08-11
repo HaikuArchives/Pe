@@ -44,6 +44,7 @@ static char *gClassName = NULL;
 #define YY_DECL	static int yylex(CLanguageProxy& proxy)
 #undef YY_INPUT
 #define YY_INPUT(tok,result,max)	GetNextChar(tok, result, max)
+#define YY_SKIP_YYWRAP
 #undef yywrap
 #define yywrap()	1
 #undef ECHO

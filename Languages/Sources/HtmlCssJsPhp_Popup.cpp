@@ -37,6 +37,7 @@
 	- AddInclude() for include, include_once, require and require_once
 	- PHP class support
 */
+#include <map>
 #include <string>
 #include "CLanguageAddOn.h"
 
