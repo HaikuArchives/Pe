@@ -23,8 +23,6 @@ if $(OS) = HAIKU {
 	if $(OSPLAT) = X86 {
 		# check for BONE...
 		local haveBone = [ GLOB /boot/develop/headers/be/bone/arpa : inet.h ] ;
-		Echo $(OS) ;
-		Echo $(OSPLAT) ;
 		if $(haveBone)	{
 			CCFLAGS += -DBONE_BUILD ;
 			C++FLAGS += -DBONE_BUILD ;
