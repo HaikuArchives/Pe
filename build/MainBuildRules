@@ -190,7 +190,11 @@ rule Bison
 
 actions BisonC++
 {
-	$(BISON) $(YACCFLAGS) -o $(1[1]) $(2)
+	# TODO: this is is not a clean solution; if we don't use --defines, the
+	# header gets a wrong name, but this option is not supported by the bison
+	# that comes with BeOS. It would probably be nicer to force BeOS users to
+	# update their bison.
+	$(BISON) --defines=$(1[1]).h -o $(1[1]) $(2) || $(BISON) $(YACCFLAGS) -o $(1[1]) $2
 }
 
 rule Rez
