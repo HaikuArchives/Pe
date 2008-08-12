@@ -533,6 +533,18 @@ CDoc* CDoc::FindDoc(const entry_ref& doc)
 	return NULL;
 }
 
+CDoc* CDoc::FindDoc(const char* name)
+{
+	doclist::iterator di;
+
+	for (di = sfDocList.begin(); di != sfDocList.end(); di++)
+	{
+		if (!strcmp((*di)->Name(), name))
+			return (*di);
+	}
+	return NULL;
+}
+
 void CDoc::PostToAll(unsigned long msg, bool async)
 {
 	doclist::iterator di;

@@ -92,6 +92,7 @@ public:
 	virtual void HighlightErrorPos(int errorPos);
 
 	static	CDoc* FindDoc(const entry_ref& doc);
+	static	CDoc* FindDoc(const char* name);
 	static	CDoc* FirstDoc();
 	static	int CountDocs();
 	static	const doclist& DocList();
