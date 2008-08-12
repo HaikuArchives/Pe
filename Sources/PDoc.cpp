@@ -761,68 +761,66 @@ bool PDoc::IsHeaderFile()
 	return false;
 } /* PDoc::IsHeaderFile */
 
+void PDoc::SearchAlternativeSuffix(const BDirectory& directory,
+	const char* name, BEntry& entry, const char* suffix, ...)
+{
+	// TODO: strlcpy() is not available under BeOS, therefore + 10
+	char searchName[B_FILE_NAME_LENGTH + 10];
+	strcpy(searchName, name);
+
+	char *insertAt = strrchr(searchName, '.');
+	if (insertAt == NULL)
+		return;
+
+	//int maxLength = sizeof(searchName) - (insertSuffix - searchName);
+
+	va_list args;
+	va_start(args, suffix);
+	while (suffix != NULL) {
+		//strlcpy(insertSuffix, suffix, maxLength);
+		strcpy(insertAt, suffix);
+
+		if (directory.Contains(searchName, B_FILE_NODE | B_SYMLINK_NODE)) {
+			FailOSErr(directory.FindEntry(searchName, &entry, true));
+			return;
+		}
+
+		suffix = va_arg(args, const char*);
+	}
+
+	va_end(args);
+} /* PDoc::SearchAlternativeSuffix */
+
 void PDoc::OpenPartner()
 {
 	try
 	{
-		BEntry e;
+		BEntry entry;
 		entry_ref doc;
-		FailOSErr(e.SetTo(EntryRef()));
+		FailOSErr(entry.SetTo(EntryRef()));
 
-		BDirectory d;
-		FailOSErr(e.GetParent(&d));
+		BDirectory directory;
+		FailOSErr(entry.GetParent(&directory));
 
+		// TODO: this is language dependent!
 		if (IsSourceFile())
 		{
-			char *t = strdup(Title());
-			FailNil(t);
-			char *x = strrchr(t, '.');
-
-			if (strcpy(x, ".h"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
-				FailOSErr(d.FindEntry(t, &e, true));
-
-			else if (strcpy(x, ".H"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
-				FailOSErr(d.FindEntry(t, &e, true));
-
-			else if (strcpy(x, ".hh"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
-				FailOSErr(d.FindEntry(t, &e, true));
-
-			else if (strcpy(x, ".hpp"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
-				FailOSErr(d.FindEntry(t, &e, true));
-
-			free(t);
+			SearchAlternativeSuffix(directory, CDoc::Name(), entry, ".h", ".H",
+				".hh", ".hpp", ".hxx", NULL);
 		}
 		else if (IsHeaderFile())
 		{
-			char *t = (char *)malloc(B_FILE_NAME_LENGTH);
-			FailNil(t);
-			strcpy(t, Title());
-			char *x = strrchr(t, '.');
-
-			if (strcpy(x, ".c"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
-				FailOSErr(d.FindEntry(t, &e, true));
-
-			else if (strcpy(x, ".C"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
-				FailOSErr(d.FindEntry(t, &e, true));
-
-			else if (strcpy(x, ".cp"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
-				FailOSErr(d.FindEntry(t, &e, true));
-
-			else if (strcpy(x, ".cpp"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
-				FailOSErr(d.FindEntry(t, &e, true));
-
-			else if (strcpy(x, ".cc"), d.Contains(t, B_FILE_NODE | B_SYMLINK_NODE))
-				FailOSErr(d.FindEntry(t, &e, true));
-
-			free(t);
+			SearchAlternativeSuffix(directory, CDoc::Name(), entry, ".c", ".C",
+				".cc", ".cpp", ".cxx", NULL);
 		}
 
-		if (!e.IsFile()) THROW((0));
-		FailOSErr(e.GetRef(&doc));
+		if (!entry.IsFile())
+			THROW((0));
+		FailOSErr(entry.GetRef(&doc));
 
 		gApp->OpenWindow(doc);
 	}
-	catch (HErr& e)
+	catch (HErr& error)
 	{
 		beep();
 	}

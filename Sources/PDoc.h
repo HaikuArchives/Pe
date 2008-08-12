@@ -157,6 +157,8 @@ private:
 			void ResetMenuShortcuts();
 			void PerformExtension(int nr);
 			void PerformExtension(const char *ext);
+			void SearchAlternativeSuffix(const BDirectory& directory,
+				const char* name, BEntry& entry, const char* suffix, ...);
 
 			void InstantiateAddOns();
 			void DeleteAddOns();
