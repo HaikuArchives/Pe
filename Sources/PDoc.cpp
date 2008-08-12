@@ -762,7 +762,7 @@ bool PDoc::IsHeaderFile()
 } /* PDoc::IsHeaderFile */
 
 void PDoc::SearchAlternativeSuffix(const BDirectory& directory,
-	const char* name, BEntry& entry, const char* suffix, ...)
+	const char* name, BEntry& entry, const char* firstSuffix, ...)
 {
 	// TODO: strlcpy() is not available under BeOS, therefore + 10
 	char searchName[B_FILE_NAME_LENGTH + 10];
@@ -775,13 +775,35 @@ void PDoc::SearchAlternativeSuffix(const BDirectory& directory,
 	//int maxLength = sizeof(searchName) - (insertSuffix - searchName);
 
 	va_list args;
-	va_start(args, suffix);
+	va_start(args, firstSuffix);
+	const char* suffix = firstSuffix;
+
 	while (suffix != NULL) {
 		//strlcpy(insertSuffix, suffix, maxLength);
 		strcpy(insertAt, suffix);
 
 		if (directory.Contains(searchName, B_FILE_NODE | B_SYMLINK_NODE)) {
 			FailOSErr(directory.FindEntry(searchName, &entry, true));
+			return;
+		}
+
+		suffix = va_arg(args, const char*);
+	}
+
+	va_end(args);
+
+	// A second pass searches the open documents
+
+	va_start(args, firstSuffix);
+	suffix = firstSuffix;
+
+	while (suffix != NULL) {
+		//strlcpy(insertSuffix, suffix, maxLength);
+		strcpy(insertAt, suffix);
+
+		CDoc* doc = CDoc::FindDoc(searchName);
+		if (doc != NULL && doc->EntryRef() != NULL) {
+			FailOSErr(entry.SetTo(doc->EntryRef()));
 			return;
 		}
 
