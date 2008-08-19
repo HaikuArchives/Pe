@@ -17,6 +17,8 @@
 #include "HColorUtils.h"
 #include "HDialogViews.h"
 #include "HError.h"
+#include "KeyBindings.h"
+#include "Prefs.h"
 
 // internal messages
 enum {
@@ -525,6 +527,35 @@ CFilterChoiceDialog::MessageReceived(BMessage *message)
 		case MSG_FILTER_MODIFIED:
 			_SetFilter(fFilterStringControl->Text());
 			break;
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			// the wheel that have changed may *not* be the vertical one,
+			// so we check:
+			float y;
+			if (message->FindFloat("be:wheel_delta_y", &y) == B_OK && y != 0)
+			{
+				float delta 
+					= 20.0 * gPrefs->GetPrefInt(prf_I_ScrollwheelLines, 3);
+				BScrollBar* vScroller = fChoicesList->ScrollBar(B_VERTICAL);
+				float minVal, maxVal;
+				vScroller->GetRange(&minVal, &maxVal);
+				float value = vScroller->Value();
+				if (y < 0) 
+				{
+					value -= delta;
+					value = max(minVal, value);
+				}
+				else 
+				{
+					value += delta;
+					value = min(maxVal, value);
+				}
+				vScroller->SetValue(value);
+			}
+			else
+				HDialog::MessageReceived(message);
+			break;
+		}
 		default:
 			BWindow::MessageReceived(message);
 			break;

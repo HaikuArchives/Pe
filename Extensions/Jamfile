@@ -64,6 +64,13 @@ PeExtension HeaderGuard
 # </pe-src>
 
 # <pe-src>
+PeExtension HeaderHeader
+	: HeaderHeader.cpp 
+	: libhekkel.so <nogrist>pe be tracker $(STDC++LIB)
+	;
+# </pe-src>
+
+# <pe-src>
 PeExtension ImageToC
 	: ImageToC.cpp 
 	: libhekkel.so <nogrist>pe be translation

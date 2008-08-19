@@ -169,7 +169,7 @@ class WordState {
 };
 
 
-//	#pragma mark - class PText
+// #pragma mark - class PText
 
 
 PText::PText(BRect frame, BScrollBar *bars[], const char *ext)
@@ -751,7 +751,7 @@ PDoc* PText::Doc() const
 	return dynamic_cast<PDoc*>(Window());
 } // PText::Doc
 
-#pragma mark - Wrap
+// // #pragma mark - Wrap
 
 int PText::FindLineBreak(int offset, bool hard)
 {
@@ -995,7 +995,7 @@ void PText::RecalculateLineBreaks()
 	RestyleDirtyLines(0);
 } /* PText::RecalculateLineBreaks */
 
-#pragma mark - Undo
+// #pragma mark - Undo
 
 void PText::Undo()
 {
@@ -1104,7 +1104,7 @@ void PText::FlushUndo()
 	fLastSavedStateCmd = NULL;
 } // PText::FlushUndo
 
-#pragma mark - Text
+// #pragma mark - Text
 
 void PText::CopyBlock(char*& s, int from, int to)
 {
@@ -1341,7 +1341,7 @@ void PText::TypeString(const char *string)
 	fStatus->SetOffset(fCaret);
 } /* PText::TypeString */
 
-#pragma mark - Split
+// #pragma mark - Split
 
 const g_unit_t
 	kSplitMinimum = 50;
@@ -1577,7 +1577,7 @@ void PText::FrameMoved(BPoint newPosition)
 	Window()->UpdateIfNeeded();
 } /* PText::FrameMoved */
 
-#pragma mark - Scroll
+// #pragma mark - Scroll
 
 void PText::AdjustScrollBars()
 {
@@ -1860,7 +1860,7 @@ void PText::ScrollTo(BPoint p)
 	Doc()->ToolBar()->SetHOffset(-p.x + 3);
 } /* PText::ScrollTo */
 
-#pragma mark - Mouse
+// #pragma mark - Mouse
 
 void PText::MouseDown(BPoint where)
 {
@@ -2171,93 +2171,65 @@ void PText::HandleDrop(BMessage *msg)
 {
 	fWindowActive = Window()->IsActive();
 
-	char *s = NULL;
-	ssize_t sl;
-
 	if (msg->HasData("text/plain", B_MIME_TYPE))
 	{
-		char *t;
+		char *s;
+		ssize_t sl;
 
-		FailOSErr(msg->FindData("text/plain", B_MIME_TYPE, (const void**)&t, &sl));
-		s = new char[sl];
-		FailNil(s);
-		memcpy(s, t, sl);
+		FailOSErr(msg->FindData("text/plain", B_MIME_TYPE, (const void**)&s, &sl));
+		if (s)
+		{
+			int offset;
+			if (msg->IsSourceRemote() || msg->IsSystem() || sfDragSource != this)
+				offset = -1;
+			else if (fDragButtons & B_TERTIARY_MOUSE_BUTTON)
+				offset = -1;
+			else if (fDragButtons & B_SECONDARY_MOUSE_BUTTON)
+			{
+				BPopUpMenu popup("copy or move");
+				popup.SetFont(be_plain_font);
+				popup.AddItem(new BMenuItem("Move", NULL));
+				popup.AddItem(new BMenuItem("Copy", NULL));
+				BMenuItem *item = popup.Go(msg->DropPoint(), false, true);
+	
+				if (!item)
+				{
+					HideCaret();
+					fAnchor = fSavedAnchor;
+					fCaret = fSavedCaret;
+					return;
+				}
+	
+				if (popup.IndexOf(item) == 0)
+					offset = fDragStart;
+				else
+					offset = -1;
+			}
+			else
+				offset = fDragStart;
+	
+			if (offset == -1 || fCaret < offset || fCaret > offset + sl)
+			{
+				if (sfDragSource == this)
+				{
+					int a, c;
+	
+					a = Offset2Line(fSavedAnchor);
+					c = Offset2Line(fSavedCaret);
+					TouchLines(min(a, c), max(a, c));
+				}
+				RegisterCommand(new PDropCmd(this, s, sl, offset, fCaret));
+			}
+		}
 	}
 	else if (msg->HasRef("refs"))
 	{
+		// open all dropped files as documents:
+		BMessage openMsg(B_REFS_RECEIVED);
 		entry_ref ref;
-
-		FailOSErr(msg->FindRef("refs", &ref));
-
-		BFile file;
-		FailOSErr(file.SetTo(&ref, B_READ_ONLY));
-
-		key_info ki;
-		if (get_key_info(&ki) == B_OK && ki.modifiers & (B_COMMAND_KEY | B_OPTION_KEY))
-			be_app->RefsReceived(msg);
-		else
-		{
-			char m[B_MIME_TYPE_LENGTH];
-			BNodeInfo(&file).GetType(m);
-
-			if (strncmp(m, "text/", 5) == 0)
-			{
-				sl = file.Seek(0, SEEK_END);
-				file.Seek(0, SEEK_SET);
-
-				s = new char[sl];
-				if (file.Read(s, sl) != sl)
-					THROW(("Read Error"));
-			}
-		}
-	}
-
-	if (s)
-	{
-		int offset;
-		if (msg->IsSourceRemote() || msg->IsSystem() || sfDragSource != this)
-			offset = -1;
-		else if (fDragButtons & B_TERTIARY_MOUSE_BUTTON)
-			offset = -1;
-		else if (fDragButtons & B_SECONDARY_MOUSE_BUTTON)
-		{
-			BPopUpMenu popup("copy or move");
-			popup.SetFont(be_plain_font);
-			popup.AddItem(new BMenuItem("Move", NULL));
-			popup.AddItem(new BMenuItem("Copy", NULL));
-			BMenuItem *item = popup.Go(msg->DropPoint(), false, true);
-
-			if (!item)
-			{
-				HideCaret();
-				fAnchor = fSavedAnchor;
-				fCaret = fSavedCaret;
-				return;
-			}
-
-			if (popup.IndexOf(item) == 0)
-				offset = fDragStart;
-			else
-				offset = -1;
-		}
-		else
-			offset = fDragStart;
-
-		if (offset == -1 || fCaret < offset || fCaret > offset + sl)
-		{
-			if (sfDragSource == this)
-			{
-				int a, c;
-
-				a = Offset2Line(fSavedAnchor);
-				c = Offset2Line(fSavedCaret);
-				TouchLines(min(a, c), max(a, c));
-			}
-			RegisterCommand(new PDropCmd(this, s, sl, offset, fCaret));
-		}
-
-		if (msg->HasRef("refs"))
-			delete s;
+		for(int32 i=0; msg->FindRef("refs", i, &ref) == B_OK; ++i)
+			openMsg.AddRef("refs", &ref);
+		be_app_messenger.SendMessage(&openMsg);
 	}
 } /* PText::HandleDrop */
 
@@ -2283,7 +2255,7 @@ bool PText::WaitMouseMoved(BPoint where)
 	return true;
 } /* PText::WaitMouseMoved */
 
-#pragma mark - Function Popup
+// #pragma mark - Function Popup
 
 class CSeparatorItem : public BMenuItem
 {
@@ -2565,7 +2537,7 @@ void PText::ShowContextualMenu(BPoint where)
 		ShowFunctionMenu(ConvertToScreen(where), kFunctionsOnly);
 } /* PText::ShowContextualMenu */
 
-#pragma mark - Lines
+// #pragma mark - Lines
 
 void PText::OffsetLineBreaks(int bytes, int line)
 {
@@ -3144,7 +3116,7 @@ void PText::BlockOffsetsForLine(int lineNr, int& startOffset, int& endOffset)
 	}
 } // PText::BlockOffsetsForLine
 
-#pragma mark - Language
+// #pragma mark - Language
 
 int PText::FindWord(int key, bool subWord)
 {
@@ -3362,7 +3334,7 @@ void PText::HashLines(vector<int>& hv, bool ignoreCase, bool ignoreWhite)
 	}
 } /* PText::HashLines */
 
-#pragma mark - Keys
+// #pragma mark - Keys
 
 void PText::KeyDown(const char *bytes, int32 numBytes)
 {
@@ -3970,7 +3942,7 @@ void PText::GlossaryButton(const char *glossy)
 	if (s) free(s);
 } /* PText::GlossaryButton */
 
-#pragma mark - Find
+// #pragma mark - Find
 
 void PText::Find(unsigned long msgWhat, void *args)
 {
@@ -4408,7 +4380,7 @@ void PText::IncSearchKey(const char *bytes, int numBytes)
 	}
 } /* PText::IncSearchKey */
 
-#pragma mark - Exec
+// #pragma mark - Exec
 
 const int kBufferSize = 4096;
 
@@ -4620,7 +4592,7 @@ long PExec::Execute()
 	return 0;
 } /* PExec::Execute */
 
-#pragma mark -
+// #pragma mark -
 
 void PText::ExecuteSelection()
 {
@@ -4681,7 +4653,7 @@ void PText::PrepareForOutput()
 	CharKeyDown("\n", 1);
 } /* PText::PrepareForOutput */
 
-#pragma mark - Draw
+// #pragma mark - Draw
 
 void PText::Draw(BRect updateRect)
 {
@@ -5422,7 +5394,7 @@ void PText::ShiftLines(int first, int dy, int part)
 		Draw(b);
 } /* PText::ShiftLinesPart2 */
 
-#pragma mark - Printing
+// #pragma mark - Printing
 
 struct PrintFunctionRef {
 	int32 offset;
@@ -5578,16 +5550,16 @@ status_t PText::Print()
 	}
 
 	fprintf(stderr, "printableRect = {%f, %f, %f, %f}\n", printableRect.left, printableRect.top, printableRect.right, printableRect.bottom);
-	fprintf(stderr, "firstLine = %d\n", firstLine);
-	fprintf(stderr, "lastLine = %d\n", lastLine);
-	fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
-	fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
+	fprintf(stderr, "firstLine = %ld\n", firstLine);
+	fprintf(stderr, "lastLine = %ld\n", lastLine);
+	fprintf(stderr, "pagesInDocument = %ld\n", pagesInDocument);
+	fprintf(stderr, "linesInDocument = %ld\n", linesInDocument);
 
 	int32 currentLine = 0;
 	while (currentLine < linesInDocument)
 	{
 		float currentHeight = 0;
-		fprintf(stderr, "currentLine = %d\n", currentLine);
+		fprintf(stderr, "currentLine = %ld\n", currentLine);
 		// smallest of remaining lines or number of lines fitting the page
 		int32 lines = (int32)(MIN((1 + linesInDocument - currentLine), printableRect.Height() / fLineHeight));
 		currentHeight += fLineHeight * lines;
@@ -5611,8 +5583,8 @@ status_t PText::Print()
 	}
 
 	
-	fprintf(stderr, "pagesInDocument = %d\n", pagesInDocument);
-	fprintf(stderr, "linesInDocument = %d\n", linesInDocument);
+	fprintf(stderr, "pagesInDocument = %ld\n", pagesInDocument);
+	fprintf(stderr, "linesInDocument = %ld\n", linesInDocument);
 
 	// let's do it!
 	printJob.BeginJob();
@@ -5622,7 +5594,7 @@ status_t PText::Print()
 		int32 printLine = firstLine;
 		while (printLine <= lastLine)
 		{
-			fprintf(stderr, "printLine = %d, lastLine = %d\n", printLine, lastLine);
+			fprintf(stderr, "printLine = %ld, lastLine = %ld\n", printLine, lastLine);
 			float currentHeight = 0;
 			int32 firstLineOnPage = printLine;
 			// smallest of remaining lines or number of lines fitting the page
@@ -5649,7 +5621,7 @@ status_t PText::Print()
 	return B_OK;
 } /* PText::Print */
 
-#pragma mark - Commands
+// #pragma mark - Commands
 
 BFilePanel *gCwdPanel = NULL;
 
