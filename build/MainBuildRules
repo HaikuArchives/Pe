@@ -191,7 +191,7 @@ rule Bison
 actions BisonC++
 {
 	# TODO: this ignores $(YACCFLAGS)
-	$(BISON) --defines=$(1[1]).h -o $(1[1]) $(2)
+	$(BISON) --defines=$(1[1]).h -o $(1[1]) $(2) || $(BISON) $(YACCFLAGS) -o $(1[1]) $(2)
 }
 
 rule Rez
