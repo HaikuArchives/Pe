@@ -3,7 +3,8 @@ SubDir TOP Extensions ;
 SubDirHdrs $(TOP) Sources ;
 
 SubDirSysHdrs /boot/home/config/include ;
-LINKFLAGS += -L/boot/home/config/lib ;
+SubDirSysHdrs /boot/common/include ;
+LINKFLAGS += -L/boot/home/config/lib -L/boot/common/lib ;
 
 # <pe-src>
 PeExtension PrefixLines 
