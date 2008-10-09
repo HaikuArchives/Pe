@@ -58,7 +58,8 @@ _EXPORT const int16 kInterfaceVersion = 2;
 static inline bool
 isOperator(char c)
 {
-	switch (c) {
+	switch (c)
+	{
 		case '/': 
 			return true;	// Can be: /, // or ^/
 		case '|': 

@@ -37,7 +37,7 @@
 
   Caveats:
     - This assumes that lout's data is installed under:
-      "/boot/home/config/etc/lout/"
+      "/boot/home/config/etc/lout/" or "/boot/common/etc/lout/"
       *but*
       if the enviromental variable "$LOUTLIB" is found, it's value is used
       instead (make sure it is correct!).
@@ -194,12 +194,49 @@ static void AddInclude(CLanguageProxy& proxy, const char ext[])
 }
 
 
+static bool PathExists(const BPath& path)
+{
+	BEntry entry(path.Path(), true);
+	return entry.Exists();
+}
+
+
+static status_t GetLoutDirectory(const char* subDir, BPath& path)
+{
+	static const char* kLoutDir = getenv("LOUTLIB");
+
+	if (kLoutDir != NULL)
+	{
+		path.SetTo(kLoutDir);
+		path.Append(subDir);
+	}
+
+	if (kLoutDir == NULL || !PathExists(path))
+	{
+		if (find_directory(B_USER_CONFIG_DIRECTORY, &path) == B_OK)
+		{
+			path.Append("etc/lout");
+			path.Append(subDir);
+		}
+
+		if (!PathExists(path))
+		{
+			if (find_directory(B_COMMON_ETC_DIRECTORY, &path) == B_OK)
+			{
+				path.Append("lout");
+				path.Append(subDir);
+			}
+			if (!PathExists(path))
+				return B_ENTRY_NOT_FOUND;
+		}
+	}
+
+	return B_OK;
+}
+
+
 static void AddSysDataBase(CLanguageProxy& proxy)
 {
-	static const char* kLoutDataDir = "/boot/home/config/etc/lout/data/";
-	static const size_t kLoutDataDirLen = strlen(kLoutDataDir);
-	static const char* kLoutLib = getenv("LOUTLIB");
-
 	char *s, *i = yytext;
 
 	s = strrchr(i, '}');
@@ -211,35 +248,21 @@ static void AddSysDataBase(CLanguageProxy& proxy)
 	s++;
 
 	s = trimstring(s);
-	char* tmp;
 
-	if (kLoutLib != NULL) {
-		tmp = (char*) calloc(1, strlen(kLoutLib) + 6 + strlen(s) + 4);
-		if (!tmp)
-			return;
-		strcat(tmp, kLoutLib);
-		strcat(tmp, "/data/");
-	}
-	else {
-		tmp = (char*) calloc(1, kLoutDataDirLen + strlen(s) + 4);
-		if (!tmp)
-			return;
-		strcat(tmp, kLoutDataDir);
-	}
+	BPath path;
+	if (GetLoutDirectory("data", path) != B_OK)
+		return;
 
-	strcat(tmp, s);
-	strcat(tmp, ".ld");
-	proxy.AddInclude(s, tmp);
-	free(tmp);
+	BString name = s;
+	name << ".ld";
+	path.Append(name.String());
+
+	proxy.AddInclude(s, path.Path());
 }
 
 
 static void AddSysInclude(CLanguageProxy& proxy)
 {
-	static const char* kLoutIncludeDir = "/boot/home/config/etc/lout/include/";
-	static const size_t kLoutIncludeDirLen = strlen(kLoutIncludeDir);
-	static const char* kLoutLib = getenv("LOUTLIB");
-
 	char *s, *i = yytext;
 
 	s = strrchr(i, '}');
@@ -253,23 +276,13 @@ static void AddSysInclude(CLanguageProxy& proxy)
 	s = trimstring(s);
 	char* tmp;
 
-	if (kLoutLib != NULL) {
-		tmp = (char*) calloc(1, strlen(kLoutLib) + 9 + strlen(s) + 4);
-		if (!tmp)
-			return;
-		strcat(tmp, kLoutLib);
-		strcat(tmp, "/include/");
-	}
-	else {
-		tmp = (char*) calloc(1, kLoutIncludeDirLen + strlen(s) + 4);
-		if (!tmp)
-			return;
-		strcat(tmp, kLoutIncludeDir);
-	}
+	BPath path;
+	if (GetLoutDirectory("include", path) != B_OK)
+		return;
 
-	strcat(tmp, s);
-	proxy.AddInclude(s, tmp);
-	free(tmp);
+	path.Append(s);
+
+	proxy.AddInclude(s, path.Path());
 }
 
 
