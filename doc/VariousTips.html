@@ -58,9 +58,9 @@
 		<p>Incremental search is a powerful feature, which you can start by a keystroke or by clicking the Incremental Search button. When Pe is in Incremental Search mode, every character you type is added to a search string and Pe will immediately try to find that string. By default Incremental Search is case insensitive but you can change this.<br>
 		The search pattern will be entered into the Find Dialog, so if you feel the need to see the search string you entered, you can find it there. If you type the Incremental Search command twice, the last search pattern will be re-used.
 
-		<p>During installation a commandline application called lpe was installed in the config/bin directory. You can use this app to use Pe as if it was a commandline editor. To let other commandline based applications like CVS use this you should set the environmental variable EDITOR to /boot/home/config/bin/lpe. You can do that by adding the following line to your UserSetupenvironment file (which you can find in the ~/config/boot directory).
+		<p>During installation a commandline application called "lpe" was installed in the common/bin (Haiku) or config/bin (BeOS) directory. You can use this app to use Pe as if it was a commandline editor. To let other commandline based applications like CVS use this you should set the environmental variable EDITOR to lpe. You can do that by adding the following line to your UserSetupEnvironment file (which you can find in the ~/config/boot directory).
 <code><pre>
-export EDITOR=/boot/home/config/bin/lpe
+export EDITOR=lpe
 </pre></code>
 
 		<hr>
@@ -72,9 +72,9 @@ export EDITOR=/boot/home/config/bin/lpe
 		<td colspan=3>
 			<!-- #include "./addr_incl.html" -->
 			<address>
-				<p>Last updated: 05/17/98<br>
-				Copyright 1997,1998, &copy; Hekkelman Programmatuur,<br>
-				<a href="mailto:info@hekkelman.com">info@hekkelman.com</a>
+				<p>Last updated: 10/09/2008<br>
+				Copyright 1997,1998, &copy; Hekkelman Programmatuur<br>
+				<!-- a href="mailto:info@hekkelman.com">info@hekkelman.com</a -->
 			</address>
 			<!-- end include -->
 		</td>
