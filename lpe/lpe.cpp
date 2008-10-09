@@ -31,15 +31,12 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 	
 	Created: 02/23/98 20:50:08
-	
-cd ~/projects/pe/lpe
-mwcc -prefix BeHeaders lpe.cpp
-cp lpe ~/config/bin
 */
 
 #include <vector>
 #include <cstdio>
 #include <cstdarg>
+
 #include <Message.h>
 #include <Roster.h>
 #include <String.h>
@@ -86,7 +83,7 @@ void OpenInPe(entry_ref& doc, int lineNr)
 		DoError("Could not find Pe!");
 	
 	status_t err;
-	if (! be_roster->IsRunning(&pe))
+	if (!be_roster->IsRunning(&pe))
 	{
 		team_id team;
 		err = be_roster->Launch(&pe, &msg, &team);
@@ -94,15 +91,15 @@ void OpenInPe(entry_ref& doc, int lineNr)
 		// now wait for the requested edit-window to come up (filter out standard
 		// windows):
 		bool foundThread = false;
-		while(!foundThread)
+		while (!foundThread)
 		{
 			int32 cookie = 0;
 			thread_info tinfo;
-			while((err = get_next_thread_info(team, &cookie, &tinfo)) == B_OK)
+			while ((err = get_next_thread_info(team, &cookie, &tinfo)) == B_OK)
 			{
 				if (!strncmp("w>", tinfo.name, 2) 
-				&& strcmp("w>pe: Open", tinfo.name)
-				&& strcmp("w>/boot/home/config/settings/pe", tinfo.name))
+					&& strcmp("w>pe: Open", tinfo.name)
+					&& strcmp("w>/boot/home/config/settings/pe", tinfo.name))
 				{
 					threads.push_back(tinfo.thread);
 					foundThread = true;
@@ -150,7 +147,7 @@ int main(int argc, char *argv[])
 		{
 			case '+':
 				lineNr = strtoul(argv[i] + 1, &p, 10);
-				if (! p || p == argv[i] + 1) Usage();
+				if (!p || p == argv[i] + 1) Usage();
 				break;
 			
 			default:
