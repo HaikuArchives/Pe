@@ -54,7 +54,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 	const char *text = proxy.Text();
 	int size = proxy.Size();
 	int i = 0, s = 0, kws = 0, esc = 0;
-	char c;
+	char c = 0;
 	bool leave = false;
 	
 	if (state == LCOMMENT)
@@ -67,11 +67,12 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 	
 	while (!leave)
 	{
+		char b = c;
 		GETCHAR;
 		
 		switch (state) {
 			case START:
-				if (c == '#')
+				if (c == '#' && (!b || isspace(b)))
 					state = LCOMMENT;
 				else if (isalpha(c) || c == '_')
 				{
