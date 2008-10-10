@@ -2321,10 +2321,19 @@ enum {
 };
 
 struct MenuFunctionScanHandler : public CFunctionScanHandler {
-	MenuFunctionScanHandler(bool sorted, int whichVal)
+	MenuFunctionScanHandler(bool sorted, int whichVal, int where)
 		: sorted(sorted)
 		, which(whichVal)
+		, where(where)
+		, closest(-1)
+		, closestItem(NULL)
 	{
+	}
+	
+	~MenuFunctionScanHandler()
+	{
+		if (closestItem)
+			closestItem->SetMarked(true);
 	}
 
 	void AddFunction(const char *name, const char *match, int offset,
@@ -2344,10 +2353,16 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 			indName.Prepend(' ', indent);
 		}
 
+		BMenuItem *item;
 		if (italic)
-			functions.AddItem(new PItalicMenuItem(indName.String(), msg));
+			item = new PItalicMenuItem(indName.String(), msg);
 		else
-			functions.AddItem(new BMenuItem(indName.String(), msg));
+			item = new BMenuItem(indName.String(), msg);
+		functions.AddItem(item);
+
+		// we might be in this function
+		if (offset > closest && offset < where)
+			closestItem = item;
 	}
 
 	void AddInclude(const char *name, const char *open, bool italic)
@@ -2388,6 +2403,9 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 	BList includes, functions;
 	bool sorted;
 	int which;
+	int where;
+	int closest;
+	BMenuItem *closestItem;
 };
 
 void PText::ShowFunctionMenu(BPoint where, int which)
@@ -2399,7 +2417,7 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 	bool optionDown = (ki.modifiers & (B_OPTION_KEY | B_SHIFT_KEY | B_COMMAND_KEY)) != 0;
 	bool sorted = (optionDown != gPrefs->GetPrefInt(prf_I_SortPopup));
 
-	MenuFunctionScanHandler handler(sorted, which);
+	MenuFunctionScanHandler handler(sorted, which, Caret());
 
 	BList& includes = handler.includes;
 	BList& functions = handler.functions;
