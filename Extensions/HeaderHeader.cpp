@@ -44,7 +44,7 @@ Keywords from the list below will be replaced by the corresponding value:
 ";
 
 static const char *sHaikuHeaderTemplate = "%COMMS%
-%COMMC% Copyright %YEAR%, Haiku.
+%COMMC% Copyright %YEAR%, Haiku, Inc.
 %COMMC% Distributed under the terms of the MIT License.
 %COMMC%
 %COMMC% Authors:
