@@ -1570,7 +1570,7 @@ void PDoc::MenusBeginning()
 		if ((doc && doc->IsWorksheet()) || !w)
 			continue;
 		// Count files to be saved
-		if (doc->IsDirty() || !doc->EntryRef())
+		if (doc && (doc->IsDirty() || !doc->EntryRef()))
 			unsavedDocs++;
 		BMessage *msg = new BMessage(msg_SelectWindow);
 		msg->AddPointer("window", w);
