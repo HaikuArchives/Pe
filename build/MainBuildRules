@@ -18,6 +18,13 @@ rule Application
 
 	Main $(app) : $(sources) ;
 	MakeLocate $(app) : $(LOCATE_MAIN_TARGET) ;
+	local linkFlags ;
+	if $(OSPLAT) = X86 {
+		linkFlags = -Xlinker -soname=\"_APP_\" ;
+	} else {
+		linkFlags = ;
+	}
+	LINKFLAGS on $(app) = [ on $(app) return $(LINKFLAGS) ] $(linkFlags) ;
 	LinkAgainst $(app) : $(libs) ;
 }
 
