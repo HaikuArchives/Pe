@@ -67,14 +67,14 @@ PeExtension HeaderGuard
 # <pe-src>
 PeExtension HeaderHeader
 	: HeaderHeader.cpp 
-	: libhekkel.so <nogrist>pe be tracker $(STDC++LIB)
+	: libhekkel.so <nogrist>Pe be tracker $(STDC++LIB)
 	;
 # </pe-src>
 
 # <pe-src>
 PeExtension ImageToC
 	: ImageToC.cpp 
-	: libhekkel.so <nogrist>pe be translation
+	: libhekkel.so <nogrist>Pe be translation
 	;
 # </pe-src>
 
@@ -130,6 +130,6 @@ PeExtension drieuxCaps
 # <pe-src>
 PeExtension WebPaste 
 	: WebPaste.cpp 
-	: libhekkel.so <nogrist>pe be $(STDC++LIB)
+	: libhekkel.so <nogrist>Pe be $(STDC++LIB)
 	;
 # </pe-src>

@@ -9,8 +9,8 @@ resource app_version {
 	variety = B_APPV_BETA,
 	internal = 0,
 
-	short_info = "Pe 2.4.1-rc1",
-	long_info = "Pe 2.4.1 Release Candidate 1"
+	short_info = "Pe 2.4.1-rc3",
+	long_info = "Pe 2.4.1 Release Candidate 3"
 };
 
 resource app_signature "application/x-vnd.beunited.pe";

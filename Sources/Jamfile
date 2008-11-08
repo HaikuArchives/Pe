@@ -45,7 +45,7 @@ SubDirSysHdrs /boot/common/include ;
 LINKFLAGS += -L/boot/home/config/lib -L/boot/common/lib ;
 
 #<pe-src>
-Application pe : 
+Application Pe : 
 	Benaphore.cpp
 	CCharObject.cpp
 	CDiff.cpp
@@ -118,7 +118,7 @@ if $(OSPLAT) = X86 {
 	ObjectC++Flags CGlossary.cpp : -Wno-format ;
 }
 
-XRes pe : 
+XRes Pe : 
 	Bindings.rsrc
 	Cursor.rsrc
 	Dialog-Colorpicker.rsrc
@@ -140,6 +140,6 @@ XRes pe :
 	WordBreakTable.rsrc
 	;
 
-Rez pe : [ FDirName $(TOP) Resources Now.r ] ;
+Rez Pe : [ FDirName $(TOP) Resources Now.r ] ;
 
-MimeSet pe ;
+MimeSet Pe ;
