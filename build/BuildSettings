@@ -7,9 +7,11 @@ if $(OS) = HAIKU {
 	CCFLAGS += -DBONE_BUILD ;
 	C++FLAGS += -DBONE_BUILD ;
 	LINKLIBS += -lnetwork ;
+	COMMON_FOLDER = /boot/common ;
 } else {
 	# BeOS
 
+	COMMON_FOLDER = /boot/home/config ;
 	if $(OSPLAT) = PPC {
 		# filter out -nosyspath
 		CFLAGS = [ FFilter $(CFLAGS) : -nosyspath ] ;
