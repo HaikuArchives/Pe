@@ -57,7 +57,7 @@ void *gResData;
 int gResSize;
 char *gIncludePaths[kMaxIncludePaths];
 
-char out[NAME_MAX] = "rez.out";
+char out[PATH_MAX] = "rez.out";
 char *in = NULL;
 static FILE *gHeader;
 
@@ -180,12 +180,17 @@ int main(int argc, char *argv[])
 	yyin = stdin;
 
 	int i = getoptions(argc, argv);
-		
+
 	char buf[PATH_MAX];
-	getcwd(buf, PATH_MAX);
-	strcat(buf, "/");
-	strcat(buf, out);
-	
+	if (out[0] == '/')
+		strcpy(buf, out);
+	else
+	{
+		getcwd(buf, PATH_MAX);
+		strcat(buf, "/");
+		strcat(buf, out);
+	}
+
 	BEntry e;
 	if (e.SetTo(out)) error("entry set to %s", out);
 	
