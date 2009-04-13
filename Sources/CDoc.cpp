@@ -261,9 +261,7 @@ void CDoc::SaveRequested(entry_ref& directory, const char *name)
 void CDoc::SaveACopy()
 {
 	if (!fSavePanel)
-		fSavePanel = new BFilePanel(B_SAVE_PANEL);
-
-	FailNil(fSavePanel);
+		CreateFilePanel();
 
 	BWindow *w = fSavePanel->Window();
 	w->Lock();

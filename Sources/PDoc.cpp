@@ -866,41 +866,78 @@ void PDoc::CreateFilePanel()
 {
 	inherited::CreateFilePanel();
 
-	BWindow *w = fSavePanel->Window();
-	BAutolock lock(w);
+	BWindow *savePanel = fSavePanel->Window();
+	BAutolock lock(savePanel);
 
 	if (lock.IsLocked())
 	{
-		BView *vw = w->ChildAt(0);
-		FailNilMsg(vw, "Error building FilePanel");
+		BView *background = savePanel->ChildAt(0);
+		FailNilMsg(background, "Error building FilePanel");
+		
+		BButton *cancel = dynamic_cast<BButton*>(background->FindView("cancel button"));
+		FailNilMsg(cancel, "Error building FilePanel");
+		
+		BView *textview = background->FindView("text view");
+		FailNilMsg(textview, "Error building FilePanel");
 
-		BMenu *m = HResources::GetMenu(rid_Menu_FpMimetypes, true);
-		FailNilMsg(m, "Error building FilePanel");
-		m->SetFont(be_plain_font);
-		m->SetRadioMode(true);
+		BMenu *menu = HResources::GetMenu(rid_Menu_FpMimetypes, true);
+		FailNilMsg(menu, "Error building FilePanel");
+		menu->SetFont(be_plain_font);
+		menu->SetRadioMode(true);
 
-		BView *v = vw->FindView("text view");
-		FailNilMsg(v, "Error building FilePanel");
-		BRect r = v->Frame();
-		v->ResizeTo(r.Width() - 50, r.Height());
+		BRect rect = textview->Frame();
+		rect.top = cancel->Frame().top;
+		font_height fh;
+		be_plain_font->GetHeight(&fh);
+		rect.bottom = rect.top + fh.descent + fh.ascent + 5.0;
 
-		r.left = r.right - 45;
-		r.right = r.left + 100;
-		r.top += (r.Height() - 20) / 2;
+		BMenuField *menuField = new BMenuField(rect, "mime", "Type:",
+			menu, B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
+		FailNilMsg(menuField, "Error building FilePanel");
+		menuField->SetDivider(be_plain_font->StringWidth("Type:") + 7);
+		menuField->MenuBar()->ResizeToPreferred();
+		menuField->ResizeToPreferred();
 
-		BMenuField *mf = new BMenuField(r, "mime", "Type:",
-			m, B_FOLLOW_BOTTOM | B_FOLLOW_LEFT);
-		FailNilMsg(mf, "Error building FilePanel");
-		vw->AddChild(mf);
-		mf->SetDivider(be_plain_font->StringWidth("Type:") + 4);
+		float height = menuField->Bounds().Height() + 8.0;
+
+		// find all the views that are in the way and
+		// move up them up the height of the menu field
+		BView *poseview = background->FindView("PoseView");
+		if (poseview)
+			poseview->ResizeBy(0, -height);
+
+		BScrollBar *hscrollbar = (BScrollBar *)background->FindView("HScrollBar");
+		if (hscrollbar)
+			hscrollbar->MoveBy(0, -height);
+
+		BScrollBar *vscrollbar = (BScrollBar *)background->FindView("VScrollBar");
+		if (vscrollbar)
+			vscrollbar->ResizeBy(0, -height);
+
+		BView *countvw = (BView *)background->FindView("CountVw");
+		if (countvw)
+			countvw->MoveBy(0, -height);
+
+		textview->MoveBy(0, -height);
+		textview->ResizeTo(textview->Bounds().Width() * 1.5,
+							textview->Bounds().Height());
+
+		background->AddChild(menuField);
+
+		// make sure the smallest window won't draw the "Type" menu over anything else
+		// we suppose the "Save" button to have the same width as the "Cancel" button
+		float minWindowWidth = textview->Bounds().Width()
+								+ cancel->Bounds().Width() * 2
+								+ 50;
+		savePanel->SetSizeLimits(minWindowWidth, 10000, 250, 10000);
 
 		int i = 0;
 		const char *p;
 
 		while ((p = gPrefs->GetIxPrefString(prf_X_Mimetype, i++)) != NULL)
-			m->AddItem(new BMenuItem(p, NULL));
+			menu->AddItem(new BMenuItem(p, NULL));
 
-		BMenuItem *item = m->FindItem(MimeType());
+		BMenuItem *item = menu->FindItem(MimeType());
 		if (item)
 			item->SetMarked(true);
 		else
@@ -908,7 +945,7 @@ void PDoc::CreateFilePanel()
 			p = MimeType();
 			if (!p || !p[0])
 				p = "<undefined>";
-			m->AddItem(item = new BMenuItem(p, NULL));
+			menu->AddItem(item = new BMenuItem(p, NULL));
 			item->SetMarked(true);
 		}
 	}
