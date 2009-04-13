@@ -241,7 +241,7 @@ rule RezObject
 
 	SEARCH on $(_r) = $(SEARCH_SOURCE) ;
 
-	# include directories to by used
+	# include directories to be used
 	HDRS on $(_rsrc) $(tmp) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
 
 	# preprocess the rez file
@@ -250,9 +250,6 @@ rule RezObject
 	# generate the resource file from the preprocessed rez file
 	MakeLocate $(_rsrc) : $(LOCATE_TARGET) ;
 	Rez $(_rsrc) : $(tmp) : -t ;
-
-	RmTemps $(_rsrc) : $(tmp) ;
-	Clean clean : $(_rsrc) ;
 }
 
 rule PreProcess
