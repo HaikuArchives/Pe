@@ -1707,7 +1707,7 @@ void PText::VerticallyScrollToSelection(int startOffset,
 		if (cnt * fLineHeight < h)
 		{
 			cnt = (int)((h / fLineHeight) - cnt) / 2;
-			top -= cnt;
+			top = max_c(0, top - cnt);
 		}
 		y = top * fLineHeight;
 	}
