@@ -4,13 +4,13 @@ resource app_flags B_SINGLE_LAUNCH;
 resource app_version {
 	major  = 2,
 	middle = 4,
-	minor  = 1,
+	minor  = 2,
 
-	variety = B_APPV_BETA,
+	variety = B_APPV_FINAL,
 	internal = 0,
 
-	short_info = "Pe 2.4.1-rc3",
-	long_info = "Pe 2.4.1 Release Candidate 3"
+	short_info = "Pe 2.4.2",
+	long_info = "Pe 2.4.2"
 };
 
 resource app_signature "application/x-vnd.beunited.pe";

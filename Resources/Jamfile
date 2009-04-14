@@ -26,5 +26,5 @@ RezObjects
 	;
 # </pe-src>
 
-Includes RMimeinfo.r : pe.types.rsrc ;
+Depends MimeInfo.rsrc : pe.types.rsrc ;
 SEARCH on pe.types.rsrc = $(SUBDIR) ;
