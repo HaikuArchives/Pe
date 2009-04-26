@@ -52,13 +52,14 @@ static const char *sHaikuHeaderTemplate = "%COMMS%
 %COMME%
 ";
 
+/*
 static const char *sHaikuAddMeHeaderMatch = \
 " * Authors:
 ";
 static const char *sHaikuAddMeHeaderTemplate = \
 " *	 	%AUTHOR% <%AUTHORMAIL%>
 ";
-
+*/
 
 static const char *sHaikuMeHeaderTemplate = "%COMMS%
 %COMMC% Copyright %YEAR%, %AUTHOR%, <%AUTHORMAIL%>.
@@ -326,7 +327,7 @@ BuildPopUp(BDirectory &dir)
 	BPopUpMenu *menu = new BPopUpMenu("menu", false);
 	//BMenuItem *item;
 	//BMessage *msg;
-	status_t err;
+	//status_t err;
 
 	//menu->SetFont(be_plain_font);
 
@@ -413,7 +414,7 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName,
 			char *p;
 			p = tmp.LockBuffer(100);
 			memset(p, 0, 100);
-			strftime(p, 100, "%F", tim);
+			strftime(p, 100, "%Y-%m-%d", tim);
 			tmp.UnlockBuffer();
 			header.ReplaceAll("%DATE%", tmp.String());
 			tmp.Truncate(0);
