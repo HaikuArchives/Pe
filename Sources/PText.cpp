@@ -48,6 +48,7 @@
 #include "CLanguageInterface.h"
 #include "PDoc.h"
 #include "PExec.h"
+#include "PErrorWindow.h"
 #include "PToolBar.h"
 #include "PMessages.h"
 #include "HPreferences.h"
@@ -744,6 +745,14 @@ void PText::SetCWD(const char *cwd)
 		fCWD = strdup(cwd);
 	}
 } /* PText::SetCWD */
+
+void PText::SetErrorWindow(PErrorWindow *window)
+{
+	if (fErrorWindowMessenger.IsValid())
+		fErrorWindowMessenger.SendMessage(B_QUIT_REQUESTED);
+	
+	fErrorWindowMessenger = BMessenger(window, window);
+} /* PText::SetErrorWindow */
 
 PDoc* PText::Doc() const
 {
@@ -4509,6 +4518,8 @@ long PExec::Execute()
 
 			if (gRedirectStdErr)
 				fErrorWindow = new PErrorWindow(efd, fWD);
+			if (fErrorWindow)
+				fText->SetErrorWindow(fErrorWindow);
 
 			bool prepared = false;
 			char buf[kBufferSize] = "", *pwd = NULL;

@@ -821,7 +821,8 @@ void PScriptCmd::Do()
 			fFD = pi[1];
 			resume_thread(spawn_thread(Piper, "Piper", B_NORMAL_PRIORITY, this));
 			
-			new PErrorWindow(pe, cwd);
+			PErrorWindow *window = new PErrorWindow(pe, cwd);
+			fText->SetErrorWindow(window);
 			
 			if (fOldTextSize)
 				fText->Delete(fAnchor, fAnchor + fOldTextSize);

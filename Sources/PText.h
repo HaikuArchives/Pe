@@ -52,6 +52,7 @@ class CLanguageInterface;
 class CFunctionScanHandler;
 class PSplitter;
 class PDoc;
+class PErrorWindow;
 
 struct LineInfo {
 	unsigned long start;
@@ -261,6 +262,7 @@ virtual		void FrameResized(float w, float h);
 			void SetCWD(const char *cwd);
 			const char *GetCWD() const;
 			void SendTextToJob(const char *txt);
+			void SetErrorWindow(PErrorWindow *window);
 			
 			void SetSplitter(PSplitter *splitter);
 			void TrackSplitter(BPoint where);
@@ -349,6 +351,7 @@ private:
 			PCmd* fLastSavedStateCmd;
 			float fDefaultCharWidth;
 			BMessage *fPrintSettings;
+			BMessenger fErrorWindowMessenger;
 		
 static		PText *sfDragSource;
 
