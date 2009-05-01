@@ -100,7 +100,8 @@ void OpenInPe(entry_ref& doc, int lineNr)
 			while ((err = get_next_thread_info(team, &cookie, &tinfo)) == B_OK)
 			{
 				if (!strncmp("w>", tinfo.name, 2) 
-					&& strcmp("w>pe: Open", tinfo.name)
+					&& strcmp("w>Pe: Open", tinfo.name)
+					&& strcmp("w>Find", tinfo.name)
 					&& strcmp("w>/boot/home/config/settings/pe", tinfo.name))
 				{
 					threads.push_back(tinfo.thread);
