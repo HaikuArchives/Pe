@@ -34,8 +34,10 @@
 */
 
 #include <vector>
-#include <cstdio>
-#include <cstdarg>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
 
 #include <Message.h>
 #include <Roster.h>
@@ -43,7 +45,7 @@
 
 const long msg_CommandLineOpen = 'Cmdl';
 
-static vector<int> threads;
+static std::vector<int> threads;
 
 void DoError(const char *e, ...);
 void Usage();
@@ -178,7 +180,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-	vector<int>::iterator ti;
+	std::vector<int>::iterator ti;
 	
 	for (ti = threads.begin(); ti != threads.end(); ti++)
 	{
