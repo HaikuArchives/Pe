@@ -426,7 +426,13 @@ if $(OSPLAT) = X86 {
 
 # Variable referring to the STL.
 if $(OSPLAT) = X86 {
-	STDC++LIB = stdc++.r4 ;
+	local hasLibStdC++.R4 = [ Glob /boot/develop/lib/x86 : libstdc++.r4.so ] ;
+	if $(hasLibStdC++.R4) {
+		STDC++LIB = stdc++.r4 ;
+	} else {
+		# supposedly a gcc 4 Haiku
+		STDC++LIB = stdc++ ;
+	}
 } else {
 	STDC++LIB = mslcpp_4_0 ;
 }
