@@ -39,6 +39,7 @@
 */
 #include <map>
 #include <string>
+#include <vector>
 #include "CLanguageAddOn.h"
 
 const long kMaxNameSize = 256;
@@ -63,7 +64,7 @@ struct PopupMenu
 	PopupMenu (BString &lab, BString &txt, const char * pos, bool ita=false)
 		: label(lab), text(txt), position(pos), italic(ita) {}
 };
-typedef vector<PopupMenu> PopupList;
+typedef std::vector<PopupMenu> PopupList;
 
 void add_to_popup(const char* name, PopupList &pul, CLanguageProxy& proxy);
 bool isident(char ch);
@@ -456,7 +457,7 @@ const char *JavaScript(const char *txt, PopupList &lstJsFunctions, PopupList &ls
 
 const char *PhpScript(const char *txt, PopupList &lstPhpFunctions, PopupList &lstPhpClasses, bool sorted)
 {
-	map <int,int,int> headings;
+	std::map <int,int,int> headings;
 	BString class_name;
 	while (*txt)
 	{

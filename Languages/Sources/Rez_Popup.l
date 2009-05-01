@@ -126,7 +126,7 @@ void GetNextChar(char *tok, int& result, int max)
 			space++;
 		}
 		
-		result = max = min(max, space);
+		result = max = std::min(max, space);
 		gIndx += 2;
 
 		while (max--)
@@ -146,7 +146,7 @@ void GetNextChar(char *tok, int& result, int max)
 		}
 		while (gIndx < gBufSize && c != '\n');
 		
-		result = max = min(max, space);
+		result = max = std::min(max, space);
 
 		while (max--)
 			*tok++ = ' ';

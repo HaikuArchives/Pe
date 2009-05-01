@@ -111,7 +111,7 @@ const char *Anchor(const char *txt, CLanguageProxy& ao)
 			if (*txt == 0)
 				break;
 			
-			int l = min((long)PATH_MAX - 1, txt - file - 1);
+			int l = std::min((long)PATH_MAX - 1, txt - file - 1);
 			strncpy(name, file, l);
 			name[l] = 0;
 			
@@ -138,7 +138,7 @@ const char *Anchor(const char *txt, CLanguageProxy& ao)
 				break;
 			
 			char *p = name + kMaxNameSize;
-			int l = min(kMaxNameSize - 1, txt - anchor - 1);
+			int l = std::min(kMaxNameSize - 1, txt - anchor - 1);
 			strncpy(name, anchor, l);
 			name[l] = 0;
 			
@@ -170,7 +170,7 @@ const char *Heading(const char *txt, CLanguageProxy& ao)
 	txt = skip(txt + 1, '<');
 	
 	char name[kMaxNameSize];
-	int l = min(txt - hName - 1, kMaxNameSize - 1);
+	int l = std::min(txt - hName - 1, kMaxNameSize - 1);
 	int offset = hName - ao.Text();
 	
 	strncpy(name, hName, l);
@@ -246,7 +246,7 @@ const char *JavaScript(const char *txt, CLanguageProxy& ao)
 					
 					int offset = txt - ao.Text();
 					
-					string name, label;
+					std::string name, label;
 					
 					while (isalnum(*txt))
 						name += *txt++;

@@ -294,7 +294,7 @@ const char *class_struct_union(const char *start, const char *&text,
 		if (*text == '{' && proxy.Types())
 		{
 			char match[256];
-			long l = min((long)255, text - start);
+			long l = std::min((long)255, text - start);
 			
 			strncpy(match, start, l);
 			match[l] = 0;
@@ -573,7 +573,7 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 			if (*text == '{')
 			{
 				char match[256];
-				long l = min((long)255, text - start);
+				long l = std::min((long)255, text - start);
 				
 				strncpy(match, start, l);
 				match[l] = 0;
@@ -699,7 +699,7 @@ const char *ident(const char *text, CLanguageProxy& proxy)
 	if (*text == '(')
 	{
 		char match[256];
-		long l = min((long)255, text - start);
+		long l = std::min((long)255, text - start);
 		
 		strncpy(match, start, l);
 		match[l] = 0;

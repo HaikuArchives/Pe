@@ -307,7 +307,7 @@ const char *ident(const char *text, CLanguageProxy& proxy, char *&scope)
 		*name = 0;
 		// add it
 		char match[256];
-		long l = min((long)255, text - start);
+		long l = std::min((long)255, text - start);
 		
 		strncpy(match, start, l);
 		match[l] = 0;
@@ -339,7 +339,7 @@ const char *ident(const char *text, CLanguageProxy& proxy, char *&scope)
 		*name = 0;
 		// add it
 		char match[256];
-		long l = min((long)255, text - start);
+		long l = std::min((long)255, text - start);
 		
 		strncpy(match, start, l);
 		match[l] = 0;
@@ -385,7 +385,7 @@ const char *ident(const char *text, CLanguageProxy& proxy, char *&scope)
 			if (*text == '{' && proxy.Types())
 			{
 				char match[256];
-				long l = min((long)255, text - start);
+				long l = std::min((long)255, text - start);
 				
 				strncpy(match, start, l);
 				match[l] = 0;
@@ -531,7 +531,7 @@ const char *ident(const char *text, CLanguageProxy& proxy, char *&scope)
 	if (*text == '(')
 	{
 		char match[256];
-		long l = min((long)255, text - start);
+		long l = std::min((long)255, text - start);
 		
 		strncpy(match, start, l);
 		match[l] = 0;

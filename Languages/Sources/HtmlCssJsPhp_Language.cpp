@@ -1567,7 +1567,7 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 		const char *et(txt + end);
 		const char *st(txt + langStart);
 
-		stack<int> bls, sbls, pls;
+		std::stack<int> bls, sbls, pls;
 
 		while (*txt && txt < et)
 		{
@@ -1584,7 +1584,7 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 		}
 
 		char ec = 0, oc = 0;
-		stack<int> *s = 0;
+		std::stack<int> *s = 0;
 
 		int db, dsb, dp;
 
