@@ -57,7 +57,7 @@ enum RFuncs {
 	refCopyBits
 };
 
-typedef struct REval {
+struct REval {
 	REval *fLeft, *fRight;
 	REvalType fType;
 	bool fOnStack;

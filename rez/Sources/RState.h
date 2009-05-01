@@ -37,7 +37,7 @@
 #ifndef RSTATE_H
 #define RSTATE_H
 
-#include <map.h>
+#include <map>
 #include "RElem.h"
 #include "SymbolTable.h"
 
@@ -49,7 +49,7 @@ class BList;
 class RState;
 struct RElem;
 
-typedef map<int, int> intmap;
+typedef std::map<int, int> intmap;
 
 extern intmap gValueMap;
 

@@ -40,7 +40,9 @@
 #include "RState.h"
 #include "REval.h"
 
-#include <cstdio>
+#include <stdio.h>
+#include <string.h>
+
 #include <List.h>
 #include <ByteOrder.h>
 

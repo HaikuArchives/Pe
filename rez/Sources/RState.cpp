@@ -37,6 +37,7 @@
 #include "RState.h"
 #include "REval.h"
 #include "SymbolTable.h"
+#include <string.h>
 #include <typeinfo>
 #include <support/Debug.h>
 #include <ByteOrder.h>
