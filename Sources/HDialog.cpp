@@ -50,7 +50,7 @@ const unsigned long
 	msg_AddDialog		= 'ADlg',
 	msg_RemoveDialog	= 'RDlg';
 
-typedef map<int, FieldCreator> field_map;
+typedef std::map<int, FieldCreator> field_map;
 
 static field_map *sFieldMap = NULL;
 
@@ -114,8 +114,8 @@ void HDialog::ResizeToLimits(float minW, float maxW, float minH, float maxH)
 {
 	SetSizeLimits(minW, maxW, minH, maxH);
 	BRect frame = Frame();
-	float w = min(maxW, max(minW, frame.Width()));
-	float h = min(maxH, max(minH, frame.Height()));
+	float w = std::min(maxW, std::max(minW, frame.Width()));
+	float h = std::min(maxH, std::max(minH, frame.Height()));
 	ResizeTo(w, h);
 }
 
@@ -551,7 +551,7 @@ int HDialog::GetValue(const char *id) const
 	if (typeid(*v) == typeid(BMenuField))
 	{
 		BMenu *menu = static_cast<BMenuField*>(v)->Menu();
-		return max(menu->IndexOf(menu->FindMarked()) + 1, 1L);
+		return std::max(menu->IndexOf(menu->FindMarked()) + 1, 1L);
 	}
 	else if (typeid(*v) == typeid(BTextControl))
 		return atoi(GetText(id));

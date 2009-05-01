@@ -260,7 +260,7 @@ float PMessageItem::PreferredHeight() const
 	}
 	if (fSrc) lines++;
 	
-	return max(lines * lineHeight + 4, (float)20);
+	return std::max(lines * lineHeight + 4, (float)20);
 } /* PMessageItem::PreferredHeight */
 
 void PMessageItem::ShowMessage()

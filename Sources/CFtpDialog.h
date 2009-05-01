@@ -40,6 +40,10 @@
 #include "HDialog.h"
 #include "HDialogViews.h"
 
+
+using std::map;
+
+
 class CFtpDialog : public HDialog
 {
   public:

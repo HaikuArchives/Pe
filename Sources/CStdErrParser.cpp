@@ -166,11 +166,12 @@ bool CStdErrParser::MatchOne(bool flush)
 			{
 				int l = (int)fErrBuffer.find('\n');
 				
-				CMessageItem *i = new CMessageItem(fErrBuffer.c_str(), min(m, l), CMessageItem::msgInfo);
+				CMessageItem *i = new CMessageItem(fErrBuffer.c_str(),
+					std::min(m, l), CMessageItem::msgInfo);
 				fErrList->AddItem(i);
 				i->SetHeight(h);
 				
-				fErrBuffer.erase(0, min(l + 1, m));
+				fErrBuffer.erase(0, std::min(l + 1, m));
 				m -= l + 1;
 				
 				found = true;

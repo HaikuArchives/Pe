@@ -123,7 +123,8 @@ CDiffWindow::CDiffWindow(BRect frame, const char *name)
 	be_plain_font->GetHeight(&fh);
 	
 	r = b;
-	r.bottom = r.top + max(kToolBarHeight, (fh.ascent + fh.descent - 1) * 2 + 1);
+	r.bottom = r.top + std::max(kToolBarHeight,
+		(fh.ascent + fh.descent - 1) * 2 + 1);
 
 	fToolBar = new CDiffToolBar(r, "DiffToolBar");
 	AddChild(fToolBar);
@@ -740,7 +741,7 @@ void CDiffWindow::Merge(int toFile)
 		GetDocs(docA, docB, false);
 
 		if (toFile == 2)
-			swap(docA, docB);
+			std::swap(docA, docB);
 		
 		char *s;
 		{

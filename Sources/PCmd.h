@@ -38,11 +38,16 @@
 
 
 #include <Path.h>
+#include <list>
 #include <vector>
 
 
 class PText;
 class PTextBuffer;
+
+using std::list;
+using std::vector;
+
 
 class PCmd {
 public:

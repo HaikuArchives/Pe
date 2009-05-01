@@ -45,7 +45,10 @@ class BFilePanel;
 class CDoc;
 class URLData;
 
-typedef list<CDoc*> doclist;
+using std::string;
+using std::vector;
+
+typedef std::list<CDoc*> doclist;
 
 // types of linebreaks
 enum {

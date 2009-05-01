@@ -466,7 +466,7 @@ status_t CTextEncodingConverter::ConvertToUtf8(BString& docText)
 									nativeSize, charset, false);
 				if (res == B_OK)
 				{
-					int sz = min((int)docText.Length(), nativeSize);
+					int sz = std::min((int)docText.Length(), nativeSize);
 					int i;
 					const char* t = docText.String();
 					char* ut = nativeText;
@@ -513,7 +513,7 @@ status_t CTextEncodingConverter::ConvertFromUtf8(BString& docText)
 									utf8Size, charset, true);
 				if (res == B_OK)
 				{
-					int sz = min((int)docText.Length(), utf8Size);
+					int sz = std::min((int)docText.Length(), utf8Size);
 					int i;
 					const char* t = docText.String();
 					char* ut = utf8Text;
@@ -573,7 +573,7 @@ status_t CTextEncodingConverter::_DoConversion(const char* text, int size,
 	int32 srcSize = size;
 	int32 srcLen = 0;
 	int32 srcOffset = 0;
-	int32 destSize = max(size, 128);
+	int32 destSize = std::max(size, 128);
 	int32 destLen;
 	int32 destOffset = 0;
 	outText = NULL;

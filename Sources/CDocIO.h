@@ -87,7 +87,7 @@ private:
 			node_ref fNodeRef;
 			BLooper* fTarget;
 
-	typedef map<node_ref, int32> WatchedFolderMap;
+	typedef std::map<node_ref, int32> WatchedFolderMap;
 	WatchedFolderMap sfWatchedFolderMap;
 	static	BLocker sfDocListLock;
 };

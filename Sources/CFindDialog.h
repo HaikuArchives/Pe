@@ -46,6 +46,8 @@
 class PMessageItem;
 class PDoc;
 
+using std::stack;
+
 const unsigned long
 	msg_QueryCanReplace = 'CRpl',
 	msg_ReplyCanReplace = 'RpRp';

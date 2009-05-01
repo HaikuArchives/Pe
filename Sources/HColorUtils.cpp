@@ -134,10 +134,10 @@ rgb_color f2rgb(float r, float g, float b, float a)
 {
 	rgb_color rgb;
 
-	rgb.red = (int)(max(0.0, min(255.0, r * 255.0)));
-	rgb.green = (int)(max(0.0, min(255.0, g * 255.0)));
-	rgb.blue = (int)(max(0.0, min(255.0, b * 255.0)));
-	rgb.alpha = (int)(max(0.0, min(255.0, a * 255.0)));
+	rgb.red = (int)(std::max(0.0, std::min(255.0, r * 255.0)));
+	rgb.green = (int)(std::max(0.0, std::min(255.0, g * 255.0)));
+	rgb.blue = (int)(std::max(0.0, std::min(255.0, b * 255.0)));
+	rgb.alpha = (int)(std::max(0.0, std::min(255.0, a * 255.0)));
 
 	return rgb;
 } /* f2rgb */
@@ -146,8 +146,8 @@ void rgb2hsv(float r, float g, float b, float& h, float& s, float& v)
 {
 	float cmin, cmax, delta;
 	
-	cmax = max(r, max(g, b));
-	cmin = min(r, min(g, b));
+	cmax = std::max(r, std::max(g, b));
+	cmin = std::min(r, std::min(g, b));
 	delta = cmax - cmin;
 	
 	v = cmax;

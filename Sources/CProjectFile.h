@@ -19,6 +19,8 @@
 class BPositionIO;
 class CProjectSerializer;
 
+using std::list;
+
 /*
  * CProjectItem
  *		represents a source-file in a project (displayed in a PProjectWindow).

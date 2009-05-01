@@ -56,7 +56,7 @@ BHandler *CCharObject::GetSubSpecifier(BMessage *msg, int32 index,
 
 void CCharObject::MessageReceived(BMessage *msg)
 {
-	auto_ptr<CCharObject> destroy(this);
+	std::auto_ptr<CCharObject> destroy(this);
 
 	switch (msg->what)
 	{

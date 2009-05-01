@@ -10,6 +10,8 @@
 
 #include <pcre.h>
 
+using std::vector;
+
 extern const status_t krx_NoMatch;
 extern const status_t krx_NotBOL;
 extern const status_t krx_NotEOL;

@@ -41,6 +41,8 @@
 class HHelpWindow;
 class HButtonBar;
 
+using std::vector;
+
 struct IMPEXP_LIBHEKKEL BtnTemplate {
 	long resID;
 	long cmd;

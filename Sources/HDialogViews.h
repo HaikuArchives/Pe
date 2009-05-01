@@ -45,6 +45,8 @@
 #define H_FOLLOW_LEFT_RIGHT_TOP		(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP)
 #define H_FOLLOW_LEFT_RIGHT_BOTTOM	(B_FOLLOW_LEFT_RIGHT|B_FOLLOW_BOTTOM)
 
+using std::vector;
+
 
 class IMPEXP_LIBHEKKEL HDlogView : public BView {
 public:

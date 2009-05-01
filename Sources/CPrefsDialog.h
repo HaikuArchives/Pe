@@ -45,6 +45,8 @@ class CKeyCapturer;
 class CGrepBox;
 class COutlineListView;
 
+using std::vector;
+
 class CPrefsDialog : public HDialog
 {
 public:

@@ -48,6 +48,10 @@
 #include "Prefs.h"
 #include <algorithm>
 
+
+using std::map;
+
+
 unsigned char *CLanguageInterface::sfWordBreakTable = NULL;
 
 class ext {
@@ -400,14 +404,14 @@ void CLanguageInterface::Balance(PText& text)
 {
 	try
 	{
-		int start = min(text.Anchor(), text.Caret());
-		int end = max(text.Anchor(), text.Caret());
+		int start = std::min(text.Anchor(), text.Caret());
+		int end = std::max(text.Anchor(), text.Caret());
 
 		if (! Balance(text, start, end))
 			THROW((0));
 
-		if (start == min(text.Anchor(), text.Caret()) &&
-			end == max(text.Anchor(), text.Caret()))
+		if (start == std::min(text.Anchor(), text.Caret()) &&
+			end == std::max(text.Anchor(), text.Caret()))
 		{
 			start--; end++;
 			if (! Balance(text, start, end))
@@ -469,9 +473,9 @@ int CLanguageInterface::FindNextWord(PText& text, int offset, int& mlen)
 			int size;
 
 			if (line >= text.LineCount() - 1)
-				size = min(text.Size() - offset, 1024);
+				size = std::min(text.Size() - offset, 1024);
 			else
-				size = min(text.LineStart(line + 1) - offset, 1024);
+				size = std::min(text.LineStart(line + 1) - offset, 1024);
 
 			CAlloca txt(size + 1);
 			text.TextBuffer().Copy(txt, offset, size);
@@ -780,7 +784,7 @@ void CLanguageInterface::GenerateKeywordMap(const char *ext) const
 						end = start + strcspn(start, "\n");
 					}
 				} else {
-					fKeywordMap.insert(pair<BString, int>(word, currType));
+					fKeywordMap.insert(std::pair<BString, int>(word, currType));
 				}
 				start = end + strspn(end, white);
 				end = start + strcspn(start, white);

@@ -36,6 +36,12 @@
 #ifndef CDIFF_H
 #define CDIFF_H
 
+#include <vector>
+
+
+using std::vector;
+
+
 class CDiff
 {
 public:

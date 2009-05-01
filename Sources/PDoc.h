@@ -40,6 +40,7 @@
 #include <typeinfo>
 
 #include "CDocWindow.h"
+#include "HDialog.h"
 
 #include "PTextBuffer.h"
 
@@ -51,6 +52,8 @@ class PToolBar;
 class HDialog;
 class BMenu;
 class BStringView;
+
+using std::vector;
 
 template <class T>
 class PDialog 

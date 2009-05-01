@@ -37,7 +37,7 @@
 #define CKEYMAPPER_H
 
 
-//using namespace std;
+using std::set;
 
 class PText;
 
@@ -52,7 +52,7 @@ struct KeyShortcut
 	inline bool operator==(const KeyShortcut& ks) const;
 };
 
-typedef map<KeyShortcut,int> keymap;
+typedef std::map<KeyShortcut,int> keymap;
 
 class CKeyMapper
 {

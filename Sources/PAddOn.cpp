@@ -186,8 +186,8 @@ int32 PEditText::TextLength() const
 void PEditText::GetSelection(int32* _start, int32* _end) const
 {
 	int32 start = fText.Anchor(), end = fText.Caret();
-	*_start = min(start, end);
-	*_end = max(start, end);
+	*_start = std::min(start, end);
+	*_end = std::max(start, end);
 }
 
 

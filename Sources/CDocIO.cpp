@@ -676,7 +676,7 @@ bool CLocalDocIO::VerifyFile()
 				}
 			}
 
-			fLastSaved = max(fLastSaved, time(NULL));
+			fLastSaved = std::max(fLastSaved, time(NULL));
 				// if more than one update request was issued
 				// in the mean time, only the first one is
 				// considered

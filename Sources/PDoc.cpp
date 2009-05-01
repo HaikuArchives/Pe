@@ -1312,6 +1312,7 @@ void PDoc::MessageReceived(BMessage *msg)
 			}
 
 			case msg_PrefsChanged:
+			{
 				rgb_color viewColor = gPrefs->GetPrefColor(
 					prf_C_Low, ui_color(B_PANEL_BACKGROUND_COLOR));
 				rgb_color oldViewColor = fText->ViewColor();
@@ -1325,6 +1326,7 @@ void PDoc::MessageReceived(BMessage *msg)
 				ResetMenuShortcuts();
 				NameChanged();
 				break;
+			}
 
 			case msg_SwitchHeaderSource:
 				OpenPartner();
@@ -1348,7 +1350,7 @@ void PDoc::MessageReceived(BMessage *msg)
 
 			case msg_FindFunction:
 			{
-				new(nothrow) PFindFunctionDialogController(fText);
+				new(std::nothrow) PFindFunctionDialogController(fText);
 				break;
 			}
 

@@ -87,8 +87,8 @@ void MTextAddOnImpl::GetSelection(int32 *start, int32 *end) const
 {
 	if (fText.LockLooper()) {
 		int32 a = fText.Anchor(), c = fText.Caret();
-		*start = min(a, c);
-		*end = max(a, c);
+		*start = std::min(a, c);
+		*end = std::max(a, c);
 		fText.UnlockLooper();
 	}
 } /* MTextAddOnImpl::GetSelection */

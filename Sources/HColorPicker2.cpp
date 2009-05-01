@@ -178,7 +178,7 @@ void HColorSlider::Draw(BRect /* updateRect */)
 	r.InsetBy(1, 1);
 
 	BRect knob;
-	float m = min(r.Width(), r.Height());
+	float m = std::min(r.Width(), r.Height());
 	knob.Set(r.left, r.top, m + r.left, m + r.top);
 
 	if (fHorizontal)
@@ -279,9 +279,15 @@ void HColorSlider::MouseDown(BPoint where)
 			if (oldPt != where)
 			{
 				if (fHorizontal)
-					fValue = min(1.0, max(0.0, (where.x - s) / (double)a));
+				{
+					fValue = std::min(1.0,
+						std::max(0.0, (where.x - s) / (double)a));
+				}
 				else
-					fValue = 1 - min(1.0, max(0.0, (where.y - s) / (double)a));
+				{
+					fValue = 1 - std::min(1.0,
+						std::max(0.0, (where.y - s) / (double)a));
+				}
 
 				msg.ReplaceFloat("value", fValue);
 
@@ -332,22 +338,22 @@ void HColorSlider::KeyDown(const char *bytes, int32 numBytes)
 	{
 		case B_UP_ARROW:
 			if (!fHorizontal)
-				nv = min(1.0, (fValue * a + 1) / (double)a);
+				nv = std::min(1.0, (fValue * a + 1) / (double)a);
 			break;
 
 		case B_LEFT_ARROW:
 			if (fHorizontal)
-				nv = max(0.0, (fValue * a - 1) / (double)a);
+				nv = std::max(0.0, (fValue * a - 1) / (double)a);
 			break;
 
 		case B_DOWN_ARROW:
 			if (!fHorizontal)
-				nv = max(0.0, (fValue * a - 1) / (double)a);
+				nv = std::max(0.0, (fValue * a - 1) / (double)a);
 			break;
 
 		case B_RIGHT_ARROW:
 			if (fHorizontal)
-				nv = min(1.0, (fValue * a + 1) / (double)a);
+				nv = std::min(1.0, (fValue * a + 1) / (double)a);
 			break;
 
 		default:
@@ -449,8 +455,8 @@ void HColorSquare::MouseDown(BPoint where)
 
 	do
 	{
-		int nx = max(2, min((int)where.x, mx));
-		int ny = max(2, min((int)where.y, my));
+		int nx = std::max(2, std::min((int)where.x, mx));
+		int ny = std::max(2, std::min((int)where.y, my));
 
 		if (nx != fX || ny != fY)
 		{

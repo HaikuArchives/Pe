@@ -43,7 +43,7 @@
 #include "Benaphore.h"
 typedef float f_unit_t;
 
-//using namespace std;
+using std::vector;
 
 struct EscapementEntry {
 	int unicode;

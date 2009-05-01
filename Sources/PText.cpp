@@ -75,6 +75,10 @@
 	#define iscntrl(c)	((((unsigned char)(c))<128) && __isctype((c), _IScntrl))
 #endif
 
+using std::min;
+using std::max;
+
+
 PText* PText::sfDragSource = NULL;
 
 struct PSettings {
@@ -1120,10 +1124,10 @@ void PText::CopyBlock(char*& s, int from, int to)
 
 	l1 = Offset2Line(from);
 	l2 = Offset2Line(to);
-	if (l1 > l2) swap(l1, l2);
+	if (l1 > l2) std::swap(l1, l2);
 	c1 = Offset2Column(from);
 	c2 = Offset2Column(to);
-	if (c1 > c2) swap(c1, c2);
+	if (c1 > c2) std::swap(c1, c2);
 
 	string t;
 
@@ -1756,7 +1760,7 @@ void PText::HorizontallyScrollToSelection(int startOffset,
 	g_unit_t startPos = Offset2Position(startOffset).x;
 	g_unit_t endPos = Offset2Position(endOffset).x;
 	if (endPos < startPos)
-		swap(startPos, endPos);
+		std::swap(startPos, endPos);
 
 	BRect b(fBounds);
 	g_unit_t x = -1;
@@ -2476,7 +2480,7 @@ void PText::ShowFunctionMenu(BPoint where, int which)
 
 void PText::NavigateOverFunctions(char direction)
 {
-	typedef map<int32, BString> NavMap;
+	typedef std::map<int32, BString> NavMap;
 	struct SimpleFunctionScanHandler : public CFunctionScanHandler {
 		void AddFunction(const char *name, const char *match, int offset,
 			bool italic, uint32 nestLevel, const char *params)
@@ -3105,7 +3109,7 @@ void PText::BlockOffsetsForLine(int lineNr, int& startOffset, int& endOffset)
 	s = Offset2Column(fAnchor);
 	e = Offset2Column(fCaret);
 
-	if (e < s) swap(e, s);
+	if (e < s) std::swap(e, s);
 
 	c = 0;
 	ls = LineStart(lineNr);
@@ -4222,8 +4226,8 @@ void PText::JumpToFunction(const char *func, int offset)
 	if (FindNext(func, offset, false, false, false, false, false, false) ||
 		FindNext(func, offset, false, false, true, false, false, false))
 	{
-		swap(fAnchor, a);
-		swap(fCaret, c);
+		std::swap(fAnchor, a);
+		std::swap(fCaret, c);
 		ChangeSelection(a, c);
 		ScrollToSelection(true, true);
 	}
@@ -4859,7 +4863,7 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 			{
 				r.left = Offset2Position(fAnchor).x - hv;
 				r.right = Offset2Position(fCaret).x - hv;
-				if (r.right < r.left) swap(r.right, r.left);
+				if (r.right < r.left) std::swap(r.right, r.left);
 
 				vw->SetLowColor(gColor[kColorSelection]);
 				vw->FillRect(r, B_SOLID_LOW);
@@ -6057,7 +6061,7 @@ void PText::MessageReceived(BMessage *msg)
 					ChangeSelection(fOPAnchor, fOPCaret);
 					fOPCaret = c;
 					fOPAnchor = a;
-					swap(fMark, fOPMark);
+					std::swap(fMark, fOPMark);
 				}
 				else
 					beep();

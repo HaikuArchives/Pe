@@ -41,6 +41,8 @@ class CHtmlBar;
 class CHtmlButtonPane;
 class CHtmlButton;
 
+using std::vector;
+
 class CHtmlBar : public BWindow {
 public:
 

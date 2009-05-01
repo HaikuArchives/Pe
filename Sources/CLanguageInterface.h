@@ -106,7 +106,7 @@ public:
 protected:
 		static const int kKeywordBufSize = 128;
 		char fKeywordBuf[kKeywordBufSize+1];
-		typedef multimap<BString, int> KeywordMap;
+		typedef std::multimap<BString, int> KeywordMap;
 		mutable bool fHaveParsedKeywords;
 		mutable KeywordMap fKeywordMap;
 //		void GenerateKeywordMap(const char *ext);

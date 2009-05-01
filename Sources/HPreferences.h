@@ -43,7 +43,9 @@
 
 #include <string>
 
-typedef map<string, char*> PrefMap;
+using std::string;
+
+typedef std::map<string, char*> PrefMap;
 
 class IMPEXP_LIBHEKKEL HPreferences {
 public:

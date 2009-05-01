@@ -49,7 +49,7 @@ HLazyObject::~HLazyObject()
 BHandler *HLazyObject::ResolveSpecifier(BMessage *msg, int32 index,
 						BMessage *specifier, int32 form, const char *property)
 {
-	auto_ptr<HLazyObject> lets_commit_suicide(this);
+	std::auto_ptr<HLazyObject> lets_commit_suicide(this);
 	BHandler *result = NULL;
 
 //	if (index > 0)

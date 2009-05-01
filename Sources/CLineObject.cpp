@@ -83,7 +83,7 @@ BHandler *CLineObject::GetSubSpecifier(BMessage *msg, int32 index,
 
 void CLineObject::MessageReceived(BMessage *msg)
 {
-	auto_ptr<CLineObject> destroy(this);
+	std::auto_ptr<CLineObject> destroy(this);
 
 	switch (msg->what)
 	{

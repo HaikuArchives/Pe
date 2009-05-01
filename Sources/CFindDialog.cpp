@@ -405,9 +405,9 @@ void CFindDialog::Layout(void) {
 	BRect r = fMainView->Bounds();
 
 	// Position Buttons
-	w = max(fButFind->Width(), fButRepl->Width());
-	w = max(w, fButRepF->Width());
-	w = max(w, fButRepA->Width());
+	w = std::max(fButFind->Width(), fButRepl->Width());
+	w = std::max(w, fButRepF->Width());
+	w = std::max(w, fButRepA->Width());
 
 	fButFind->MoveTo(fMainView->Right()-w-dx, dy);
 	fButFind->SetWidth(w);
@@ -434,17 +434,17 @@ void CFindDialog::Layout(void) {
 	fScrRepl->ResizeTo(w, lineHeight*2+6);
 
 	// Multi File Search
-	w = max(fChkText->Width(), fChkRecu->Width());
-	wd = max(fMfdNamp->Divider(), fMfdSdir->Divider());
+	w = std::max(fChkText->Width(), fChkRecu->Width());
+	wd = std::max(fMfdNamp->Divider(), fMfdSdir->Divider());
 	fMfdSdir->SetDivider(wd);
 	fMfdNamp->SetDivider(wd);
 
 	fChkText->MoveTo(dx, r.bottom-fChkText->Height()-dy);
 	fChkRecu->MoveAbove(fChkText, 2);
 
-	wm = max(fMfdNamp->StringWidth(fMitNampAny->Label()), fMfdNamp->StringWidth(fMitNampEnd->Label()));
-	wm = max(wm, fMfdNamp->StringWidth(fMitNampBeg->Label()));
-	wm = max(wm, fMfdNamp->StringWidth(fMitNampCon->Label()));
+	wm = std::max(fMfdNamp->StringWidth(fMitNampAny->Label()), fMfdNamp->StringWidth(fMitNampEnd->Label()));
+	wm = std::max(wm, fMfdNamp->StringWidth(fMitNampBeg->Label()));
+	wm = std::max(wm, fMfdNamp->StringWidth(fMitNampCon->Label()));
 	wm += fMfdNamp->StringWidth("WW");
 
 	fMfdNamp->MoveTo(2*dx+w, fChkText->Top()-2);
@@ -453,8 +453,8 @@ void CFindDialog::Layout(void) {
 	fMfdSdir->MoveTo(2*dx+w, fChkRecu->Top()-2);
 	fMfdSdir->MenuBar()->SetMaxContentWidth(r.right-fMfdSdir->Left()-fMfdSdir->Divider()-2*dx-30);
 
-	wm = max(fMfdMeth->StringWidth(fMitMethDir->Label()), fMfdMeth->StringWidth(fMitMethWin->Label()));
-	wm = max(wm, fMfdMeth->StringWidth(fMitMethInc->Label()));
+	wm = std::max(fMfdMeth->StringWidth(fMitMethDir->Label()), fMfdMeth->StringWidth(fMitMethWin->Label()));
+	wm = std::max(wm, fMfdMeth->StringWidth(fMitMethInc->Label()));
 	wm += fMfdMeth->StringWidth("WW");
 
 	fChkMult->MoveAbove(fChkRecu, dy);
@@ -466,15 +466,15 @@ void CFindDialog::Layout(void) {
 	fChkWrap->MoveAbove(fChkMult, dy);
 	fChkCase->MoveAbove(fChkWrap);
 
-	fChkWord->MoveTo(max(fChkCase->Right(), fChkWrap->Right())+dx, fChkWrap->Top());
+	fChkWord->MoveTo(std::max(fChkCase->Right(), fChkWrap->Right())+dx, fChkWrap->Top());
 	fChkBack->MoveAbove(fChkWord);
 
-	fChkBtch->MoveTo(max(fChkBack->Right(), fChkWord->Right())+dx, fChkWrap->Top());
+	fChkBtch->MoveTo(std::max(fChkBack->Right(), fChkWord->Right())+dx, fChkWrap->Top());
 	fChkGrep->MoveAbove(fChkBtch);
 
 	// set minimum height to fit one line in textviews...
 	h = fScrRepl->Bottom()+r.bottom-fChkCase->Top()+2;
-	w = 2*dx+max(fChkGrep->Right(), fChkBtch->Right())+fButRepA->Width();
+	w = 2*dx+std::max(fChkGrep->Right(), fChkBtch->Right())+fButRepA->Width();
 	ResizeToLimits(w, 99999, h-2*lineHeight, 99999);
 	// ...but default to two lines in textviews:
 	ResizeTo(w, h);
@@ -1647,7 +1647,7 @@ bool BufferContainsEx(const char *buf, int size, const char *path,
 				
 			free(l);
 			
-			offset = max(e, offset+1);
+			offset = std::max(e, offset+1);
 			r = regex->Match(buf, size, offset);
 			offset = regex->MatchStart();
 			e = offset + regex->MatchLen();

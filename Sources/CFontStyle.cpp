@@ -175,7 +175,7 @@ void CFontStyle::InitTable()
 
 void CFontStyle::ReHash()
 {
-	int nc = max(1, fEscapementsCount * 2);
+	int nc = std::max(1, fEscapementsCount * 2);
 	EscapementEntry *n = (EscapementEntry *)calloc(nc, sizeof(EscapementEntry));
 	FailNil(n);
 	

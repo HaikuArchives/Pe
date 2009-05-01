@@ -88,7 +88,7 @@ PCutCmd::~PCutCmd()
 void PCutCmd::Do()
 {
 	fText->Select(fAnchor, fCaret, true, false);
-	fWhere = min(fAnchor, fCaret);
+	fWhere = std::min(fAnchor, fCaret);
 	fText->GetSelectedText(fSavedTxt);
 	fText->Cut(fAppend);
 	Update();
@@ -127,7 +127,7 @@ PClearCmd::~PClearCmd()
 void PClearCmd::Do()
 {
 	fText->Select(fAnchor, fCaret, true, false);
-	fWhere = min(fAnchor, fCaret);
+	fWhere = std::min(fAnchor, fCaret);
 	fText->GetSelectedText(fSavedTxt);
 	fText->Clear();
 	Update();
@@ -165,7 +165,7 @@ PPasteCmd::~PPasteCmd()
 void PPasteCmd::Do()
 {
 	fText->SetBlockSelect(false);
-	fWhere = min(fText->Anchor(), fText->Caret());
+	fWhere = std::min(fText->Anchor(), fText->Caret());
 	fText->GetSelectedText(fSavedTxt);
 
 	fText->Paste();
@@ -225,11 +225,11 @@ PTypingCmd::~PTypingCmd()
 
 void PTypingCmd::Do()
 {
-	fDeletedIndx = min(fText->Caret(), fText->Anchor());
+	fDeletedIndx = std::min(fText->Caret(), fText->Anchor());
 	fDeletedLen = abs(fText->Caret() - fText->Anchor());
 		
 	if (fDeletedIndx + fDeletedLen >= fText->TextBuffer().Size())
-		fDeletedLen = max(fText->TextBuffer().Size() - fDeletedIndx, 0);
+		fDeletedLen = std::max(fText->TextBuffer().Size() - fDeletedIndx, 0);
 		
 	fDeleted = (char *)malloc(fDeletedLen);
 		
@@ -247,8 +247,8 @@ void PTypingCmd::Undo()
 	{
 		int lf, lt;
 		
-		lf = fText->Offset2Line(min(fText->Anchor(), fText->Caret()));
-		lt = fText->Offset2Line(max(fText->Anchor(), fText->Caret()));
+		lf = fText->Offset2Line(std::min(fText->Anchor(), fText->Caret()));
+		lt = fText->Offset2Line(std::max(fText->Anchor(), fText->Caret()));
 		fText->TouchLines(lf, lt);
 	}
 
@@ -482,8 +482,8 @@ void PExtCmd::Undo()
 	}
 
 	fText->Select(fAnchor, fCaret, true, false);
-	swap(anchor, fAnchor);
-	swap(caret, fCaret);
+	std::swap(anchor, fAnchor);
+	std::swap(caret, fCaret);
 	
 	Update();
 } /* PExtCmd::Undo */
@@ -508,8 +508,8 @@ void PExtCmd::Redo()
 	}
 	
 	fText->Select(fAnchor, fCaret, true, false);
-	swap(anchor, fAnchor);
-	swap(caret, fCaret);
+	std::swap(anchor, fAnchor);
+	std::swap(caret, fCaret);
 	
 	Update();
 } /* PExtCmd::Redo */
@@ -734,7 +734,7 @@ void PScriptCmd::Do()
 	fOldTextSize = abs(fText->Anchor() - fText->Caret());
 	if (fOldTextSize)
 	{
-		fAnchor = fCaret = min(fText->Anchor(), fText->Caret());
+		fAnchor = fCaret = std::min(fText->Anchor(), fText->Caret());
 		fOldText = (char *)malloc(fOldTextSize);
 		FailNil(fOldText);
 		fText->TextBuffer().Copy(fOldText, fAnchor, fOldTextSize);
@@ -920,8 +920,8 @@ long PScriptCmd::Piper(void *data)
 PShiftCmd::PShiftCmd(const char *name, PText *txt)
 	: PCmd(name, txt)
 {
-	fFrom = min(fText->Caret(), fText->Anchor());
-	fTo = max(fText->Caret(), fText->Anchor());
+	fFrom = std::min(fText->Caret(), fText->Anchor());
+	fTo = std::max(fText->Caret(), fText->Anchor());
 	int fromLine = fText->Offset2Line(fFrom);
 	int toLine = fText->Offset2Line(fTo);
 	// our first line may be a soft wrapped one: find the preceding hard wrap
@@ -971,7 +971,7 @@ PShiftLeftCmd::PShiftLeftCmd(PText *txt)
 	}
 	// Get the first character of each hard line. If it's not a tab or a space,
 	// we mark it 0.
-	fFirstChars = new(nothrow) char[fLineCount];
+	fFirstChars = new(std::nothrow) char[fLineCount];
 	FailNil(fFirstChars);
 	fNoOp = true;
 	int hardIndex = 0;
@@ -1114,8 +1114,8 @@ void PShiftRightCmd::Undo()
 PTwiddleCmd::PTwiddleCmd(PText *txt)
 	: PCmd("Twiddle", txt)
 {
-	fFrom = min(fText->Caret(), fText->Anchor());
-	fTo = max(fText->Caret(), fText->Anchor());
+	fFrom = std::min(fText->Caret(), fText->Anchor());
+	fTo = std::max(fText->Caret(), fText->Anchor());
 	
 	if (fFrom == fTo)
 	{
@@ -1187,8 +1187,8 @@ PCommentCmd::PCommentCmd(PText *txt, bool comment,
 {
 	fComment = comment;
 	
-	fFrom = min(fText->Caret(), fText->Anchor());
-	fTo = max(fText->Caret(), fText->Anchor());
+	fFrom = std::min(fText->Caret(), fText->Anchor());
+	fTo = std::max(fText->Caret(), fText->Anchor());
 	
 	if (strlen(before) > 7 || strlen(after) > 7) THROW(("comment strings too long"));
 	
@@ -1224,8 +1224,8 @@ void PCommentCmd::Do()
 	}
 	
 	fText->Select(fText->LineStart(lf), fText->LineStart(fText->Offset2Line(fTo)), true, false);
-	fFrom = min(fText->Caret(), fText->Anchor());
-	fTo = max(fText->Caret(), fText->Anchor());
+	fFrom = std::min(fText->Caret(), fText->Anchor());
+	fTo = std::max(fText->Caret(), fText->Anchor());
 
 	if (fText->LineCount() != c)	
 		Redraw();
@@ -1257,8 +1257,8 @@ void PCommentCmd::Undo()
 	}
 	
 	fText->Select(fText->LineStart(lf), fText->LineStart(fText->Offset2Line(fTo)), true, false);
-	fFrom = min(fText->Caret(), fText->Anchor());
-	fTo = max(fText->Caret(), fText->Anchor());
+	fFrom = std::min(fText->Caret(), fText->Anchor());
+	fTo = std::max(fText->Caret(), fText->Anchor());
 	
 	if (fText->LineCount() != c)	
 		Redraw();
@@ -1341,7 +1341,7 @@ void PWrapCmd::Do()
 
 void PWrapCmd::Undo()
 {
-	int a = min(fAnchor, fCaret);
+	int a = std::min(fAnchor, fCaret);
 	fText->Delete(a, a + fNewLen);
 	if (fSavedText)
 	{
@@ -1388,7 +1388,7 @@ void PUnwrapCmd::Do()
 
 void PUnwrapCmd::Undo()
 {
-	int a = min(fAnchor, fCaret);
+	int a = std::min(fAnchor, fCaret);
 	fText->Delete(a, a + fNewLen);
 	if (fSavedText)
 	{
@@ -1419,8 +1419,8 @@ void PJustifyCmd::Do()
 	if (fText->Caret() == fText->Anchor())
 		fText->SelectParagraph();
 	
-	fAnchor = min(fText->Anchor(), fText->Caret());
-	fOldLen = max(fText->Anchor(), fText->Caret()) - fAnchor;
+	fAnchor = std::min(fText->Anchor(), fText->Caret());
+	fOldLen = std::max(fText->Anchor(), fText->Caret()) - fAnchor;
 	
 	fText->GetSelectedText(fSavedText);
 	
@@ -1466,9 +1466,9 @@ void PJustifyCmd::Undo()
 	fText->Delete(fAnchor, fAnchor + fNewLen);
 	fText->Insert(fSavedText, fOldLen, fAnchor);
 	
-	swap(fSavedText, t);
+	std::swap(fSavedText, t);
 	free(t);
-	swap(fOldLen, fNewLen);
+	std::swap(fOldLen, fNewLen);
 	
 	fText->Select(fAnchor, fAnchor + fNewLen, true, false);
 	
@@ -1490,8 +1490,8 @@ PChangeCaseCmd::PChangeCaseCmd(PText *txt, int newCase)
 	
 	if (fSavedText)
 	{
-		fAnchor = min(fText->Anchor(), fText->Caret());
-		fCaret = max(fText->Anchor(), fText->Caret());
+		fAnchor = std::min(fText->Anchor(), fText->Caret());
+		fCaret = std::max(fText->Anchor(), fText->Caret());
 	}
 	else
 	{

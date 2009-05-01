@@ -54,6 +54,9 @@ class PSplitter;
 class PDoc;
 class PErrorWindow;
 
+using std::stack;
+
+
 struct LineInfo {
 	unsigned long start;
 	unsigned char state		: 8;

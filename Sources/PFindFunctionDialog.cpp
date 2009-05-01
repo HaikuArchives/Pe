@@ -134,11 +134,12 @@ PFindFunctionDialogController::PFindFunctionDialogController(PText *text)
 	  CFunctionScanHandler(),
 	  fDialog(NULL),
 	  fTarget(text),
-	  fChoiceModel(new(nothrow) ChoiceModel)
+	  fChoiceModel(new(std::nothrow) ChoiceModel)
 {
 	FailNil(fChoiceModel);
 	text->ScanForFunctions(*this);
-	fDialog = new(nothrow) CFilterChoiceDialog("Find Function", fChoiceModel, 1);
+	fDialog = new(std::nothrow) CFilterChoiceDialog("Find Function",
+		fChoiceModel, 1);
 	FailNil(fDialog);
 	fDialog->SetCaller(text->Window());
 	fDialog->SetListener(this);
@@ -173,7 +174,7 @@ void
 PFindFunctionDialogController::AddFunction(const char *name, const char *match,
 	int offset, bool italic, uint32 nestLevel, const char *params)
 {
-	Choice *choice = new(nothrow) Choice(name, msg_JumpToProcedure, false,
+	Choice *choice = new(std::nothrow) Choice(name, msg_JumpToProcedure, false,
 		italic, nestLevel);
 	FailNil(choice);
 	choice->message.AddInt32("offset", offset);
@@ -186,7 +187,8 @@ void
 PFindFunctionDialogController::AddInclude(const char *name, const char *open,
 	bool italic)
 {
-	Choice *choice = new(nothrow) Choice(name, msg_OpenInclude, false, italic);
+	Choice *choice = new(std::nothrow) Choice(name, msg_OpenInclude, false,
+		italic);
 	FailNil(choice);
 	choice->message.AddString("include", open);
 	fChoiceModel->AddIncludeChoice(choice);
@@ -196,7 +198,7 @@ PFindFunctionDialogController::AddInclude(const char *name, const char *open,
 void
 PFindFunctionDialogController::AddSeparator(const char* name)
 {
-	Choice *choice = new(nothrow) Choice(name, 0, true, false);
+	Choice *choice = new(std::nothrow) Choice(name, 0, true, false);
 	FailNil(choice);
 	fChoiceModel->AddFunctionChoice(choice);
 }

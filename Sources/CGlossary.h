@@ -36,13 +36,15 @@
 #ifndef CGLOSSARY_H
 #define CGLOSSARY_H
 
+#include <string>
 
-//using namespace std;
+
+using std::string;
 
 const unsigned long
 	kModifierMask = B_SHIFT_KEY | B_COMMAND_KEY | B_CONTROL_KEY | B_OPTION_KEY | B_MENU_KEY;
 
-typedef map<int, string> glossymap;
+typedef std::map<int, string> glossymap;
 
 class CGlossary {
 public:

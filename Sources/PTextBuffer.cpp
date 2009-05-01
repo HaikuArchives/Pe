@@ -61,7 +61,7 @@ void PTextBuffer::Insert(const char *bytes, int numBytes, int index)
 
 	if (numBytes < 0 || index < 0 || index > fLogicalSize) return;
 	
-	index = max(min(fLogicalSize, index), 0);
+	index = std::max(std::min(fLogicalSize, index), 0);
 	
 	if (index != fGap)
 		MoveGap(index);
@@ -91,7 +91,7 @@ void PTextBuffer::Delete(int from, int to)
 	if (cnt <= 0 || from < 0 || index >= fLogicalSize)
 		return;
 	
-	index = max(min(fLogicalSize - 1, index), 0);
+	index = std::max(std::min(fLogicalSize - 1, index), 0);
 	MoveGap(index);
 	
 	fGapSize += cnt;
@@ -129,7 +129,7 @@ void PTextBuffer::MoveGap(int offset)
 		int trail = fPhysicalSize - gapEnd;
 		src = gapEnd;
 		dst = fGap;
-		cnt = min(trail, fGapSize + offset - src);
+		cnt = std::min(trail, fGapSize + offset - src);
 	}
 	else
 	{
@@ -229,7 +229,7 @@ int PTextBuffer::CharLen(int index) const
 	if (index < fLogicalSize && index >= 0)
 	{
 		char b[8];
-		Copy(b, index, min(7, fLogicalSize - index));
+		Copy(b, index, std::min(7, fLogicalSize - index));
 		b[7] = 0;
 	
 		return mcharlen(b);
@@ -246,7 +246,7 @@ int PTextBuffer::PrevCharLen(int index) const
 	if (index > 0 && index <= fLogicalSize)
 	{
 		char b[8];
-		int cnt = max(0, min(7, index));
+		int cnt = std::max(0, std::min(7, index));
 		Copy(b, index - cnt, cnt);
 		b[cnt] = 0;
 	
@@ -297,7 +297,7 @@ void PTextBuffer::CharInfo(int offset, int& unicode, int& len) const
 	else
 	{
 		char b[8];
-		Copy(b, offset, min(7, fLogicalSize - offset));
+		Copy(b, offset, std::min(7, fLogicalSize - offset));
 		b[7] = 0;
 	
 		len = mcharlen(b);

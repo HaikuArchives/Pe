@@ -225,12 +225,12 @@ void CFtpDialog::Layout(void)
 	fUsePassive->MoveTo(dx, fPassword->Bottom()+dy);
 	fConnectButton->MoveTo(2*dx, fUsePassive->Bottom()+dy);
 	//
-	float bw = max(max(dx*10, fCancelButton->Width()), fOkButton->Width());
-	bw = max(bw, fServerName->Right());
-	bw = max(bw, fUserName->Right());
-	bw = max(bw, fPassword->Right());
-	bw = max(bw, fUsePassive->Right());
-	bw = max(bw, fConnectButton->Right()+2*dx);
+	float bw = std::max(std::max(dx*10, fCancelButton->Width()), fOkButton->Width());
+	bw = std::max(bw, fServerName->Right());
+	bw = std::max(bw, fUserName->Right());
+	bw = std::max(bw, fPassword->Right());
+	bw = std::max(bw, fUsePassive->Right());
+	bw = std::max(bw, fConnectButton->Right()+2*dx);
 	//
 	fServerName->SetWidth(bw);
 	fUserName->SetWidth(bw);
@@ -263,9 +263,9 @@ void CFtpDialog::Layout(void)
 	//
 	float minW = 200;
 	float minH = 100;
-	minW = max(minW, 
+	minW = std::max(minW, 
 		       bw + 3*dx + fShowDotted->Width() + fDirectoryField->Width());
-	minH = max(minH, fLoginBox->Bottom()+2*fOkButton->Height()+3*dy);
+	minH = std::max(minH, fLoginBox->Bottom()+2*fOkButton->Height()+3*dy);
 	ResizeToLimits(minW, 99999, minH, 99999);
 } // CFtpDialog::Layout
 

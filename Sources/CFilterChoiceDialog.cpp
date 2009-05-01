@@ -403,7 +403,7 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 	BMessage *message = new BMessage(MSG_COMMIT_REQUEST);
 	FailNil(message);
 	BRect rect(bounds);
-	fFilterStringControl = new(nothrow) BTextControl(rect, "filter text",
+	fFilterStringControl = new(std::nothrow) BTextControl(rect, "filter text",
 		"Filter", "", message,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW);
 	FailNil(fFilterStringControl);
@@ -420,14 +420,14 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 	rect.top = fFilterStringControl->Frame().bottom + 1 + 5;
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	fChoicesList = new(nothrow) BListView(rect, "choices list",
+	fChoicesList = new(std::nothrow) BListView(rect, "choices list",
 		B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
 	FailNil(fChoicesList);
 	message = new BMessage(MSG_COMMIT_REQUEST);
 	fChoicesList->SetInvocationMessage(message);
 	fChoicesList->SetTarget(this);
 	// scroll view
-	BScrollView *scrollView = new(nothrow) BScrollView("scroll view",
+	BScrollView *scrollView = new(std::nothrow) BScrollView("scroll view",
 		fChoicesList, B_FOLLOW_ALL, 0, true, true, B_FANCY_BORDER); 
 	fMainView->AddChild(scrollView);
 	scrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -438,7 +438,7 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 	// get the choice groups
 	fItemCount = 0;
 	fGroupCount = fModel->CountChoiceGroups();
-	fGroupInfos = new(nothrow) ChoiceGroupInfo[fGroupCount];
+	fGroupInfos = new(std::nothrow) ChoiceGroupInfo[fGroupCount];
 	FailNil(fGroupInfos);
 	for (int i = 0; i < fGroupCount; i++) 
 	{
@@ -450,7 +450,7 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 			// + 1 for group separator item
 	}
 	// get the item infos
-	fItemInfos = new(nothrow) ChoiceItemInfo[fItemCount];
+	fItemInfos = new(std::nothrow) ChoiceItemInfo[fItemCount];
 	FailNil(fItemInfos);
 	for (int groupIndex = 0; groupIndex < fGroupCount; groupIndex++) 
 	{
@@ -458,7 +458,7 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 		// add a group separator item
 		ChoiceItemInfo& separatorItemInfo = fItemInfos[groupInfo.index - 1];
 		separatorItemInfo.choiceItem = NULL;
-		separatorItemInfo.listItem = new(nothrow) SeparatorListItem(
+		separatorItemInfo.listItem = new(std::nothrow) SeparatorListItem(
 			groupIndex, -1, &separatorItemInfo);
 		separatorItemInfo.isSeparator = true;
 		// add the group's real items
@@ -469,7 +469,7 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 			itemInfo.choiceItem = choiceItem;
 			if (choiceItem->IsSeparator()) 
 			{
-				itemInfo.listItem = new(nothrow) SeparatorListItem(
+				itemInfo.listItem = new(std::nothrow) SeparatorListItem(
 					groupIndex, i, &itemInfo);
 				itemInfo.isSeparator = true;
 			} 
@@ -477,7 +477,7 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 			{
 				bool italic = choiceItem->IsItalic();
 				BFont *font = (italic ? &fItalicFont : &fPlainFont);
-				itemInfo.listItem = new(nothrow) ChoiceListItem(
+				itemInfo.listItem = new(std::nothrow) ChoiceListItem(
 					groupIndex, i, &itemInfo, font);
 				itemInfo.isSeparator = false;
 			}
@@ -543,12 +543,12 @@ CFilterChoiceDialog::MessageReceived(BMessage *message)
 				if (y < 0) 
 				{
 					value -= delta;
-					value = max(minVal, value);
+					value = std::max(minVal, value);
 				}
 				else 
 				{
 					value += delta;
-					value = min(maxVal, value);
+					value = std::min(maxVal, value);
 				}
 				vScroller->SetValue(value);
 			}
@@ -671,7 +671,7 @@ CFilterChoiceDialog::_ResizeWindow()
 			= (fh.ascent + fh.descent + fh.leading) * kMaximalVisibleListItems;
 		// we can get the height from the frame of the last item
 		BRect itemFrame(fChoicesList->ItemFrame(count -1));
-		float desiredListHeight = min(itemFrame.bottom, maxListHeight);
+		float desiredListHeight = std::min(itemFrame.bottom, maxListHeight);
 		if (listBounds.Height() > maxListHeight)
 			frame.bottom += maxListHeight - listBounds.Height();
 		else if (listBounds.Height() < desiredListHeight)

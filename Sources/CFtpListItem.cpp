@@ -147,5 +147,5 @@ void CFtpListItem::Update(BView */*owner*/, const BFont */*font*/)
 {
 	font_height fh;
 	be_plain_font->GetHeight(&fh);
-	SetHeight(max((float)18.0, 4 + fh.descent + fh.ascent));
+	SetHeight(std::max((float)18.0, 4 + fh.descent + fh.ascent));
 } // CFtpListItem::Update
