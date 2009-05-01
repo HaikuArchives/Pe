@@ -14,43 +14,43 @@
 
 static const char *sTrackerSig = "application/x-vnd.Be-TRAK";
 
-static const char *sAboutText = "HeaderHeader Extension for Pe
+static const char *sAboutText = "HeaderHeader Extension for Pe\n"
+"\n"
+"This extension prepends a chooseable licence header the current file, \n"
+"using the appropriate comment characters for the language used, \n"
+"and informations from a selected People file as author.\n"
+"\n"
+"First select your own People file from \"Set Author"B_UTF8_ELLIPSIS"\", \n"
+"then just select the header you want to use.\n"
+"You can also add your own templates in the settings folder. \n"
+"Use the \"Open Template Folder"B_UTF8_ELLIPSIS"\" menu, \n"
+"create text files there which contain the licence or informations you want. \n"
+"\n"
+"Keywords from the list below will be replaced by the corresponding value:\n"
+"%COMMS%		Start of comment block string\n"
+"%COMMC%		Comment block continuation string\n"
+"%COMML%		Comment block continuation string (blank if possible)\n"
+"%COMME%		End of comment block string\n"
+"%FILENAME%		Filename\n"
+"%FILENAMENOEXT%	Filename without extension\n"
+"%YEAR%		Current year\n"
+"%DATE%		Current date (YYYY-mm-dd)\n"
+"%TIME%		Current time (HH:MM:SS)\n"
+"(from the people file)\n"
+"%AUTHOR%		Your name\n"
+"%AUTHORMAIL%	Your email\n"
+"%COMPANY%		Company name\n"
+"%AUTHORURL%		Your url\n"
+;
 
-This extension prepends a chooseable licence header the current file, 
-using the appropriate comment characters for the language used, 
-and informations from a selected People file as author.
-
-First select your own People file from \"Set Author"B_UTF8_ELLIPSIS"\", 
-then just select the header you want to use.
-You can also add your own templates in the settings folder. 
-Use the \"Open Template Folder"B_UTF8_ELLIPSIS"\" menu, 
-create text files there which contain the licence or informations you want. 
-
-Keywords from the list below will be replaced by the corresponding value:
-%COMMS%		Start of comment block string
-%COMMC%		Comment block continuation string
-%COMML%		Comment block continuation string (blank if possible)
-%COMME%		End of comment block string
-%FILENAME%		Filename
-%FILENAMENOEXT%	Filename without extension
-%YEAR%		Current year
-%DATE%		Current date (YYYY-mm-dd)
-%TIME%		Current time (HH:MM:SS)
-(from the people file)
-%AUTHOR%		Your name
-%AUTHORMAIL%	Your email
-%COMPANY%		Company name
-%AUTHORURL%		Your url
-";
-
-static const char *sHaikuHeaderTemplate = "%COMMS%
-%COMMC% Copyright %YEAR%, Haiku, Inc.
-%COMMC% Distributed under the terms of the MIT License.
-%COMMC%
-%COMMC% Authors:
-%COMMC%		%AUTHOR% <%AUTHORMAIL%>
-%COMME%
-";
+static const char *sHaikuHeaderTemplate = "%COMMS%\n"
+"%COMMC% Copyright %YEAR%, Haiku, Inc.\n"
+"%COMMC% Distributed under the terms of the MIT License.\n"
+"%COMMC%\n"
+"%COMMC% Authors:\n"
+"%COMMC%		%AUTHOR% <%AUTHORMAIL%>\n"
+"%COMME%\n"
+;
 
 /*
 static const char *sHaikuAddMeHeaderMatch = \
@@ -61,11 +61,11 @@ static const char *sHaikuAddMeHeaderTemplate = \
 ";
 */
 
-static const char *sHaikuMeHeaderTemplate = "%COMMS%
-%COMMC% Copyright %YEAR%, %AUTHOR%, <%AUTHORMAIL%>.
-%COMMC% Distributed under the terms of the MIT License.
-%COMME%
-";
+static const char *sHaikuMeHeaderTemplate = "%COMMS%\n"
+"%COMMC% Copyright %YEAR%, %AUTHOR%, <%AUTHORMAIL%>.\n"
+"%COMMC% Distributed under the terms of the MIT License.\n"
+"%COMME%\n"
+;
 
 /*
 static const char *sHaikuMeAddMeHeaderTemplate = \
@@ -73,91 +73,91 @@ static const char *sHaikuMeAddMeHeaderTemplate = \
 ";
 */
 
-static const char *sHaikuMeRightsHeaderTemplate = "%COMMS%
-%COMMC% Copyright %YEAR%, %AUTHOR%, <%AUTHORMAIL%>. All rights reserved.
-%COMMC% Distributed under the terms of the MIT License.
-%COMME%
-";
+static const char *sHaikuMeRightsHeaderTemplate = "%COMMS%\n"
+"%COMMC% Copyright %YEAR%, %AUTHOR%, <%AUTHORMAIL%>. All rights reserved.\n"
+"%COMMC% Distributed under the terms of the MIT License.\n"
+"%COMME%\n"
+;
 
-static const char *sIdMeMITCreatedHeaderTemplate = \
-"%COMMS%	$Id: %FILENAME% $
-%COMML%
-%COMML%	Copyright %YEAR% %AUTHOR%
-%COMML%
-%COMML%	Distributed under the MIT License
-%COMML%
-%COMML%	Created: %DATE%
-%COMME%
-";
+static const char *sIdMeMITCreatedHeaderTemplate =
+"%COMMS%	$Id: %FILENAME% $\n"
+"%COMML%\n"
+"%COMML%	Copyright %YEAR% %AUTHOR%\n"
+"%COMML%\n"
+"%COMML%	Distributed under the MIT License\n"
+"%COMML%\n"
+"%COMML%	Created: %DATE%\n"
+"%COMME%\n"
+;
 
-static const char *sIdMeFullMITCreatedHeaderTemplate = \
-"%COMMS%	$Id: %FILENAME% $
-%COMML%	
-%COMML%	Copyright %YEAR%
-%COMML%	        %AUTHOR%  All rights reserved.
-%COMML%	
-%COMML%	Redistribution and use in source and binary forms, with or without
-%COMML%	modification, are permitted provided that the following conditions are met:
-%COMML%	1. Redistributions of source code must retain the above copyright notice,
-%COMML%	   this list of conditions and the following disclaimer.
-%COMML%	2. Redistributions in binary form must reproduce the above copyright notice,
-%COMML%	   this list of conditions and the following disclaimer in the documentation
-%COMML%	   and/or other materials provided with the distribution.
-%COMML%	3. All advertising materials mentioning features or use of this software
-%COMML%	   must display the following acknowledgement:
-%COMML%	   
-%COMML%	    This product includes software developed by %AUTHOR%.
-%COMML%	
-%COMML%	4. The name of %AUTHOR% may not be used to endorse or
-%COMML%	   promote products derived from this software without specific prior
-%COMML%	   written permission.
-%COMML%	
-%COMML%	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-%COMML%	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-%COMML%	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
-%COMML%	AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-%COMML%	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-%COMML%	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-%COMML%	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-%COMML%	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-%COMML%	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-%COMML%	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
-%COMML%
-%COMML%	Created: %DATE% %TIME%
-%COMME%
-";
+static const char *sIdMeFullMITCreatedHeaderTemplate =
+"%COMMS%	$Id: %FILENAME% $\n"
+"%COMML%	\n"
+"%COMML%	Copyright %YEAR%\n"
+"%COMML%	        %AUTHOR%  All rights reserved.\n"
+"%COMML%	\n"
+"%COMML%	Redistribution and use in source and binary forms, with or without\n"
+"%COMML%	modification, are permitted provided that the following conditions are met:\n"
+"%COMML%	1. Redistributions of source code must retain the above copyright notice,\n"
+"%COMML%	   this list of conditions and the following disclaimer.\n"
+"%COMML%	2. Redistributions in binary form must reproduce the above copyright notice,\n"
+"%COMML%	   this list of conditions and the following disclaimer in the documentation\n"
+"%COMML%	   and/or other materials provided with the distribution.\n"
+"%COMML%	3. All advertising materials mentioning features or use of this software\n"
+"%COMML%	   must display the following acknowledgement:\n"
+"%COMML%	   \n"
+"%COMML%	    This product includes software developed by %AUTHOR%.\n"
+"%COMML%	\n"
+"%COMML%	4. The name of %AUTHOR% may not be used to endorse or\n"
+"%COMML%	   promote products derived from this software without specific prior\n"
+"%COMML%	   written permission.\n"
+"%COMML%	\n"
+"%COMML%	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,\n"
+"%COMML%	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND\n"
+"%COMML%	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL\n"
+"%COMML%	AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,\n"
+"%COMML%	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,\n"
+"%COMML%	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;\n"
+"%COMML%	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,\n"
+"%COMML%	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR\n"
+"%COMML%	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF\n"
+"%COMML%	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	\n"
+"%COMML%\n"
+"%COMML%	Created: %DATE% %TIME%\n"
+"%COMME%\n"
+;
 
-static const char *sIdMeFullMITRevisedCreatedHeaderTemplate = \
-"%COMMS%	$Id: %FILENAME% $
-%COMML%	
-%COMML%	Copyright %YEAR%
-%COMML%	        %AUTHOR%  All rights reserved.
-%COMML%	
-%COMML%	Redistribution and use in source and binary forms, with or without
-%COMML%	modification, are permitted provided that the following conditions are met:
-%COMML%	1. Redistributions of source code must retain the above copyright notice,
-%COMML%	   this list of conditions and the following disclaimer.
-%COMML%	2. Redistributions in binary form must reproduce the above copyright notice,
-%COMML%	   this list of conditions and the following disclaimer in the documentation
-%COMML%	   and/or other materials provided with the distribution.
-%COMML%	4. The name of %AUTHOR% may not be used to endorse or
-%COMML%	   promote products derived from this software without specific prior
-%COMML%	   written permission.
-%COMML%	
-%COMML%	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-%COMML%	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-%COMML%	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
-%COMML%	AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-%COMML%	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-%COMML%	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-%COMML%	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-%COMML%	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-%COMML%	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-%COMML%	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
-%COMML%
-%COMML%	Created: %DATE% %TIME%
-%COMME%
-";
+static const char *sIdMeFullMITRevisedCreatedHeaderTemplate =
+"%COMMS%	$Id: %FILENAME% $\n"
+"%COMML%	\n"
+"%COMML%	Copyright %YEAR%\n"
+"%COMML%	        %AUTHOR%  All rights reserved.\n"
+"%COMML%	\n"
+"%COMML%	Redistribution and use in source and binary forms, with or without\n"
+"%COMML%	modification, are permitted provided that the following conditions are met:\n"
+"%COMML%	1. Redistributions of source code must retain the above copyright notice,\n"
+"%COMML%	   this list of conditions and the following disclaimer.\n"
+"%COMML%	2. Redistributions in binary form must reproduce the above copyright notice,\n"
+"%COMML%	   this list of conditions and the following disclaimer in the documentation\n"
+"%COMML%	   and/or other materials provided with the distribution.\n"
+"%COMML%	4. The name of %AUTHOR% may not be used to endorse or\n"
+"%COMML%	   promote products derived from this software without specific prior\n"
+"%COMML%	   written permission.\n"
+"%COMML%	\n"
+"%COMML%	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,\n"
+"%COMML%	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND\n"
+"%COMML%	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL\n"
+"%COMML%	AUTHORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,\n"
+"%COMML%	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,\n"
+"%COMML%	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;\n"
+"%COMML%	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,\n"
+"%COMML%	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR\n"
+"%COMML%	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF\n"
+"%COMML%	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	\n"
+"%COMML%\n"
+"%COMML%	Created: %DATE% %TIME%\n"
+"%COMME%\n"
+;
 
 
 //------------------------------------------------------------------------------

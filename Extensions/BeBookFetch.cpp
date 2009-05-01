@@ -16,6 +16,9 @@
 
 #define kTrackerSig		"application/x-vnd.Be-TRAK"
 
+using std::vector;
+
+
 //------------------------------------------------------------------------------
 
 uint32
