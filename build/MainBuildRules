@@ -209,7 +209,7 @@ rule Rez
 	local rezFile = $(2) ;
 	local flags = $(3) ;
 	
-	REZHDRS on $(output) = [ on $(output) FIncludes $(HDRS) ] ;
+	REZHDRS on $(output) = [ on $(output) return "-I"$(HDRS) ] ;
 	REZFLAGS on $(output) = [ on $(output) return $(REZFLAGS) ] $(flags) ;
 	Depends $(output) : rez $(rezFile) ;
 	Rez1 $(output) : rez $(rezFile) ;
@@ -413,26 +413,29 @@ rule ObjectSysHdrs
 	}
 }
 
-
 # FSysIncludes <dirs> ;
 #
 # Counterpart of FIncludes for system include search paths.
 #
-if $(OSPLAT) = X86 {
+if $(IS_GCC_4_PLATFORM) {
 	rule FSysIncludes { return -I$(<) ; }
 } else {
-	rule FSysIncludes { return "-i "$(<) ; }
+	if $(OSPLAT) = X86 {
+		rule FSysIncludes { return -I$(<) ; }
+	} else {
+		rule FSysIncludes { return "-i "$(<) ; }
+	}
 }
 
 # Variable referring to the STL.
-if $(OSPLAT) = X86 {
-	local hasLibStdC++.R4 = [ Glob /boot/develop/lib/x86 : libstdc++.r4.so ] ;
-	if $(hasLibStdC++.R4) {
+if $(IS_GCC_4_PLATFORM) {
+	# gcc 4 Haiku
+	STDC++LIB = stdc++ ;
+} else {
+	# BeOS or BeOS compatible Haiku
+	if $(OSPLAT) = X86 {
 		STDC++LIB = stdc++.r4 ;
 	} else {
-		# supposedly a gcc 4 Haiku
-		STDC++LIB = stdc++ ;
+		STDC++LIB = mslcpp_4_0 ;
 	}
-} else {
-	STDC++LIB = mslcpp_4_0 ;
 }

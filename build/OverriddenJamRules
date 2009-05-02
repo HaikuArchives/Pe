@@ -41,10 +41,22 @@ actions piecemeal together existing Clean
 # Changes to rules for sake of discrimination between system and non-system
 # headers.
 
-if $(OSPLAT) = X86 {
-	HDRS_INCLUDES_SEPARATOR = -I- ;
+if $(IS_GCC_4_PLATFORM) {
+	HDRS_INCLUDES_SEPARATOR = ;
 } else {
-	HDRS_INCLUDES_SEPARATOR = -i- ;
+	if $(OSPLAT) = X86 {
+		HDRS_INCLUDES_SEPARATOR = -I- ;
+	} else {
+		HDRS_INCLUDES_SEPARATOR = -i- ;
+	}
+}
+
+# FIncludes <dirs> ;
+#
+# Overridden for gcc 4 platforms to use the correct
+#
+if $(IS_GCC_4_PLATFORM) {
+	rule FIncludes { return "-iquote "$(1) ; }
 }
 
 rule Cc
