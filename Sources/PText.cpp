@@ -4390,7 +4390,7 @@ void PText::IncSearchKey(const char *bytes, int numBytes)
 	{
 		int offset = fIncCaret;
 
-		if (FindNext(fIncPat, offset, ignCase, false, fIncSearch == 2, false, false, true))
+		if (FindNext(fIncPat, offset, ignCase, true, fIncSearch == 2, false, false, true))
 		{
 			BMessage msg(msg_EnterSearchString);
 			msg.AddString("string", fIncPat);
