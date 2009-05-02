@@ -90,7 +90,7 @@ rule SetUpSubDirBuildSettings {
 		if $(OSPLAT) = X86 {
 			CCFLAGS += -Wall -Wno-multichar -Wmissing-prototypes ;
 			CCFLAGS += -Wpointer-arith -Wcast-align -Wsign-compare ;
-			C++FLAGS += -Wall -Wno-multichar -Wmissing-prototypes ;
+			C++FLAGS += -Wall -Wno-multichar ;
 			C++FLAGS += -Wno-ctor-dtor-privacy -Woverloaded-virtual ;
 			C++FLAGS += -Wpointer-arith -Wcast-align -Wsign-compare ;
 			C++FLAGS += -Wno-unknown-pragmas ;
