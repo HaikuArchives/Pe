@@ -457,6 +457,27 @@ void PDoc::HasBeenSaved()
 	fText->ResetUndo();
 }
 
+void PDoc::DoSavePreparations()
+{
+	// If enabled we remove trailing white space.
+	if (gPrefs->GetPrefInt(prf_I_DiscardTrailingSpace, 0) == 0)
+		return;
+
+	try
+	{
+		PDiscardTrailingSpaceCmd *cmd = new PDiscardTrailingSpaceCmd(fText);
+		if (!cmd->IsNoOp())
+			fText->RegisterCommand(cmd);
+	}
+	catch (HErr& e)
+	{
+		e.DoError();
+	}
+	catch (...)
+	{
+	}
+}
+
 void PDoc::WindowActivated(bool active)
 {
 	inherited::WindowActivated(active);

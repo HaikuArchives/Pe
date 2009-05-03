@@ -165,8 +165,9 @@ resource 'DLOG' (132, "Preferences") {
 			TabSheet			{ "Files", "Options for files on disk"														},
 				Caption			{{   0,   0, 120,  16 }, "sv",							"When saving a file"				},
 
-				CheckBox		{{ 140,  20, 290,  36 }, pnm_Fil_X_MakeBackup,			"Make backup (filename~)"			},
-				CheckBox		{{ 140,  40, 290,  56 }, pnm_Fil_X_EndWithNewline,		"End with newline"					},
+				CheckBox		{{ 140,   0, 290,  16 }, pnm_Fil_X_MakeBackup,			"Make backup (filename~)"			},
+				CheckBox		{{ 140,  20, 290,  36 }, pnm_Fil_X_EndWithNewline,		"End with newline"					},
+				CheckBox		{{ 140,  40, 290,  56 }, pnm_Fil_X_DiscardTrailingSpace,"Discard trailing space"			},
 
 				Line			{{   0,  63, 290,  64 }},
 

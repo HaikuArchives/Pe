@@ -353,6 +353,7 @@ bool CPrefsDialog::OkClicked()
 	CntrlGetChkbx(pnm_Inc_X_BeIncludes,				prf_I_BeIncludes,		 		dummy);
 	CntrlGetChkbx(pnm_Fil_X_MakeBackup,				prf_I_MakeBackup, 				dummy);
 	CntrlGetChkbx(pnm_Fil_X_EndWithNewline,			prf_I_EndWithNewline, 			dummy);
+	CntrlGetChkbx(pnm_Fil_X_DiscardTrailingSpace,	prf_I_DiscardTrailingSpace, 	dummy);
 	CntrlGetChkbx(pnm_Fil_X_VerifyOpenFiles,		prf_I_VerifyOpenFiles, 			dummy);
 	CntrlGetChkbx(pnm_Con_X_ShowBeIdeMenu,			prf_I_ShowBeIdeMenu,			dummy);
 	CntrlGetChkbx(pnm_Con_X_LoadBeIdeExt,			prf_I_LoadBeIdeExt,				dummy);
@@ -547,6 +548,7 @@ bool CPrefsDialog::CancelClicked()
 	CntrlSetChkbx(pnm_Inc_X_BeIncludes,				prf_I_BeIncludes,			true);
 	CntrlSetChkbx(pnm_Fil_X_MakeBackup,				prf_I_MakeBackup,			false);
 	CntrlSetChkbx(pnm_Fil_X_EndWithNewline,			prf_I_EndWithNewline,		true);
+	CntrlSetChkbx(pnm_Fil_X_DiscardTrailingSpace,	prf_I_DiscardTrailingSpace, false);
 	CntrlSetChkbx(pnm_Fil_X_VerifyOpenFiles,		prf_I_VerifyOpenFiles,		true);
 	CntrlSetChkbx(pnm_Con_X_ShowBeIdeMenu,			prf_I_ShowBeIdeMenu,		true);
 	CntrlSetChkbx(pnm_Con_X_LoadBeIdeExt,			prf_I_LoadBeIdeExt,			true);

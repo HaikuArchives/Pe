@@ -66,6 +66,7 @@ const char* const prf_I_ContextChars			= "contextchars";
 const char* const prf_I_ContextLines			= "contextlines";
 const char* const prf_I_DiffCaseInsensitive		= "diffcase";
 const char* const prf_I_DiffIgnoreWhiteSpace	= "diffwhite";
+const char* const prf_I_DiscardTrailingSpace	= "discard trailing space";
 const char* const prf_I_EndWithNewline			= "nl at eof";
 const char* const prf_I_FlashCursor				= "flash cursor";
 const char* const prf_I_FontSize				= "font size";

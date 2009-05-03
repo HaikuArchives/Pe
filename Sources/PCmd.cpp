@@ -1641,3 +1641,133 @@ void PEncodingCmd::Undo()
 	fText->Doc()->SetEncoding(fSourceEncoding);
 } /* PEncodingCmd::Undo */
 
+
+#pragma mark --- Discard Trailing Space Command ---
+
+PDiscardTrailingSpaceCmd::PDiscardTrailingSpaceCmd(PText *txt)
+	: PCmd("Discard Trailing Space", txt)
+{
+	fAnchor = txt->Anchor();
+	fCaret = txt->Caret();
+
+	std::vector<int> spaceOffsets;
+
+	// analyze the lines
+	int spacesToRemove = 0;
+	const char* text = txt->Text();
+	int textSize = txt->Size();
+	int offset = 0;
+	while (offset < textSize)
+	{
+		const char* foundNL = strchr(text + offset, '\n');
+		offset = foundNL != NULL ? foundNL - text : textSize;
+		int spaceStart = offset;
+		while (spaceStart > 0
+			&& (text[spaceStart - 1] == ' ' || text[spaceStart - 1] == '\t'))
+		{
+			spaceStart--;
+		}
+
+		if (spaceStart < offset)
+		{
+			int spaceCount = offset - spaceStart;
+			spaceOffsets.push_back(spaceStart);
+			spaceOffsets.push_back(spaceCount);
+
+			spacesToRemove += spaceCount;
+		}
+
+		offset++;
+	}
+
+	fLineCount = spaceOffsets.size() / 2;
+	fTotalSpaceCount = spacesToRemove;
+	if (fLineCount == 0)
+	{
+		fSpaceOffsets = NULL;
+		fSpaces = NULL;
+		return;
+	}
+
+	fSpaceOffsets = (int*)malloc(2 * fLineCount * sizeof(int));
+	fSpaces = (char*)malloc(spacesToRemove);
+
+	try
+	{
+		FailNil(fSpaceOffsets);
+		FailNil(fSpaces);
+	}
+	catch (...)
+	{
+		free(fSpaceOffsets);
+		free(fSpaces);
+		throw;
+	}
+
+	fSpaceCounts = fSpaceOffsets + fLineCount;
+
+	// copy space offsets, counts, and the spaces themselves into the
+	// allocated structures
+	int spaceArrayOffset = 0;
+	for (int i = 0; i < fLineCount; i++) {
+		fSpaceOffsets[i] = spaceOffsets[2 * i];
+		fSpaceCounts[i] = spaceOffsets[2 * i + 1];
+		memcpy(fSpaces + spaceArrayOffset, text + fSpaceOffsets[i],
+			fSpaceCounts[i]);
+		spaceArrayOffset += fSpaceCounts[i];
+	}
+}
+
+PDiscardTrailingSpaceCmd::~PDiscardTrailingSpaceCmd()
+{
+	free(fSpaceOffsets);
+	free(fSpaces);
+}
+
+bool PDiscardTrailingSpaceCmd::IsNoOp() const
+{
+	return fLineCount == 0;
+}
+
+void PDiscardTrailingSpaceCmd::Do()
+{
+	if (IsNoOp())
+		return;
+
+	// remove the spaces -- do that backwards, so we don't need to bother with
+	// adjusting our offsets
+	int anchor = fAnchor;
+	int caret = fCaret;
+	for (int i = fLineCount - 1; i >= 0; i--)
+	{
+		fText->Delete(fSpaceOffsets[i], fSpaceOffsets[i] + fSpaceCounts[i]);
+
+		// update anchor and caret
+		if (anchor > fSpaceOffsets[i])
+			anchor -= std::min(anchor - fSpaceOffsets[i], fSpaceCounts[i]);
+		if (caret > fSpaceOffsets[i])
+			caret -= std::min(caret - fSpaceOffsets[i], fSpaceCounts[i]);
+	}
+
+	fText->Select(anchor, caret, true, false);
+
+	Update();
+}
+
+void PDiscardTrailingSpaceCmd::Undo()
+{
+	if (IsNoOp())
+		return;
+
+	// re-insert the spaces
+	int spaceIndex = 0;
+	for (int i = 0; i < fLineCount; i++)
+	{
+		fText->Insert(fSpaces + spaceIndex, fSpaceCounts[i], fSpaceOffsets[i]);
+		spaceIndex += fSpaceCounts[i];
+	}
+
+	fText->Select(fAnchor, fCaret, true, false);
+
+	Update();
+}

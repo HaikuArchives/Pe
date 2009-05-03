@@ -70,6 +70,7 @@
 // Files
 #define pnm_Fil_X_MakeBackup			"maba"
 #define pnm_Fil_X_EndWithNewline		"fonl"
+#define pnm_Fil_X_DiscardTrailingSpace	"dtsp"
 #define pnm_Fil_X_VerifyOpenFiles		"vofm"
 #define pnm_Fil_T_NrOfRecentDocs		"resi"
 #define pnm_Fil_X_SkipTmpFiles			"sktm"

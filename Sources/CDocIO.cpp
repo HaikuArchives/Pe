@@ -433,6 +433,7 @@ bool CLocalDocIO::WriteDoc()
 
 	try
 	{
+		fDoc->DoSavePreparations();
 		BMessage settingsMsg;
 		fDoc->CollectSettings(settingsMsg);
 		BString docText;
@@ -768,6 +769,7 @@ bool CFtpDocIO::WriteDoc()
 {
 	try
 	{
+		fDoc->DoSavePreparations();
 		BMessage settingsMsg;
 		fDoc->CollectSettings(settingsMsg);
 		BString docText;

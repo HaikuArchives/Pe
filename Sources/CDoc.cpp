@@ -417,6 +417,10 @@ void CDoc::HasBeenSaved()
 {
 }
 
+void CDoc::DoSavePreparations()
+{
+}
+
 void CDoc::HighlightErrorPos(int errorPos)
 {
 }
