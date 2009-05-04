@@ -754,7 +754,7 @@ void PText::SetErrorWindow(PErrorWindow *window)
 {
 	if (fErrorWindowMessenger.IsValid())
 		fErrorWindowMessenger.SendMessage(B_QUIT_REQUESTED);
-	
+
 	fErrorWindowMessenger = BMessenger(window, window);
 } /* PText::SetErrorWindow */
 
@@ -2203,7 +2203,7 @@ void PText::HandleDrop(BMessage *msg)
 				popup.AddItem(new BMenuItem("Move", NULL));
 				popup.AddItem(new BMenuItem("Copy", NULL));
 				BMenuItem *item = popup.Go(msg->DropPoint(), false, true);
-	
+
 				if (!item)
 				{
 					HideCaret();
@@ -2211,7 +2211,7 @@ void PText::HandleDrop(BMessage *msg)
 					fCaret = fSavedCaret;
 					return;
 				}
-	
+
 				if (popup.IndexOf(item) == 0)
 					offset = fDragStart;
 				else
@@ -2219,13 +2219,13 @@ void PText::HandleDrop(BMessage *msg)
 			}
 			else
 				offset = fDragStart;
-	
+
 			if (offset == -1 || fCaret < offset || fCaret > offset + sl)
 			{
 				if (sfDragSource == this)
 				{
 					int a, c;
-	
+
 					a = Offset2Line(fSavedAnchor);
 					c = Offset2Line(fSavedCaret);
 					TouchLines(min(a, c), max(a, c));
@@ -2342,7 +2342,7 @@ struct MenuFunctionScanHandler : public CFunctionScanHandler {
 		, closestItem(NULL)
 	{
 	}
-	
+
 	~MenuFunctionScanHandler()
 	{
 		if (closestItem)
@@ -5539,8 +5539,8 @@ status_t PText::Print()
 	}
 
 	BPrintJob printJob(Window()->Title());
-	
-	// 
+
+	//
 	//fPrintSettings->PrintToStream();
 
 	printJob.SetSettings(new BMessage(*fPrintSettings));
@@ -5556,17 +5556,17 @@ status_t PText::Print()
 	{
 		struct PrintFunctionRef *ref;
 		ref = (struct PrintFunctionRef *)bookmarkHandler.functions.ItemAt(i);
-		fprintf(stderr, "ref[%ld]: {%d, %d, %d, %d, %d, %d, '%s'}\n", i, 
+		fprintf(stderr, "ref[%ld]: {%d, %d, %d, %d, %d, %d, '%s'}\n", i,
 			ref->offset, ref->line, ref->page, ref->level, ref->italic, ref->separator, ref->name.String());
 
 	}
 	*/
 
 	// information from printJob
-	BRect printableRect = printJob.PrintableRect();	
+	BRect printableRect = printJob.PrintableRect();
 	int32 firstPage = printJob.FirstPage();
 	int32 lastPage = printJob.LastPage();
-   
+
 	// lines eventually to be used to compute pages to print
 	int32 firstLine = 0;
 	int32 lastLine = LineCount();
@@ -5614,13 +5614,13 @@ status_t PText::Print()
 		lastLine = currentLine - 1;
 	}
 
-	
+
 	fprintf(stderr, "pagesInDocument = %ld\n", pagesInDocument);
 	fprintf(stderr, "linesInDocument = %ld\n", linesInDocument);
 
 	// let's do it!
 	printJob.BeginJob();
-	
+
 	if (LineCount() > 0 && Size() > 0)
 	{
 		int32 printLine = firstLine;
@@ -5645,7 +5645,7 @@ status_t PText::Print()
 			printJob.SpoolPage();
 		}
 	}
-	
+
 
 	printJob.CommitJob();
 
@@ -6177,15 +6177,30 @@ void PText::MessageReceived(BMessage *msg)
 					BPoint pos;
 					uint32 buttons;
 					GetMouse(&pos, &buttons, false);
-//					pos = ConvertFromScreen(pos);
+
 					int toBeScrolledPart = (pos.y < fSplitAt && fSplitAt > 0) ? 1 : 2;
 					int savedActivePart = fActivePart;
 					if (toBeScrolledPart != savedActivePart)
 						fActivePart = toBeScrolledPart;
-					BMessage msg(y < 0 ? kmsg_ScrollOneLineUp : kmsg_ScrollOneLineDown);
-					int numLines = gPrefs->GetPrefInt(prf_I_ScrollwheelLines, 3);
-					for( int i=0; i<numLines; ++i)
+
+					bool pageWise = (modifiers()
+						& (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) != 0;
+					if (pageWise)
+					{
+						BMessage msg(y < 0
+							? kmsg_ScrollPageUp : kmsg_ScrollPageDown);
 						DoKeyCommand(&msg);
+					}
+					else
+					{
+						BMessage msg(y < 0
+							? kmsg_ScrollOneLineUp : kmsg_ScrollOneLineDown);
+						int numLines = gPrefs->GetPrefInt(
+							prf_I_ScrollwheelLines, 3);
+						for (int i = 0; i < numLines; ++i)
+							DoKeyCommand(&msg);
+					}
+
 					if (toBeScrolledPart != savedActivePart)
 						fActivePart = savedActivePart;
 				}
