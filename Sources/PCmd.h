@@ -398,24 +398,4 @@ private:
 		long fAnchor, fCaret, fSrcLen, fDstLen;
 };
 
-class PDiscardTrailingSpaceCmd : public PCmd {
-public:
-		PDiscardTrailingSpaceCmd(PText *txt);
-		~PDiscardTrailingSpaceCmd();
-
-		bool IsNoOp() const;
-
-virtual	void Do();
-virtual	void Undo();
-
-private:
-		int fAnchor, fCaret;
-		int fLineCount;
-		int	fTotalSpaceCount;
-		int *fSpaceOffsets;
-		int *fSpaceCounts;
-		char *fSpaces;
-};
-
-
 #endif // PCMD_H

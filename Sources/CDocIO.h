@@ -39,10 +39,14 @@ public:
 	virtual bool VerifyFile();
 	virtual void SetEntryRef(const entry_ref* ref);
 	virtual BLooper* Target();
+
+			void PrepareTextForSaving(BString& docText, BMessage& settingsMsg);
+
 protected:
 			bool ReadDocFromStream(BPositionIO& stream, bool readAttributes);
 			bool DoPreEditTextConversions(BString& docText);
-			bool DoPostEditTextConversions(BString& docText);
+			bool DoPostEditTextConversions(BString& docText,
+				BMessage& settingsMsg);
 
 			CDoc* fDoc;
 			CTextEncodingConverter fConv;

@@ -126,7 +126,6 @@ public:
 	// hook methods
 	virtual void NameChanged();
 	virtual void HasBeenSaved();
-	virtual	void DoSavePreparations();
 
 protected:
 

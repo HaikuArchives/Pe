@@ -263,6 +263,81 @@ bool CDocIO::MatchesNodeMonitorMsg(BMessage* msg)
 	return false;
 }
 
+void CDocIO::PrepareTextForSaving(BString& docText, BMessage& settingsMsg)
+{
+	// ATM we only remove trailing white space. If disabled, get out.
+	if (gPrefs->GetPrefInt(prf_I_DiscardTrailingSpace, 0) == 0)
+		return;
+
+	// If we actually remove white space, we'll have to adjust anchor and
+	// caret, too. So get them now.
+	int32 anchor = 0;
+	int32 caret = 0;
+	bool hasAnchor = settingsMsg.FindInt32("anchor", &anchor) == B_OK;
+	bool hasCaret = settingsMsg.FindInt32("caret", &caret) == B_OK;
+
+	int textSize = docText.Length();
+	char* text = docText.LockBuffer(textSize);
+
+	int lastOffset = 0;
+	int offset = 0;
+	int moveBy = 0;
+	while (offset < textSize)
+	{
+		// find the next newline
+		const char* foundNL = strchr(text + offset, '\n');
+		offset = foundNL != NULL ? foundNL - text : textSize;
+
+		// count the spaces before the newline
+		int spaceStart = offset;
+		while (spaceStart > 0
+			&& (text[spaceStart - 1] == ' ' || text[spaceStart - 1] == '\t'))
+		{
+			spaceStart--;
+		}
+
+		// If there were any spaces, we want to skip them.
+		if (spaceStart < offset)
+		{
+			int32 spaceCount = offset - spaceStart;
+
+			// move the text before the spaces, if necessary
+			if (moveBy > 0)
+			{
+				memmove(text + lastOffset - moveBy, text + lastOffset,
+					spaceStart - lastOffset);
+			}
+
+			// update anchor and caret
+			if (anchor + moveBy > spaceStart)
+				anchor -= std::min(anchor + moveBy - spaceStart, spaceCount);
+			if (caret + moveBy > spaceStart)
+				caret -= std::min(caret + moveBy - spaceStart, spaceCount);
+
+			// the newline and the following chars need to be moved
+			lastOffset = offset;
+			moveBy += spaceCount;
+		}
+
+		offset++;
+	}
+
+	// move the text after the last spaces to remove
+	if (moveBy > 0 && lastOffset < textSize)
+	{
+		memmove(text + lastOffset - moveBy, text + lastOffset,
+			textSize - lastOffset);
+	}
+
+	docText.UnlockBuffer(textSize - moveBy);
+
+	// update anchor and caret settings
+	if (hasAnchor)
+		settingsMsg.ReplaceInt32("anchor", anchor);
+	if (hasCaret)
+		settingsMsg.ReplaceInt32("caret", caret);
+}
+
 bool CDocIO::DoPreEditTextConversions(BString& docText)
 {
 	// convert from document's native encoding to internal type (UTF-8):
@@ -293,8 +368,10 @@ bool CDocIO::DoPreEditTextConversions(BString& docText)
 	return true;
 }
 
-bool CDocIO::DoPostEditTextConversions(BString& docText)
+bool CDocIO::DoPostEditTextConversions(BString& docText, BMessage& settingsMsg)
 {
+	PrepareTextForSaving(docText, settingsMsg);
+
 	if (fDoc->Encoding() != B_UNICODE_UTF8)
 	{
 		// convert from internal encoding (UTF-8) to native type:
@@ -433,12 +510,11 @@ bool CLocalDocIO::WriteDoc()
 
 	try
 	{
-		fDoc->DoSavePreparations();
 		BMessage settingsMsg;
 		fDoc->CollectSettings(settingsMsg);
 		BString docText;
 		fDoc->GetText(docText);
-		if (!DoPostEditTextConversions(docText))
+		if (!DoPostEditTextConversions(docText, settingsMsg))
 			return false;
 
 		FailOSErr(e.GetName(name));
@@ -769,12 +845,11 @@ bool CFtpDocIO::WriteDoc()
 {
 	try
 	{
-		fDoc->DoSavePreparations();
 		BMessage settingsMsg;
 		fDoc->CollectSettings(settingsMsg);
 		BString docText;
 		fDoc->GetText(docText);
-		if (!DoPostEditTextConversions(docText))
+		if (!DoPostEditTextConversions(docText, settingsMsg))
 			return false;
 
 		CFtpStream ftp(*fURL, false,

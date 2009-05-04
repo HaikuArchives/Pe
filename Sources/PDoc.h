@@ -142,7 +142,6 @@ virtual		void SaveRequested(entry_ref& directory, const char *name);
 
 virtual 	void NameChanged();
 virtual 	void HasBeenSaved();
-virtual		void DoSavePreparations();
 virtual		void HighlightErrorPos(int errorPos);
 
 private:

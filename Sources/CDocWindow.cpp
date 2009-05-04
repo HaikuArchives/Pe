@@ -125,8 +125,17 @@ status_t CDocWindow::WriteState()
 		status_t res = file.SetTo(EntryRef(), B_READ_WRITE);
 		if (res != B_OK)
 			return res;
+
 		BMessage settingsMsg;
 		CollectSettings(settingsMsg);
+
+		// We need to prepare the settings for saving. We also prepare the text
+		// which is unnecessary, but ATM we don't have the interface to avoid
+		// that.
+		BString text;
+		GetText(text);
+		fDocIO->PrepareTextForSaving(text, settingsMsg);
+
 		WriteAttr(file, settingsMsg);
 		return file.Sync();
 	}
