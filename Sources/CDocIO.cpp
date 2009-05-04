@@ -722,7 +722,7 @@ bool CLocalDocIO::MatchesNodeMonitorMsg(BMessage* msg)
 			&& name == fEntryRef->name)
 			return true;
 	}
-		
+
 	return false;
 }
 
@@ -738,7 +738,8 @@ bool CLocalDocIO::VerifyFile()
 
 			time_t t;
 			FailOSErr(file.GetModificationTime(&t));
-			if (fLastSaved && t > fLastSaved + 1)
+			if (fLastSaved && t > fLastSaved + 1
+				&& _HasFileContentsChanged(file))
 			{
 				char s[PATH_MAX + 20];
 				sprintf(s, "File %s was modified by another application, reload it?", fEntryRef->name);
@@ -768,6 +769,67 @@ bool CLocalDocIO::VerifyFile()
 	}
 	return result;
 }
+
+bool CLocalDocIO::_HasFileContentsChanged(BPositionIO& file)
+{
+	// We determine whether the file contents changed by preparing the current
+	// text for saving and compare it with the file. If anything fails, we
+	// return true to be on the safe side.
+
+	try
+	{
+		// get the text and convert it for writing
+		BMessage settingsMsg;
+		fDoc->CollectSettings(settingsMsg);
+		BString docText;
+		fDoc->GetText(docText);
+		if (!DoPostEditTextConversions(docText, settingsMsg))
+			return true;
+
+		// compare the file size
+		off_t fileSize;
+		if (file.GetSize(&fileSize) != B_OK || fileSize != docText.Length())
+			return true;
+
+		// allocate a read buffer
+		static const size_t kBufferSize = 64 * 1024;
+		struct Buffer {
+			char*	buffer;
+
+			Buffer()	{ buffer = new char[kBufferSize]; }
+			~Buffer()	{ delete[] buffer; }
+		} _buffer;
+		char* buffer = _buffer.buffer;
+
+		// compare the text
+		const char* text = docText.String();
+		size_t textSize = docText.Length();
+		size_t offset = 0;
+		while (offset < textSize)
+		{
+			// read the next chunk
+			size_t toRead = std::min(textSize - offset, kBufferSize);
+			ssize_t bytesRead = file.ReadAt(offset, buffer, toRead);
+			if (bytesRead <= 0)
+				return true;
+
+			if (memcmp(text, buffer, bytesRead) != 0)
+				return true;
+
+			offset += bytesRead;
+		}
+
+		// the texts are equal
+		return false;
+	}
+	catch (...)
+	{
+		// We're not interested in any error. Just assume the file contents
+		// changed.
+		return true;
+	}
+}
+
 
 // #pragma mark - CFtpDocIO
 

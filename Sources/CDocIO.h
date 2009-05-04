@@ -1,6 +1,6 @@
 /*
 	Copyright 2005 Oliver Tappe
-	
+
 	Distributed under the MIT License
 */
 
@@ -86,6 +86,8 @@ public:
 private:
 	virtual	void StartWatchingFolder(void);
 	virtual	void StopWatchingFolder(void);
+
+			bool _HasFileContentsChanged(BPositionIO& file);
 
 			entry_ref *fEntryRef;
 			node_ref fNodeRef;
