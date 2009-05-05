@@ -787,9 +787,15 @@ bool CLocalDocIO::_HasFileContentsChanged(BPositionIO& file)
 			return true;
 
 		// compare the file size
+#if defined(__HAIKU__)
 		off_t fileSize;
 		if (file.GetSize(&fileSize) != B_OK || fileSize != docText.Length())
 			return true;
+#else
+		if (file.Seek(0, SEEK_END) != docText.Length())
+			return true;
+#endif
+
 
 		// allocate a read buffer
 		static const size_t kBufferSize = 64 * 1024;
