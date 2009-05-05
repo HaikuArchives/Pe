@@ -170,6 +170,8 @@ virtual		void FrameResized(float w, float h);
 			void ShowCaret();
 			void InvalidateRange(int fromOffset, int toOffset, int part);
 			void InvalidateRange(int fromOffset, int toOffset);
+			void InvalidateLines(int fromLine, int toLine, int part);
+			void InvalidateLines(int fromLine, int toLine);
 
 			status_t PageSetup();
 			status_t Print();
@@ -295,6 +297,8 @@ virtual		void FrameResized(float w, float h);
 			void SelectionChanged();
 			void TextBufferChanged();
 			void ActivePartChanged(int oldActivePart);
+			void LinesShifted(int first, int dy);
+			void PrepareForRedrawDirtyLines();
 			void UpdateBraceHighlights();
 
 private:
@@ -381,11 +385,15 @@ static		PText *sfDragSource;
 			};
 			typedef std::list<HighlightInfo*> HighlightList;
 
+			struct BraceHighlightInfo : HighlightInfo {
+				int	line;
+			};
+
 			int fHighlightCursor;
 			int fHighlightChangeCounter;
 			int fHighlightPart;
-			HighlightInfo fBraceHighlight1;
-			HighlightInfo fBraceHighlight2;
+			BraceHighlightInfo fBraceHighlight1;
+			BraceHighlightInfo fBraceHighlight2;
 			HighlightList fHighlights;
 
 // saveable settings

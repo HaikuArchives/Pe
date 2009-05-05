@@ -1334,6 +1334,8 @@ void PText::TextChanged(int from, int to)
 	{
 		if (fSplitAt > 0) ShiftLines(line + 1, dy + fShift, 1);
 		ShiftLines(line + 1, dy + fShift, 2);
+
+		LinesShifted(line + 1, dy + fShift);
 	}
 
 	if (lc > LineCount() && fShift == 0)
@@ -5187,6 +5189,8 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 
 void PText::RedrawDirtyLines()
 {
+	PrepareForRedrawDirtyLines();
+
 	BRect b(fBounds);
 	int i;
 	float y1, y2;
@@ -5479,9 +5483,10 @@ void PText::ShiftLines(int first, int dy, int part)
 		Draw(b);
 } /* PText::ShiftLinesPart2 */
 
-void PText::InvalidateRange(int fromOffset, int toOffset, int part)
+/*!	Invalidates lines \a fromLine to \a toLine inclusively. */
+void PText::InvalidateLines(int fromLine, int toLine, int part)
 {
-	if (fromOffset >= toOffset)
+	if (fromLine > toLine)
 		return;
 
 	// get bounds and vertical scroll offset of the part in question
@@ -5509,10 +5514,6 @@ void PText::InvalidateRange(int fromOffset, int toOffset, int part)
 	if (!bounds.IsValid())
 		return;
 
-	// We only invalidate complete lines.
-	int fromLine = Offset2Line(fromOffset);
-	int toLine = Offset2Line(toOffset - 1);
-
 	// compute the invalidation rect and invalidate it
 	float fromY = bounds.top + ceil(fLineHeight * fromLine - vScrollOffset);
 	float toY = fromY + ceil((toLine + 1 - fromLine) * fLineHeight);
@@ -5520,6 +5521,24 @@ void PText::InvalidateRange(int fromOffset, int toOffset, int part)
 	BRect rect(hScrollOffset, fromY + 1, hScrollOffset + fBounds.Width(),
 		toY);
 	Invalidate(rect & bounds.OffsetByCopy(hScrollOffset, 0));
+}
+
+void PText::InvalidateLines(int fromLine, int toLine)
+{
+	InvalidateLines(fromLine, toLine, 1);
+	InvalidateLines(fromLine, toLine, 2);
+}
+
+void PText::InvalidateRange(int fromOffset, int toOffset, int part)
+{
+	if (fromOffset >= toOffset)
+		return;
+
+	// We only invalidate complete lines.
+	int fromLine = Offset2Line(fromOffset);
+	int toLine = Offset2Line(toOffset - 1);
+
+	InvalidateLines(fromLine, toLine);
 }
 
 void PText::InvalidateRange(int fromOffset, int toOffset)
@@ -6613,17 +6632,35 @@ void PText::ActivePartChanged(int oldActivePart)
 {
 }
 
+void PText::LinesShifted(int first, int dy)
+{
+	if (fBraceHighlight1.fromOffset >= 0 && first <= fBraceHighlight1.line)
+		fBraceHighlight1.line += dy;
+	if (fBraceHighlight2.fromOffset >= 0 && first <= fBraceHighlight2.line)
+		fBraceHighlight2.line += dy;
+}
+
+void PText::PrepareForRedrawDirtyLines()
+{
+	int newCursor = fAnchor == fCaret ? fAnchor : -1;
+	if (newCursor != fHighlightCursor
+		|| fText.ChangeCounter() != fHighlightChangeCounter)
+	{
+		UpdateBraceHighlights();
+	}
+}
+
 void PText::UpdateBraceHighlights()
 {
 	// invalidate the old highlights
 	if (fBraceHighlight1.fromOffset >= 0) {
-		InvalidateRange(fBraceHighlight1.fromOffset, fBraceHighlight1.toOffset);
+		InvalidateLines(fBraceHighlight1.line, fBraceHighlight1.line);
 		fBraceHighlight1.fromOffset = -1;
 		fHighlights.remove(&fBraceHighlight1);
 	}
 
 	if (fBraceHighlight2.fromOffset >= 0) {
-		InvalidateRange(fBraceHighlight2.fromOffset, fBraceHighlight2.toOffset);
+		InvalidateLines(fBraceHighlight2.line, fBraceHighlight2.line);
 		fBraceHighlight2.fromOffset = -1;
 		fHighlights.remove(&fBraceHighlight2);
 	}
@@ -6686,11 +6723,13 @@ void PText::UpdateBraceHighlights()
 	// update the highlights
 	fBraceHighlight1.fromOffset = offset;
 	fBraceHighlight1.toOffset = fBraceHighlight1.fromOffset + 1;
+	fBraceHighlight1.line = Offset2Line(fBraceHighlight1.fromOffset);
 	fHighlights.push_back(&fBraceHighlight1);
 	InvalidateRange(fBraceHighlight1.fromOffset, fBraceHighlight1.toOffset);
 
 	fBraceHighlight2.fromOffset = otherOffset;
 	fBraceHighlight2.toOffset = fBraceHighlight2.fromOffset + 1;
+	fBraceHighlight2.line = Offset2Line(fBraceHighlight2.fromOffset);
 	fHighlights.push_back(&fBraceHighlight2);
 	InvalidateRange(fBraceHighlight2.fromOffset, fBraceHighlight2.toOffset);
 }
