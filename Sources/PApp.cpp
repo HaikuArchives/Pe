@@ -196,6 +196,7 @@ PApp::PApp()
 		SetColor(kColorText,			prf_C_Text,				0x00, 0x00, 0x00);
 		SetColor(kColorSelection,		prf_C_Selection,		0xff, 0xec, 0x7c);
 		SetColor(kColorMark,			prf_C_Mark,				0x00, 0x00, 0xFF);
+		SetColor(kColorHighlight,		prf_C_Highlight,		0xe0, 0xe0, 0xff);
 		SetColor(kColorKeyword1,		prf_C_Keyword1,			0x39, 0x74, 0x79);
 		SetColor(kColorKeyword2,		prf_C_Keyword2,			0x39, 0x74, 0x79);
 		SetColor(kColorComment1,		prf_C_Comment1,			0xA1, 0x64, 0x0E);
@@ -644,7 +645,7 @@ void PApp::RefsReceived(BMessage	*inMessage)
 			FailOSErr (inMessage->FindRef("refs", i, &doc));
 			PDoc *d = dynamic_cast<PDoc*>(OpenWindow(doc));
 			if (!d) continue;
-			
+
 			if (inMessage->HasData(kTokenIdentifier, kTokenIDType))
 			{
 				TokenIdentifier *ident;

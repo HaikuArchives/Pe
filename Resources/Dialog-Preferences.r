@@ -65,9 +65,9 @@ resource rtyp_Popu (rid_Popu_PrfDefaultLang, "Default Language menu") {
 
 
 resource 'DLOG' (132, "Preferences") {
-	{0, 0, 415, 266}, "Preferences", B_TITLED_WINDOW, NORMAL,
+	{0, 0, 415, 276}, "Preferences", B_TITLED_WINDOW, NORMAL,
 	{
-		TabbedBook				{{   0,   0, 415, 266 }, "tabB" 															},
+		TabbedBook				{{   0,   0, 415, 276 }, "tabB" 															},
 			TabSheet			{ "Colours", "The colours used for syntax colouring and window layout"						},
 				ColorControl	{{   0,   0, 145,  16 }, pnm_Col_C_Low,					"Background"						},
 				ColorControl	{{ 155,   0, 290,  16 }, pnm_Col_C_Text,				"Normal Text"						},
@@ -75,42 +75,44 @@ resource 'DLOG' (132, "Preferences") {
 				ColorControl	{{   0,  16, 145,  32 }, pnm_Col_C_Selection,			"Selection"							},
 				ColorControl	{{ 155,  16, 290,  32 }, pnm_Col_C_Mark,				"Mark"								},
 
-				Line			{{   0,  36, 290,  37 }																		},
+				ColorControl	{{   0,  32, 145,  48 }, pnm_Col_C_Highlight,			"Highlight"							},
 
-				ColorControl	{{   0,  40, 110,  56 }, pnm_Col_C_Keyword1,			"Keywords"							},
-				ColorControl	{{ 110,  40, 145,  56 }, pnm_Col_C_Keyword2,			""									},
-				ColorControl	{{ 155,  40, 255,  56 }, pnm_Col_C_Comment1,			"Comments"							},
-				ColorControl	{{ 255,  40, 290,  56 }, pnm_Col_C_Comment2,			""									},
+				Line			{{   0,  52, 290,  53 }																		},
 
-				ColorControl	{{   0,  56, 110,  72 }, pnm_Col_C_String1,				"Strings"							},
-				ColorControl	{{ 110,  56, 145,  72 }, pnm_Col_C_String2,				""									},
-				ColorControl	{{ 155,  56, 255,  72 }, pnm_Col_C_Number1,				"Numbers"							},
-				ColorControl	{{ 255,  56, 290,  72 }, pnm_Col_C_Number2,				""									},
+				ColorControl	{{   0,  56, 110,  72 }, pnm_Col_C_Keyword1,			"Keywords"							},
+				ColorControl	{{ 110,  56, 145,  72 }, pnm_Col_C_Keyword2,			""									},
+				ColorControl	{{ 155,  56, 255,  72 }, pnm_Col_C_Comment1,			"Comments"							},
+				ColorControl	{{ 255,  56, 290,  72 }, pnm_Col_C_Comment2,			""									},
 
-				ColorControl	{{   0,  72, 110,  88 }, pnm_Col_C_Operator1,			"Operators"							},
-				ColorControl	{{ 110,  72, 145,  88 }, pnm_Col_C_Operator2,			""									},
-				ColorControl	{{ 155,  72, 255,  88 }, pnm_Col_C_Separator1,			"Separators"						},
-				ColorControl	{{ 255,  72, 290,  88 }, pnm_Col_C_Separator2,			""									},
+				ColorControl	{{   0,  72, 110,  88 }, pnm_Col_C_String1,				"Strings"							},
+				ColorControl	{{ 110,  72, 145,  88 }, pnm_Col_C_String2,				""									},
+				ColorControl	{{ 155,  72, 255,  88 }, pnm_Col_C_Number1,				"Numbers"							},
+				ColorControl	{{ 255,  72, 290,  88 }, pnm_Col_C_Number2,				""									},
 
-				ColorControl	{{   0,  88, 110, 104 }, pnm_Col_C_Preprocessor1,		"PreProcessor"						},
-				ColorControl	{{ 110,  88, 145, 104 }, pnm_Col_C_Preprocessor2,		""									},
-				ColorControl	{{ 155,  88, 255, 104 }, pnm_Col_C_Error1,				"Errors"							},
-				ColorControl	{{ 255,  88, 290, 104 }, pnm_Col_C_Error2,				""									},
+				ColorControl	{{   0,  88, 110, 104 }, pnm_Col_C_Operator1,			"Operators"							},
+				ColorControl	{{ 110,  88, 145, 104 }, pnm_Col_C_Operator2,			""									},
+				ColorControl	{{ 155,  88, 255, 104 }, pnm_Col_C_Separator1,			"Separators"						},
+				ColorControl	{{ 255,  88, 290, 104 }, pnm_Col_C_Separator2,			""									},
 
-				Line			{{   0, 108, 290, 109 }},
+				ColorControl	{{   0, 104, 110, 120 }, pnm_Col_C_Preprocessor1,		"PreProcessor"						},
+				ColorControl	{{ 110, 104, 145, 120 }, pnm_Col_C_Preprocessor2,		""									},
+				ColorControl	{{ 155, 104, 255, 120 }, pnm_Col_C_Error1,				"Errors"							},
+				ColorControl	{{ 255, 104, 290, 120 }, pnm_Col_C_Error2,				""									},
 
-				ColorControl	{{   0, 112, 145, 128 }, pnm_Col_C_IdentifierSystem,	"System Identifiers"				},
-				ColorControl	{{ 155, 112, 290, 128 }, pnm_Col_C_CharConst,			"Char Constants"					},
-				ColorControl	{{   0, 128, 145, 144 }, pnm_Col_C_IdentifierUser,		"User Identifiers"					},
-				ColorControl	{{ 155, 128, 255, 144 }, pnm_Col_C_Tag,					"Tags/Attribut."					},
-				ColorControl	{{ 255, 128, 290, 144 }, pnm_Col_C_Attribute,			""									},
+				Line			{{   0, 124, 290, 115 }},
 
-				Line			{{   0, 148, 290, 149 }																		},
+				ColorControl	{{   0, 128, 145, 144 }, pnm_Col_C_IdentifierSystem,	"System Identifiers"				},
+				ColorControl	{{ 155, 128, 290, 144 }, pnm_Col_C_CharConst,			"Char Constants"					},
+				ColorControl	{{   0, 144, 145, 160 }, pnm_Col_C_IdentifierUser,		"User Identifiers"					},
+				ColorControl	{{ 155, 144, 255, 160 }, pnm_Col_C_Tag,					"Tags/Attribut."					},
+				ColorControl	{{ 255, 144, 290, 160 }, pnm_Col_C_Attribute,			""									},
 
-				ColorControl	{{   0, 152, 145, 168 }, pnm_Col_C_UserSet1,			"User defined 1"					},
-				ColorControl	{{ 155, 152, 290, 168 }, pnm_Col_C_UserSet2,			"User defined 2"					},
-				ColorControl	{{   0, 168, 145, 184 }, pnm_Col_C_UserSet3,			"User defined 3"					},
-				ColorControl	{{ 155, 168, 290, 184 }, pnm_Col_C_UserSet4,			"User defined 4"					},
+				Line			{{   0, 164, 290, 165 }																		},
+
+				ColorControl	{{   0, 168, 145, 184 }, pnm_Col_C_UserSet1,			"User defined 1"					},
+				ColorControl	{{ 155, 168, 290, 184 }, pnm_Col_C_UserSet2,			"User defined 2"					},
+				ColorControl	{{   0, 184, 145, 200 }, pnm_Col_C_UserSet3,			"User defined 3"					},
+				ColorControl	{{ 155, 184, 290, 200 }, pnm_Col_C_UserSet4,			"User defined 4"					},
 
 			TabSheetEnd			{																							},
 
@@ -141,7 +143,7 @@ resource 'DLOG' (132, "Preferences") {
 				CheckBox		{{   0,  80, 140,  96 }, pnm_Edi_X_SmartWorkspaces,		"Smart Workspaces"					},
 				CheckBox		{{ 150,  80, 290,  96 }, pnm_Edi_X_AlternateHome,		"Alternate Home"					},
 
-				Edit			{{   0, 100, 290, 117 }, pnm_Edi_T_ContextLines,		
+				Edit			{{   0, 100, 290, 117 }, pnm_Edi_T_ContextLines,
 									"Context Lines at Top/Bottom Edge:",	"", "0123456789", 2, 240
 								},
 
@@ -309,8 +311,8 @@ resource 'DLOG' (132, "Preferences") {
 
 			TabSheetEnd			{																							},
 
-			Button				{{ 335, 235, 390, 255 }, "ok  ",		"Apply",			'ok  '							},
-			Button				{{ 265, 235, 320, 255 }, "cncl",		"Revert",			'cncl'							},
+			Button				{{ 335, 245, 390, 265 }, "ok  ",		"Apply",			'ok  '							},
+			Button				{{ 265, 245, 320, 265 }, "cncl",		"Revert",			'cncl'							},
 		TabbedBookEnd			{}
 	}
 };

@@ -25,6 +25,7 @@ const char* const prf_C_Comment1				= "comment color";
 const char* const prf_C_Comment2				= "alt comment color";
 const char* const prf_C_Error1					= "error color";
 const char* const prf_C_Error2					= "alt error color";
+const char* const prf_C_Highlight				= "highlight color";
 const char* const prf_C_IdentifierSystem		= "system identifier color";
 const char* const prf_C_IdentifierUser			= "user identifier color";
 const char* const prf_C_Invisibles				= "invisibles color";

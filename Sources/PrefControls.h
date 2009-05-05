@@ -16,6 +16,7 @@
 #define pnm_Col_C_Text					"txtc"
 #define pnm_Col_C_Selection				"selc"
 #define pnm_Col_C_Mark					"mrkc"
+#define pnm_Col_C_Highlight				"hilc"
 #define pnm_Col_C_Keyword1				"keyc"
 #define pnm_Col_C_Keyword2				"ke2c"
 #define pnm_Col_C_Comment1				"cmtc"

@@ -272,6 +272,7 @@ bool CPrefsDialog::OkClicked()
 	CntrlGetColor(pnm_Col_C_Text,				kColorText,				prf_C_Text);
 	CntrlGetColor(pnm_Col_C_Selection,			kColorSelection,		prf_C_Selection);
 	CntrlGetColor(pnm_Col_C_Mark,				kColorMark,				prf_C_Mark);
+	CntrlGetColor(pnm_Col_C_Highlight,			kColorHighlight,		prf_C_Highlight);
 	CntrlGetColor(pnm_Col_C_Keyword1,			kColorKeyword1,			prf_C_Keyword1);
 	CntrlGetColor(pnm_Col_C_Keyword2,			kColorKeyword2,			prf_C_Keyword2);
 	CntrlGetColor(pnm_Col_C_Comment1,			kColorComment1,			prf_C_Comment1);
@@ -492,6 +493,7 @@ bool CPrefsDialog::CancelClicked()
 	CntrlSetColor(pnm_Col_C_Text,				kColorText);
 	CntrlSetColor(pnm_Col_C_Selection,			kColorSelection);
 	CntrlSetColor(pnm_Col_C_Mark,				kColorMark);
+	CntrlSetColor(pnm_Col_C_Highlight,			kColorHighlight);
 	CntrlSetColor(pnm_Col_C_Keyword1,			kColorKeyword1);
 	CntrlSetColor(pnm_Col_C_Keyword2,			kColorKeyword2);
 	CntrlSetColor(pnm_Col_C_Comment1,			kColorComment1);

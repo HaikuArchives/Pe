@@ -873,10 +873,10 @@ void PDoc::CreateFilePanel()
 	{
 		BView *background = savePanel->ChildAt(0);
 		FailNilMsg(background, "Error building FilePanel");
-		
+
 		BButton *cancel = dynamic_cast<BButton*>(background->FindView("cancel button"));
 		FailNilMsg(cancel, "Error building FilePanel");
-		
+
 		BView *textview = background->FindView("text view");
 		FailNilMsg(textview, "Error building FilePanel");
 
@@ -1226,6 +1226,26 @@ void PDoc::DeleteAddOns()
 } /* PDoc::DeleteAddOns */
 
 #pragma mark - Commands
+
+void PDoc::DispatchMessage(BMessage* message, BHandler* handler)
+{
+	// This is a work-around for the problem that anchor, caret, and the text
+	// itself are modified all over the place. Since all actions manipulating
+	// either of them should be caused by an incoming message, we check here
+	// whether they changed while the message was processed and call respective
+	// hooks on the PText.
+	int anchor = fText->Anchor();
+	int caret = fText->Caret();
+	int changeCounter = fText->TextBuffer().ChangeCounter();
+
+	inherited::DispatchMessage(message, handler);
+
+	if (fText->Anchor() != anchor || fText->Caret() != caret)
+		fText->SelectionChanged(anchor, caret);
+
+	if (fText->TextBuffer().ChangeCounter() != changeCounter)
+		fText->TextBufferChanged();
+}
 
 void PDoc::MessageReceived(BMessage *msg)
 {

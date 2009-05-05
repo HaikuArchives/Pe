@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,13 +28,15 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #ifndef PTEXT_H
 #define PTEXT_H
 
 typedef float g_unit_t;
+
+#include <list>
 
 #include <Messenger.h>
 #include <View.h>
@@ -62,7 +64,7 @@ struct LineInfo {
 	unsigned char state		: 8;
 	unsigned char dirty		: 1;
 	unsigned char nl		: 1;
-	
+
 	LineInfo() { start = state = dirty = nl = 0; };
 	LineInfo(int nStart, int nState, bool nNl = true)
 		: start(nStart), state(nState), dirty(1), nl(nNl) {};
@@ -73,7 +75,7 @@ struct WordInfo {
 	short classCnt;
 	unsigned char classMap[256];
 	short forwardCnt;
-	unsigned char forwardTable[1]; 
+	unsigned char forwardTable[1];
 };
 
 typedef vector<LineInfo> VLineInfo;
@@ -91,14 +93,14 @@ enum {
 };
 
 public:
-			PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], 
+			PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[],
 				  const char *ext);
 			~PText();
 
 			void ReInit();
 
 			void SetStatus(PStatus *status);
-		
+
 virtual		void AttachedToWindow();
 
 virtual		void Draw(BRect updateRect);
@@ -117,7 +119,7 @@ virtual		void FrameResized(float w, float h);
 			void Pulse();
 
 			void HandleDrop(BMessage *msg);
-			
+
 			void ProcessCommand(unsigned long what, void *param);
 
 			void SetText(const char *utf8Text, size_t size);
@@ -137,17 +139,17 @@ virtual		void FrameResized(float w, float h);
 			void FontChanged(bool reInit = true);
 
 			void ChangedInfo(BMessage *msg);
-			
+
 			void GetSelectedText(char*& s, bool extend = false);
 			void CopyBlock(char*& s, int from, int to);
 
 			bool WaitMouseMoved(BPoint where);
 			void ShowContextualMenu(BPoint where);
 			void ShowFunctionMenu(BPoint where, int which);
-			
+
 			void SetDirty(bool dirty);
 			bool IsDirty();
-		
+
 			void AdjustScrollBars();
 			void ScrollBarChanged(BScrollBar *bar, g_unit_t newValue);
 			void ScrollToCaret(bool keepContext);
@@ -156,7 +158,7 @@ virtual		void FrameResized(float w, float h);
 	virtual	void ScrollTo(BPoint p);
 
 			void ShowTabStops(bool show);
-	
+
 			void DrawLine(int lineNr, g_unit_t y, bool buffer);
 //			void DrawString(BView *v, const char *buf, int size, float hv, float& x, float y);
 			void RedrawDirtyLines();
@@ -166,7 +168,8 @@ virtual		void FrameResized(float w, float h);
 			void DrawCaret();
 			void HideCaret();
 			void ShowCaret();
-			
+			void InvalidateRange(int fromOffset, int toOffset, int part);
+
 			status_t PageSetup();
 			status_t Print();
 
@@ -184,7 +187,7 @@ virtual		void FrameResized(float w, float h);
 			void SmartBrace();
 			void ScanForFunctions(CFunctionScanHandler& handler);
 			void HashLines(vector<int>& hv, bool ignoreCase, bool ignoreWhite);
-			
+
 			int Offset2Line(int offset);
 			BPoint Offset2Position(int offset, int part = -1);
 			int LinePosition2Offset(int line, g_unit_t position);
@@ -198,55 +201,55 @@ virtual		void FrameResized(float w, float h);
 			int Offset2Column(int offset);
 			int Column2Offset(int lineNr, int column);
 			int RealLine2Line(int lineNr);
-			
+
 			// block select mode:
 			bool IsFixedFont() const;
 			bool IsBlockSelect() const				{ return fBlockSelect; }
 			void SetBlockSelect(bool block)			{ fBlockSelect = block; }
 			void BlockOffsetsForLine(int lineNr, int& startOffset, int& endOffset);
-			
+
 			void Selection2Region(BRegion& rgn, int part = -1);
 			void ChangeSelection(int newAnchor, int newCaret, bool block = false);
 			void SelectLine(int lineNr);
 			void SelectParagraph();
 			void InvertRegion(BRegion& rgn);
-	
+
 			void CharKeyDown(const char *bytes, int numBytes);
 			void BackspaceKeyDown();
 			void DeleteKeyDown();
 			void GlossaryKey(int ch, int modifiers);
 			void GlossaryButton(const char *glossy);
-			
+
 			g_unit_t TextWidth(int offset, int len) const;
 			g_unit_t StringWidth(const char *buf, int len) const;
-			
+
 			void Insert(const char *text, int textLen, int offset);
 			void Delete(int from, int to);
 			void RestyleDirtyLines(int from);
 			void TextChanged(int from, int to);
 			void TypeString(const char *string);
-			
+
 			void Cut(int append = 0);
 			void Copy(int append = 0);
 			void Paste();
 			void Clear();
-			
+
 			void TouchLine(int lineNr);
 			void TouchLines(int from, int to = -1);
-		
+
 			int Anchor();
 			int Caret();
 			void SetCaret(int newCaret);
 			void SetMark(int offset);
 			void Select(int anchor, int caret, bool update, bool block);
 			void CenterSelection();
-			
+
 			void RegisterCommand(PCmd *cmd);
 			void Undo();
 			void Redo();
 			void ResetUndo();
 			void FlushUndo();
-			
+
 			void Find(unsigned long msg, void *args);
 			bool CanReplace(const char *s, bool ignoreCase, bool regx);
 			bool FindNext(const char *what, int& offset, bool ignoreCase,
@@ -255,10 +258,10 @@ virtual		void FrameResized(float w, float h);
 			bool IsIncSearching() const;
 			void DoIncSearch(bool forward);
 			void IncSearchKey(const char *bytes, int numBytes);
-			
+
 			void JumpToFunction(const char *func, int offset);
 			void FindNextError(bool backward);
-			
+
 			void ExecuteSelection();
 			void KillCurrentJob();
 			void PrepareForOutput();
@@ -266,7 +269,7 @@ virtual		void FrameResized(float w, float h);
 			const char *GetCWD() const;
 			void SendTextToJob(const char *txt);
 			void SetErrorWindow(PErrorWindow *window);
-			
+
 			void SetSplitter(PSplitter *splitter);
 			void TrackSplitter(BPoint where);
 			void SplitterMoved(g_unit_t dy);
@@ -274,7 +277,7 @@ virtual		void FrameResized(float w, float h);
 			void SplitWindow();
 			void UnsplitWindow();
 			void SwitchPart(int toPart);
-		
+
 			const PTextBuffer& TextBuffer() const;
 			const char* FindString() const;
 			const char* ReplaceString() const;
@@ -287,6 +290,11 @@ virtual		void FrameResized(float w, float h);
 			int WrapType() const;
 			int WrapWidth() const;
 			PDoc* Doc() const;
+
+			void SelectionChanged(int oldAnchor, int oldCaret);
+			void TextBufferChanged();
+			void ActivePartChanged(int oldActivePart);
+			void UpdateBraceHighlights();
 
 private:
 			void VerticallyScrollToSelection(int startOffset,
@@ -302,7 +310,7 @@ private:
 			BRect PartBounds(int part);
 			bool OffsetIsOutsideOfContextArea(int32 offset);
 			void NavigateOverFunctions(char direction);
-			
+
 			BBitmap *fLineMap;
 			BView	*fLineView;
 			BFont fFont;
@@ -355,11 +363,29 @@ private:
 			float fDefaultCharWidth;
 			BMessage *fPrintSettings;
 			BMessenger fErrorWindowMessenger;
-		
+
 static		PText *sfDragSource;
 
 			rgb_color fLowColor, fTextColor;
 			rgb_color fKeywordColor, fStringColor, fCommentColor;
+
+			struct HighlightInfo {
+				HighlightInfo()
+					: fromOffset(-1)
+				{
+				}
+
+				int	fromOffset;
+				int toOffset;
+			};
+			typedef std::list<HighlightInfo*> HighlightList;
+
+			int fHighlightCursor;
+			int fHighlightChangeCounter;
+			int fHighlightPart;
+			HighlightInfo fBraceHighlight1;
+			HighlightInfo fBraceHighlight2;
+			HighlightList fHighlights;
 
 // saveable settings
 			int fTabStops;
@@ -483,8 +509,8 @@ inline bool PText::IsFixedFont() const
 
 inline void PText::ProcessCommand(unsigned long what, void *param)
 {
-	BMessage msg(what); 
-	msg.AddPointer("param", param); 
+	BMessage msg(what);
+	msg.AddPointer("param", param);
 	BMessenger(this).SendMessage(&msg);
 }
 

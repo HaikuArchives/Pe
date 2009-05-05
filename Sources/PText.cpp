@@ -240,6 +240,10 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fMainPopUp->SetFont(be_plain_font);
 	fMainPopUp->SetRadioMode(false);
 
+	fHighlightCursor = -1;
+	fHighlightChangeCounter = -1;
+	fHighlightPart = -1;
+
 	ReInit();
 } /* PText::PText */
 
@@ -1510,6 +1514,7 @@ void PText::DoneMovingSplitter()
 	if (kSplitMinimum > fSplitAt ||
 		b.Height() - kSplitMinimum < fSplitAt + kSplitterHeight)
 	{
+		int previousActivePart = fActivePart;
 		fActivePart = 2;
 		fVScrollBar2->SetValue(v);
 
@@ -1527,15 +1532,22 @@ void PText::DoneMovingSplitter()
 
 		TouchLines(floor(v / fLineHeight));
 		RedrawDirtyLines();
+
+		if (fActivePart != previousActivePart)
+			ActivePartChanged(previousActivePart);
 	}
 } /* PText::DoneMovingSplitter */
 
 void PText::SwitchPart(int newPart)
 {
+	int previousActivePart = fActivePart;
 	HideCaret();
 
 	fActivePart = newPart;
 	HiliteSelection();
+
+	if (fActivePart != previousActivePart)
+		ActivePartChanged(previousActivePart);
 } /* PText::SwitchPart */
 
 void PText::SplitWindow()
@@ -4845,6 +4857,37 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 		}
 	}
 
+	// draw the background for highlighted text
+	bool highlightsDrawn = false;
+	for (HighlightList::iterator it = fHighlights.begin();
+			it != fHighlights.end(); ++it)
+	{
+		HighlightInfo* highlight = *it;
+		if (highlight->fromOffset < e && highlight->toOffset >= s)
+		{
+			BRect r(E);
+
+			if (highlight->fromOffset > s)
+				r.left = Offset2Position(highlight->fromOffset).x - hv;
+			else
+				r.left = hv ? 0 : 3;
+
+			if (highlight->toOffset < e
+				|| (lineNr == LineCount() - 1
+					&& highlight->toOffset == fText.Size()))
+			{
+				r.right = Offset2Position(highlight->toOffset).x - hv;
+			}
+
+			vw->SetLowColor(gColor[kColorHighlight]);
+			vw->FillRect(r, B_SOLID_LOW);
+			highlightsDrawn = true;
+		}
+	}
+
+	if (highlightsDrawn)
+		vw->SetLowColor(gColor[kColorLow]);
+
 	int a, c;
 	a = min(fAnchor, fCaret);
 	c = max(fAnchor, fCaret);
@@ -5425,6 +5468,50 @@ void PText::ShiftLines(int first, int dy, int part)
 	else if (first < tl + ceil(b.Height() / fLineHeight))
 		Draw(b);
 } /* PText::ShiftLinesPart2 */
+
+void PText::InvalidateRange(int fromOffset, int toOffset, int part)
+{
+	if (fromOffset >= toOffset)
+		return;
+
+	// get bounds and vertical scroll offset of the part in question
+	float vScrollOffset = 0;
+	BRect bounds;
+
+	if (part == 1)
+	{
+		if (fSplitAt <= 0)
+			return;
+
+		bounds = fBounds;
+		bounds.bottom = fSplitAt - kSplitterHeight;
+		vScrollOffset = fVScrollBar1->Value();
+	}
+	else if (part == 2)
+	{
+		bounds = fBounds;
+		bounds.top = fSplitAt;
+		vScrollOffset = fVScrollBar2->Value();
+	}
+	else
+		return;
+
+	if (!bounds.IsValid())
+		return;
+
+	// We only invalidate complete lines.
+	int fromLine = Offset2Line(fromOffset);
+	int toLine = Offset2Line(toOffset - 1);
+
+	// compute the invalidation rect and invalidate it
+	float fromY = ceil(fLineHeight * fromLine - vScrollOffset);
+	float toY = fromY + ceil((toLine + 1 - fromLine) * fLineHeight);
+	float hScrollOffset = fHScrollBar->Value();
+	BRect rect(hScrollOffset, fromY + 1, hScrollOffset + fBounds.Width(),
+		toY);
+	Invalidate(rect & bounds.OffsetByCopy(hScrollOffset, 0));
+}
+
 
 // #pragma mark - Printing
 
@@ -6052,6 +6139,7 @@ void PText::MessageReceived(BMessage *msg)
 				if (fSplitAt > 0)
 				{
 					HideCaret();
+					int previousActivePart = fActivePart;
 					fActivePart = (fActivePart == 1) ? 2 : 1;
 
 					int a, c;
@@ -6062,6 +6150,9 @@ void PText::MessageReceived(BMessage *msg)
 					fOPCaret = c;
 					fOPAnchor = a;
 					std::swap(fMark, fOPMark);
+
+					if (fActivePart != previousActivePart)
+						ActivePartChanged(previousActivePart);
 				}
 				else
 					beep();
@@ -6485,3 +6576,112 @@ void PText::ChangedInfo(BMessage *msg)
 	ReInit();
 	Invalidate();
 } /* PText::ChangedInfo */
+
+
+// #pragma mark - Highlighting
+
+void PText::SelectionChanged(int oldAnchor, int oldCaret)
+{
+	int newCursor = fAnchor == fCaret ? fAnchor : -1;
+	if (newCursor != fHighlightCursor)
+		UpdateBraceHighlights();
+}
+
+void PText::TextBufferChanged()
+{
+	if (fText.ChangeCounter() != fHighlightChangeCounter)
+		UpdateBraceHighlights();
+}
+
+void PText::ActivePartChanged(int oldActivePart)
+{
+	if (fActivePart != fHighlightPart)
+		UpdateBraceHighlights();
+}
+
+void PText::UpdateBraceHighlights()
+{
+	// invalidate the old highlights
+	if (fBraceHighlight1.fromOffset >= 0) {
+		InvalidateRange(fBraceHighlight1.fromOffset, fBraceHighlight1.toOffset,
+			fHighlightPart);
+		fBraceHighlight1.fromOffset = -1;
+		fHighlights.remove(&fBraceHighlight1);
+	}
+
+	if (fBraceHighlight2.fromOffset >= 0) {
+		InvalidateRange(fBraceHighlight2.fromOffset, fBraceHighlight2.toOffset,
+			fHighlightPart);
+		fBraceHighlight2.fromOffset = -1;
+		fHighlights.remove(&fBraceHighlight2);
+	}
+
+	fHighlightCursor = fAnchor == fCaret ? fAnchor : -1;
+	fHighlightChangeCounter = fText.ChangeCounter();
+	fHighlightPart = fActivePart;
+
+	if (!gBalance)
+		return;
+
+	// If we have a selection, there's nothing to highlight
+	if (fHighlightCursor < 0)
+		return;
+
+	// Check whether the cursor touches a parenthesis/bracket/brace
+	char charBefore = fHighlightCursor > 0
+		? fText[fHighlightCursor - 1] : 0;
+	char charAfter = fHighlightCursor < fText.Size()
+		? fText[fHighlightCursor] : 0;
+	int offset = -1;
+	int direction = 1;
+	if (charBefore == ')' || charBefore == ']' || charBefore == '}'
+		|| charBefore == '>')
+	{
+		// match opening counterpart
+		offset = fHighlightCursor - 1;
+		direction = -1;
+	}
+	else if (charAfter == '(' || charAfter == '[' || charAfter == '{'
+		|| charAfter == '<')
+	{
+		// match closing counterpart
+		offset = fHighlightCursor;
+	}
+	else if (charBefore == '(' || charBefore == '[' || charBefore == '{'
+		|| charBefore == '<')
+	{
+		// match closing counterpart
+		offset = fHighlightCursor - 1;
+	}
+	else if (charAfter == ')' || charAfter == ']' || charAfter == '}'
+		|| charAfter == '>')
+	{
+		// match opening counterpart
+		offset = fHighlightCursor;
+		direction = -1;
+	}
+	else
+		return;
+
+	// find the other
+	int otherOffset = FindTheOther(offset + (direction > 0 ? 1 : 0),
+		fText[offset]);
+	if (otherOffset < 0)
+		return;
+
+	if (direction < 0)
+		otherOffset--;
+
+	// update the highlights
+	fBraceHighlight1.fromOffset = offset;
+	fBraceHighlight1.toOffset = fBraceHighlight1.fromOffset + 1;
+	fHighlights.push_back(&fBraceHighlight1);
+	InvalidateRange(fBraceHighlight1.fromOffset, fBraceHighlight1.toOffset,
+		fHighlightPart);
+
+	fBraceHighlight2.fromOffset = otherOffset;
+	fBraceHighlight2.toOffset = fBraceHighlight2.fromOffset + 1;
+	fHighlights.push_back(&fBraceHighlight2);
+	InvalidateRange(fBraceHighlight2.fromOffset, fBraceHighlight2.toOffset,
+		fHighlightPart);
+}
