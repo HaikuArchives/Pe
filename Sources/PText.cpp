@@ -242,7 +242,6 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 
 	fHighlightCursor = -1;
 	fHighlightChangeCounter = -1;
-	fHighlightPart = -1;
 
 	ReInit();
 } /* PText::PText */
@@ -2046,6 +2045,8 @@ void PText::MouseDown(BPoint where)
 
 		fStatus->SetOffset(fCaret);
 
+		SelectionChanged();
+
 		g_unit_t v = -1;
 		BPoint cur;
 
@@ -2065,6 +2066,7 @@ void PText::MouseDown(BPoint where)
 						curOffset = LineStart(Offset2Line(curOffset));
 
 					ChangeSelection(max(anchor2, curOffset), min(anchor1, curOffset), modifiers & B_OPTION_KEY);
+					SelectionChanged();
 				}
 				else if (curOffset > anchor2)
 				{
@@ -2078,6 +2080,7 @@ void PText::MouseDown(BPoint where)
 					}
 
 					ChangeSelection(min(anchor1, curOffset), max(anchor2, curOffset), modifiers & B_OPTION_KEY);
+					SelectionChanged();
 				}
 
 				v = fActivePart == 1 ? fVScrollBar1->Value() : fVScrollBar2->Value();
@@ -5511,12 +5514,18 @@ void PText::InvalidateRange(int fromOffset, int toOffset, int part)
 	int toLine = Offset2Line(toOffset - 1);
 
 	// compute the invalidation rect and invalidate it
-	float fromY = ceil(fLineHeight * fromLine - vScrollOffset);
+	float fromY = bounds.top + ceil(fLineHeight * fromLine - vScrollOffset);
 	float toY = fromY + ceil((toLine + 1 - fromLine) * fLineHeight);
 	float hScrollOffset = fHScrollBar->Value();
 	BRect rect(hScrollOffset, fromY + 1, hScrollOffset + fBounds.Width(),
 		toY);
 	Invalidate(rect & bounds.OffsetByCopy(hScrollOffset, 0));
+}
+
+void PText::InvalidateRange(int fromOffset, int toOffset)
+{
+	InvalidateRange(fromOffset, toOffset, 1);
+	InvalidateRange(fromOffset, toOffset, 2);
 }
 
 
@@ -6587,7 +6596,7 @@ void PText::ChangedInfo(BMessage *msg)
 
 // #pragma mark - Highlighting
 
-void PText::SelectionChanged(int oldAnchor, int oldCaret)
+void PText::SelectionChanged()
 {
 	int newCursor = fAnchor == fCaret ? fAnchor : -1;
 	if (newCursor != fHighlightCursor)
@@ -6602,30 +6611,25 @@ void PText::TextBufferChanged()
 
 void PText::ActivePartChanged(int oldActivePart)
 {
-	if (fActivePart != fHighlightPart)
-		UpdateBraceHighlights();
 }
 
 void PText::UpdateBraceHighlights()
 {
 	// invalidate the old highlights
 	if (fBraceHighlight1.fromOffset >= 0) {
-		InvalidateRange(fBraceHighlight1.fromOffset, fBraceHighlight1.toOffset,
-			fHighlightPart);
+		InvalidateRange(fBraceHighlight1.fromOffset, fBraceHighlight1.toOffset);
 		fBraceHighlight1.fromOffset = -1;
 		fHighlights.remove(&fBraceHighlight1);
 	}
 
 	if (fBraceHighlight2.fromOffset >= 0) {
-		InvalidateRange(fBraceHighlight2.fromOffset, fBraceHighlight2.toOffset,
-			fHighlightPart);
+		InvalidateRange(fBraceHighlight2.fromOffset, fBraceHighlight2.toOffset);
 		fBraceHighlight2.fromOffset = -1;
 		fHighlights.remove(&fBraceHighlight2);
 	}
 
 	fHighlightCursor = fAnchor == fCaret ? fAnchor : -1;
 	fHighlightChangeCounter = fText.ChangeCounter();
-	fHighlightPart = fActivePart;
 
 	if (!gBalance)
 		return;
@@ -6683,12 +6687,10 @@ void PText::UpdateBraceHighlights()
 	fBraceHighlight1.fromOffset = offset;
 	fBraceHighlight1.toOffset = fBraceHighlight1.fromOffset + 1;
 	fHighlights.push_back(&fBraceHighlight1);
-	InvalidateRange(fBraceHighlight1.fromOffset, fBraceHighlight1.toOffset,
-		fHighlightPart);
+	InvalidateRange(fBraceHighlight1.fromOffset, fBraceHighlight1.toOffset);
 
 	fBraceHighlight2.fromOffset = otherOffset;
 	fBraceHighlight2.toOffset = fBraceHighlight2.fromOffset + 1;
 	fHighlights.push_back(&fBraceHighlight2);
-	InvalidateRange(fBraceHighlight2.fromOffset, fBraceHighlight2.toOffset,
-		fHighlightPart);
+	InvalidateRange(fBraceHighlight2.fromOffset, fBraceHighlight2.toOffset);
 }

@@ -169,6 +169,7 @@ virtual		void FrameResized(float w, float h);
 			void HideCaret();
 			void ShowCaret();
 			void InvalidateRange(int fromOffset, int toOffset, int part);
+			void InvalidateRange(int fromOffset, int toOffset);
 
 			status_t PageSetup();
 			status_t Print();
@@ -291,7 +292,7 @@ virtual		void FrameResized(float w, float h);
 			int WrapWidth() const;
 			PDoc* Doc() const;
 
-			void SelectionChanged(int oldAnchor, int oldCaret);
+			void SelectionChanged();
 			void TextBufferChanged();
 			void ActivePartChanged(int oldActivePart);
 			void UpdateBraceHighlights();

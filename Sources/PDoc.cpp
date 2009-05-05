@@ -110,6 +110,7 @@ PDoc::PDoc(const entry_ref *doc, bool show)
 			AddRecent(path.Path());
 
 		NameChanged();
+		fText->TextBufferChanged();
 	}
 
 	fButtonBar->SetEnabled(msg_Save, false);
@@ -1241,7 +1242,7 @@ void PDoc::DispatchMessage(BMessage* message, BHandler* handler)
 	inherited::DispatchMessage(message, handler);
 
 	if (fText->Anchor() != anchor || fText->Caret() != caret)
-		fText->SelectionChanged(anchor, caret);
+		fText->SelectionChanged();
 
 	if (fText->TextBuffer().ChangeCounter() != changeCounter)
 		fText->TextBufferChanged();
