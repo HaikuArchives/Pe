@@ -87,7 +87,7 @@ private:
 	virtual	void StartWatchingFolder(void);
 	virtual	void StopWatchingFolder(void);
 
-			bool _HasFileContentsChanged(BPositionIO& file);
+			bool _HasFileContentsChanged(BFile& file);
 
 			entry_ref *fEntryRef;
 			node_ref fNodeRef;
