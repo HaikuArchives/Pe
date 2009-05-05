@@ -4886,7 +4886,10 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 	}
 
 	if (highlightsDrawn)
+	{
+		vw->SetDrawingMode(B_OP_OVER);
 		vw->SetLowColor(gColor[kColorLow]);
+	}
 
 	int a, c;
 	a = min(fAnchor, fCaret);
@@ -5167,6 +5170,10 @@ void PText::DrawLine(int lineNr, float y, bool buffer)
 		vw->StrokeLine(BPoint(x, E.top), BPoint(x, E.bottom));
 		vw->SetHighColor(kBlack);
 	}
+
+	// restore B_OP_COPY if necessary
+	if (highlightsDrawn)
+		vw->SetDrawingMode(B_OP_COPY);
 
 	if (buffer)
 	{
