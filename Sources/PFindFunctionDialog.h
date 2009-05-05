@@ -1,5 +1,7 @@
-// PFindFunctionDialog.h
-
+/*
+ * Copyright 2004, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef PFINDFUNCTIONDIALOG_H
 #define PFINDFUNCTIONDIALOG_H
 

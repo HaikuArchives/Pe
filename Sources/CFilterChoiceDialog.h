@@ -1,5 +1,7 @@
-// CFilterChoiceDialog.h
-
+/*
+ * Copyright 2004, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef CFILTERCHOICEDIALOG_H
 #define CFILTERCHOICEDIALOG_H
 
