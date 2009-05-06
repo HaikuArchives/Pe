@@ -131,25 +131,22 @@ long CutContaining(MTextAddOn *addon)
 {
 	//  error checking
 
-	long	selStart;
+	long	selBeg;
 	long	selEnd;
 
 	if (sSelectionOnly)
 	{
-		addon->GetSelection(&selStart, &selEnd);
-		if (selEnd <= selStart)
+		addon->GetSelection(&selBeg, &selEnd);
+		if (selEnd <= selBeg)
 			return B_ERROR;
 	}
 	else
 	{
-		selStart = 0;
+		selBeg = 0;
 		selEnd = addon->TextLength();
 	}
 
 	//  set-up
-
-	const char *txt = addon->Text();
-	int size = selEnd - selStart;
 
 	regex_t pb;
 	memset(&pb, 0, sizeof(pb));
@@ -157,63 +154,45 @@ long CutContaining(MTextAddOn *addon)
 
 	if (r == REG_NOERROR)
 	{
-		char *new_text = new char[size + 1];
-		int ns, ni, ts, ti;
+		BString clip;
+		BString line;
+		const char *txt = addon->Text()+selBeg;
+		int size = selEnd - selBeg;
+		int beg = 0;
+		int pos = -1;
+		int len;
 
-		ns = ni = ts = ti = 0;
-
-		while (ti <= size)
+		while (++pos <= size)
 		{
-			if (ti == size || txt[ti] == '\n')
+			if ((pos == size || txt[pos] == '\n'))
 			{
-				int sl = ni - ns + 1;
+				if ((len = pos-beg) > 0) {
+					line.SetTo(txt+beg, len);
+					if (regexec(&pb, line.String(), 0, NULL, 0) == REG_NOERROR)
+					{
+						addon->Select(beg, pos + 1);
+						addon->Delete();
+						txt = addon->Text()+selBeg;
+						pos = beg - 1;
+						size -= len + 1;
 
-				new_text[ni] = 0;
-
-				r = regexec(&pb, new_text + ns, 0, NULL, 0);
-
-				if (r == 0)
-				{
-					addon->Select(ts, ti + 1);
-					addon->Delete();
-					txt = addon->Text();
-
-					ti -= sl;
-					size -= sl;
-
-					new_text[ni] = '\n';
-					ns = ni + 1;
+						clip << line << '\n';
+						continue;
+					}
 				}
-				else if (r == REG_NOMATCH)
-				{
-					ni = ns - 1;
-					ts = ti + 1;
-				}
-				else
-					break;
-			}
-			else
-				new_text[ni] = txt[ti];
-
-			ni++;
-			ti++;
-		}
-
-		if (r < 2)
-		{
-			if (be_clipboard->Lock())
-			{
-				be_clipboard->Clear();
-				be_clipboard->Data()->AddData("text/plain", B_MIME_DATA, new_text, ns);
-				be_clipboard->Commit();
-				be_clipboard->Unlock();
+				beg = pos + 1;
 			}
 		}
 
-		delete[] new_text;
+		if (be_clipboard->Lock())
+		{
+			be_clipboard->Clear();
+			be_clipboard->Data()->AddData("text/plain", B_MIME_DATA, clip.String(), clip.Length());
+			be_clipboard->Commit();
+			be_clipboard->Unlock();
+		}
 	}
-
-	if (r != REG_NOERROR && r != REG_NOMATCH)
+	else
 	{
 		char err[100];
 

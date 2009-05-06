@@ -131,25 +131,22 @@ long CopyContaining(MTextAddOn *addon)
 {
 	//  error checking
 
-	long	selStart;
+	long	selBeg;
 	long	selEnd;
 
 	if (sSelectionOnly)
 	{
-		addon->GetSelection(&selStart, &selEnd);
-		if (selEnd <= selStart)
+		addon->GetSelection(&selBeg, &selEnd);
+		if (selEnd <= selBeg)
 			return B_ERROR;
 	}
 	else
 	{
-		selStart = 0;
+		selBeg = 0;
 		selEnd = addon->TextLength();
 	}
 
 	//  set-up
-
-	const char *txt = addon->Text(), *ptr = txt + selStart;
-	int size = selEnd - selStart;
 
 	regex_t pb;
 	memset(&pb, 0, sizeof(pb));
@@ -157,51 +154,38 @@ long CopyContaining(MTextAddOn *addon)
 
 	if (r == REG_NOERROR)
 	{
-		//  perform operation into temporary buffer
+		BString clip;
+		BString line;
+		const char *txt = addon->Text()+selBeg;
+		int size = selEnd - selBeg;
+		int beg = 0;
+		int pos = -1;
+		int len;
 
-		char *new_text = new char[size + 1];
-		int ls = 0, li = 0, i = 0;
-
-		while (li <= size)
+		while (++pos <= size)
 		{
-			if (li == size || ptr[li] == '\n')
+			if ((pos == size || txt[pos] == '\n'))
 			{
-				new_text[i] = 0;
-
-				r = regexec(&pb, new_text + ls, 0, NULL, 0);
-
-				if (r == 0)
-				{
-					new_text[i] = '\n';
-					ls = i + 1;
+				if ((len = pos-beg) > 0) {
+					line.SetTo(txt+beg, len);
+					if (regexec(&pb, line.String(), 0, NULL, 0) == REG_NOERROR)
+					{
+						clip << line << '\n';
+					}
 				}
-				else if (r == REG_NOMATCH)
-					i = ls - 1;
-				else
-					break;
+				beg = pos + 1;
 			}
-			else
-				new_text[i] = ptr[li];
-
-			i++;
-			li++;
 		}
 
-		if (r < 2)
+		if (be_clipboard->Lock())
 		{
-			if (be_clipboard->Lock())
-			{
-				be_clipboard->Clear();
-				be_clipboard->Data()->AddData("text/plain", B_MIME_DATA, new_text, ls);
-				be_clipboard->Commit();
-				be_clipboard->Unlock();
-			}
+			be_clipboard->Clear();
+			be_clipboard->Data()->AddData("text/plain", B_MIME_DATA, clip.String(), clip.Length());
+			be_clipboard->Commit();
+			be_clipboard->Unlock();
 		}
-
-		delete[] new_text;
 	}
-
-	if (r != REG_NOERROR && r != REG_NOMATCH)
+	else
 	{
 		char err[100];
 
