@@ -167,7 +167,17 @@ long CopyContaining(MTextAddOn *addon)
 			if ((pos == size || txt[pos] == '\n'))
 			{
 				if ((len = pos-beg) > 0) {
+#ifdef __HAIKU__
+					// I assume on Haiku it's fast enough
 					line.SetTo(txt+beg, len);
+#else
+					// Fast workaround for slow BString.SetTo() on BeOS
+					char *buf;
+					FailNil(buf = line.LockBuffer(len+1));
+					memcpy(buf, txt+beg, len);
+					buf[len] = '\0';
+					line.UnlockBuffer(len);
+#endif
 					if (regexec(&pb, line.String(), 0, NULL, 0) == REG_NOERROR)
 					{
 						clip << line << '\n';
