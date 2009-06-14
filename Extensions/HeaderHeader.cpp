@@ -217,8 +217,14 @@ class MimeRefFilter : public BRefFilter {
 			//MimeRefFilter(BList *mimes);
 	virtual	~MimeRefFilter();
 
+#ifdef __HAIKU__
+	virtual	bool	Filter(const entry_ref *ref, BNode *node, 
+							struct stat_beos *st, const char *filetype);
+#else
 	virtual	bool	Filter(const entry_ref *ref, BNode *node, 
 							struct stat *st, const char *filetype);
+#endif
+
 	private:
 		BList	*fMimes;
 };
@@ -253,8 +259,13 @@ MimeRefFilter::~MimeRefFilter()
 
 
 bool
+#ifdef __HAIKU__
+MimeRefFilter::Filter(const entry_ref *ref, BNode *node, 
+					struct stat_beos *st, const char *filetype)
+#else
 MimeRefFilter::Filter(const entry_ref *ref, BNode *node, 
 					struct stat *st, const char *filetype)
+#endif
 {
 	int i;
 	// allow folders else it's quite hard to navigate :)
