@@ -165,14 +165,14 @@ long Pipe(MTextAddOn *addon)
 			char cmd[1024];
 			sprintf(cmd, "cat %s | %s", fn, sText);
 
-			char *args[4];
+			const char *args[4];
 
 			args[0] = "/bin/sh";
 			args[1] = "-c";
 			args[2] = cmd;
 			args[3] = NULL;
 
-			if (execvp(args[0], args) < 0)
+			if (execvp(args[0], (char**)args) < 0)
 				beep();	// what else can we do???
 		}
 		else if (pid >= 0)	// parent

@@ -585,9 +585,8 @@ void PAboutBox::Animate()
 				p.y = kPEOffsetV;
 				p.x = fPStop;
 
-				unsigned int c = (int)fState2 * 10;
-
 #ifndef __HAIKU__
+				unsigned int c = (int)fState2 * 10;
 				fOffView->SetHighColor(c, c, (80 * (25 - fState2) + fState2 * 250) / 25);
 				fOffView->DrawString("B", p);
 				fOffView->SetHighColor((178 * (25 - fState2) + fState2 * 250) / 25 , c, c);

@@ -66,6 +66,7 @@ rgb_color DistinctColor(rgb_color highColor, rgb_color lowColor)
 	result.red = 255 - highColor.red; 
 	result.green = 255 - highColor.green; 
 	result.blue = 255 - highColor.blue;
+	result.alpha = highColor.alpha;
 	
 	return result;
 } /* DistinctColor */

@@ -35,7 +35,7 @@
 
 #include "pe.h"
 
-static char *rcsid = "$Id$";
+static const char *rcsid = "$Id$";
 
 #include "PApp.h"
 #include "PDoc.h"

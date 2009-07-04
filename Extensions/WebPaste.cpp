@@ -19,7 +19,7 @@
 #define OPEN_IN_BROWSER 1
 #define COPY_TO_CLIPBOARD 1
 
-struct {
+static struct {
 	const char *pe_name;
 	const char *cgi_name;
 } kLanguageNamesMap[] = {

@@ -55,7 +55,7 @@ int gResID, gResType;		// globals that describe the current resource
 char *gResName;
 void *gResData;
 int gResSize;
-char *gIncludePaths[kMaxIncludePaths];
+const char *gIncludePaths[kMaxIncludePaths];
 
 char out[PATH_MAX] = "rez.out";
 char *in = NULL;
@@ -86,7 +86,7 @@ void Usage()
 int getoptions(int argc, char *argv[])
 {
 	int i = 1, icnt = 0;
-	char **incl = gIncludePaths;
+	const char **incl = gIncludePaths;
 	
 	*incl++ = "";
 	*incl++ = ".";
@@ -289,7 +289,8 @@ void WriteResource(const char *file, int type, int id, const char *name)
 	void *p;
 	size_t s;
 	FILE *f;
-	char **i = gIncludePaths, path[PATH_MAX];
+	const char **i = gIncludePaths;
+	char path[PATH_MAX];
 	
 	do
 	{
@@ -358,7 +359,8 @@ void WriteHeader(unsigned long type, int id, const unsigned char *buf,
 void Include(const char *file)
 {
 	BFile f;
-	char **i = gIncludePaths, path[PATH_MAX];
+	const char **i = gIncludePaths;
+	char path[PATH_MAX];
 	
 	do
 	{

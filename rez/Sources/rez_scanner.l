@@ -227,7 +227,7 @@ ${hexdigit}{1,8}										yylval = strtol(yytext + 1, &d, 16); return NUMBER;
 															include_lineno_stack[include_stack_ptr] = yylineno;
 															include_stack[include_stack_ptr++] = YY_CURRENT_BUFFER;
 															yytext[yyleng - 1] = 0;
-															char **i = gIncludePaths;
+															const char **i = gIncludePaths;
 															char p[PATH_MAX];
 															
 															do

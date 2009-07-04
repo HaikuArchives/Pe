@@ -74,7 +74,7 @@ PeExtension HeaderHeader
 # <pe-src>
 PeExtension ImageToC
 	: ImageToC.cpp 
-	: libhekkel.so <nogrist>Pe be translation
+	: libhekkel.so <nogrist>Pe be translation $(STDC++LIB)
 	;
 # </pe-src>
 

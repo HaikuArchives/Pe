@@ -123,6 +123,12 @@ status_t PAddOn::Perform(BMessage& message)
 }
 
 
+status_t PAddOn::Perform(perform_code d, void* arg)
+{
+	return BHandler::Perform(d, arg);
+}
+
+
 status_t PAddOn::LanguagePerform(BMessage& message)
 {
 	return B_ERROR;

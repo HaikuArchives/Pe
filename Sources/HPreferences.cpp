@@ -129,6 +129,7 @@ rgb_color HPreferences::GetPrefColor(const char *name, rgb_color def)
 	if (pi != fPrefs.end())
 	{
 		rgb_color c;
+		c.alpha = 255;
 		char s[4], *p;
 		const char *v = (*pi).second;
 		

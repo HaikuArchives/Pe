@@ -58,6 +58,9 @@ public:
 
 	virtual void	LanguageChanged(BMessage& message);
 
+	virtual status_t	Perform(perform_code d, void* arg);
+							// just to avoid it being hidden
+
 protected:
 	/* buttons/menus */
 	void*			AddButton(BBitmap& bitmap, const char* toolTip, uint32 kind,

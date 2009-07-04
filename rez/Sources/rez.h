@@ -59,6 +59,6 @@ extern int gResID, gResType;
 extern char *gResName;
 extern void *gResData;
 extern int gResSize;
-extern char *gIncludePaths[];
+extern const char *gIncludePaths[];
 
 #endif

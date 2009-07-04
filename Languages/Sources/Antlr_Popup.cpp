@@ -582,8 +582,8 @@ const char *ident(const char *text, CLanguageProxy& proxy, char *&scope)
 
 void ScanForFunctions(CLanguageProxy& proxy)
 {
-	const char *text = proxy.Text(), *max = text + proxy.Size();
-	char * scope = "file";
+	const char* text = proxy.Text(), *max = text + proxy.Size();
+	char* scope = (char*)"file";
 	if (*max != 0)
 		return;
 	
