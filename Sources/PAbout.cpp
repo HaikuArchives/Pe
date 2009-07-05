@@ -48,7 +48,7 @@ const char kAboutText[] =
 		"a high performance editor\n"
 		"created by Maarten Hekkelman.\n"
 		"Hekkelman Programmatuur B.V.\n"
-		"Copyright © 1997, 1998, 2002.\n\n"
+		"Copyright © 1996, 1997, 1998, 2002.\n\n"
 		"-\n\n"
 		"This is the Open Source version of Pe,\n"
 		"copyright © 2003-2009, Team Pe,\n"
