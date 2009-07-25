@@ -5472,9 +5472,9 @@ void PText::ShiftLines(int first, int dy, int part)
 		CopyBits(src, dst);
 
 		if (dy > 0)
-			src.bottom = dst.top;
+			src.bottom = dst.top - 1;
 		else
-			src.top = dst.bottom;
+			src.top = dst.bottom + 1;
 
 		Invalidate(src);
 		Window()->UpdateIfNeeded();
