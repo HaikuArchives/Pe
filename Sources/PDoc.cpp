@@ -665,13 +665,13 @@ void PDoc::OpenSelection()
 			}
 
 			if ((back >= 0) && (front < end)) {
-				if ((text[back] == '"') && (text[front] != '"') ||
-					(text[back] != '"') && (text[front] == '"')) {
+				if (((text[back] == '"') && (text[front] != '"')) ||
+					((text[back] != '"') && (text[front] == '"'))) {
 					front = (frontSpace ? frontSpace : front);
 					back = (backSpace ? backSpace : back);
 				}
-				if ((text[back] == '<') && (text[front] != '>') ||
-					(text[back] != '<') && (text[front] == '>')) {
+				if (((text[back] == '<') && (text[front] != '>')) ||
+					((text[back] != '<') && (text[front] == '>'))) {
 					front = (frontSpace ? frontSpace : front);
 					back = (backSpace ? backSpace : back);
 				}

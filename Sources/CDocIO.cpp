@@ -649,7 +649,7 @@ void CLocalDocIO::HandleNodeMonitorMsg(BMessage* msg)
 
 	const char *name;
 	if ((opcode == B_ENTRY_CREATED
-			|| opcode == B_ENTRY_MOVED && fNodeRef.node == -1)
+			|| (opcode == B_ENTRY_MOVED && fNodeRef.node == -1))
 		&& msg->FindString("name", &name) == B_OK
 		&& !strcmp(name, fEntryRef->name))
 	{

@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 11/18/98 21:24:03
 */
@@ -62,7 +62,7 @@
 
 const unsigned long msg_Done = 'done';
 
-PProjectWindow* 
+PProjectWindow*
 PProjectWindow::Create(const entry_ref *doc, const char* mimetype)
 {
 	PProjectWindow* pwin = new PProjectWindow(doc, mimetype);
@@ -90,7 +90,7 @@ PProjectWindow::~PProjectWindow()
 		delete fPanel;
 		fPanel = NULL;
 	}
-	
+
 } /* PProjectWindow::~PProjectWindow */
 
 void PProjectWindow::SetupSizeAndLayout()
@@ -98,7 +98,7 @@ void PProjectWindow::SetupSizeAndLayout()
 	inherited::SetupSizeAndLayout();
 	ResizeTo(180, 400);
 	SetSizeLimits(100, 100000, 100, 100000);
-	
+
 	BRect r(Bounds());
 
 	BMenuBar *mbar;
@@ -107,31 +107,31 @@ void PProjectWindow::SetupSizeAndLayout()
 
 	r.bottom = r.top + kToolBarHeight;
 	r.OffsetBy(0, mbar->Bounds().bottom + 1);
-	
+
 	AddChild(fToolBar = new PToolBar(r, "toolbar"));
 
 	r.bottom -= 2;
 	r.OffsetTo(0, 0);
-	
+
 	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "buttonbar", rid_Tbar_ProjectWin, this));
-	
+
 	r = Bounds();
 	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT + 1;
 	r.right -= B_V_SCROLL_BAR_WIDTH;
-	AddChild(fStatus 
+	AddChild(fStatus
 		= new PGroupStatus(r, fDocIO->EntryRef() ? fDocIO->EntryRef()->name : NULL));
 
 	r = Bounds();
 	r.top = fToolBar->Frame().bottom;
-	
+
 	r.right -= B_V_SCROLL_BAR_WIDTH;
 	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
 	fList = new PTypeAHeadList(r, "group", fStatus);
 	fList->SetInvocationMessage(new BMessage(msg_PProjectItemInvoked));
 	fList->SetSelectionMessage(new BMessage(msg_PProjectItemSelected));
-	
+
 	AddChild(new BScrollView("scroller", fList, B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER));
-	
+
 	Read();
 
 	NameChanged();
@@ -157,27 +157,27 @@ void PProjectWindow::MessageReceived(BMessage *msg)
 			case msg_PProjectItemSelected:
 				SelectionChanged();
 				break;
-			
+
 			case msg_PAdd:
 				AddFiles();
 				SetDirty(true);
 				break;
-			
+
 			case msg_PRemove:
 				RemoveSelected();
 				break;
-			
+
 			case B_REFS_RECEIVED:
 				AddRefs(msg);
 				break;
-			
+
 			case msg_EditAsText:
 				if (IsDirty())
 					Save();
 				gApp->NewWindow(EntryRef());
 				Close();
 				break;
-			
+
 			default:
 				inherited::MessageReceived(msg);
 				break;
@@ -189,7 +189,7 @@ void PProjectWindow::SetText(const BString& docText)
 	fPrjFile = ProjectRoster->ParseProjectFile(EntryRef(), MimeType(), docText);
 	if (!fPrjFile || !fPrjFile->HaveProjectInfo())
 		return;
-	
+
 	try
 	{
 		fList->MakeEmpty();
@@ -203,10 +203,10 @@ void PProjectWindow::SetText(const BString& docText)
 	catch (HErr& e)
 	{
 		e.DoError();
-	}	
+	}
 } /* PProjectWindow::ReadData */
 
-void PProjectWindow::AddItemsToList(CProjectItem* item, 
+void PProjectWindow::AddItemsToList(CProjectItem* item,
 												BListItem* parentListItem)
 {
 	if (!item)
@@ -216,7 +216,7 @@ void PProjectWindow::AddItemsToList(CProjectItem* item,
 	BEntry e(path.Path());
 	entry_ref ref;
 	uint32 level
-		= parentListItem 
+		= parentListItem
 			? parentListItem->OutlineLevel() + 1
 			: 0;
 	if (e.Exists() && e.GetRef(&ref) == B_OK) {
@@ -250,9 +250,9 @@ void PProjectWindow::ReadAttr(BFile& file, BMessage& settingsMsg)
 		{
 			fm = (char *)malloc(ai.size);
 			FailNil(fm);
-			
+
 			FailIOErr(file.ReadAttr("pe-prj-info", ai.type, 0, fm, ai.size));
-			
+
 			FailOSErr(settingsMsg.Unflatten(fm));
 		}
 	}
@@ -272,7 +272,7 @@ void PProjectWindow::Save()
 	{
 		if (!fPrjFile)
 			THROW(("No project available"));
-		
+
 		fPrjFile->Save();
 		SetDirty(false);
 	}
@@ -295,7 +295,7 @@ void PProjectWindow::WriteAttr(BFile& file, const BMessage& settingsMsg)
 		FailIOErr(file.WriteAttr("pe-prj-info", 'info', 0, fm, s));
 	}
 	catch (HErr& e) {}
-	if (fm) 
+	if (fm)
 		free(fm);
 }
 
@@ -334,7 +334,7 @@ status_t PProjectWindow::InitCheck() const
 void PProjectWindow::AddRef(const entry_ref& ref)
 {
 	PEntryItem *item;
-	
+
 	for (int i = 0; i < fList->FullListCountItems(); i++)
 	{
 		item = static_cast<PEntryItem*>(fList->FullListItemAt(i));
@@ -359,10 +359,10 @@ void PProjectWindow::AddRef(const entry_ref& ref)
 		if (dynamic_cast<CProjectGroupItem*>(selectedItem->ModelItem()))
 			parentItem = selectedItem;
 		else
-			parentItem 
+			parentItem
 				= dynamic_cast<PProjectItem*>(fList->Superitem(selectedItem));
 		parentModelItem
-			= parentItem 
+			= parentItem
 				? dynamic_cast<CProjectGroupItem*>(parentItem->ModelItem())
 				: NULL;
 	}
@@ -376,8 +376,8 @@ void PProjectWindow::AddRef(const entry_ref& ref)
 	item = new PEntryItem(ref, level, modelItem);
 
 	if (parentModelItem && parentItem) {
-		int32 pos 
-			= parentModelItem->AddItem(modelItem, 
+		int32 pos
+			= parentModelItem->AddItem(modelItem,
 												gPrefs->GetPrefInt(prf_I_SortProjectFiles, 1));
 		int32 parentIdx = fList->FullListIndexOf(parentItem);
 		fList->AddItem( item, parentIdx + pos + 1);
@@ -385,7 +385,7 @@ void PProjectWindow::AddRef(const entry_ref& ref)
 		fPrjFile->AddItem(modelItem, false);
 		fList->AddItem(item);
 	}
-				
+
 	SetDirty(true);
 }
 
@@ -396,7 +396,7 @@ void PProjectWindow::AddFiles()
 	else
 	{
 		entry_ref ref;
-		
+
 		if (EntryRef())
 		{
 			BEntry e, p;
@@ -404,7 +404,7 @@ void PProjectWindow::AddFiles()
 			FailOSErr(e.GetParent(&p));
 			FailOSErr(p.GetRef(&ref));
 		}
-		
+
 		fPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), &ref);
 		fPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Add");
 		fPanel->Show();
@@ -415,7 +415,7 @@ void PProjectWindow::AddRefs(BMessage *msg)
 {
 	entry_ref ref;
 	int c = 0;
-	
+
 	while (msg->FindRef("refs", c++, &ref) == B_OK)
 		AddRef(ref);
 
@@ -427,17 +427,17 @@ void PProjectWindow::RemoveSelected()
 	do
 	{
 		if (fList->IsItemSelected(s)) {
-			PProjectItem* projectItem 
+			PProjectItem* projectItem
 				= dynamic_cast<PProjectItem*>(fList->RemoveItem(s));
 			if (projectItem) {
-				CProjectGroupItem* projectGroupItem 
+				CProjectGroupItem* projectGroupItem
 					= dynamic_cast<CProjectGroupItem*>(projectItem->ModelItem());
 				if (projectGroupItem) {
-					BAlert* alert 
-						= new BAlert( "Pe Message", 
+					BAlert* alert
+						= new BAlert( "Pe Message",
 										  "You can't remove a group-item",
 										  "Ah, Ok", NULL, NULL,
-										  B_WIDTH_AS_USUAL, B_OFFSET_SPACING, 
+										  B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
 										  B_WARNING_ALERT);
 					alert->SetShortcut( 0, B_ESCAPE);
 					alert->Go();
@@ -451,7 +451,7 @@ void PProjectWindow::RemoveSelected()
 		}
 	}
 	while (fList->IsItemSelected(s) ||
-		(s = fList->CurrentSelection(s)) > 0 && s < fList->CountItems());
+		((s = fList->CurrentSelection(s)) > 0 && s < fList->CountItems()));
 }
 
 void PProjectWindow::OpenItem()
@@ -466,17 +466,17 @@ void PProjectWindow::OpenItem()
 			FailOSErr(node.SetTo(&gi->Ref()));
 			BNodeInfo info;
 			FailOSErr(info.SetTo(&node));
-			
+
 			char mime[B_MIME_TYPE_LENGTH];
-			
-			CProjectFile* subProject 
+
+			CProjectFile* subProject
 				= dynamic_cast<CProjectFile*>(gi->ModelItem());
 			if (subProject) {
 				if (!subProject->HasBeenParsed()) {
 					subProject->Read();
 					if (subProject->HasBeenParsed()) {
 						list<CProjectItem*>::const_iterator iter;
-						for( iter = subProject->begin(); 
+						for( iter = subProject->begin();
 							  iter != subProject->end(); ++iter) {
 							AddItemsToList( *iter, gi);
 						}
@@ -512,8 +512,8 @@ void PProjectWindow::SelectionChanged(void)
 	int32 sel = fList->CurrentSelection(0);
 	BListItem* viewItem = (sel<0) ? NULL : fList->FullListItemAt(sel);
 	PProjectItem* prjViewItem = dynamic_cast<PProjectItem*>(viewItem);
-	CProjectItem* prjItem 
-		= prjViewItem 
+	CProjectItem* prjItem
+		= prjViewItem
 			? dynamic_cast<CProjectItem*>(prjViewItem->ModelItem())
 			: NULL;
 	bool addOk = prjItem ? prjItem->CanBeAddedTo() : false;
