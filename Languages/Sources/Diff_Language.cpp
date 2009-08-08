@@ -57,9 +57,9 @@ ColorLine(CLanguageProxy& proxy, int& /*state*/)
 	|| strncmp(proxy.Text(), "@@", 2) == 0) {
 		proxy.SetColor(0, kColorComment1);
 	} else if (*proxy.Text() == '-' || *proxy.Text() == '<') {
-		proxy.SetColor(0, kColorString1);
-	} else if (*proxy.Text() == '+' || *proxy.Text() == '>') {
 		proxy.SetColor(0, kColorError1);
+	} else if (*proxy.Text() == '+' || *proxy.Text() == '>') {
+		proxy.SetColor(0, kColorString1);
 	} else
 		proxy.SetColor(0, kColorText);
 }
