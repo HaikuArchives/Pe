@@ -64,7 +64,8 @@ rule SharedLibrary
 	MakeLocate $(lib) : $(LOCATE_MAIN_TARGET) ;
 	local linkFlags ;
 	if $(OSPLAT) = X86 {
-		linkFlags = -nostart -Xlinker -soname=\"$(lib)\" ;
+		linkFlags = -nostart -Xlinker -soname=\"$(lib)\" 
+			-Xlinker --no-undefined ;
 	} else {
 		linkFlags = -xms ;
 	}
