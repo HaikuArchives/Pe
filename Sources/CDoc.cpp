@@ -236,6 +236,9 @@ void CDoc::SaveRequested(entry_ref& directory, const char *name)
 		FailOSErr(e.GetRef(&eref));
 		fDocIO->SetEntryRef(&eref);
 
+		if (!IsDirty())
+			SetDirty(true);
+
 		Save();
 		NameChanged();
 
