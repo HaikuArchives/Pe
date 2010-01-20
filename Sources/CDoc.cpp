@@ -64,7 +64,7 @@ CDoc::CDoc(const char* mimetype, BLooper *target, const entry_ref *doc)
 	if (doc)
 	{
 		BEntry e;
-		FailOSErr(e.SetTo(doc));
+		FailOSErr(e.SetTo(doc, true));
 		FailOSErr(e.GetParent(&gCWD));
 
 		BNode node;
