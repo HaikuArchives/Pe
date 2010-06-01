@@ -1640,7 +1640,7 @@ void PDoc::MenusBeginning()
 			   strcmp(fWindows->ItemAt(insertId)->Label(), w->Title()) < 0) ;
 		// Finally insert
 		fWindows->AddItem(new BMenuItem(w->Title(), msg,
-			(doc && doc->fShortcut < 10) ? '1' + doc->fShortcut : 0), insertId);
+			(doc && doc->fShortcut < 9) ? '1' + doc->fShortcut : 0), insertId);
 	}
 
 	// Disable "Save" menuitem on non-dirty/new files
