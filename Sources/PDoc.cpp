@@ -223,6 +223,7 @@ void PDoc::InitWindow(const char *name)
 	r.left = fButtonBar->Frame().right + 4;
 	fToolBar->AddChild(fError = new BStringView(r, "error", "", B_FOLLOW_LEFT_RIGHT));
 	fError->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fError->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fError->SetFont(be_plain_font);
 	fError->SetHighColor(kBlack);
 
@@ -1238,6 +1239,18 @@ void PDoc::DispatchMessage(BMessage* message, BHandler* handler)
 	int anchor = fText->Anchor();
 	int caret = fText->Caret();
 	int changeCounter = fText->TextBuffer().ChangeCounter();
+
+
+	switch (message->what) {
+		/* handle Dano-style color changes */
+		case '_UIC':
+		{
+			fError->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+			fError->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+			break;
+		}
+	}
+
 
 	inherited::DispatchMessage(message, handler);
 
