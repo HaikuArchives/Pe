@@ -44,7 +44,7 @@
 #endif
 
 const char kAboutText[] =
-		"Pe 2.4.2 Open Source Version\n\n"
+		"Pe 2.4.3 Open Source Version\n\n"
 		"a high performance editor\n"
 		"created by Maarten Hekkelman.\n"
 		"Hekkelman Programmatuur B.V.\n"
