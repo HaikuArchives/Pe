@@ -110,7 +110,7 @@ Application Pe :
 	Sstdio.cpp
 	utf-support.cpp
 	Utils.cpp
-	:	libhekkel.so pcre be $(STDC++LIB) tracker mail textencoding 
+	:	libhekkel.so pcreposix pcre tracker mail textencoding be $(STDC++LIB)
 	;
 #	</pe-src>
 if $(OSPLAT) = X86 {
