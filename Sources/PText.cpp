@@ -6309,8 +6309,7 @@ void PText::MessageReceived(BMessage *msg)
 					if (toBeScrolledPart != savedActivePart)
 						fActivePart = toBeScrolledPart;
 
-					bool pageWise = (modifiers()
-						& (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) != 0;
+					bool pageWise = (modifiers() & B_SHIFT_KEY) != 0;
 					if (pageWise)
 					{
 						BMessage msg(y < 0
