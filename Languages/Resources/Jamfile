@@ -23,5 +23,6 @@ RezObjects
 	keywords.sh.r
 	keywords.sql.r
 	keywords.tex.r
+	keywords.xml.r
 	;
 # </pe-src>

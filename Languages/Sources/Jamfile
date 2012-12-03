@@ -176,3 +176,11 @@ PeLanguage TexExt
 	: keywords.tex.rsrc 
 	;
 # </pe-src>
+
+# <pe-src>
+PeLanguage XMLExt 
+	: Xml_Language.cpp
+	: be
+	: keywords.xml.rsrc 
+	;
+# </pe-src>
