@@ -19,6 +19,7 @@ RezObjects
 	keywords.pas.r
 	keywords.pl.r
 	keywords.py.r
+	keywords.rb.r
 	keywords.rez.r
 	keywords.sh.r
 	keywords.sql.r

@@ -154,6 +154,14 @@ PeLanguage RezExt
 # </pe-src>
 
 # <pe-src>
+PeLanguage RubyExt 
+	: Ruby_Language.cpp
+	: be 
+	: keywords.rb.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
 PeLanguage ShellExt 
 	: Shell_Language.cpp 
 	: be 
