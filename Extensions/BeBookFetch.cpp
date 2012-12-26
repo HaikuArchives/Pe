@@ -203,7 +203,7 @@ perform_edit(MTextAddOn* addon)
 
 	if (selection.CountChars() < 3) {
 		MIdeaAlert("The text selection is too short.\n"
-					"Make sure that the selection doesn't contains punctuation "
+					"Make sure that the selection doesn't contain punctuation "
 					"marks or other symbols.").Go();
 		return B_ERROR;
 	}

@@ -322,7 +322,7 @@ perform_edit(MTextAddOn* addon)
 
 
 	if (err == B_LAUNCH_FAILED) {
-		MStopAlert("Can't run Wget!").Go();
+		MStopAlert("Can't run wget!").Go();
 		return B_OK;
 	}
 	

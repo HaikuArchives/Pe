@@ -34,7 +34,7 @@
 #include "Types.r"
 
 
-resource 'DLOG' (100, "Color Picker") {
+resource 'DLOG' (100, "Color picker") {
 	{ 0, 0, 230, 170 }, "ColorPicker", B_MODAL_WINDOW, NORMAL,
 	{
 		ColorSquare		{{  10,  10, 220, 110 }, "hs"							},

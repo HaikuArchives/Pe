@@ -40,13 +40,13 @@ resource rtyp_Popu (rid_Popu_InfMimetypes, "Mimetype") {
 	}
 };
 
-resource rtyp_Popu (rid_Popu_InfFont, "Font Popup") {
+resource rtyp_Popu (rid_Popu_InfFont, "Font popup") {
 	"Font",
 	{
 	}
 };
 
-resource rtyp_Popu (rid_Popu_InfEncoding, "Encoding Popup") {
+resource rtyp_Popu (rid_Popu_InfEncoding, "Encoding popup") {
 	"Encoding",
 	{
 		Item	{ "UTF-8",				'chng', none, noKey },
@@ -77,8 +77,8 @@ resource rtyp_Popu (rid_Popu_InfEncoding, "Encoding Popup") {
 	}
 };
 
-resource rtyp_Popu (rid_Popu_InfSrcEncoding, "Source Encoding Popup") {
-	"Source Encoding",
+resource rtyp_Popu (rid_Popu_InfSrcEncoding, "Source encoding popup") {
+	"Source encoding",
 	{
 		Item	{ "UTF-8",				'chng', none, noKey },
 		Item	{ "ISO 8859-1",			'chng', none, noKey },
@@ -108,8 +108,8 @@ resource rtyp_Popu (rid_Popu_InfSrcEncoding, "Source Encoding Popup") {
 	}
 };
 
-resource rtyp_Popu (rid_Popu_InfLinebreaks, "Line Breaks") {
-	"Line Breaks",
+resource rtyp_Popu (rid_Popu_InfLinebreaks, "Line breaks") {
+	"Line breaks",
 	{
 		Item	{ "Be/Unix",			'chng', none, noKey },
 		Item	{ "Mac",				'chng', none, noKey },
@@ -126,15 +126,15 @@ resource rtyp_Popu (rid_Popu_InfLanguage, "Language menu") {
 };
 
 resource 'DLOG' (6, "Info") {
-	{0, 0, 400, 250}, "File Options", B_TITLED_WINDOW, NORMAL,
+	{0, 0, 400, 250}, "File options", B_TITLED_WINDOW, NORMAL,
 	{
 		TabbedBook				{{   0,   0, 400, 250 },	"tabbook"																},
 
-			TabSheet			{ "Editor",					"Editor Options"														},
-				CheckBox		{{   0,   0, 140,  16 },	"show tabs",		"Show Tabstops"										},
-				Edit			{{ 150,   0, 275,  16 },	"tabs",				"Spaces per Tab:",	"", "0123456789", 3, 120		},
-				CheckBox		{{   0,  20, 140,  36 },	"syntaxcol",		"Syntax Colouring"									},
-				CheckBox		{{ 150,  20, 275,  36 },	"show invisibles",	"Show Invisibles"									},
+			TabSheet			{ "Editor",					"Editor options"														},
+				CheckBox		{{   0,   0, 140,  16 },	"show tabs",		"Show tabstops"										},
+				Edit			{{ 150,   0, 275,  16 },	"tabs",				"Spaces per tab:",	"", "0123456789", 3, 120		},
+				CheckBox		{{   0,  20, 140,  36 },	"syntaxcol",		"Syntax colouring"									},
+				CheckBox		{{ 150,  20, 275,  36 },	"show invisibles",	"Show invisibles"									},
 				
 				Line			{{   0,  43, 275,  44 }																				},
 				
@@ -143,9 +143,9 @@ resource 'DLOG' (6, "Info") {
 				
 				Line			{{   0,  78, 275,  79 }																				},
 			
-				PopupMenu		{{  -1,  84, 275, 104 },	"source encoding",	"Input Encoding:",	rid_Popu_InfSrcEncoding, 110		},
-				PopupMenu		{{  -1, 104, 275, 124 },	"encoding",			"Output Encoding:",	rid_Popu_InfEncoding, 110		},
-				PopupMenu		{{  -1, 126, 275, 146 },	"linebreaks",		"Linebreaks:",		rid_Popu_InfLinebreaks, 110		},
+				PopupMenu		{{  -1,  84, 275, 104 },	"source encoding",	"Input encoding:",	rid_Popu_InfSrcEncoding, 110		},
+				PopupMenu		{{  -1, 104, 275, 124 },	"encoding",			"Output encoding:",	rid_Popu_InfEncoding, 110		},
+				PopupMenu		{{  -1, 126, 275, 146 },	"linebreaks",		"Line breaks:",		rid_Popu_InfLinebreaks, 110		},
 				
 				Line			{{   0, 151, 275, 152 }},
 				
@@ -153,9 +153,9 @@ resource 'DLOG' (6, "Info") {
 			
 			TabSheetEnd			{																									},
 			
-			TabSheet			{ "Statistics",				"Statistical and State Information"										},
+			TabSheet			{ "Statistics",				"Statistical and state information"										},
 				Caption			{{   0,   0,  75,  16 },	"cname",			"Name:"												},
-				Caption			{{  80,   0, 240,  16 },	"name",				"Not Saved"											},
+				Caption			{{  80,   0, 240,  16 },	"name",				"Not saved"											},
 				Caption			{{   0,  20,  75,  36 },	"ctime",			"Last saved:"										},
 				Caption			{{  80,  20, 240,  36 },	"time",				""													},
 				PopupMenu		{{  -1,  38, 240,  58 },	"mime",				"Mimetype:",		rid_Popu_InfMimetypes, 77		},
@@ -165,14 +165,14 @@ resource 'DLOG' (6, "Info") {
 				Caption			{{  80,  80, 240,  96 },	"lines",			""													},
 			TabSheetEnd			{},
 			
-			TabSheet			{ "Wrapping",				"Options for Soft Wrapping"												},
-				CheckBox		{{   0,   0, 100,  16 },	"softwrap",			"Soft Wrap Files"									},
+			TabSheet			{ "Wrapping",				"Options for soft-wrapping"												},
+				CheckBox		{{   0,   0, 100,  16 },	"softwrap",			"Soft-wrap files"									},
 				
 				Caption			{{   0,  40, 238,  56 },	"w",				"And when wrapping use these settings:"				},
 				
-				RadioButton		{{   0,  60, 100,  76 },	"wrapwindow",		"Window Width"										},
-				RadioButton		{{   0,  80, 100,  96 },	"wrappaper",		"Paper Width"										},
-				RadioButton		{{   0, 100,  98, 116 },	"wrapfixed",		"Fixed Column:"										},
+				RadioButton		{{   0,  60, 100,  76 },	"wrapwindow",		"Window width"										},
+				RadioButton		{{   0,  80, 100,  96 },	"wrappaper",		"Paper width"										},
+				RadioButton		{{   0, 100,  98, 116 },	"wrapfixed",		"Fixed column:"										},
 				
 				Edit			{{ 100, 100, 140, 116 },	"wrapfixedto",		"",					"", "0123456789", 3, 0			},
 

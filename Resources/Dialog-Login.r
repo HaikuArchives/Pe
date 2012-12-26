@@ -37,7 +37,7 @@
 resource 'DLOG' (12, "Login") {
 	{ 0, 0, 260, 122 }, "Login", B_MODAL_WINDOW, NORMAL,
 	{
-		Caption	{{  10,  10, 250,  26 }, "cserver",		"Please enter the username and password for:"	},
+		Caption	{{  10,  10, 250,  26 }, "cserver",		"Please enter username and password for:"	},
 		Caption	{{  10,  27, 250,  39 }, "server",		"'%s'"											},
 		Edit	{{  10,  42, 250,  58 }, "username",	"Username:",	"", "", 24, 60					},
 		Edit	{{  10,  62, 250,  78 }, "password",	"Password:",	"", "", 128, 60					},

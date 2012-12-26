@@ -367,25 +367,25 @@ void CFindDialog::Layout(void) {
 	fButFind	->ResizeLocalized("Find");
 	fButRepl	->ResizeLocalized("Replace");
 	fButRepF	->ResizeLocalized("Replace & Find");
-	fButRepA	->ResizeLocalized("Replace All");
+	fButRepA	->ResizeLocalized("Replace all");
 	fMfdPats	->ResizeLocalized(NULL, "Find:");
 	fLabRepl	->ResizeLocalized("Replace:");
-	fChkCase	->ResizeLocalized("Ignore Case");
-	fChkWrap	->ResizeLocalized("Wrap Around");
+	fChkCase	->ResizeLocalized("Ignore case");
+	fChkWrap	->ResizeLocalized("Wrap around");
 	fChkBack	->ResizeLocalized("Backwards");
-	fChkWord	->ResizeLocalized("Entire Word");
+	fChkWord	->ResizeLocalized("Entire word");
 	fChkGrep	->ResizeLocalized("Regex");
 	fChkBtch	->ResizeLocalized("Batch");
-	fChkMult	->ResizeLocalized("Multi-File:");
+	fChkMult	->ResizeLocalized("Multi-file:");
 	fMfdMeth	->ResizeLocalized();
-	fMitMethDir	->SetLabel("Directory Scan");
-	fMitMethWin	->SetLabel("Open Windows");
+	fMitMethDir	->SetLabel("Directory scan");
+	fMitMethWin	->SetLabel("Open windows");
 	fMitMethInc	->SetLabel("$BEINCLUDES");
-	fChkText	->ResizeLocalized("Text Files Only");
+	fChkText	->ResizeLocalized("Text files only");
 	fChkRecu	->ResizeLocalized("Recursive");
-	fMfdSdir	->ResizeLocalized("Search In:");
+	fMfdSdir	->ResizeLocalized("Search in:");
 	fMitSdirOth	->SetLabel("Other…");
-	fMfdNamp	->ResizeLocalized("File Name:");
+	fMfdNamp	->ResizeLocalized("File name:");
 	fMitNampAny	->SetLabel("Any");
 	fMitNampEnd	->SetLabel("Ends with");
 	fMitNampBeg	->SetLabel("Begins with");
@@ -529,7 +529,7 @@ void CFindDialog::DoFind(unsigned long cmd)
 
 				if (cmd == msg_ReplaceAll)
 				{
-					switch (MAlert("Replace All on multiple files", "Cancel", "Leave Open", "Save To Disk").Go())
+					switch (MAlert("Replace all on multiple files", "Cancel", "Leave open", "Save to disk").Go())
 					{
 						case 1:	return;
 						case 2:	all = mrLeaveOpen; break;
@@ -1301,7 +1301,7 @@ void CFindDialog::ShowBatch(vector<PMessageItem*> *lst, BWindow** w)
 		if (w && *w)
 			m = static_cast<PMessageWindow*>(*w);
 		else
-			m = new PMessageWindow("Search Results");
+			m = new PMessageWindow("Search results");
 
 		BAutolock lock(m);
 

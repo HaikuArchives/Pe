@@ -79,7 +79,7 @@ void CGoToLine::Layout(void)
 {
 	fLine->ResizeLocalized("Line:");
 	fCancelButton->ResizeLocalized("Cancel");
-	fOkButton->ResizeLocalized("Ok");
+	fOkButton->ResizeLocalized("OK");
 
 	float div = fLine->StringWidth("Line:")+20;
 	fLine->SetDivider(div);

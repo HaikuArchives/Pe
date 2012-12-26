@@ -34,8 +34,8 @@
 #include "Types.r"
 
 
-resource 'DLOG' (11, "FTP Open") {
-	{ 0, 0, 300, 170 }, "FTP Open…", B_TITLED_WINDOW, NORMAL,
+resource 'DLOG' (11, "FTP open") {
+	{ 0, 0, 300, 170 }, "FTP open…", B_TITLED_WINDOW, NORMAL,
 	{
 		Edit	{{  10,  10, 290,  26 }, "server",		"Server:",		"", "", 128, 60		},
 		Edit	{{  10,  30, 290,  46 }, "user",		"Username:",	"", "", 24, 60		},

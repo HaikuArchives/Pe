@@ -145,7 +145,7 @@ resource rtyp_Htmp (rid_Htmp_HtmlPalette) {
 		Dialog	{ "Anchor…",	"HTMLAnchor" },
 		Dialog	{ "Update",		"HTMLUpdate" },
 		Simple	{ "Paragraph",	"<p>$selection$$insert$\n</p>\n" },
-		Simple	{ "Linebreak",	"<br>\n" },
+		Simple	{ "Line break",	"<br>\n" },
 		Command	{ "Preview",	msg_ShowInBrowser }
 	}
 };

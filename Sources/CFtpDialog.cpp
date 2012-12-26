@@ -205,11 +205,11 @@ void CFtpDialog::Layout(void)
 	fServerName->ResizeLocalized("Host:");
 	fUserName->ResizeLocalized("Username:");
 	fPassword->ResizeLocalized("Password:");
-	fUsePassive->ResizeLocalized("Passive Mode");
+	fUsePassive->ResizeLocalized("Passive mode");
 	fConnectButton->ResizeLocalized("Connect");
 	fCancelButton->ResizeLocalized("Cancel");
 	fOkButton->ResizeLocalized("Open");
-	fShowDotted->ResizeLocalized("Show All!");
+	fShowDotted->ResizeLocalized("Show all!");
 	fDirectoryField->ResizeLocalized();
 	fFileName->ResizeLocalized();
 
@@ -304,7 +304,7 @@ void CFtpDialog::MakeItSave(const char *name)
 
 	fOkButton->SetLabel("Save");
 
-	SetTitle("Save on Server");
+	SetTitle("Save on server");
 } // CFtpDialog::MakeItSave
 
 bool CFtpDialog::OkClicked()

@@ -127,7 +127,7 @@ void ImageToC::DumpBitmap(BBitmap* bitmap, const char *name)
 		return;
 	}
 
-	PEditText text(this, "Insert Bitmap");
+	PEditText text(this, "Insert bitmap");
 	BString baseName;
 
 	const char *colorSpace = color_space_to_string(bitmap->ColorSpace());

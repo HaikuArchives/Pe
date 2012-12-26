@@ -41,21 +41,21 @@ resource rtyp_Menu (rid_Menu_DwFile, "File Menu") {
 	"File",
 	{
 		Item		{ "New",					msg_New,						none,	'N'		},
-		Item		{ "New Group",				msg_NewGroup,					none,	noKey	},
+		Item		{ "New group",				msg_NewGroup,					none,	noKey	},
 		Item		{ "Open…",					msg_Open,						none,	'O'		},
-		Item		{ "Open from Server…",		msg_FtpOpen,					none,	noKey	},
-		Item		{ "Open Selection",			msg_OpenSelected,				none,	'D'		},
+		Item		{ "Open from server…",		msg_FtpOpen,					none,	noKey	},
+		Item		{ "Open selection",			msg_OpenSelected,				none,	'D'		},
 		Submenu		{ rid_Menu_DwRecent															},	
 		Item		{ "Close",					msg_Close,						none,	'W'		},
 		Separator	{																			},
 		Item		{ "Save",					msg_Save,						none,	'S'		},
-		Item		{ "Save As…",				msg_SaveAs,						none,	noKey	},
-		Item		{ "Save on Server…",		msg_FtpSave,					none,	noKey	},
-		Item		{ "Save a Copy As…",		msg_SaveCopy,					none,	noKey	},
-		Item		{ "Save All",				msg_SaveAll,					none,	noKey	},
+		Item		{ "Save as…",				msg_SaveAs,						none,	noKey	},
+		Item		{ "Save on server…",		msg_FtpSave,					none,	noKey	},
+		Item		{ "Save a copy as…",		msg_SaveCopy,					none,	noKey	},
+		Item		{ "Save all",				msg_SaveAll,					none,	noKey	},
 		Item		{ "Revert…",				msg_Revert,						none,	noKey	},
 		Separator	{																			},
-		Item		{ "Page Setup…",			msg_PageSetup,					none,	noKey	},
+		Item		{ "Page setup…",			msg_PageSetup,					none,	noKey	},
 		Item		{ "Print…",					msg_Print,						none,	'P'		},
 		Separator	{																			},
 		Item		{ "Quit",					msg_Quit,						none,	'Q'		}
@@ -73,9 +73,9 @@ resource rtyp_Menu (rid_Menu_DwEdit, "Edit Menu") {
 		Item 		{ "Paste",					'PSTE',							none,	'V'		},
 		Item		{ "Clear",					msg_Clear,						none,	noKey	},
 		Separator	{																			},
-		Item		{ "Select All",				'SALL',							none,	'A'		},
-		Item		{ "Select Line",			msg_SelectLine,					none,	'L'		},
-		Item		{ "Select Paragraph",		msg_SelectParagraph,			none,	noKey	}
+		Item		{ "Select all",				'SALL',							none,	'A'		},
+		Item		{ "Select line",			msg_SelectLine,					none,	'L'		},
+		Item		{ "Select paragraph",		msg_SelectParagraph,			none,	noKey	}
 	}
 };
 
@@ -85,19 +85,19 @@ resource rtyp_Menu (rid_Menu_DwText, "Text Menu") {
 		Item		{ "Balance",				msg_Balance,					none,	'B'		},
 		Item		{ "Twiddle",				msg_Twiddle,					none,	'\''	},
 		Submenu		{ rid_Menu_DwChangeCase														},
-		Item		{ "Change Encoding…",		msg_ConvertEncoding,			none,	noKey	},
+		Item		{ "Change encoding…",		msg_ConvertEncoding,			none,	noKey	},
 		Separator	{																			},
-		Item		{ "Shift Left",				msg_ShiftLeft,					none,	'['		},
-		Item		{ "Shift Right",			msg_ShiftRight,					none,	']'		},
+		Item		{ "Shift left",				msg_ShiftLeft,					none,	'['		},
+		Item		{ "Shift right",			msg_ShiftRight,					none,	']'		},
 		Separator	{																			},
 		Item		{ "Comment",				msg_Comment,					none,	noKey	},
 		Item		{ "Uncomment",				msg_Uncomment,					none,	noKey	},
 		Separator	{																			},
 		Item		{ "Justify",				msg_Justify,					none,	noKey	},
-		Item		{ "Insert Linebreaks",		msg_Wrap,						none,	noKey	},
-		Item		{ "Remove Linebreaks",		msg_Unwrap,						none,	noKey	},
+		Item		{ "Insert line breaks",		msg_Wrap,						none,	noKey	},
+		Item		{ "Remove line breaks",		msg_Unwrap,						none,	noKey	},
 		Separator	{																			},
-		Item		{ "Show in Browser",		msg_ShowInBrowser,				shift,	'B'		}
+		Item		{ "Show in browser",		msg_ShowInBrowser,				shift,	'B'		}
 	}
 };
 
@@ -105,36 +105,36 @@ resource rtyp_Menu (rid_Menu_DwSearch, "Search Menu") {
 	"Search",
 	{
 		Item		{ "Find…",					msg_FindCmd,					none,	'F'		},
-		Item		{ "Find Again",				msg_FindAgain,					none,	'G'		},
-		Item		{ "Find Selection",			msg_FindSelection,				none,	'H'		},
-		Item		{ "Enter Search String",	msg_EnterSearchString,			none,	'E'		},
+		Item		{ "Find again",				msg_FindAgain,					none,	'G'		},
+		Item		{ "Find selection",			msg_FindSelection,				none,	'H'		},
+		Item		{ "Enter search string",	msg_EnterSearchString,			none,	'E'		},
 		Separator	{																			},
 		Item		{ "Replace",				msg_Replace,					none,	'='		},
-		Item		{ "Replace & Find",			msg_ReplaceAndFind,				none,	'T'		},
-		Item		{ "Replace All",			msg_ReplaceAll,					none,	noKey	},
+		Item		{ "Replace & find",			msg_ReplaceAndFind,				none,	'T'		},
+		Item		{ "Replace all",			msg_ReplaceAll,					none,	noKey	},
 		Separator	{																			},
-		Item		{ "Find in Next File",		msg_FindInNextFile,				none,	'J'		},
+		Item		{ "Find in next file",		msg_FindInNextFile,				none,	'J'		},
 		Separator	{																			},
-		Item		{ "Incremental Search",		msg_IncSearch,					none,	'I'		},
+		Item		{ "Incremental search",		msg_IncSearch,					none,	'I'		},
 		Separator	{																			},
-		Item		{ "Jump to Next Error",		msg_FindNextError,				none,	noKey	},
-		Item		{ "Go To Line…",			msg_GoToLine,					none,	','		},
-		Item		{ "Find Function…",			msg_FindFunction,				shift,	'F'		},
-		Item		{ "Previous Function",		msg_PreviousFunction,			none,	noKey	},
-		Item		{ "Next Function",			msg_NextFunction,				none,	noKey   },
+		Item		{ "Jump to next error",		msg_FindNextError,				none,	noKey	},
+		Item		{ "Go to line…",			msg_GoToLine,					none,	','		},
+		Item		{ "Find function…",			msg_FindFunction,				shift,	'F'		},
+		Item		{ "Previous function",		msg_PreviousFunction,			none,	noKey	},
+		Item		{ "Next function",			msg_NextFunction,				none,	noKey   },
  		Separator	{																			},
-		Item		{ "Find Differences…",		msg_FindDifferences,			none,	noKey	}
+		Item		{ "Find differences…",		msg_FindDifferences,			none,	noKey	}
 	}
 };
 
 resource rtyp_Menu (rid_Menu_DwWindow, "Window Menu") {
 	"Window",
 	{
-		Item		{ "File Options…",			msg_Info,						none,	noKey	},
+		Item		{ "File options…",			msg_Info,						none,	noKey	},
 		Item		{ "Preferences…",			msg_Preferences,				none,	noKey	},
-		Item		{ "Working Directory…",		msg_ChangeWorkingDir,			none,	noKey	},
+		Item		{ "Working directory…",		msg_ChangeWorkingDir,			none,	noKey	},
 		Item		{ "Glossary",				msg_ShowGlossary,				none,	noKey	},
-		Item		{ "HTML Palette",			msg_ShowHtmlPalette,			none,	noKey	},
+		Item		{ "HTML palette",			msg_ShowHtmlPalette,			none,	noKey	},
 		Separator	{																			},
 		Item		{ "Stack",					msg_Stack,						none,	noKey	},
 		Item		{ "Tile",					msg_Tile,						none,	noKey	},
@@ -163,10 +163,10 @@ resource rtyp_Menu (rid_Menu_DwExtensions, "Extensions") {
 resource rtyp_Menu (rid_Menu_DwBeide, "BeIDE") {
 	"BeIDE",
 	{
-		Item		{ "Bring to Front",			msg_IdeBringToFront,			none,	noKey	},
+		Item		{ "Bring to front",			msg_IdeBringToFront,			none,	noKey	},
 		Separator	{																			},
-		Item		{ "Add File",				msg_IdeAdd,						none,	noKey	},
-		Item		{ "Remove File",			msg_IdeRemove,					none,	noKey	},
+		Item		{ "Add file",				msg_IdeAdd,						none,	noKey	},
+		Item		{ "Remove file",			msg_IdeRemove,					none,	noKey	},
 		Item		{ "Project -> Group",		msg_IdeProjectToGroup,			none,	noKey	},
 		Separator	{																			},
 		Item		{ "Make",					msg_IdeMake,					none,	'M'		}
@@ -174,19 +174,19 @@ resource rtyp_Menu (rid_Menu_DwBeide, "BeIDE") {
 };
 
 resource rtyp_Menu (rid_Menu_DwRecent, "Recent Menu") {
-	"Open Recent",
+	"Open recent",
 	{
 	}
 };
 
 resource rtyp_Menu (rid_Menu_DwChangeCase, "Change Case Menu") {
-	"Change Case",
+	"Change case",
 	{
-		Item		{ "Upper Case",				msg_ChangeCaseUpper,			none,	noKey	},
-		Item		{ "Lower Case",				msg_ChangeCaseLower,			none,	noKey	},
-		Item		{ "Capitalize Words",		msg_ChangeCaseCap,				none,	noKey	},
-		Item		{ "Capitalize Lines",		msg_ChangeCaseLine,				none,	noKey	},
-		Item		{ "Capitalize Sentences",	msg_ChangeCaseSent,				none,	noKey	}
+		Item		{ "Upper case",				msg_ChangeCaseUpper,			none,	noKey	},
+		Item		{ "Lower case",				msg_ChangeCaseLower,			none,	noKey	},
+		Item		{ "Capitalize words",		msg_ChangeCaseCap,				none,	noKey	},
+		Item		{ "Capitalize lines",		msg_ChangeCaseLine,				none,	noKey	},
+		Item		{ "Capitalize sentences",	msg_ChangeCaseSent,				none,	noKey	}
 	}
 };
 
@@ -217,7 +217,7 @@ resource rtyp_Menu (rid_Menu_PwFile)
 		Item		{ "Close",						msg_Close,					none,	'W'		},
 		Separator	{																			},
 		Item		{ "Save",						msg_Save,					none,	'S'		},
-		Item		{ "Save As…",					msg_SaveAs,					none,	noKey	},
+		Item		{ "Save as…",					msg_SaveAs,					none,	noKey	},
 		Item		{ "Revert…",					msg_Revert,					none,	noKey	},
 		Separator	{																			},
 		Item		{ "Quit",						msg_Quit,					none,	'Q'		}
@@ -228,7 +228,7 @@ resource rtyp_Menu (rid_Menu_PwEdit)
 {
 	"Edit",
 	{
-		Item		{ "Edit as Text",				msg_EditAsText,				none,	noKey	}
+		Item		{ "Edit as text",				msg_EditAsText,				none,	noKey	}
 	}
 };
 
@@ -253,14 +253,14 @@ resource rtyp_Popu (rid_Popu_CtxText, "Main view") {
 		Item		{ "Copy",						'COPY',						none,	noKey	},
 		Item 		{ "Paste",						'PSTE',						none,	noKey	},
 		Item		{ "Clear",						msg_Clear,					none,	noKey	},
-		Item		{ "Select All",					'SALL',						none,	noKey	},
+		Item		{ "Select all",					'SALL',						none,	noKey	},
 		Separator	{																			},
 		Item		{ "Comment",					msg_Comment,				none,	noKey	},
 		Item		{ "Uncomment",					msg_Uncomment,				none,	noKey	},
 		Separator	{																			},
-		Item		{ "Syntax Colouring",			msg_ToggleSyntaxColoring,	none,	noKey	},
-		Item		{ "Show Invisibles",			msg_ToggleShowInvisibles,	none,	noKey	},
-		Item		{ "Soft Wrap",					msg_SoftWrap,				none,	noKey	},
-		Item		{ "Alternate Font",				msg_ToggleFont,				none,	noKey	}
+		Item		{ "Syntax colouring",			msg_ToggleSyntaxColoring,	none,	noKey	},
+		Item		{ "Show invisibles",			msg_ToggleShowInvisibles,	none,	noKey	},
+		Item		{ "Soft-wrap",					msg_SoftWrap,				none,	noKey	},
+		Item		{ "Alternate font",				msg_ToggleFont,				none,	noKey	}
 	}
 };

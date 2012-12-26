@@ -315,7 +315,7 @@ void PProjectWindow::NameChanged()
 
 const char* PProjectWindow::DefaultName() const
 {
-	return "Untitled Project";
+	return "Untitled project";
 }
 
 const char* PProjectWindow::ErrorMsg() const
@@ -434,7 +434,7 @@ void PProjectWindow::RemoveSelected()
 					= dynamic_cast<CProjectGroupItem*>(projectItem->ModelItem());
 				if (projectGroupItem) {
 					BAlert* alert
-						= new BAlert( "Pe Message",
+						= new BAlert( "Pe message",
 										  "You can't remove a group-item",
 										  "Ah, Ok", NULL, NULL,
 										  B_WIDTH_AS_USUAL, B_OFFSET_SPACING,

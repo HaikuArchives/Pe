@@ -61,22 +61,22 @@ type rtyp_Tbar {
 resource rtyp_Tbar (rid_Tbar_DocumentWin) {
 	standard,
 	{
-		rid_Timg_NewDocument,	0,						msg_New,			0,				"New Document",
-		rid_Timg_OpenDocument,	0,						msg_BtnOpen,		menu,			"Open Document",
-		rid_Timg_SaveDocument,	0,						msg_Save,			0,				"Save Document",
+		rid_Timg_NewDocument,	0,						msg_New,			0,				"New document",
+		rid_Timg_OpenDocument,	0,						msg_BtnOpen,		menu,			"Open document",
+		rid_Timg_SaveDocument,	0,						msg_Save,			0,				"Save document",
 		0,						0,						0,					separator,		"",
-		rid_Timg_ExecuteCmd,	0,						msg_Execute,		toggle,			"Execute Command",
-		rid_Timg_FunctionPopup,	0,						msg_FuncPopup,		menu,			"Function Popupmenu",
-		rid_Timg_HeaderPopup,	0,						msg_HeaderPopup,	menu,			"Header Popupmenu",
+		rid_Timg_ExecuteCmd,	0,						msg_Execute,		toggle,			"Execute command",
+		rid_Timg_FunctionPopup,	0,						msg_FuncPopup,		menu,			"Function popup-menu",
+		rid_Timg_HeaderPopup,	0,						msg_HeaderPopup,	menu,			"Header popup-menu",
 		0,						0,						0,					separator,		"",
 		rid_Timg_Find,			0,						msg_FindCmd,		0,				"Find",
-		rid_Timg_IncSearch,		0,						msg_IncSearchBtn,	toggle,			"Incremental Search",
+		rid_Timg_IncSearch,		0,						msg_IncSearchBtn,	toggle,			"Incremental search",
 		0,						0,						0,					separator,		"",
-		rid_Timg_ReadonlyOff,	rid_Timg_ReadonlyOn,	msg_ReadOnly,		dual,			"Read Only",
-		rid_Timg_FileOptions,	0,						msg_Info,			0,				"File Options…",
-		rid_Timg_SoftwrapOff,	rid_Timg_SoftwrapOn,	msg_SoftWrap,		dual,			"Softwrap",
+		rid_Timg_ReadonlyOff,	rid_Timg_ReadonlyOn,	msg_ReadOnly,		dual,			"Read only",
+		rid_Timg_FileOptions,	0,						msg_Info,			0,				"File options…",
+		rid_Timg_SoftwrapOff,	rid_Timg_SoftwrapOn,	msg_SoftWrap,		dual,			"Soft-wrap",
 		0,						0,						0,					separator,		"",
-		rid_Timg_EditAsProject,	0,						msg_EditAsProject,	0,				"Edit As Project"
+		rid_Timg_EditAsProject,	0,						msg_EditAsProject,	0,				"Edit as project"
 	}
 };
 
@@ -89,8 +89,8 @@ resource rtyp_Tbar (rid_Tbar_DifferencesWin) {
 		0,						0,						0,					separator,		"",
 		rid_Timg_ArrowCircle,	0,						msg_RefreshDiffs,	0,				"Refresh",
 		0,						0,						0,					separator,		"",
-		rid_Timg_ArrowLeft,		0,						msg_MergeTo1,		0,				"Merge to File 1",
-		rid_Timg_ArrowRight,	0,						msg_MergeTo2,		0,				"Merge to File 2",
+		rid_Timg_ArrowLeft,		0,						msg_MergeTo1,		0,				"Merge to file 1",
+		rid_Timg_ArrowRight,	0,						msg_MergeTo2,		0,				"Merge to file 2",
 	}
 };
 
@@ -98,10 +98,10 @@ resource rtyp_Tbar (rid_Tbar_DifferencesWin) {
 resource rtyp_Tbar (rid_Tbar_GroupWin) {
 	acceptFirstClick,
 	{
-		rid_Timg_FileAdd,		0,						'Add ',				0,				"Add File",
-		rid_Timg_FileRemove,	0,						'Rmve',				0,				"Remove File",
+		rid_Timg_FileAdd,		0,						'Add ',				0,				"Add file",
+		rid_Timg_FileRemove,	0,						'Rmve',				0,				"Remove file",
 		0,						0,						0,					space,			"",
-		rid_Timg_SaveDocument,	0,						msg_Save,			0,				"Save Document"
+		rid_Timg_SaveDocument,	0,						msg_Save,			0,				"Save document"
 	}
 };
 
@@ -109,11 +109,11 @@ resource rtyp_Tbar (rid_Tbar_GroupWin) {
 resource rtyp_Tbar (rid_Tbar_ProjectWin) {
 	standard,
 	{
-		rid_Timg_FileAdd,		0,						'Add ',				0,				"Add File",
-		rid_Timg_FileRemove,	0,						'Rmve',				0,				"Remove File",
+		rid_Timg_FileAdd,		0,						'Add ',				0,				"Add file",
+		rid_Timg_FileRemove,	0,						'Rmve',				0,				"Remove file",
 		0,						0,						0,					space,			"",
-		rid_Timg_SaveDocument,	0,						msg_Save,			0,				"Save Document",
+		rid_Timg_SaveDocument,	0,						msg_Save,			0,				"Save document",
 		0,						0,						0,					space,			"",
-		rid_Timg_FilePencil,	0,						msg_EditAsText,		0,				"Edit Project as Text"
+		rid_Timg_FilePencil,	0,						msg_EditAsText,		0,				"Edit project as text"
 	}
 };

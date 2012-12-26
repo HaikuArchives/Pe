@@ -350,13 +350,13 @@ bool CDocIO::DoPreEditTextConversions(BString& docText)
 			err = BString("An error occurred when converting the document ")
 					<< "from its native encoding to UTF-8. The first "
 					<< "problematic character is highlighted.\n"
-					<< "Please use the 'File Options'-dialog to select "
+					<< "Please use the 'File options'-dialog to select "
 					<< "the correct source encoding.";
 		else
 			err = BString("An error occurred when checking the document's ")
 					<< "UTF-8 encoding. The first problematic character is "
 					<< "highlighted.\n"
-					<< "Please use the 'File Options'-dialog to select "
+					<< "Please use the 'File options'-dialog to select "
 					<< "the correct source encoding.";
 		fDoc->SetErrorMsg(err.String());
 		return false;
@@ -384,9 +384,9 @@ bool CDocIO::DoPostEditTextConversions(BString& docText, BMessage& settingsMsg)
 				BString("An error occurred when converting the document ")
 					<< "to the requested destination encoding. The first "
 					<< "problematic character is highlighted.\n"
-					<< "Please use the 'File Options'-dialog to select "
+					<< "Please use the 'File options'-dialog to select "
 					<< "another destination encoding.";
-			MInfoAlert a(err.String(), "I See");
+			MInfoAlert a(err.String(), "I see");
 			a.Go();
 			return false;
 		}

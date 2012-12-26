@@ -42,186 +42,186 @@
 
 resource rtyp_Cmnd (rid_Cmnd_Editing, "Editing commands") {
 	{
-		kmsg_NrArgument,							"Numerical Argument Prefix",
+		kmsg_NrArgument,							"Numerical argument prefix",
 		kmsg_Recenter,								"Recenter",
-		kmsg_OpenLine,								"Open Line",
-		kmsg_AppendNextCut,							"Append Next Cut",
-		kmsg_ClearRegion,							"Delete Region between Caret and Mark",
-		kmsg_CopyRegion,							"Copy Region between Caret and Mark",
-		kmsg_CutRegion,								"Cut Region between Caret and Mark",
-		kmsg_ExchangeMarkAndPoint,					"Exchange Caret and Mark",
-		kmsg_MarkWord,								"Mark Word",
-		kmsg_MarkAll,								"Mark All",
+		kmsg_OpenLine,								"Open line",
+		kmsg_AppendNextCut,							"Append next cut",
+		kmsg_ClearRegion,							"Delete region between caret and mark",
+		kmsg_CopyRegion,							"Copy region between caret and mark",
+		kmsg_CutRegion,								"Cut region between caret and mark",
+		kmsg_ExchangeMarkAndPoint,					"Exchange caret and mark",
+		kmsg_MarkWord,								"Mark word",
+		kmsg_MarkAll,								"Mark all",
 		kmsg_Mark,									"Mark",
-		kmsg_CutWordBackward,						"Cut Previous Word",
-		kmsg_CutWord,								"Cut Next Word",
-		kmsg_CutToEndOfLine,						"Cut to End of Line",
-		kmsg_DeleteToEndOfFile,						"Delete to End of File",
-		kmsg_DeleteToEndOfLine,						"Delete to End of Line",
-		kmsg_DeleteToBeginningOfLine,				"Delete to Beginning of Line",
-		kmsg_DeleteCharacterRight,					"Delete Character Right",
-		kmsg_DeleteCharacterLeft,					"Delete Character Left",
-		kmsg_ScrollToEndOfFile,						"Scroll to End of File",
-		kmsg_ScrollToStartOfFile,					"Scroll to Start of File",
-		kmsg_ScrollPageDown,						"Scroll Page Down",
-		kmsg_ScrollPageUp,							"Scroll Page Up",
-		kmsg_ScrollOneLineDown,						"Scroll One Line Down",
-		kmsg_ScrollOneLineUp,						"Scroll One Line Up",
-		kmsg_ExtendSelectionToEndOfFile,			"Extend Selection to End of File",
-		kmsg_ExtendSelectionToBeginningOfFile,		"Extend Selection to Beginning of File",
-		kmsg_ExtendSelectionToEndOfPage,			"Extend Selection to End of Page",
-		kmsg_ExtendSelectionToBeginningOfPage,		"Extend Selection to Beginning of Page",
-		kmsg_ExtendSelectionToNextPage,				"Extend Selection to Next Page",
-		kmsg_ExtendSelectionToPreviousPage,			"Extend Selection to Previous Page",
-//		kmsg_ExtendSelectionToCurrentLine,			"Extend Selection to Current Line",
-		kmsg_ExtendSelectionToNextLine,				"Extend Selection to Next Line",
-		kmsg_ExtendSelectionToPreviousLine,			"Extend Selection to Previous Line",
-		kmsg_ExtendSelectionToEndOfLine,			"Extend Selection to End of Line",
-		kmsg_ExtendSelectionToBeginningOfLine,		"Extend Selection to Beginning of Line",
-		kmsg_ExtendSelectionWithNextSubword,		"Extend Selection with Next SubWord",
-		kmsg_ExtendSelectionWithPreviousSubword,	"Extend Selection with Previous SubWord",
-		kmsg_ExtendSelectionWithNextWord,			"Extend Selection with Next Word",
-		kmsg_ExtendSelectionWithPreviousWord,		"Extend Selection with Previous Word",
-		kmsg_ExtendSelectionWithCharacterRight,		"Extend Selection with Character Right",
-		kmsg_ExtendSelectionWithCharacterLeft,		"Extend Selection with Character Left",
-		kmsg_MoveToEndOfFile,						"Move to End of File",
-		kmsg_MoveToBeginningOfFile,					"Move to Beginning of File",
-		kmsg_MoveToBottomOfPage,					"Move to Bottom of Page",
-		kmsg_MoveToTopOfPage,						"Move to Top of Page",
-		kmsg_MoveToNextPage,						"Move to Next Page",
-		kmsg_MoveToPreviousPage,					"Move to Previous Page",
-		kmsg_MoveToNextLine,						"Move to Next Line",
-		kmsg_MoveToPreviousLine,					"Move to Previous Line",
-		kmsg_MoveToEndOfLine,						"Move to End of Line",
-		kmsg_MoveToBeginningOfLine,					"Move to Beginning of Line",
-		kmsg_MoveWordRight,							"Move Word Right",
-		kmsg_MoveWordLeft,							"Move Word Left",
-		kmsg_MoveSubwordRight,						"Move SubWord Right",
-		kmsg_MoveSubwordLeft,						"Move SubWord Left",
-		kmsg_MoveCharacterRight,					"Move Character Right",
-		kmsg_MoveCharacterLeft,						"Move Character Left"
+		kmsg_CutWordBackward,						"Cut previous word",
+		kmsg_CutWord,								"Cut next word",
+		kmsg_CutToEndOfLine,						"Cut to end of line",
+		kmsg_DeleteToEndOfFile,						"Delete to end of file",
+		kmsg_DeleteToEndOfLine,						"Delete to end of line",
+		kmsg_DeleteToBeginningOfLine,				"Delete to beginning of line",
+		kmsg_DeleteCharacterRight,					"Delete character right",
+		kmsg_DeleteCharacterLeft,					"Delete character left",
+		kmsg_ScrollToEndOfFile,						"Scroll to end of file",
+		kmsg_ScrollToStartOfFile,					"Scroll to start of file",
+		kmsg_ScrollPageDown,						"Scroll page down",
+		kmsg_ScrollPageUp,							"Scroll page up",
+		kmsg_ScrollOneLineDown,						"Scroll one line down",
+		kmsg_ScrollOneLineUp,						"Scroll one line up",
+		kmsg_ExtendSelectionToEndOfFile,			"Extend selection to end of file",
+		kmsg_ExtendSelectionToBeginningOfFile,		"Extend selection to beginning of file",
+		kmsg_ExtendSelectionToEndOfPage,			"Extend selection to end of page",
+		kmsg_ExtendSelectionToBeginningOfPage,		"Extend selection to beginning of page",
+		kmsg_ExtendSelectionToNextPage,				"Extend selection to next page",
+		kmsg_ExtendSelectionToPreviousPage,			"Extend selection to previous page",
+//		kmsg_ExtendSelectionToCurrentLine,			"Extend selection to current line",
+		kmsg_ExtendSelectionToNextLine,				"Extend selection to next line",
+		kmsg_ExtendSelectionToPreviousLine,			"Extend selection to previous line",
+		kmsg_ExtendSelectionToEndOfLine,			"Extend selection to end of line",
+		kmsg_ExtendSelectionToBeginningOfLine,		"Extend selection to beginning of line",
+		kmsg_ExtendSelectionWithNextSubword,		"Extend selection with next sub-word",
+		kmsg_ExtendSelectionWithPreviousSubword,	"Extend selection with previous sub-word",
+		kmsg_ExtendSelectionWithNextWord,			"Extend selection with next word",
+		kmsg_ExtendSelectionWithPreviousWord,		"Extend selection with previous word",
+		kmsg_ExtendSelectionWithCharacterRight,		"Extend selection with character right",
+		kmsg_ExtendSelectionWithCharacterLeft,		"Extend selection with character left",
+		kmsg_MoveToEndOfFile,						"Move to end of file",
+		kmsg_MoveToBeginningOfFile,					"Move to beginning of file",
+		kmsg_MoveToBottomOfPage,					"Move to bottom of page",
+		kmsg_MoveToTopOfPage,						"Move to top of page",
+		kmsg_MoveToNextPage,						"Move to next page",
+		kmsg_MoveToPreviousPage,					"Move to previous page",
+		kmsg_MoveToNextLine,						"Move to next line",
+		kmsg_MoveToPreviousLine,					"Move to previous line",
+		kmsg_MoveToEndOfLine,						"Move to end of line",
+		kmsg_MoveToBeginningOfLine,					"Move to beginning of line",
+		kmsg_MoveWordRight,							"Move word right",
+		kmsg_MoveWordLeft,							"Move word left",
+		kmsg_MoveSubwordRight,						"Move sub-word right",
+		kmsg_MoveSubwordLeft,						"Move sub-word left",
+		kmsg_MoveCharacterRight,					"Move character right",
+		kmsg_MoveCharacterLeft,						"Move character left"
 	}
 };
 
-resource rtyp_Cmnd (rid_Cmnd_FileMenu, "File Menu") {
+resource rtyp_Cmnd (rid_Cmnd_FileMenu, "File menu") {
 	{
 		msg_Quit,									"Quit",
 		msg_Revert,									"Revert",
-		msg_SaveCopy,								"Save a Copy As…",
-		msg_FtpSave,								"Save on Server…",
-		msg_SaveAs,									"Save As…",
-		msg_SaveAll,								"Save All",
+		msg_SaveCopy,								"Save a copy as…",
+		msg_FtpSave,								"Save on server…",
+		msg_SaveAs,									"Save as…",
+		msg_SaveAll,								"Save all",
 		msg_Save,									"Save",
-		msg_CloseAll,								"Close All",
+		msg_CloseAll,								"Close all",
 		msg_Close,									"Close",
-		msg_OpenSelected,							"Open Selected File",
-		msg_FtpOpen,								"Open from Server…",
+		msg_OpenSelected,							"Open selected file",
+		msg_FtpOpen,								"Open from server…",
 		msg_Open,									"Open…",
-		msg_NewGroup,								"New Group",
+		msg_NewGroup,								"New group",
 		msg_New,									"New"
 	}
 };
 
-resource rtyp_Cmnd (rid_Cmnd_EditMenu, "Edit Menu") {
+resource rtyp_Cmnd (rid_Cmnd_EditMenu, "Edit menu") {
 	{
-		msg_SelectParagraph,						"Select Paragraph",
-		msg_SelectLine,								"Select Line",
-		'SALL',										"Select All",
+		msg_SelectParagraph,						"Select paragraph",
+		msg_SelectLine,								"Select line",
+		'SALL',										"Select all",
 		msg_Clear,									"Clear",
 		'PSTE',										"Paste",
-		msg_CopyAppend,								"Copy and Append",
+		msg_CopyAppend,								"Copy and append",
 		'COPY',										"Copy",
-		msg_CutAppend,								"Cut and Append",
+		msg_CutAppend,								"Cut and append",
 		'CCUT',										"Cut",
 		msg_Redo,									"Redo",
 		msg_Undo,									"Undo"
 	}
 };
 
-resource rtyp_Cmnd (rid_Cmnd_TextMenu, "Text Menu") {
+resource rtyp_Cmnd (rid_Cmnd_TextMenu, "Text menu") {
 	{
-		msg_ShowInBrowser,							"Show in Browser",
-		msg_Unwrap,									"Remove Linebreaks",
-		msg_Wrap,									"Insert Linebreaks",
+		msg_ShowInBrowser,							"Show in browser",
+		msg_Unwrap,									"Remove line breaks",
+		msg_Wrap,									"Insert line breaks",
 		msg_Justify,								"Justify",
 		msg_Uncomment,								"Uncomment",
 		msg_Comment,								"Comment",
-		msg_ShiftRight,								"Shift Right",
-		msg_ShiftLeft,								"Shift Left",
-		msg_ConvertEncoding,						"Change Encoding…",
-		msg_ChangeCaseSent,							"Capitalize Sentences",
-		msg_ChangeCaseLine,							"Capitalize Lines",
-		msg_ChangeCaseCap,							"Capitalize Words",
-		msg_ChangeCaseLower,						"Change to Lowercase",
-		msg_ChangeCaseUpper,						"Change to Uppercase",
+		msg_ShiftRight,								"Shift right",
+		msg_ShiftLeft,								"Shift left",
+		msg_ConvertEncoding,						"Change encoding…",
+		msg_ChangeCaseSent,							"Capitalize sentences",
+		msg_ChangeCaseLine,							"Capitalize lines",
+		msg_ChangeCaseCap,							"Capitalize words",
+		msg_ChangeCaseLower,						"Change to lowercase",
+		msg_ChangeCaseUpper,						"Change to uppercase",
 		msg_Twiddle,								"Twiddle",
 		msg_Balance,								"Balance"
 	}
 };
 
-resource rtyp_Cmnd (rid_Cmnd_SearchMenu, "Search Menu") {
+resource rtyp_Cmnd (rid_Cmnd_SearchMenu, "Search menu") {
 	{
-		msg_GoToLine,								"Go To Line…",
-		msg_FindNextError,							"Jump to Next Error",
-		msg_IncSearchBackward,						"Incremental Search Backwards",
-		msg_IncSearch,								"Incremental Search",
-		msg_FindInNextFile,							"Find in Next File",
-		msg_ReplaceAll,								"Replace All",
-		msg_ReplaceAndFindBackward,					"Replace and Find Backwards",
-		msg_ReplaceAndFind,							"Replace and Find",
+		msg_GoToLine,								"Go to line…",
+		msg_FindNextError,							"Jump to next error",
+		msg_IncSearchBackward,						"Incremental search backwards",
+		msg_IncSearch,								"Incremental search",
+		msg_FindInNextFile,							"Find in next file",
+		msg_ReplaceAll,								"Replace all",
+		msg_ReplaceAndFindBackward,					"Replace and find backwards",
+		msg_ReplaceAndFind,							"Replace and find",
 		msg_Replace,								"Replace…",
-		msg_EnterReplaceString,						"Enter Replace String",
-		msg_EnterSearchString,						"Enter Search String",
-		msg_FindSelectionBackward,					"Find Selection Backwards",
-		msg_FindSelection,							"Find Selection",
-		msg_FindAgainBackward,						"Find Again Backwards",
-		msg_FindAgain,								"Find Again",
+		msg_EnterReplaceString,						"Enter replace string",
+		msg_EnterSearchString,						"Enter search string",
+		msg_FindSelectionBackward,					"Find selection backwards",
+		msg_FindSelection,							"Find selection",
+		msg_FindAgainBackward,						"Find again backwards",
+		msg_FindAgain,								"Find again",
 		msg_FindCmd,								"Find…",
-		msg_FindFunction,							"Find Function…",
-		msg_PreviousFunction,						"Previous Function",
-		msg_NextFunction,							"Next Function"
+		msg_FindFunction,							"Find function…",
+		msg_PreviousFunction,						"Previous function",
+		msg_NextFunction,							"Next function"
 	}
 };
 
-resource rtyp_Cmnd (rid_Cmnd_WindowMenu, "Window Menu") {
+resource rtyp_Cmnd (rid_Cmnd_WindowMenu, "Window menu") {
 	{
-		msg_Worksheet,								"Open Worksheet",
+		msg_Worksheet,								"Open worksheet",
 		msg_Zoom,									"Zoom",
 		msg_Tile,									"Tile",
 		msg_Stack,									"Stack",
-		msg_ShowHtmlPalette,						"HTML Palette",
+		msg_ShowHtmlPalette,						"HTML palette",
 		msg_ShowGlossary,							"Glossary",
-		msg_ChangeWorkingDir,						"Working Directory…",
+		msg_ChangeWorkingDir,						"Working directory…",
 		msg_Preferences,							"Preferences…",
-		msg_Info,									"File Options…",
+		msg_Info,									"File options…",
 	}
 };
 
-resource rtyp_Cmnd (rid_Cmnd_HelpMenu, "Help Menu") {
+resource rtyp_Cmnd (rid_Cmnd_HelpMenu, "Help menu") {
 	{
 		msg_About,									"About…",
 		msg_Help,									"Help…"
 	}
 };
 
-resource rtyp_Cmnd (rid_Cmnd_BeideMenu, "BeIDE Menu") {
+resource rtyp_Cmnd (rid_Cmnd_BeideMenu, "BeIDE menu") {
 	{
 		msg_IdeMake,								"Make",
 		msg_IdeProjectToGroup,						"Project -> Group",
-		msg_IdeRemove,								"Remove File",
-		msg_IdeAdd,									"Add File",
-		msg_IdeBringToFront,						"Bring to Front"
+		msg_IdeRemove,								"Remove file",
+		msg_IdeAdd,									"Add file",
+		msg_IdeBringToFront,						"Bring to front"
 	}
 };
 
 resource rtyp_Cmnd (rid_Cmnd_Miscellaneous, "Miscellaneous") {
 	{
-		kmsg_UnsplitWindow,							"Unsplit Window",
-		kmsg_SwitchActivePart,						"Switch to Other Part of Window",
-		kmsg_SplitWindow,							"Split Window",
-		msg_CancelCommand,							"Cancel Executing Command",
-		msg_Execute,								"Execute Command",
-		msg_SwitchHeaderSource,						"Open Header/Source",
+		kmsg_UnsplitWindow,							"Unsplit window",
+		kmsg_SwitchActivePart,						"Switch to other part of window",
+		kmsg_SplitWindow,							"Split window",
+		msg_CancelCommand,							"Cancel executing command",
+		msg_Execute,								"Execute command",
+		msg_SwitchHeaderSource,						"Open header/source",
 	}
 };
 
@@ -234,7 +234,7 @@ resource rtyp_Cmnd (rid_Cmnd_Extensions, "Extensions") {
 // Opt = right Ctrl key on intel keyboard
 // Cmd = either Alt key on intel keyboard
 
-resource rtyp_Bind (rid_Bind_Editing, "Bindings for Editing") {
+resource rtyp_Bind (rid_Bind_Editing, "Bindings for editing") {
 	{
 		0,				0x61,	0,		0,			kmsg_MoveCharacterLeft,
 		0,				0x63,	0,		0,			kmsg_MoveCharacterRight,
@@ -314,7 +314,7 @@ resource rtyp_Bind (rid_Bind_Editing, "Bindings for Editing") {
 	}
 };
 
-resource rtyp_Bind (rid_Bind_FileMenu, "Bindings for File Menu") {
+resource rtyp_Bind (rid_Bind_FileMenu, "Bindings for file menu") {
 	{
 		Cmd,			0x27,	0,		0,			msg_Quit,
 //		0,				0,		0, 		0,			msg_Revert,
@@ -332,7 +332,7 @@ resource rtyp_Bind (rid_Bind_FileMenu, "Bindings for File Menu") {
 	}
 };
 
-resource rtyp_Bind (rid_Bind_EditMenu, "Bindings for Edit Menu") {
+resource rtyp_Bind (rid_Bind_EditMenu, "Bindings for edit menu") {
 	{
 		Cmd,			0x44,	0,		0,			msg_SelectLine,
 		Cmd,			0x3c,	0,		0,			'SALL',
@@ -346,7 +346,7 @@ resource rtyp_Bind (rid_Bind_EditMenu, "Bindings for Edit Menu") {
 	}
 };
 
-resource rtyp_Bind (rid_Bind_TextMenu, "Bindings for Text Menu") {
+resource rtyp_Bind (rid_Bind_TextMenu, "Bindings for text menu") {
 	{
 		Cmd,			0x50,	0,		0,			msg_Balance,
 		Cmd,			0x11,	0,		0,			msg_Twiddle,
@@ -364,7 +364,7 @@ resource rtyp_Bind (rid_Bind_TextMenu, "Bindings for Text Menu") {
 	}
 };
 
-resource rtyp_Bind (rid_Bind_SearchMenu, "Bindings for Search Menu") {
+resource rtyp_Bind (rid_Bind_SearchMenu, "Bindings for search menu") {
 	{
 		Cmd,			0x53,	0,		0,			msg_GoToLine,	
 //		Cmd,			0x2e,	0,		0,			msg_FindNextError,
@@ -386,7 +386,7 @@ resource rtyp_Bind (rid_Bind_SearchMenu, "Bindings for Search Menu") {
 	}
 };
 
-resource rtyp_Bind (rid_Bind_WindowMenu, "Bindings for Window Menu") {
+resource rtyp_Bind (rid_Bind_WindowMenu, "Bindings for window menu") {
 	{
 //		0,				0,		0, 		0,			msg_FontTabs,
 //		0,				0,		0, 		0,			msg_Info,
@@ -400,14 +400,14 @@ resource rtyp_Bind (rid_Bind_WindowMenu, "Bindings for Window Menu") {
 	}
 };
 
-resource rtyp_Bind (rid_Bind_HelpMenu, "Bindings for Help Menu") {
+resource rtyp_Bind (rid_Bind_HelpMenu, "Bindings for help menu") {
 	{
 //		0,				0,		0, 		0,			msg_About,
 		0,				0x02,	0,		0,			msg_Help
 	}
 };
 
-resource rtyp_Bind (rid_Bind_BeideMenu, "Bindings for BeIDE Menu") {
+resource rtyp_Bind (rid_Bind_BeideMenu, "Bindings for BeIDE menu") {
 	{
 		Cmd,			0x52,	0,		0,			msg_IdeMake,
 //		0,				0,		0, 		0,			msg_IdeProjectToGroup,
@@ -417,7 +417,7 @@ resource rtyp_Bind (rid_Bind_BeideMenu, "Bindings for BeIDE Menu") {
 	}
 };
 
-resource rtyp_Bind (rid_Bind_Miscellaneous, "Miscellaneous Bindings") {
+resource rtyp_Bind (rid_Bind_Miscellaneous, "Miscellaneous bindings") {
 	{
 		Ctrl,			0x4e,	0,		0,			msg_CancelCommand,
 		Cmd,			0x47,	0,		0,			msg_Execute,
@@ -426,7 +426,7 @@ resource rtyp_Bind (rid_Bind_Miscellaneous, "Miscellaneous Bindings") {
 	}
 };
 
-resource rtyp_Bind (rid_Bind_Emacs, "Emacs Bindings") {
+resource rtyp_Bind (rid_Bind_Emacs, "Emacs bindings") {
 	{
 		Ctrl,			0x2d,	0,		0,			kmsg_NrArgument,
 		Ctrl,			0x44,	0,		0,			kmsg_Recenter,

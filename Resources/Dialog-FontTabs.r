@@ -34,13 +34,13 @@
 #include "Types.r"
 
 
-//resource rtyp_Popu (rid_Popu_XFONT, "Font Popup") {
+//resource rtyp_Popu (rid_Popu_XFONT, "Font popup") {
 //	"Font",
 //	{
 //	}
 //};
 //
-//resource rtyp_Popu (rid_Popu_XENCODING, "Encoding Popup") {
+//resource rtyp_Popu (rid_Popu_XENCODING, "Encoding popup") {
 //	"Encoding",
 //	{
 //		Item	{ "UTF-8", 'chng', none, noKey },
@@ -58,8 +58,8 @@
 //	}
 //};
 //
-//resource rtyp_Popu (rid_Popu_XLINEBREAKS, "Line Breaks") {
-//	"Line Breaks",
+//resource rtyp_Popu (rid_Popu_XLINEBREAKS, "Line breaks") {
+//	"Line breaks",
 //	{
 //		Item	{ "Be", 'chng', none, noKey },
 //		Item	{ "Mac", 'chng', none, noKey },
@@ -67,14 +67,14 @@
 //	}
 //};
 
-resource 'DLOG' (10, "Window Options") {
-	{ 0, 0, 250, 140 }, "Window Options", B_TITLED_WINDOW, NORMAL,
+resource 'DLOG' (10, "Window options") {
+	{ 0, 0, 250, 140 }, "Window options", B_TITLED_WINDOW, NORMAL,
 	{
 //		PopupMenu	{{ 	10,   8, 160,  28 }, "font",			"Font:",				rid_Popu_XFONT, 30		},
 //		Edit		{{ 161,  10, 240,  26 }, "size",			"Size:",				"", "0123456789", 2, 0	},
 //
 //		PopupMenu	{{  10,  33, 129,  53 }, "encoding",		"Encoding:",			rid_Popu_XENCODING, 50	},
-//		PopupMenu	{{ 130,  33, 240,  53 }, "linebreaks",		"Linebreaks:",			rid_Popu_XLINEBREAKS, 60},
+//		PopupMenu	{{ 130,  33, 240,  53 }, "linebreaks",		"Line breaks:",			rid_Popu_XLINEBREAKS, 60},
 //
 //		CheckBox	{{  10,  60, 120,  76 }, "show tabs",		"Show Tabstops"									},
 //		Edit		{{ 130,  59, 240,  75 }, "tabs",			"Spaces per Tab:",		"", "0123456789", 3, 0	},

@@ -121,7 +121,7 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 	else
 	{
 		//SetEnabled("mime", false);
-		SetText("time", "Not Saved");
+		SetText("time", "Not saved");
 	}
 
 	mf = dynamic_cast<BMenuField*>(FindView("font"));

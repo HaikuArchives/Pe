@@ -34,8 +34,8 @@
 #include "Types.r"
 
 
-resource 'DLOG' (3, "Open Selection") {
-	{ 0, 0, 250, 70 }, "Open Selection", B_TITLED_WINDOW, NORMAL,
+resource 'DLOG' (3, "Open selection") {
+	{ 0, 0, 250, 70 }, "Open selection", B_TITLED_WINDOW, NORMAL,
 	{
 		Edit	{{  10,  10, 240,  26 }, "open",	"Open:",	"", "", 0, 30	},
 		Button	{{ 180,  40, 240,  60 }, "ok",		"OK",		'ok  '			},

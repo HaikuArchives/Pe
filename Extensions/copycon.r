@@ -35,13 +35,13 @@
 
 resource 'DLOG' (1, "dialog") {
 	{ 0, 0, 250, 110 },
-	"Copy Lines Containing",
+	"Copy lines containing",
 	B_MODAL_WINDOW,
 	NORMAL,
 	{
 		Caption			{{  10,  10, 200,  26 }, "", "Enter the regex to match" },
 		Edit			{{  10,  32, 240,  48 }, "text", "", "", "", 1024, 0 },
-		CheckBox		{{  10,  54, 240,  70 }, "sel", "Selection Only" },
+		CheckBox		{{  10,  54, 240,  70 }, "sel", "Selection only" },
 		Button			{{ 180,  80, 240, 100 }, "ok", "OK", 'ok  ' },
 		Button			{{ 110,  80, 170, 100 }, "cancel", "Cancel", 'cncl' }
 	}

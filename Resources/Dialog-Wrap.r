@@ -38,8 +38,8 @@ resource 'DLOG' (2, "Wrap") {
 	{ 0, 0, 200, 110 }, "Wrap", B_TITLED_WINDOW, NORMAL,
 	{
 		Caption		{{  10,  10, 190,  26 }, "limit",	"Limit to:"										},
-		RadioButton	{{  10,  30, 120,  46 }, "width",	"Window Width"									},
-		RadioButton	{{  10,  50, 120,  66 }, "count",	"Character Width:"								},
+		RadioButton	{{  10,  30, 120,  46 }, "width",	"Window width"									},
+		RadioButton	{{  10,  50, 120,  66 }, "count",	"Character width:"								},
 		Edit		{{ 130,  50, 160,  66 }, "chars",	"",					"70", "0123456789", 0, 0	},
 		Button		{{ 130,  80, 190,  90 }, "ok",		"Wrap",				'ok  '						}
 	}

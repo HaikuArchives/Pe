@@ -407,7 +407,7 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 	FailNil(message);
 	BRect rect(bounds);
 	fFilterStringControl = new(std::nothrow) BTextControl(rect, "filter text",
-		"Filter", "", message,
+		"Filter:", "", message,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP, B_WILL_DRAW);
 	FailNil(fFilterStringControl);
 	fMainView->AddChild(fFilterStringControl);

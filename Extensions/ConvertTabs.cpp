@@ -36,7 +36,7 @@ static void DetermineAddon(void)
 	while (get_next_image_info(0, &cookie, &info) == B_OK) {
 		if ((char *)&DetermineAddon >= (char *)info.text && 
 			(char *)&DetermineAddon < ((char *)info.text + info.text_size)) {
-			if (strstr(info.name, "Replace As Tabs"))
+			if (strstr(info.name, "Replace as tabs"))
 				sIsReplaceAddon = true;
 			break;
 		}
@@ -135,7 +135,7 @@ static void ConvertTabs(MTextAddOn *addon, BString &str)
 
 static void ShowErrors(const char *msg)
 {
-	BAlert *alert = new BAlert("Convert Tabs", msg, "Quit", NULL, NULL,
+	BAlert *alert = new BAlert("Convert tabs", msg, "Quit", NULL, NULL,
 							   B_WIDTH_AS_USUAL, B_STOP_ALERT);
 	alert->Lock();
 	alert->SetLook(B_TITLED_WINDOW_LOOK);
