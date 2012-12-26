@@ -74,7 +74,7 @@ proc		PROCEDURE{ws}(\(("VAR"{ws})?{ident}\:{ws}{ident}\){ws})?
 "IMPORT"													BEGIN(import);
 \"																string_caller = INITIAL; BEGIN(string); inString = true;
 .
-<block>"END"{ws}{ident}								BEGIN(INITIAL); nesting = std::max(--nesting, 0);
+<block>"END"{ws}{ident}								BEGIN(INITIAL); --nesting; nesting = std::max(nesting, 0);
 <block>\"													string_caller = block; BEGIN(string);
 <block>{ident}
 <block>.

@@ -104,6 +104,7 @@ class WordState {
 			: fKey(key)
 			, fSubWord(subWord)
 			, fSkip(!mouseSelect)
+			, fLastIsUpperCase(false)
 			, fUnicodeClass(-1)
 		{
 		}
@@ -934,7 +935,7 @@ int PText::FindLineBreak(int offset, bool hard)
 
 int PText::RewrapLines(int from, int to, bool hard)
 {
-	int offset, state, lb, fl, dy;
+	int offset, lb, fl, dy;
 
 	// first remove invalid linebreaks
 	fl = min(Offset2Line(from), LineCount() - 1);
@@ -974,7 +975,6 @@ int PText::RewrapLines(int from, int to, bool hard)
 	le = ls + 1;
 
 	// then determine the new ones
-	state = (*ls).state;
 	lb = (*ls).start;
 
 	offset = FindLineBreak(lb, hard);
@@ -2972,12 +2972,9 @@ void PText::Selection2Region(BRegion& rgn, int part)
 	if (fAnchor == fCaret)
 		return;
 
-	int first, last, firstLine, lastLine;
+	int first, last;
 	first = min(fAnchor, fCaret);
 	last = max(fAnchor, fCaret);
-
-	firstLine = Offset2Line(first);
-	lastLine = Offset2Line(last);
 
 	BPoint p1, p2;
 
@@ -4519,13 +4516,13 @@ long PExec::Execute()
 
 			if (fWD) chdir(fWD);
 
-			char *args[5];
+			const char *args[5];
 			args[0] = "/bin/sh";
 			args[1] = "-c";
 			args[2] = fCmd;
 			args[3] = NULL;
 
-			if (execvp(args[0], args))
+			if (execvp(args[0], const_cast<char **>(args)))
 			{
 				beep();		// what else can we do???
 				exit(1);	// this may kill Pe, but what will happen if we just return?
@@ -4708,12 +4705,10 @@ void PText::Draw(BRect updateRect)
 {
 	fBounds = Bounds();
 
-	int start, end, i, cl;
+	int start, end, i;
 	float y, v;
 	BRect r;
 	BRegion clip;
-
-	cl = Offset2Line(fCaret);
 
 	SetLowColor(gColor[kColorLow]);
 
@@ -6483,9 +6478,8 @@ void PText::MenusBeginning()
 	BMenuBar *mbar = dynamic_cast<BMenuBar*>(Window()->FindView("mbar"));
 	FailNil(mbar);
 
-	const char *what, *with;
+	const char *what;
 	what = gFindDialog->FindString();
-	with = gFindDialog->ReplaceString();
 
 	mbar->FindItem(B_CUT)->SetEnabled(hasSelection);
 	mbar->FindItem(B_COPY)->SetEnabled(hasSelection);

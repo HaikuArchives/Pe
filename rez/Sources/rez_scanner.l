@@ -288,7 +288,7 @@ void AddMacro(char *s)
 void CopyBuf()
 {
 	size_t size = sbp - sBuf - sizeof(long);
-	*(long *)sBuf = size;
+	memcpy(sBuf, &size, sizeof(size));
 	
 	yylval = (int)malloc(size + sizeof(long));
 	memcpy((void*)yylval, sBuf, size + sizeof(long));

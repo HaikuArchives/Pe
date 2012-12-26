@@ -206,7 +206,7 @@ void CGlossary::ParseGlossaryFile()
 			else if (strlen(kp) == 1)
 				key |= *kp;
 			else if (tolower(*kp) == 'f')
-				key |= strtol(kp + 1, &kp, 10) + 1 | 0x0100;
+				key |= (strtol(kp + 1, &kp, 10) + 1) | 0x0100;
 			else
 				THROW(("Incorrect Glossary File, unrecognized keyword %s", kp));
 

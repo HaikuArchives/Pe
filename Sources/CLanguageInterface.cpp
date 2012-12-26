@@ -696,7 +696,6 @@ void CLanguageInterface::GenerateKeywordMap(const char *ext) const
 	try
 	{
 		BPath settings;
-		bool isNew = false;
 
 		FailOSErr(find_directory(B_USER_SETTINGS_DIRECTORY, &settings, true));
 
@@ -713,7 +712,6 @@ void CLanguageInterface::GenerateKeywordMap(const char *ext) const
 			// copy resources into separate file in settings-folder, such that
 			// the user can edit that in order to modify the keywords for that
 			// specific language:
-			isNew = true;
 
 			BFile rf;
 			FailOSErr(rf.SetTo(ext, B_READ_ONLY));

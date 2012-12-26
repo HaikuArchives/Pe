@@ -337,11 +337,6 @@ char *RelativePath(entry_ref& a, entry_ref& b)
 	s = sa = pa.Path();
 	sb = pb.Path();
 
-	int ma, mb;
-
-	ma = strrchr(sa, '/') - sa;
-	mb = strrchr(sb, '/') - sb;
-
 	while (*sa == *sb)
 	{
 		sa++;

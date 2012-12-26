@@ -159,9 +159,8 @@ long Anchor(MTextAddOn *addon)
 {
 	char s[2048];
 
-	long st, end, len;
+	long st, end;
 	addon->GetSelection(&st, &end);
-	len = end - st;
 
 	if (*sPath)
 		sprintf(s, "<a href=\"%s\">", sPath);
@@ -194,11 +193,6 @@ char *RelativePath(entry_ref& a, entry_ref& b)
 
 	s = sa = pa.Path();
 	sb = pb.Path();
-
-	int ma, mb;
-
-	ma = strrchr(sa, '/') - sa;
-	mb = strrchr(sb, '/') - sb;
 
 	while (*sa == *sb)
 	{
