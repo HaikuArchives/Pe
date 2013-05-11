@@ -35,9 +35,11 @@
 
 #include <vector>
 
+#include <errno.h>
+#include <fcntl.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 
 #include <Message.h>
 #include <Roster.h>
@@ -47,14 +49,20 @@ const long msg_CommandLineOpen = 'Cmdl';
 
 static std::vector<int> threads;
 
+static BString sTempFilePath;
+
 void DoError(const char *e, ...);
-void Usage();
+void Usage(bool error);
 void OpenInPe(entry_ref& ref, int lineNr);
 
-void Usage()
+void Usage(bool error)
 {
-	puts("usage: lpe [file:linenr | +linenr file | file] ...");
-	exit(1);
+	puts("usage: lpe [--type <fileType>] [file:linenr | +linenr [file] | file] "
+		"...");
+	puts("If no file has been specified, copy stdin to a temporary file and");
+	puts("open that. In that case <fileType> specifies the file extension to");
+	puts("be used to help Pe recognize the content type.");
+	exit(error ? 1 : 0);
 } /* Usage */
 
 void DoError(const char *e, ...)
@@ -131,6 +139,15 @@ void OpenInPe(entry_ref& doc, int lineNr)
 
 } /* OpenInPe */
 
+
+static void
+remove_temp_file()
+{
+	if (!sTempFilePath.IsEmpty())
+		unlink(sTempFilePath);
+}
+
+
 int main(int argc, char *argv[])
 {
 	int			i = 0;
@@ -141,8 +158,8 @@ int main(int argc, char *argv[])
 	BEntry		e;
 	BString		path;
 	int			nr;
-
-	if (argc < 2) Usage();
+	bool		pathSeen = false;
+	const char*	fileType = NULL;
 
 	while (++i < argc)
 	{
@@ -150,11 +167,28 @@ int main(int argc, char *argv[])
 		{
 			case '+':
 				lineNr = strtoul(argv[i] + 1, &p, 10);
-				if (!p || p == argv[i] + 1) Usage();
+				if (!p || p == argv[i] + 1) Usage(true);
 				break;
-			
+
+			case '-':
+				if (strcmp(argv[i], "-h") == 0
+					|| strcmp(argv[i], "--help") == 0) {
+					Usage(false);
+				}
+
+				if (strcmp(argv[i], "--type") == 0) {
+					i++;
+					if (i >= argc)
+						Usage(true);
+
+					fileType = argv[i];
+					break;
+				}
+				// fall through
+
 			default:
 			{
+				pathSeen = true;
 				path = argv[i];
 				dpPtr = strrchr(argv[i], ':');
 				if (dpPtr != NULL)
@@ -180,7 +214,60 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
-	
+
+	if (!pathSeen) {
+		// No files specified. Write the stdin to a file and open that instead.
+
+		sTempFilePath.SetToFormat("/tmp/lpe-%ld", (long)find_thread(NULL));
+		if (fileType != NULL)
+			sTempFilePath << '.' << fileType;
+
+		entry_ref tempFileRef;
+		status_t error = get_ref_for_path(sTempFilePath, &tempFileRef);
+		if (error != B_OK) {
+			DoError("Failed to get temporary file entry ref: %s",
+				strerror(error));
+		}
+
+		// remove and re-create the file
+		unlink(sTempFilePath);
+
+		int fd = creat(sTempFilePath, S_IRUSR | S_IWUSR);
+		if (fd < 0)
+			DoError("Failed to create temporary file: %s", strerror(errno));
+
+		atexit(&remove_temp_file);
+
+		// copy stdin to file
+		char buffer[64 * 1024];
+		for (;;) {
+			size_t bytesRead = fread(buffer, 1, sizeof(buffer), stdin);
+			if (bytesRead == 0) {
+				if (ferror(stdin) != 0) {
+					error = errno;
+					DoError("Failed to read from stdin: %s", strerror(error));
+				}
+				break;
+			}
+
+			ssize_t bytesWritten = write(fd, buffer, bytesRead);
+			if (bytesWritten < 0) {
+				error = errno;
+				DoError("Failed to write to temporary file: %s",
+					strerror(error));
+			}
+
+			if ((size_t)bytesWritten != bytesRead) {
+				DoError("Failed to write to temporary file: unknown error",
+					strerror(error));
+			}
+		}
+
+		close(fd);
+
+		OpenInPe(tempFileRef, lineNr);
+	}
+
 	std::vector<int>::iterator ti;
 	
 	for (ti = threads.begin(); ti != threads.end(); ti++)
