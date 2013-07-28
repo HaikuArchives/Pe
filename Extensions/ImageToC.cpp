@@ -158,19 +158,19 @@ void ImageToC::DumpBitmap(BBitmap* bitmap, const char *name)
 	char line[1024];
 #ifdef __MWERKS__
 	sprintf(line,
-		"const %sWidth = %ld;\n"
-		"const %sHeight = %ld;\n"
+		"const %sWidth = %" B_PRId32 ";\n"
+		"const %sHeight = %" B_PRId32 ";\n"
 		"const %sColorSpace = %s;\n"
-		"const %sBytesPerRow = %ld;\n\n",
+		"const %sBytesPerRow = %" B_PRId32 ";\n\n",
 		baseName.String(), bitmap->Bounds().IntegerWidth() + 1, baseName.String(),
 		bitmap->Bounds().IntegerHeight() + 1, baseName.String(), colorSpace,
 		baseName.String(), bitmap->BytesPerRow());
 #else
 	snprintf(line, sizeof(line),
-		"const %sWidth = %ld;\n"
-		"const %sHeight = %ld;\n"
+		"const %sWidth = %" B_PRId32 ";\n"
+		"const %sHeight = %" B_PRId32 ";\n"
 		"const %sColorSpace = %s;\n"
-		"const %sBytesPerRow = %ld;\n\n",
+		"const %sBytesPerRow = %" B_PRId32 ";\n\n",
 		baseName.String(), bitmap->Bounds().IntegerWidth() + 1, baseName.String(),
 		bitmap->Bounds().IntegerHeight() + 1, baseName.String(), colorSpace,
 		baseName.String(), bitmap->BytesPerRow());
@@ -193,9 +193,9 @@ void ImageToC::DumpBitmap(BBitmap* bitmap, const char *name)
 	int32 size = bitmap->BitsLength() / bytesPerPixel;
 
 #ifdef __MWERKS__
-	sprintf(line, "const %sData[%ld] = {", baseName.String(), size);
+	sprintf(line, "const %sData[%" B_PRId32 "] = {", baseName.String(), size);
 #else
-	snprintf(line, sizeof(line), "const %sData[%ld] = {",
+	snprintf(line, sizeof(line), "const %sData[%" B_PRId32 "] = {",
 		baseName.String(), size);
 #endif
 	text.Insert(line);
@@ -252,7 +252,7 @@ void ImageToC::DumpBitmap(BBitmap* bitmap, const char *name)
 					pos = line;
 				}
 
-				pos += sprintf(pos, "0x%08lx, ", data[i]);
+				pos += sprintf(pos, "%#" B_PRIx32 ", ", data[i]);
 			}
 			break;
 		}

@@ -39,17 +39,17 @@
 #include "copycon.r.h"
 
 #if __INTEL__
-extern "C" _EXPORT long perform_edit(MTextAddOn *addon);
+extern "C" _EXPORT status_t perform_edit(MTextAddOn *addon);
 #else
 #pragma export on
 extern "C" {
-long perform_edit(MTextAddOn *addon);
+status_t perform_edit(MTextAddOn *addon);
 }
 #pragma export reset
 #endif
 
-long CopyContaining(MTextAddOn *addon);
-long SuffixLines(MTextAddOn *addon);
+status_t CopyContaining(MTextAddOn *addon);
+status_t SuffixLines(MTextAddOn *addon);
 
 static bool sOK = false;
 static bool sSelectionOnly;
@@ -97,13 +97,13 @@ bool CCopyContainingDialog::CancelClicked()
 	return true;
 } /* CCopyContainingDialog::CancelClicked */
 
-long perform_edit(MTextAddOn *addon)
+status_t perform_edit(MTextAddOn *addon)
 {
-	long result = B_NO_ERROR;
+	status_t result = B_NO_ERROR;
 
 	try
 	{
-		long s, e, l;
+		int32 s, e, l;
 		addon->GetSelection(&s, &e);
 		sSelectionOnly = (s != e);
 
@@ -127,12 +127,12 @@ long perform_edit(MTextAddOn *addon)
 	return result;
 } /* perform_edit */
 
-long CopyContaining(MTextAddOn *addon)
+status_t CopyContaining(MTextAddOn *addon)
 {
 	//  error checking
 
-	long	selBeg;
-	long	selEnd;
+	int32 selBeg;
+	int32 selEnd;
 
 	if (sSelectionOnly)
 	{

@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 02-06-02
 */
@@ -57,7 +57,7 @@ class CFindDialog : public HDialog
 	friend class CDirDropArea;
 public:
 	enum { sResID = 8 };
-		
+
 	CFindDialog(BRect frame, const char *name,
 		window_type type, int flags, BWindow *owner);
 
@@ -79,13 +79,13 @@ public:
 	bool Word();
 	bool Grep();
 	bool IsInMultiFileState() const;
-	
+
 	CRegex* Regex();
-	
+
 	void GetPatternInfo(BMessage* patternMsg);
 	void SetPatternInfo(const BMessage* patternMsg);
 	bool PatternInfoDiffersFrom(const BMessage* patternMsg);
-		
+
 private:
 	virtual bool QuitRequested();
 
@@ -102,9 +102,9 @@ private:
 	bool GetRefForPath(entry_ref& ref, const char *path);
 	void DoIncludesFind();
 	void DoOpenWindows(bool replace);
-	
+
 	void ShowBatch(vector<PMessageItem*> *lst, BWindow **w);
-	
+
 	void AddCurrentPatternToFindPopup(bool showReplaceText);
 
 	char **fBeIncludes;
@@ -119,7 +119,7 @@ private:
 	int fCurrentIncludeIndex;
 	CRegex fRegex;
 	long padding[4];
-	
+
 	// Interface
 	HButton			*fButFind;
 	HButton			*fButRepl;
@@ -200,12 +200,12 @@ inline CRegex* CFindDialog::Regex()
 
 #pragma mark - Find
 
-void initskip(const char *p, int skip[], bool ignoreCase);
-void initskip_b(const char *p, int skip[], bool ignoreCase);
-int mismatchsearch(const char *p, const char *a, int N, int skip[], bool ignoreCase);
-int mismatchsearch_b(const char *p, const char *a, int N, int skip[], bool ignoreCase);
+void initskip(const char *p, int32 skip[], bool ignoreCase);
+void initskip_b(const char *p, int32 skip[], bool ignoreCase);
+int32 mismatchsearch(const char *p, const char *a, int32 N, int32 skip[], bool ignoreCase);
+int32 mismatchsearch_b(const char *p, const char *a, int32 N, int32 skip[], bool ignoreCase);
 
-int Find(const char *what, const char *buf, int bufSize, bool ignoreCase);
-void Offset2Line(const char *buf, int size, int offset, int& line, int& selStart, char** l);
+int32 Find(const char *what, const char *buf, int32 bufSize, bool ignoreCase);
+void Offset2Line(const char *buf, int32 size, int32 offset, int32& line, int32& selStart, char** l);
 
 #endif // CFINDDIALOG_H

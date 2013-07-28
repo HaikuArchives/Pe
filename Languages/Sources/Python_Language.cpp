@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 12/07/97 22:01:11 by Maarten Hekkelman
 */
@@ -54,7 +54,7 @@ bool isOperator(char c)
 {
 	if (c == '+' || c=='-' || c=='*' || c=='/' || c=='%' || c=='=' || c=='>' || c=='<' || c=='&' || c=='|' || c=='!' || c=='.' || c==':' )
 		return true;
-			
+
 	return false;
 }
 
@@ -62,7 +62,7 @@ bool isSymbol(char c)
 {
 	if (c=='{' || c=='}' || c=='(' || c==')' || c=='[' || c==']' || c==',' ||  c==';')
 		return true;
-	
+
 	return false;
 }
 
@@ -74,20 +74,20 @@ bool isNumeric(char c)
 	return false;
 }
 
-_EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
+_EXPORT void ColorLine(CLanguageProxy& proxy, int32& state)
 {
 	const char *text = proxy.Text();
-	int size = proxy.Size();
-	int i = 0, s = 0, kws = 0, esc = 0;
+	int32 size = proxy.Size();
+	int32 i = 0, s = 0, kws = 0, esc = 0;
 	char c;
 	bool leave = false;
-	
+
 	// floating point flag, true when the NUMERIC: label finds a . inside a number, and checks to make sure that a number with two '.' is invalid. (and not highlighted as numeric)
 	bool floating_point = false;
 	// same flag, only for hex numbers. allows proper highlighting only for 1 x per number. (0x21 is ok. 0x023x31 is not. will look wierd.)
 	bool hex_num = false;
 
-	
+
 	switch (state)
 	{
 		case COMMENT:  proxy.SetColor(0, kColorComment1); break;
@@ -95,14 +95,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 		case STRING3:  proxy.SetColor(0, kColorString1);  break;
 		default:       proxy.SetColor(0, kColorText);     break;
 	}
-	
+
 	if (size <= 0)
 		return;
-	
+
 	while (!leave)
 	{
 		GETCHAR;
-		
+
 		switch (state) {
 			case START:
 				if (c == '#')
@@ -142,14 +142,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				// steroids end.
 				else if (c == '\n' || c == 0)
 					leave = true;
-					
+
 				if (leave || (state != START && s < i))
 				{
 					proxy.SetColor(s, kColorText);
 					s = i - 1;
 				}
 				break;
-			
+
 			case IDENT:
 				if (!isalnum(c) && c != '_')
 				{
@@ -171,21 +171,21 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					{
 						proxy.SetColor(s, kColorText);
 					}
-					
+
 					s = --i;
 					state = START;
 				}
 				else if (kws)
 					kws = proxy.Move((int)(unsigned char)c, kws);
 				break;
-			
+
 			case LCOMMENT:
 				proxy.SetColor(s, kColorComment1);
 				leave = true;
 				if (text[size - 1] == '\n')
 					state = START;
 				break;
-			
+
 			case STRING1:
 				if (c == '"' && !esc)
 				{
@@ -204,14 +204,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						proxy.SetColor(s, kColorText);
 						state = START;
 					}
-					
+
 					s = size;
 					leave = true;
 				}
 				else
 					esc = !esc && (c == '\\');
 				break;
-			
+
 			case STRING2:
 				if (c == '\'' && !esc)
 				{
@@ -230,14 +230,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						proxy.SetColor(s, kColorText);
 						state = START;
 					}
-					
+
 					s = size;
 					leave = true;
 				}
 				else
 					esc = !esc && (c == '\\');
 				break;
-			
+
 			case STRING3:
 				if (c == '\'' && text[i] == '\'' && text[i + 1] == '\'' && !esc)
 				{
@@ -256,14 +256,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						proxy.SetColor(s, kColorText);
 						state = START;
 					}
-					
+
 					s = size;
 					leave = true;
 				}
 				else
 					esc = !esc && (c == '\\');
 				break;
-			
+
 			case COMMENT:
 				if (c == '"' && text[i] == '"' && text[i + 1] == '"')
 				{
@@ -277,7 +277,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					leave = true;
 				}
 				break;
-				
+
 			case NUMERIC:
 			{
 				proxy.SetColor(s, kColorNumber1);
@@ -296,7 +296,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					}
 			}
 			break;
-			
+
 			case OPERATOR:
 			{
 				proxy.SetColor(s, kColorOperator1);
@@ -310,7 +310,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 			}
 			break;
-			
+
 			case SYMBOL:
 			{
 				proxy.SetColor(s, kColorSeparator1);
@@ -323,8 +323,8 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					state = START;
 				}
 			}
-			break;			
-			
+			break;
+
 			default:	// error condition, gracefully leave the loop
 				leave = true;
 				break;

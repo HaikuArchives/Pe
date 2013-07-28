@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 02-06-02
 */
@@ -39,7 +39,9 @@
 #include "HDefines.h"
 #include "HColorUtils.h"
 
-const ulong
+#include <stdlib.h>
+
+const uint32
 	msg_NewColor = 'NClr';
 
 HColorControl::HColorControl(BRect r, const char *name, const char *label, rgb_color color)
@@ -59,7 +61,7 @@ void HColorControl::Draw(BRect /*updateRect*/)
 {
 	BRect r(Bounds());
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	font_height fh;
 	BFont font;
 	GetFont(&font);
@@ -75,22 +77,22 @@ void HColorControl::Draw(BRect /*updateRect*/)
 		StrokeLine(BPoint(p.x, p.y + 2), BPoint(p.x + StringWidth(fLabel), p.y + 2));
 		SetHighColor(0, 0, 0);
 	}
-	
+
 	DrawString(fLabel, p);
-	
+
 	r.left = r.right - 32;
 	r.bottom -= fh.descent - 2;
 	r.top = r.bottom - 12;
-	
+
 	FillRect(r, B_SOLID_LOW);
 	r.left += 2;
 	r.top += 2;
-	
+
 	if (fDown)
 	{
 		SetHighColor(kBlack);
 		StrokeRect(r);
-		
+
 		r.InsetBy(1, 1);
 		rgb_color c = fColor;
 		c.red >>= 1;
@@ -98,7 +100,7 @@ void HColorControl::Draw(BRect /*updateRect*/)
 		c.blue >>= 1;
 		SetHighColor(c);
 		FillRect(r);
-		
+
 		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		r.InsetBy(-1, -1);
 		r.OffsetBy(-1, -1);
@@ -114,12 +116,12 @@ void HColorControl::Draw(BRect /*updateRect*/)
 		StrokeLine(r.LeftBottom(), r.RightBottom());
 		StrokeLine(r.RightTop(), r.RightBottom());
 		r.OffsetBy(-1, -1);
-		
+
 		SetHighColor(kBlack);
 		StrokeRect(r);
-	
+
 		r.InsetBy(1, 1);
-		
+
 		SetHighColor(fColor);
 		FillRect(r);
 	}
@@ -132,9 +134,9 @@ void HColorControl::MouseDown(BPoint where)
 	if (modifiers() & B_OPTION_KEY)
 	{
 		BMessage msg(B_PASTE);
-		
+
 		msg.AddData("RGBColor", 'RGBC', &fColor, 4);
-		
+
 		roSColor ro;
 		rgb2ro(fColor, ro);
 
@@ -142,7 +144,7 @@ void HColorControl::MouseDown(BPoint where)
 
 		BRect r(0, 0, 9, 9);
 		BBitmap *image = new BBitmap(r, B_RGB_32_BIT);
-		
+
 		uchar data[300], *dp = data;
 		for (int i = 0; i < 100; i++)
 		{
@@ -151,16 +153,16 @@ void HColorControl::MouseDown(BPoint where)
 			*dp++ = fColor.blue;
 		}
 		image->SetBits(data, 300, 0, B_RGB_32_BIT);
-		
+
 		DragMessage(&msg, image, BPoint(4, 4));
 	}
 	else
 	{
-		unsigned long btns;
+		uint32 btns;
 		BRect r(Bounds());
 		r.left = r.right - 32;
 		BPoint p = where;
-		
+
 		do
 		{
 			if (fDown != r.Contains(p))
@@ -168,16 +170,16 @@ void HColorControl::MouseDown(BPoint where)
 				fDown = !fDown;
 				Draw(r);
 			}
-			
+
 			GetMouse(&p, &btns);
 		}
 		while (btns);// && abs(p.x - where.x) <= 2 && abs(p.y - where.y) <= 2);
-	
+
 		if (fDown)
 		{
-			HColorPicker2 *getColor 
+			HColorPicker2 *getColor
 				= DialogCreator<HColorPicker2>::CreateDialog(Window());
-			
+
 			BMessage msg(msg_NewColor);
 			msg.AddData("color", B_RGB_COLOR_TYPE, &fColor, sizeof(fColor));
 			getColor->Connect(msg, this);
@@ -203,7 +205,7 @@ void HColorControl::MessageReceived(BMessage *msg)
 {
 	roSColor *c;
 	ssize_t l;
-	
+
 	if (msg->WasDropped() && msg->FindData("roColour", (type_code)'roCr', (const void**)&c, &l) == B_NO_ERROR)
 	{
 		fColor = ro2rgb(*c);
@@ -217,12 +219,12 @@ void HColorControl::MessageReceived(BMessage *msg)
 	{
 		ssize_t l;
 		rgb_color *c;
-		
+
 		if (msg->FindData("color", B_RGB_COLOR_TYPE, (const void**)&c, &l) == B_NO_ERROR)
 		{
 			fColor = *c;
 			Draw(Bounds());
-			
+
 			BMessage m(msg_FieldChanged);
 			m.AddPointer("source", this);
 			Looper()->PostMessage(&m);

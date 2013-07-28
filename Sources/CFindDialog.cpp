@@ -780,7 +780,7 @@ void CFindDialog::MessageReceived(BMessage *msg)
 
 			case msg_FindPopup:
 			{
-				long ix;
+				int32 ix;
 				FailOSErr(msg->FindInt32("index", &ix));
 
 				CRecentPatternController::ActiveController()->GoToIndex(ix);
@@ -1084,7 +1084,7 @@ bool CFindDialog::DoMultiFileFind(const char *dir, bool recursive, bool restart,
 						{
 							BAutolock lock(doc);
 
-							int offset = 0;
+							int32 offset = 0;
 
 							doc->TextView()->FindNext(fEdiFind->Text(),
 								offset, fChkCase->IsOn(), false, false, false,
@@ -1279,7 +1279,7 @@ void CFindDialog::DoOpenWindows(bool replace)
 					doc->TextView()->Find(msg_ReplaceAll, NULL);
 				else
 				{
-					int offset = 0;
+					int32 offset = 0;
 					doc->TextView()->FindNext(fEdiFind->Text(), offset,
 						fChkCase->IsOn(), false, false, fChkWord->IsOn(),
 						fChkGrep->IsOn(), true);
@@ -1321,9 +1321,9 @@ void CFindDialog::ShowBatch(vector<PMessageItem*> *lst, BWindow** w)
 #pragma mark - Find
 
 
-void initskip(const char *p, int skip[], bool ignoreCase)
+void initskip(const char *p, int32 skip[], bool ignoreCase)
 {
-	for (int i = 0; i < 255; i++)
+	for (int32 i = 0; i < 255; i++)
 		skip[i] = 1;
 
 	// [zooey]: temporary fix, as the current code isn't able to deal
@@ -1348,12 +1348,12 @@ void initskip(const char *p, int skip[], bool ignoreCase)
 #endif
 } /* initskip */
 
-int mismatchsearch(const char *p, const char *a, int N, int skip[], bool ignoreCase)
+int32 mismatchsearch(const char *p, const char *a, int32 N, int32 skip[], bool ignoreCase)
 {
 	ASSERT(p);
 	ASSERT(a);
 	ASSERT(skip);
-	int i, j, t, M = strlen(p);
+	int32 i, j, t, M = strlen(p);
 	unsigned char c;
 
 	if (ignoreCase)
@@ -1389,9 +1389,9 @@ int mismatchsearch(const char *p, const char *a, int N, int skip[], bool ignoreC
 	return i;
 } /* mismatchsearch */
 
-void initskip_b(const char*p, int skip[], bool ignoreCase)
+void initskip_b(const char*p, int32 skip[], bool ignoreCase)
 {
-	for (int i = 0; i < 255; i++)
+	for (int32 i = 0; i < 255; i++)
 		skip[i] = 1;
 
 	// [zooey]: temporary fix, as the current code isn't able to deal
@@ -1416,12 +1416,12 @@ void initskip_b(const char*p, int skip[], bool ignoreCase)
 #endif
 } /* initskip_b */
 
-int mismatchsearch_b(const char *p, const char *a, int N, int skip[], bool ignoreCase)
+int32 mismatchsearch_b(const char *p, const char *a, int32 N, int32 skip[], bool ignoreCase)
 {
 	ASSERT(p);
 	ASSERT(a);
 	ASSERT(skip);
-	int i, j, t, M = strlen((char *)p);
+	int32 i, j, t, M = strlen((char *)p);
 	unsigned char c;
 
 	if (ignoreCase)
@@ -1457,10 +1457,10 @@ int mismatchsearch_b(const char *p, const char *a, int N, int skip[], bool ignor
 	return i - M;
 } /* mismatchsearch_b */
 
-int Find(const char *what, const char *buf, int bufSize, bool ignoreCase)
+int32 Find(const char *what, const char *buf, int32 bufSize, bool ignoreCase)
 {
-	int skip[256];
-	int offset = 0;
+	int32 skip[256];
+	int32 offset = 0;
 
 	initskip(what, skip, ignoreCase);
 	offset = mismatchsearch(what, buf, bufSize, skip, ignoreCase);
@@ -1468,7 +1468,7 @@ int Find(const char *what, const char *buf, int bufSize, bool ignoreCase)
 	return offset;
 } /* Find */
 
-static bool IsWord(const char *buf, int size, int start, int len)
+static bool IsWord(const char *buf, int32 size, int32 start, int32 len)
 {
 	bool result;
 
@@ -1480,10 +1480,10 @@ static bool IsWord(const char *buf, int size, int start, int len)
 	return result;
 } /* IsWord */
 
-void Offset2Line(const char *buf, int size, int offset, int& line, int& selStart, char** l)
+void Offset2Line(const char *buf, int32 size, int32 offset, int32& line, int32& selStart, char** l)
 {
 	line = 1;
-	int i = 0, ls = 0;
+	int32 i = 0, ls = 0;
 
 	while (i < offset)
 	{
@@ -1539,8 +1539,8 @@ bool BufferContains(const char *buf, int size, const char *path, const char *wha
 	bool word, vector<PMessageItem*> *lst)
 {
 	bool result = false;
-	int skip[256];
-	int offset = 0;
+	int32 skip[256];
+	int32 offset = 0;
 
 	initskip(what, skip, ignoreCase);
 
@@ -1563,7 +1563,7 @@ bool BufferContains(const char *buf, int size, const char *path, const char *wha
 				PMessageItem *i = new PMessageItem;
 
 				char *l;
-				int line, start;
+				int32 line, start;
 
 				Offset2Line(buf, size, offset, line, start, &l);
 
@@ -1631,7 +1631,7 @@ bool BufferContainsEx(const char *buf, int size, const char *path,
 			PMessageItem *i = new PMessageItem;
 
 			char *l;
-			int line, start;
+			int32 line, start;
 
 			Offset2Line(buf, size, offset, line, start, &l);
 

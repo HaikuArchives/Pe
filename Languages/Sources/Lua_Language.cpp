@@ -16,8 +16,8 @@ _EXPORT const int16 kInterfaceVersion = 2;
 }
 
 enum {
-	START, 
-	IDENT, 
+	START,
+	IDENT,
 	STRING,  // "strings"
 	STRING2, // 'strings'
 //	STRING3, // [[strings]]
@@ -34,16 +34,16 @@ bool isOperator(char c)
 	if (c == '=' || c == '~' || c == '<' || c == '>' || c == '+' || c == '-' ||
 		c == '/' || c == '.' || c == '{' || c == '}')
 		return true;
-			
+
 	return false;
 }
 
 bool isSymbol(char c)
 {
-	if (c == '(' || c == ')' || c == '[' || c == ']' || c == '&' || 
+	if (c == '(' || c == ')' || c == '[' || c == ']' || c == '&' ||
 		c == ',' || c == ';' || c == '$' || c == '#')
 		return true;
-	
+
 	return false;
 }
 
@@ -63,11 +63,11 @@ bool isHexNum(char c)
 	return false;
 }
 
-_EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
+_EXPORT void ColorLine(CLanguageProxy& proxy, int32& state)
 {
 	const char *text = proxy.Text();
-	int size = proxy.Size();
-	int i = 0, s = 0, kws = 0, esc = 0;
+	int32 size = proxy.Size();
+	int32 i = 0, s = 0, kws = 0, esc = 0;
 	char c;
 	bool leave = false;
 	bool floating_point = false;
@@ -79,14 +79,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 		proxy.SetColor(0, kColorComment1);
 	else
 		proxy.SetColor(0, kColorText);
-	
+
 	if (size <= 0)
 		return;
-	
+
 	while (!leave)
 	{
 		GETCHAR;
-		
+
 		switch (state) {
 			case START:
 				if (isalpha(c) || c == '_')
@@ -112,11 +112,11 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 */
 				else if (isNumeric(c) || (c == '$' && isHexNum(text[i])))
 				{
-					state = NUMERIC;	
+					state = NUMERIC;
 				}
 				else if (isOperator(c))
 				{
-					state = OPERATOR;	
+					state = OPERATOR;
 				}
 				else if (isSymbol(c))
 				{
@@ -124,14 +124,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (c == '\n' || c == 0)
 					leave = true;
-					
+
 				if (leave || (state != START && s < i))
 				{
 					proxy.SetColor(s, kColorText);
 					s = i - 1;
 				}
 			break;
-			
+
 			// -- format comments
 			case LCOMMENT:
 				proxy.SetColor(s - 1, kColorComment1);
@@ -143,7 +143,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case IDENT:
 				if (!isalnum(c) && c != '_')
 				{
-					int kwc;
+					int32 kwc;
 
 					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0)
 					{
@@ -168,7 +168,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else if (kws)
 					kws = proxy.Move((int)(unsigned char) c, kws);
 			break;
-			
+
 			case STRING:
 				if (c == '"' && !esc)
 				{
@@ -187,7 +187,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						proxy.SetColor(s, kColorText);
 						state = START;
 					}
-					
+
 					s = size;
 					leave = true;
 				}
@@ -213,7 +213,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						proxy.SetColor(s, kColorText);
 						state = START;
 					}
-					
+
 					s = size;
 					leave = true;
 				}
@@ -241,7 +241,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						state = START;
 					}
 			break;
-		
+
 			case OPERATOR:
 				proxy.SetColor(s, kColorOperator1);
 				if (isOperator(text[i - 1]))
@@ -253,7 +253,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					state = START;
 				}
 			break;
-		
+
 			case SYMBOL:
 				proxy.SetColor(s, kColorSeparator1);
 				if (isSymbol(text[i - 1]))
@@ -264,8 +264,8 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					i--;
 					state = START;
 				}
-			break;			
-			
+			break;
+
 			default:
 				leave = true;
 			break;

@@ -35,8 +35,6 @@
 
 #include "pe.h"
 
-#include <Slider.h>
-
 #include "HDialog.h"
 #include "HTabSheet.h"
 #include "HColorControl.h"
@@ -45,6 +43,8 @@
 #include "HDefines.h"
 #include "HError.h"
 #include "MAlert.h"
+
+#include <Slider.h>
 
 const unsigned long
 	msg_AddDialog		= 'ADlg',
@@ -160,7 +160,7 @@ void HDialog::MessageReceived(BMessage *inMessage)
 	}
 } /* HDialog::MessageReceived */
 
-void		do_window_action(int32 window_id, int32 action, 
+void		do_window_action(int32 window_id, int32 action,
 							 BRect zoomRect, bool zoom);
 
 static BRect CallerFrame(BMessenger& caller)
@@ -272,11 +272,11 @@ void HDialog::Hide()
 		if (cr.IsValid())
 		{
 			// store coordinates relative to closest corner of owner-frame:
-			origin[0] = 
+			origin[0] =
 				(fabs(cr.left-frame.left) < fabs(frame.left-cr.right))
 					? 'L'
 					: 'R';
-			origin[1] = 
+			origin[1] =
 				(fabs(cr.top-frame.top) < fabs(frame.top-cr.bottom))
 					? 'T'
 					: 'B';
@@ -372,7 +372,7 @@ void HDialog::CreateField(int kind, BPositionIO& data, BView*& inside)
 	dRect r;
 	char name[256];
 	char label[256];
-	ulong cmd;
+	uint32 cmd;
 	BView *v;
 
 	switch (kind)
@@ -551,7 +551,7 @@ int HDialog::GetValue(const char *id) const
 	if (typeid(*v) == typeid(BMenuField))
 	{
 		BMenu *menu = static_cast<BMenuField*>(v)->Menu();
-		return std::max(menu->IndexOf(menu->FindMarked()) + 1, 1L);
+		return std::max(menu->IndexOf(menu->FindMarked()) + 1, (int32)1);
 	}
 	else if (typeid(*v) == typeid(BTextControl))
 		return atoi(GetText(id));
@@ -669,7 +669,7 @@ enum window_action {
 };
 
 // from interface_misc.h
-void		 do_window_action(int32 window_id, int32 action, 
+void		 do_window_action(int32 window_id, int32 action,
 							  BRect zoomRect, bool zoom);
 window_info	*get_window_info(int32 a_token);
 int32		*get_token_list(team_id app, int32 *count);
@@ -686,7 +686,7 @@ static void WarpMouseToWindow(const char* windowName)
 		if (windowInfo && windowInfo->team == pe_team
 		&& !strcmp(windowInfo->name, windowName))
 		{
-			do_window_action(windowInfo->id, B_BRING_TO_FRONT, BRect(0,0,0,0), 
+			do_window_action(windowInfo->id, B_BRING_TO_FRONT, BRect(0,0,0,0),
 							 false);
 			found = true;
 		}

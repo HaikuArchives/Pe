@@ -39,7 +39,7 @@
 #include "rez.h"
 #include <math.h>
 
-long REval::Evaluate(RElem *head)
+addr_t REval::Evaluate(RElem *head)
 {
 	switch (fType)
 	{
@@ -152,7 +152,7 @@ void REval::SetElement(RElem *elem)
 	fElem = elem;
 } /* REval::SetElement */
 
-long REvaluate(REval *e, RElem *head)
+addr_t REvaluate(REval *e, RElem *head)
 {
 	return e->Evaluate(head);
 } /* REvaluate */
@@ -185,7 +185,7 @@ REval* RUnaryOp(REval *a, REvalOp op)
 	return r;
 } /* RUnaryOp */
 
-REval* RValue(long v)
+REval* RValue(addr_t v)
 {
 	REval *r = new REval;
 	
@@ -198,7 +198,7 @@ REval* RValue(long v)
 	return r;
 } /* RValue */
 
-REval* RIdentifier(long v)
+REval* RIdentifier(addr_t v)
 {
 	REval *r = new REval;
 	

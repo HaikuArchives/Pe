@@ -36,6 +36,8 @@
 #ifndef REZ_H
 #define REZ_H
 
+#include <sys/types.h>
+
 struct RElem;
 
 struct ResHeader {
@@ -43,12 +45,12 @@ struct ResHeader {
 	int id;
 	int type;
 	
-	ResHeader(int t, int i, int n);
+	ResHeader(int t, int i, addr_t n);
 };
 
 void error(const char *e, ...);
 void warn(const char *e, ...);
-void WriteResource(int x);
+void WriteResource(addr_t x);
 void WriteResource(const char *file, int type, int id, const char *name);
 void WriteHeader(unsigned long type, int id, const unsigned char *buf,
 	int bufSize, const char *name);

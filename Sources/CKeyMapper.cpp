@@ -166,7 +166,7 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 	{
 		FailOSErr(gPrefsDir.CreateFile("keybindings", &file));
 
-		long resID = rid_Bind_Editing, cnt = 0;
+		int32 resID = rid_Bind_Editing, cnt = 0;
 		BMallocIO b;
 		
 		b << cnt;
@@ -181,7 +181,7 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 			
 			BMemoryIO buf(p, size);
 			
-			long t;
+			int32 t;
 			
 			buf >> t;
 			cnt += t;
@@ -214,23 +214,23 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 	else
 		FailOSErr(file.SetTo(&gPrefsDir, "keybindings", B_READ_ONLY));
 	
-	long cnt, cmd, size;
+	int32 cnt, cmd, size;
 
 	size = file.Seek(0, SEEK_END);
 	file.Seek(0, SEEK_SET);
 	file >> cnt;
 	
-	if (cnt != size / (sizeof(long) * 3))
+	if (cnt != size / (sizeof(int32) * 3))
 	{
 		cnt = __swap_int32(cnt);
-		if (cnt != size / (sizeof(long) * 3))
+		if (cnt != size / (sizeof(int32) * 3))
 			THROW(("Invalid keybinding file!"));
 		
 		while (cnt--)
 		{
 			KeyShortcut ks;
 			
-			int a, b, c;
+			int32 a, b, c;
 			
 			file >> a >> b >> c;
 			
@@ -271,7 +271,7 @@ void CKeyMapper::WriteKeymap(keymap& kmap)
 	keymap::iterator ki;
 	for (ki = kmap.begin(); ki != kmap.end(); ki++)
 	{
-		file << (*ki).first.combo << (*ki).first.prefix << (long)(*ki).second;
+		file << (*ki).first.combo << (*ki).first.prefix << (int32)(*ki).second;
 	}
 	
 	InitKeymap();

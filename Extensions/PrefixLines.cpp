@@ -37,23 +37,23 @@
 #include "prefix.r.h"
 
 #if __INTEL__
-extern "C" _EXPORT long perform_edit(MTextAddOn *addon);
+extern "C" _EXPORT status_t perform_edit(MTextAddOn *addon);
 #else
 #pragma export on
 extern "C" {
-long perform_edit(MTextAddOn *addon);
+status_t perform_edit(MTextAddOn *addon);
 }
 #pragma export reset
 #endif
 
-long PrefixLines(MTextAddOn *addon);
-long SuffixLines(MTextAddOn *addon);
+status_t PrefixLines(MTextAddOn *addon);
+status_t SuffixLines(MTextAddOn *addon);
 
 static bool sOK = false;
 static bool sSelectionOnly, sBefore;
 static char *sText;
 
-const unsigned long
+const uint32
 	kWindowWidth = 250,
 	kWindowHeight = 125,
 	kMsgOK = 'ok  ',
@@ -103,13 +103,13 @@ bool CPrefixDialog::CancelClicked()
 	return true;
 } /* CPrefixDialog::CancelClicked */
 
-long perform_edit(MTextAddOn *addon)
+status_t perform_edit(MTextAddOn *addon)
 {
-	long result = B_NO_ERROR;
+	status_t result = B_NO_ERROR;
 
 	try
 	{
-		long s, e, l;
+		int32 s, e, l;
 		addon->GetSelection(&s, &e);
 		sSelectionOnly = (s != e);
 		sBefore = true;
@@ -136,12 +136,12 @@ long perform_edit(MTextAddOn *addon)
 	return result;
 } /* perform_edit */
 
-long PrefixLines(MTextAddOn *addon)
+status_t PrefixLines(MTextAddOn *addon)
 {
 	//  error checking
 
-	long	selStart;
-	long	selEnd;
+	int32 selStart;
+	int32 selEnd;
 
 	if (sSelectionOnly)
 	{
@@ -200,12 +200,12 @@ long PrefixLines(MTextAddOn *addon)
 	return B_NO_ERROR;
 } /* PrefixLines */
 
-long SuffixLines(MTextAddOn *addon)
+status_t SuffixLines(MTextAddOn *addon)
 {
 	//  error checking
 
-	long	selStart;
-	long	selEnd;
+	int32 selStart;
+	int32 selEnd;
 
 	if (sSelectionOnly)
 	{

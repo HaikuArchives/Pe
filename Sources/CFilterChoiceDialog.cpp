@@ -891,8 +891,8 @@ CFilterChoiceDialog::_CoalesceSeparators()
 	// we also don't want separators at the end
 	bool wasSeparator = true;
 	bool wasGroupSeparator = true;
-	int count = fChoicesList->CountItems();
-	for (int i = count - 1; i >= 0; i--) 
+	int32 count = fChoicesList->CountItems();
+	for (int32 i = count - 1; i >= 0; i--) 
 	{
 		BListItem *listItem = fChoicesList->ItemAt(i);
 		ChoiceItemInfo *info = _InfoForItem(listItem);
@@ -923,7 +923,7 @@ CFilterChoiceDialog::_CoalesceSeparators()
 	// remove the first item, if it is a separator
 	count = fChoicesList->CountItems();
 	if (count > 0 && wasSeparator)
-		fChoicesList->RemoveItem(0L);
+		fChoicesList->RemoveItem((int32)0);
 }
 
 // _InfoForItem

@@ -128,7 +128,7 @@ void OpenInPe(entry_ref& doc, int lineNr)
 		if (reply.HasInt32("thread"))
 		{
 			thread_id tid;
-			err = reply.FindInt32("thread", (long *)&tid);
+			err = reply.FindInt32("thread", (int32*)&tid);
 			if (err) DoError("Error getting thread id (%s)", strerror(err));
 		
 			threads.push_back(tid);
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
 	
 	for (ti = threads.begin(); ti != threads.end(); ti++)
 	{
-		long l;
+		status_t l;
 		wait_for_thread((*ti), &l);
 //		status_t err = wait_for_thread((*ti), &l);
 //		if (err) DoError("Error waiting for thread: %s", strerror(err));

@@ -284,7 +284,7 @@ const char* DEB_StateName(int state)
 
 
 //#define GETCHAR  (c = (i++ < size) ? text[i - 1] : 0)
-inline char get_char(int &i, int &size, const char *text)
+inline char get_char(int32 &i, int32 &size, const char *text)
 {
 	return (i++ < size) ? text[i-1] : 0;
 }
@@ -293,12 +293,12 @@ inline char get_char(int &i, int &size, const char *text)
 #pragma mark ColorLine
 
 
-_EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
+_EXPORT void ColorLine(CLanguageProxy& proxy, int32& state)
 {
 	const char *text = proxy.Text();
-	int size = proxy.Size();
+	int32 size = proxy.Size();
 	char c;					// Current character
-	int nxt = 0,			// Position after current character in text (i)
+	int32 nxt = 0,			// Position after current character in text (i)
 		beg = 0,			// (s)
 		kws = 0,			//
 		forceState = START,	//
@@ -946,7 +946,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 //	if (percent)
 //		state |= 0x4000;
 } /* ColorLine */
-// 
+//
 
 #pragma mark FindNextWord
 
@@ -961,10 +961,10 @@ const unsigned char kWordWrapTable[] =
 		0x84, 0x86, 0x00, 0x00, 0x83, 0x83
 	};
 
-int FindNextWord(const CLanguageProxy& proxy)
+int32 FindNextWord(const CLanguageProxy& proxy)
 {
-	int mark = 0, i = 0;
-	int unicode, state, len;
+	int32 mark = 0, i = 0;
+	int32 unicode, state, len;
 
 	state = 1;
 
@@ -1022,16 +1022,16 @@ int FindNextWord(const CLanguageProxy& proxy)
 #pragma mark Balance
 
 
-Language get_language_for_offset(const CLanguageProxy& proxy, int inOffset, int& outLangStart)
+Language get_language_for_offset(const CLanguageProxy& proxy, int32 inOffset, int32& outLangStart)
 {
 	const char *text = proxy.Text();
-	int size = proxy.Size(), forceState = START;
+	int32 size = proxy.Size(), forceState = START;
 
 	if (inOffset > size)
 		inOffset = size;
 
 	char c = 0;
-	int i = 0, bo = 0, s = 0;
+	int32 i = 0, bo = 0, s = 0;
 	bool leave = false, esc = false, script = false, percent = false;
 	int state = 0;
 
@@ -1528,12 +1528,12 @@ static const char *skip(const char *txt)
 	return txt;
 } // skip
 
-_EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
+_EXPORT bool Balance(CLanguageProxy& proxy, int32& start, int32& end)
 {
-	int langStart;
+	int32 langStart;
 	Language lang = get_language_for_offset(proxy, start, langStart);
 	const char *txt = proxy.Text();
-	int size = proxy.Size();
+	int32 size = proxy.Size();
 
 	if (lang == kLanguageHtml)
 	{
@@ -1567,7 +1567,7 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 		const char *et(txt + end);
 		const char *st(txt + langStart);
 
-		std::stack<int> bls, sbls, pls;
+		std::stack<int32> bls, sbls, pls;
 
 		while (*txt && txt < et)
 		{
@@ -1584,9 +1584,9 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 		}
 
 		char ec = 0, oc = 0;
-		std::stack<int> *s = 0;
+		std::stack<int32> *s = 0;
 
-		int db, dsb, dp;
+		int32 db, dsb, dp;
 
 		db = bls.empty() ? -1 : start - bls.top();
 		dsb = sbls.empty() ? -1 : start - sbls.top();
@@ -1618,7 +1618,7 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 
 		if (ec)
 		{
-			int l = 1;
+			int32 l = 1;
 
 			while (*txt)
 			{

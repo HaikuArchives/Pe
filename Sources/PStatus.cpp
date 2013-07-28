@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "pe.h"
@@ -48,15 +48,15 @@ PStatus::PStatus(BRect frame, PText *txt)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	BFont font(be_plain_font);
 	font.SetSize(10);
 	SetFont(&font);
-	
+
 	font_height fh;
 	font.GetHeight(&fh);
 	fBaseline = Bounds().bottom - fh.descent;
-	
+
 	fText = txt;
 	fOffset = 0;
 	fPath = NULL;
@@ -70,7 +70,7 @@ PStatus::~PStatus()
 void PStatus::Draw(BRect updateRect)
 {
 	BRect b(Bounds());
-	
+
 	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	StrokeLine(b.LeftTop(), b.RightTop());
 	b.top++;
@@ -81,7 +81,7 @@ void PStatus::Draw(BRect updateRect)
 	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 	StrokeLine(b.RightBottom(), b.LeftBottom());
 	StrokeLine(b.RightTop(), b.RightBottom());
-	
+
 	SetHighColor(kWhite);
 	StrokeLine(b.LeftTop(), b.RightTop());
 	StrokeLine(b.LeftTop(), b.LeftBottom());
@@ -94,8 +94,8 @@ void PStatus::Draw(BRect updateRect)
 	SetHighColor(kBlack);
 	MovePenTo(3, fBaseline);
 	char s[32];
-	int line = fText->Offset2Line(fOffset);
-	sprintf(s, "%d,%d", line + 1, fText->Offset2Column(fOffset) + 1);
+	int32 line = fText->Offset2Line(fOffset);
+	sprintf(s, "%" B_PRId32 ",%" B_PRId32, line + 1, fText->Offset2Column(fOffset) + 1);
 	DrawString(s);
 } /* PStatus::Draw */
 
@@ -114,20 +114,20 @@ void PStatus::SetPath(const char *path)
 void PStatus::MouseDown(BPoint where)
 {
 	bigtime_t longEnough = system_time() + 250000;
-	
+
 	do
 	{
 		BPoint p;
-		unsigned long btns;
-		
+		uint32 btns;
+
 		GetMouse(&p, &btns);
-		
+
 		if (!btns)
 		{
 			Window()->PostMessage(msg_GoToLine, fText);
 			return;
 		}
-		
+
 		if (fabs(where.x - p.x) > 2 || fabs(where.y - p.y) > 2)
 			break;
 	}
@@ -137,19 +137,19 @@ void PStatus::MouseDown(BPoint where)
 	{
 		BPopUpMenu popup("no title");
 		popup.SetFont(be_plain_font);
-		
+
 		char *s = strdup(fPath), *d;
-	
+
 		d = strrchr(s, '/');
 		if (d) *d = 0;
-		
+
 		d = strtok(s, "/");
 		while (d)
 		{
 			popup.AddItem(new BMenuItem(d, NULL), 0);
 			d = strtok(NULL, "/");
 		}
-		
+
 		where.y = Bounds().bottom + 1;
 		BMenuItem *i = popup.Go(ConvertToScreen(where), true, false, ConvertToScreen(Bounds()));
 
@@ -159,20 +159,20 @@ void PStatus::MouseDown(BPoint where)
 			s = strdup(fPath);
 			d = strchr(s, '/');
 			FailNil(d);
-	
+
 			int ix = popup.CountItems() - popup.IndexOf(i);
-			
+
 			while (ix--)
 				d = strchr(d + 1, '/');
-			
+
 			FailNil(d);
 			*d = 0;
-	
+
 			entry_ref ref;
 			FailOSErr(get_ref_for_path(s, &ref));
 			OpenInTracker(ref);
 		}
-		
+
 		free(s);
 	}
 	else

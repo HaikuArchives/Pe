@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 12/07/97 22:01:11 by Maarten Hekkelman
 
@@ -84,7 +84,7 @@ bool isOperator(char c)
 		c == '>' ||	c == '<' || c == '&' || c == '|' || c == '!' || c == '.' ||
 		c == '~' || c == '^' || c == '?' || c == ':')
 		return true;
-			
+
 	return false;
 }
 
@@ -92,7 +92,7 @@ bool isSymbol(char c)
 {
 	if (c=='{' || c=='}' || c=='(' || c==')' || c=='[' || c==']' || c==',' ||  c==';')
 		return true;
-	
+
 	return false;
 }
 
@@ -113,14 +113,14 @@ bool isHexNum(char c)
 }
 
 static inline bool strings_equal(const char* string1, const char* string2,
-	int len1, int len2)
+	int32 len1, int32 len2)
 {
 	return (len1 == len2 && strncmp(string1, string2, len1) == 0);
 }
 
-bool find_comment_start(const char *text, int len, int& offset)
+bool find_comment_start(const char *text, int32 len, int32& offset)
 {
-	for (int i = 0; i < len; i++)
+	for (int32 i = 0; i < len; i++)
 	{
 		if (text[i] == '/')
 		{
@@ -139,9 +139,9 @@ bool find_comment_start(const char *text, int len, int& offset)
 	return false;
 }
 
-bool find_comment_end(const char *text, int len, int& offset)
+bool find_comment_end(const char *text, int32 len, int32& offset)
 {
-	for (int i = 0; i < len; i++)
+	for (int32 i = 0; i < len; i++)
 	{
 		if (text[i] == '*')
 		{
@@ -155,32 +155,32 @@ bool find_comment_end(const char *text, int len, int& offset)
 	return false;
 }
 
-_EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
+_EXPORT void ColorLine(CLanguageProxy& proxy, int32& state)
 {
 	const char *text = proxy.Text();
-	int size = proxy.Size();
-	int i = 0, s = 0, kws = 0, cc_cnt = 0, esc = 0;
+	int32 size = proxy.Size();
+	int32 i = 0, s = 0, kws = 0, cc_cnt = 0, esc = 0;
 	char c;
 	bool leave = false;
 	// floating point flag, true when the NUMERIC: label finds a . inside a number, and checks to make sure that a number with two '.' is invalid. (and not highlighted as numeric)
 	bool floating_point = false;
 	// same flag, only for hex numbers. allows proper highlighting only for 1 x per number. (0x21 is ok. 0x023x31 is not. will look wierd.)
 	bool hex_num = false;
-	int ifZeroCounter = state >> STATE_SHIFT;
+	int32 ifZeroCounter = state >> STATE_SHIFT;
 	state = state & STATE_MASK;
-	
+
 	if (state == COMMENT || state == LCOMMENT)
 		proxy.SetColor(0, kColorComment1);
 	else
 		proxy.SetColor(0, kColorText);
-	
+
 	if (size <= 0)
 		return;
-	
+
 	while (!leave)
 	{
 		GETCHAR;
-		
+
 		switch (state) {
 			case START:
 				s = i - 1;
@@ -215,11 +215,11 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				// m7m: here are the 3 magic IFs.
 				else if (isNumeric(c))
 				{
-					state = NUMERIC;	
+					state = NUMERIC;
 				}
 				else if (isOperator(c))
 				{
-					state = OPERATOR;	
+					state = OPERATOR;
 				}
 				else if (isSymbol(c))
 				{
@@ -228,7 +228,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else if (c == '\n' || c == 0)
 					leave = true;
 				break;
-			
+
 			case COMMENT:
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == '/')
 				{
@@ -249,11 +249,11 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				if (text[size - 1] == '\n')
 					state = START;
 				break;
-			
+
 			case IDENT:
 				if (!isalnum(c) && c != '_')
 				{
-					int kwc;
+					int32 kwc;
 
 					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0)
 					{
@@ -269,14 +269,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					}
 					else
 						proxy.SetColor(s, kColorText);
-					
+
 					i--;
 					state = START;
 				}
 				else if (kws)
 					kws = proxy.Move((int)(unsigned char)c, kws);
 				break;
-			
+
 			case PRAGMA1:
 				if (c == ' ' || c == '\t')
 					;
@@ -290,13 +290,13 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					proxy.SetColor(s, kColorText);
 					i--;
 					state = START;
-				}	
+				}
 				break;
-			
+
 			case PRAGMA2:
 				if (!islower(c))
 				{
-					int kwc;
+					int32 kwc;
 
 					if (i > s + 2 && (kwc = proxy.IsKeyword(kws)) != 0)
 					{
@@ -337,7 +337,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					{
 						proxy.SetColor(s, kColorText);
 					}
-					
+
 					if (state != IF_ZERO)
 					{
 						state = strncmp(text+i-8, "include", 7) ? START : INCL1;
@@ -347,7 +347,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else if (kws)
 					kws = proxy.Move((int)(unsigned char)c, kws);
 				break;
-			
+
 			case INCL1:
 				if (c == '"')
 					state = INCL2;
@@ -359,7 +359,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					i--;
 				}
 				break;
-			
+
 			case INCL2:
 				if (c == '"')
 				{
@@ -371,9 +371,9 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					proxy.SetColor(s, kColorText);
 					leave = true;
 					state = START;
-				}	
+				}
 				break;
-			
+
 			case INCL3:
 				if (c == '>')
 				{
@@ -385,9 +385,9 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					proxy.SetColor(s, kColorText);
 					leave = true;
 					state = START;
-				}	
+				}
 				break;
-			
+
 			case STRING:
 				if (c == '"' && !esc)
 				{
@@ -410,7 +410,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else
 					esc = !esc && (c == '\\');
 				break;
-			
+
 			case CHAR_CONST:
 				if (c == '\t' || c == '\n' || c == 0
 					|| (c == '\'' && !esc && (cc_cnt == 0 || cc_cnt > 5)))
@@ -464,7 +464,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 			}
 			break;
-			
+
 			case SYMBOL:
 			{
 				proxy.SetColor(s, kColorSeparator1);
@@ -476,7 +476,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					state = START;
 				}
 			}
-			break;			
+			break;
 
 			case IF_ZERO:
 			{
@@ -487,11 +487,11 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				{
 					// get the preprocessor keyword
 					while (isspace(GETCHAR));
-					int s = i - 1;
-					int end = s;
+					int32 s = i - 1;
+					int32 end = s;
 					while (end < size && text[end] != 0 && !isspace(text[end]))
 						end++;
-					int len = end - s;
+					int32 len = end - s;
 					// on "#if", "#ifdef", "#ifndef" increment the nesting
 					// counter
 					if (strings_equal(text + s, "if", len, 2)
@@ -529,7 +529,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					}
 				}
 				// we need to check for C style comments
-				int commentOffset;
+				int32 commentOffset;
 				if (find_comment_start(text + i - 1, size - i + 1,
 						commentOffset))
 				{
@@ -544,7 +544,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case IF_ZERO_COMMENT:
 			{
 				proxy.SetColor(i - 1, kColorComment1);
-				int commentEnd;
+				int32 commentEnd;
 				if (find_comment_end(text + i - 1, size - i + 1, commentEnd)) {
 					i += commentEnd + 1;
 					state = IF_ZERO;

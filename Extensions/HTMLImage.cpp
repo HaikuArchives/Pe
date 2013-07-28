@@ -37,16 +37,16 @@
 #include "HTMLImage.dlog.r.h"
 
 #if __INTEL__
-extern "C" _EXPORT long perform_edit(MTextAddOn *addon);
+extern "C" _EXPORT status_t perform_edit(MTextAddOn *addon);
 #else
 #pragma export on
 extern "C" {
-long perform_edit(MTextAddOn *addon);
+status_t perform_edit(MTextAddOn *addon);
 }
 #pragma export reset
 #endif
 
-long Image(MTextAddOn *addon);
+status_t Image(MTextAddOn *addon);
 int SkipGIFDataBlock(BPositionIO& data);
 void GetGIFSize(entry_ref& ref, short& width, short& height);
 char *RelativePath(entry_ref& a, entry_ref& b);
@@ -55,7 +55,7 @@ static bool sOK = false;
 static char *sPath, *sMap, *sAlt, *sWidth, *sHeight, *sBorder, *sAlign;
 static MTextAddOn *sAddon;
 
-const unsigned long
+const uint32
 	kWindowWidth = 250,
 	kWindowHeight = 125,
 	kMsgOK = 'ok  ',
@@ -161,9 +161,9 @@ void CImageDialog::MessageReceived(BMessage *msg)
 		HDialog::MessageReceived(msg);
 } /* CImageDialog::MessageReceived */
 
-long perform_edit(MTextAddOn *addon)
+status_t perform_edit(MTextAddOn *addon)
 {
-	long result = B_NO_ERROR;
+	status_t result = B_NO_ERROR;
 
 	try
 	{
@@ -173,7 +173,7 @@ long perform_edit(MTextAddOn *addon)
 		CImageDialog *p = DialogCreator<CImageDialog>::CreateDialog(addon->Window(), tmpl);
 		p->Show();
 
-		long l;
+		status_t l;
 		wait_for_thread(p->Thread(), &l);
 
 		if (sOK)
@@ -188,7 +188,7 @@ long perform_edit(MTextAddOn *addon)
 	return result;
 } /* perform_edit */
 
-long Image(MTextAddOn *addon)
+status_t Image(MTextAddOn *addon)
 {
 	char s[2048], *sp;
 
@@ -239,7 +239,7 @@ long Image(MTextAddOn *addon)
 
 	strcat(sp, ">");
 
-	long st, end;
+	int32 st, end;
 	addon->GetSelection(&st, &end);
 	addon->Insert(s);
 	st += strlen(s);

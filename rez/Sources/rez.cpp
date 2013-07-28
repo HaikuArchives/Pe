@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 12/02/98 15:37:15
 */
@@ -87,13 +87,13 @@ int getoptions(int argc, char *argv[])
 {
 	int i = 1, icnt = 0;
 	const char **incl = gIncludePaths;
-	
+
 	*incl++ = "";
 	*incl++ = ".";
 
 	if (argc == 1)
 		Usage();
-	
+
 	while (i < argc)
 	{
 		if (argv[i][0] == '-')
@@ -117,7 +117,7 @@ int getoptions(int argc, char *argv[])
 					}
 					else
 						*incl ++ = argv[i] + 2;
-						
+
 					if (++icnt >= 19)
 						error("too many include paths");
 					break;
@@ -129,14 +129,14 @@ int getoptions(int argc, char *argv[])
 
 		i++;
 	}
-	
+
 	return i;
 } /* getopt */
 
 void error(const char *e, ...)
 {
 	char msg[1024] = "### Rez Error\n# ";
-	
+
 	va_list vl;
 	va_start(vl, e);
 	vsprintf(msg + strlen(msg), e, vl);
@@ -151,7 +151,7 @@ void error(const char *e, ...)
 void warn(const char *e, ...)
 {
 	char msg[1024] = "### Rez Warning\n# ";
-	
+
 	va_list vl;
 	va_start(vl, e);
 	vsprintf(msg + strlen(msg), e, vl);
@@ -165,13 +165,13 @@ void Work(const char *file)
 {
 	if (file)
 		yyin = fopen(file, "r");
-	
+
 	if (yyin == NULL)
 		error("Error opening file %s", file ? file : "stdin");
-	
+
 	while (yyparse() == 0)
 		;
-	
+
 	fclose(yyin);
 } /* Work */
 
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
 
 	BEntry e;
 	if (e.SetTo(out)) error("entry set to %s", out);
-	
+
 	BDirectory d;
 	if (e.GetParent(&d)) error("get parent of %s", out);
 	if ((gTruncate || gSaveAsHeader) && e.Exists() && e.Remove())
@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 
 	BFile f;
 	BResources res;
-	
+
 	if (!gDump)
 	{
 		if (gTruncate || !e.Exists())
@@ -209,9 +209,9 @@ int main(int argc, char *argv[])
 			if (d.CreateFile(buf, &f)) error("creating %s", buf);
 			gTruncate = true;
 		}
-		else	
+		else
 			if (f.SetTo(buf, B_READ_WRITE)) error("opening %s", buf);
-		
+
 		if (gSaveAsHeader)
 		{
 			gHeader = fopen(buf, "w");
@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
 		else if (res.SetTo(&f, gTruncate) != B_NO_ERROR)
 			error("opening resource file %s", buf);
 	}
-	
+
 	resFile = &res;
 
 	if (i == argc)
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
 
 #pragma mark -
 
-ResHeader::ResHeader(int t, int i, int n)
+ResHeader::ResHeader(int t, int i, addr_t n)
 {
 	type = t;
 	id = i;
@@ -252,13 +252,13 @@ ResHeader::ResHeader(int t, int i, int n)
 		name = strdup((char *)n);
 	else
 		name = NULL;
-	
+
 	gResID = id;
 	gResType = type;
 	gResName = name;
 } /* ResHeader::ResHeader */
 
-void WriteResource(int x)
+void WriteResource(addr_t x)
 {
 	ResHeader *rh = (ResHeader *)x;
 
@@ -278,7 +278,7 @@ void WriteResource(int x)
 		if (resFile->AddResource(rh->type, rh->id, gResData, gResSize, rh->name))
 			error("writing resource");
 	}
-	
+
 	gResSize = 0;
 	free(gResData);
 	gResData = NULL;
@@ -291,19 +291,19 @@ void WriteResource(const char *file, int type, int id, const char *name)
 	FILE *f;
 	const char **i = gIncludePaths;
 	char path[PATH_MAX];
-	
+
 	do
 	{
 		strcpy(path, *i++);
 		strcat(path, "/");
 		strcat(path, file);
-	
+
 		f = fopen(path, "rb");
 	}
 	while (f == NULL && *i);
-	
+
 	if (!f) error("Error opening file %s: %s", file, strerror(errno));
-	
+
 	long sType = htonl(type);
 	if (verbose) printf("Writing Resource. Type: %4.4s, id: %d, name: %s\n", (char*)&sType, id, name);
 
@@ -312,10 +312,10 @@ void WriteResource(const char *file, int type, int id, const char *name)
 	fseek(f, 0, SEEK_SET);
 	p = malloc(s);
 	if (!p) error("Insufficient memory");
-	
+
 	fread(p, s, 1, f);
 	fclose(f);
-	
+
 	if (gDump)
 		fwrite(p, s, 1, stdout);
 	else if (gSaveAsHeader)
@@ -328,7 +328,7 @@ void WriteResource(const char *file, int type, int id, const char *name)
 		if (resFile->AddResource(type, id, p, s, name))
 			error("writing resource");
 	}
-	
+
 	free(p);
 } /* WriteResource */
 
@@ -341,8 +341,8 @@ void WriteHeader(unsigned long type, int id, const unsigned char *buf,
 	int b = bufSize;
 	long aType = htonl(type);
 
-	fprintf(gHeader, "const char\n\tk%4.4s%d[%d] = {", (char*)&aType, id, bufSize);
-	
+	fprintf(gHeader, "const unsigned char\n\tk%4.4s%d[%d] = {", (char*)&aType, id, bufSize);
+
 	while (bufSize > 0)
 	{
 		int m = min_c(bufSize, 16);
@@ -352,8 +352,8 @@ void WriteHeader(unsigned long type, int id, const unsigned char *buf,
 		for (int j = 0; j < m; j++, bufSize--)
 			fprintf(gHeader, "0x%02x, ", *p++);
 	}
-	
-	fprintf(gHeader, "\n\t};\nconst int k%4.4s%dSize = %d;\n\n", (char*)&aType, id, b);
+
+	fprintf(gHeader, "\n\t};\nconst int32 k%4.4s%dSize = %d;\n\n", (char*)&aType, id, b);
 } /* WriteHeader */
 
 void Include(const char *file)
@@ -361,7 +361,7 @@ void Include(const char *file)
 	BFile f;
 	const char **i = gIncludePaths;
 	char path[PATH_MAX];
-	
+
 	do
 	{
 		strcpy(path, *i++);
@@ -369,9 +369,9 @@ void Include(const char *file)
 		strcat(path, file);
 	}
 	while (f.SetTo(path, B_READ_ONLY) != B_OK && *i);
-	
+
 	if (f.InitCheck() != B_OK) error("Error opening file %s: %s", file, strerror(errno));
-	
+
 	if (resFile)
 		resFile->MergeFrom(&f);
 	else

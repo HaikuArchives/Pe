@@ -55,7 +55,7 @@ BHandler *CLineObject::GetSubSpecifier(BMessage *msg, int32 index,
 {
 	if ((strcmp(property, "Char") == 0 || strcmp(property, "Character") == 0))
 	{
-		long ix, rng;
+		int32 ix, rng;
 		
 		if (form == B_INDEX_SPECIFIER)
 		{

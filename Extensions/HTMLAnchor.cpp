@@ -37,16 +37,16 @@
 #include "HTMLAnchor.dlog.r.h"
 
 #if __INTEL__
-extern "C" _EXPORT long perform_edit(MTextAddOn *addon);
+extern "C" _EXPORT status_t perform_edit(MTextAddOn *addon);
 #else
 #pragma export on
 extern "C" {
-long perform_edit(MTextAddOn *addon);
+status_t perform_edit(MTextAddOn *addon);
 }
 #pragma export reset
 #endif
 
-long Anchor(MTextAddOn *addon);
+status_t Anchor(MTextAddOn *addon);
 int SkipGIFDataBlock(BPositionIO& data);
 void GetGIFSize(entry_ref& ref, short& width, short& height);
 char *RelativePath(entry_ref& a, entry_ref& b);
@@ -55,7 +55,7 @@ static bool sOK = false;
 static char *sPath;
 static MTextAddOn *sAddon;
 
-const unsigned long
+const uint32
 	kWindowWidth = 250,
 	kWindowHeight = 125,
 	kMsgOK = 'ok  ',
@@ -125,9 +125,9 @@ void CAnchorDialog::MessageReceived(BMessage *msg)
 		HDialog::MessageReceived(msg);
 } /* CAnchorDialog::MessageReceived */
 
-long perform_edit(MTextAddOn *addon)
+status_t perform_edit(MTextAddOn *addon)
 {
-	long result = B_NO_ERROR;
+	status_t result = B_NO_ERROR;
 
 	try
 	{
@@ -137,7 +137,7 @@ long perform_edit(MTextAddOn *addon)
 		CAnchorDialog *p = DialogCreator<CAnchorDialog>::CreateDialog(addon->Window(), tmpl);
 		p->Show();
 
-		long l;
+		status_t l;
 		wait_for_thread(p->Thread(), &l);
 
 		if (sOK)
@@ -155,11 +155,11 @@ long perform_edit(MTextAddOn *addon)
 	return result;
 } /* perform_edit */
 
-long Anchor(MTextAddOn *addon)
+status_t Anchor(MTextAddOn *addon)
 {
 	char s[2048];
 
-	long st, end;
+	int32 st, end;
 	addon->GetSelection(&st, &end);
 
 	if (*sPath)

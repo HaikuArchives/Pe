@@ -1,17 +1,17 @@
 // CLang_jam.cpp
-// 
+//
 // Copyright (c) 2004, Ingo Weinhold (bonefish@cs.tu-berlin.de)
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation 
+// to deal in the Software without restriction, including without limitation
 // the rights to use, copy, modify, merge, publish, distribute, sublicense,
 // and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-// 
+//
 // Except as contained in this notice, the name of a copyright holder shall
 // not be used in advertising or otherwise to promote the sale, use or other
 // dealings in this Software without prior written authorization of the
@@ -92,7 +92,7 @@ struct Token {
 // Tokenizer
 class Tokenizer {
 public:
-	Tokenizer(CLanguageProxy& proxy, int offset, int length)
+	Tokenizer(CLanguageProxy& proxy, int32 offset, int32 length)
 		: fProxy(proxy),
 		  fLine(proxy.Text()),
 		  fLength(offset + length),
@@ -101,7 +101,7 @@ public:
 	{
 	}
 
-	Tokenizer(CLanguageProxy& proxy, const char* line, int offset, int length)
+	Tokenizer(CLanguageProxy& proxy, const char* line, int32 offset, int32 length)
 		: fProxy(proxy),
 		  fLine(line),
 		  fLength(offset + length),
@@ -111,18 +111,18 @@ public:
 	}
 
 	bool GetNextToken(Token& token);
-	int GetOffset() const				{ return fOffset; }
+	int32 GetOffset() const				{ return fOffset; }
 
 private:
-	inline int _GetCurrentChar();
-	inline int _GetNextChar();
+	inline int32 _GetCurrentChar();
+	inline int32 _GetNextChar();
 	inline void _PutLastChar();
 
 private:
 	CLanguageProxy&	fProxy;
 	const char*		fLine;
-	int				fLength;
-	int				fOffset;
+	int32			fLength;
+	int32			fOffset;
 	bool			fNoKeyword;
 };
 
@@ -131,7 +131,7 @@ bool
 Tokenizer::GetNextToken(Token& token)
 {
 	// skip leading white space
-	int c = _GetCurrentChar();
+	int32 c = _GetCurrentChar();
 	while (c != 0 && isspace(c)) {
 		fNoKeyword = false;
 		c = _GetNextChar();
@@ -190,7 +190,7 @@ Tokenizer::GetNextToken(Token& token)
 	}
 	// check whether it is a keyword or not
 	token.length = fOffset - token.offset;
-	int state = 0;
+	int32 state = 0;
 	if (!fNoKeyword) {
 		state = 1;
 		for (int i = 0; state && i < token.length; i++)
@@ -238,7 +238,7 @@ Tokenizer::GetNextToken(Token& token)
 }
 
 // _GetCurrentChar
-int
+int32
 Tokenizer::_GetCurrentChar()
 {
 	if (fOffset >= fLength)
@@ -247,7 +247,7 @@ Tokenizer::_GetCurrentChar()
 }
 
 // _GetNextChar
-int
+int32
 Tokenizer::_GetNextChar()
 {
 	if (fOffset >= fLength)
@@ -282,10 +282,10 @@ enum {
 // ParseState
 class ParseState {
 public:
-	ParseState(int type)	: fType(type) {}
+	ParseState(int32 type)	: fType(type) {}
 	virtual ~ParseState()	{}
 
-	int GetType() const	{ return fType; }
+	int32 GetType() const	{ return fType; }
 
 	virtual bool Parse(ParseContext& context) const;
 
@@ -294,7 +294,7 @@ protected:
 		{ return true; }
 
 private:
-	int	fType;
+	int32	fType;
 };
 
 // DefaultState
@@ -378,7 +378,7 @@ public:
 
 // ParseContext
 struct ParseContext {
-	ParseContext(CLanguageProxy& proxy, ParseAction& action, int packedState)
+	ParseContext(CLanguageProxy& proxy, ParseAction& action, int32 packedState)
 		: proxy(proxy),
 		  action(action),
 		  offset(0),
@@ -386,7 +386,7 @@ struct ParseContext {
 		  state(NULL),
 		  counter(packedState >> STATE_SHIFT)
 	{
-		int stateType = (packedState & STATE_MASK);
+		int32 stateType = (packedState & STATE_MASK);
 		if (stateType >= 0 && stateType < STATE_COUNT)
 			state = kStates[stateType];
 		else
@@ -394,17 +394,17 @@ struct ParseContext {
 	}
 
 	const char* GetText() const	{ return proxy.Text() + offset; }
-	int GetSize() const			{ return size - offset; }
+	int32 GetSize() const			{ return size - offset; }
 
-	int GetPackedState() const
+	int32 GetPackedState() const
 		{ return (state->GetType() | counter << STATE_SHIFT); }
 
 	CLanguageProxy&		proxy;
 	ParseAction&		action;
-	int					offset;
-	int					size;
+	int32				offset;
+	int32				size;
 	const ParseState*	state;
-	int					counter;
+	int32				counter;
 };
 
 // Parse
@@ -455,7 +455,7 @@ bool
 ActionsState::Parse(ParseContext& context) const
 {
 	const char* text = context.GetText();
-	int size = context.GetSize();
+	int32 size = context.GetSize();
 	Token token;
 	token.string = text;
 	token.offset = context.offset;
@@ -487,13 +487,13 @@ bool
 CommentState::Parse(ParseContext& context) const
 {
 	const char* text = context.GetText();
-	int size = context.GetSize();
+	int32 size = context.GetSize();
 	Token token;
 	token.string = text;
 	token.offset = context.offset;
 	token.type = Token::COMMENT;
 	// find new line or EOF
-	for (int i = 0; i < size; i++) {
+	for (int32 i = 0; i < size; i++) {
 		if (text[i] == '\n') {
 			context.offset += i;
 			context.state = ExitState();
@@ -597,7 +597,7 @@ ColorParseAction::TokenParsed(ParseContext& context, const Token& token)
 // ColorLine
 _EXPORT
 void
-ColorLine(CLanguageProxy& proxy, int& packedState)
+ColorLine(CLanguageProxy& proxy, int32& packedState)
 {
 	ColorParseAction action;
 	ParseContext context(proxy, action, packedState);

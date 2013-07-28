@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 27 October, 1998 15:19:58
 */
@@ -53,17 +53,17 @@ class PCmd {
 public:
 		PCmd(const char *str, PText *txt);
 virtual	~PCmd();
-		
+
 virtual void Do() = 0;
 virtual void Undo() = 0;
 virtual void Redo();
 
 		void Update();
 		void Redraw();
-		
+
 		const char* Desc() const;
 		bool IsUndoable() const;
-		
+
 protected:
 		char		*fStr;
 		PText		*fText;
@@ -82,38 +82,38 @@ inline bool PCmd::IsUndoable() const
 
 class PCutCmd : public PCmd {
 public:
-		PCutCmd(PText *txt, int append = 0);
+		PCutCmd(PText *txt, int32 append = 0);
 		~PCutCmd();
-		
+
 virtual	void Do();
 virtual	void Undo();
 
 private:
-		int fAnchor, fCaret;
+		int32 fAnchor, fCaret;
 		char *fSavedTxt;
-		int fWhere;
-		int fAppend;
+		int32 fWhere;
+		int32 fAppend;
 };
 
 class PClearCmd : public PCmd {
 public:
 		PClearCmd(PText *txt);
 		~PClearCmd();
-		
+
 virtual	void Do();
 virtual	void Undo();
 
 private:
-		int fAnchor, fCaret;
+		int32 fAnchor, fCaret;
 		char *fSavedTxt;
-		int fWhere;
+		int32 fWhere;
 };
 
 class PPasteCmd : public PCmd {
 public:
 		PPasteCmd(PText *txt);
 		~PPasteCmd();
-		
+
 virtual	void Do();
 virtual void Undo();
 virtual void Redo();
@@ -121,7 +121,7 @@ virtual void Redo();
 private:
 		char *fSavedTxt;
 		char *fPasted;
-		int fWhere, fTo;
+		int32 fWhere, fTo;
 };
 
 class PTypingCmd : public PCmd {
@@ -129,13 +129,13 @@ friend class PText;
 public:
 		PTypingCmd(PText *txt);
 		~PTypingCmd();
-		
+
 virtual	void Do();
 virtual	void Undo();
 virtual void Redo();
 
 protected:
-		int fDeletedIndx, fDeletedLen, fInsertedLen;
+		int32 fDeletedIndx, fDeletedLen, fInsertedLen;
 		char *fDeleted;
 };
 
@@ -145,7 +145,7 @@ protected:
 //
 //virtual void Do();
 //virtual void Undo();
-//	
+//
 //private:
 //		font_family fNewFamily;
 //		font_style fNewStyle;
@@ -159,7 +159,7 @@ class PDropCmd : public PCmd {
 public:
 		PDropCmd(PText *txt, const char *data, ssize_t dataLen, int srcLoc, int dstLoc);
 		~PDropCmd();
-		
+
 virtual void Do();
 virtual void Undo();
 
@@ -181,11 +181,11 @@ struct ExtAction {
 	int aType;
 	int aOffset;
 	char *aText;
-	
+
 	ExtAction();
 	ExtAction(int type, int offset, char *text);
 	~ExtAction();
-	
+
 	bool operator<(const ExtAction& a);
 	bool operator==(const ExtAction& a);
 };
@@ -215,12 +215,12 @@ class PReplaceCmd : public PCmd {
 public:
 		PReplaceCmd(PText *txt, int offset, int size, bool findNext, bool backward);
 		~PReplaceCmd();
-	
+
 virtual	void Do();
 virtual	void Undo();
 
 private:
-		int fOffset, fSize;
+		int32 fOffset, fSize;
 		bool fFindNext, fWrap, fIgnoreCase, fBackward, fEntireWord, fGrep;
 		char *fWhat, *fWith, *fExpr;
 };
@@ -246,14 +246,14 @@ class PScriptCmd : public PCmd {
 public:
 			PScriptCmd(PText *txt, const char *script);
 			~PScriptCmd();
-		
+
 virtual	void Do();
 virtual	void Undo();
 virtual	void Redo();
 
 			int Exec();
 
-static		long Piper(void *data);
+static		status_t Piper(void *data);
 
 private:
 			int fPid, fFD;
@@ -314,14 +314,14 @@ class PCommentCmd : public PCmd {
 public:
 		PCommentCmd(PText *txt, bool comment,
 			const char *before, const char *after);
-	
+
 virtual void Do();
 virtual void Undo();
 
 private:
 		void CommentLine(int line);
 		bool UncommentLine(int line);
-		
+
 		bool fComment;
 		int fFrom, fTo;
 		char fBefore[8], fAfter[8];
@@ -358,7 +358,7 @@ class PJustifyCmd : public PCmd {
 public:
 			PJustifyCmd(PText *txt);
 			~PJustifyCmd();
-			
+
 virtual	void Do();
 virtual	void Undo();
 virtual	void Redo();

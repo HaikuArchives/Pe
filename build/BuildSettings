@@ -4,8 +4,8 @@
 
 # C and C++ flags
 if $(OS) = HAIKU {
-	CCFLAGS += -DBONE_BUILD ;
-	C++FLAGS += -DBONE_BUILD ;
+	CCFLAGS += -DBONE_BUILD -fno-omit-frame-pointer ;
+	C++FLAGS += -DBONE_BUILD -fno-omit-frame-pointer ;
 	LINKLIBS += -lnetwork ;
 	COMMON_FOLDER = /boot/common ;
 } else {

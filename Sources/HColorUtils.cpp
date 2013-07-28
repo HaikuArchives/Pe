@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 10/10/97 15:00:45
 */
@@ -63,24 +63,24 @@ rgb_color DistinctColor(rgb_color highColor, rgb_color lowColor)
 		return highColor;
 
 	rgb_color result;
-	result.red = 255 - highColor.red; 
-	result.green = 255 - highColor.green; 
+	result.red = 255 - highColor.red;
+	result.green = 255 - highColor.green;
 	result.blue = 255 - highColor.blue;
 	result.alpha = highColor.alpha;
-	
+
 	return result;
 } /* DistinctColor */
 
 void DefineInvColors(rgb_color selectionColor)
 {
-	for (int i = 0; i < kColorEnd; i++)
+	for (int32 i = 0; i < kColorEnd; i++)
 		gInvColor[i] = DistinctColor(gColor[i], selectionColor);
 } /* DefineInvColors */
 
 rgb_color LookupDistinctColor(rgb_color highColor)
 {
-	for (int i = 0; i < kColorEnd; i++)
-		if (*(long*)&gColor[i] == *(long*)&highColor)
+	for (int32 i = 0; i < kColorEnd; i++)
+		if (*(int32*)&gColor[i] == *(int32*)&highColor)
 			return gInvColor[i];
 
 	return highColor;
@@ -95,8 +95,8 @@ void InitSelectedMap()
 {
 	BScreen screen;
 	rgb_color c, d;
-	int i;
-	
+	int32 i;
+
 	for (i = 0; i < 255; i++)
 	{
 		d = c = screen.ColorForIndex(i);
@@ -146,11 +146,11 @@ rgb_color f2rgb(float r, float g, float b, float a)
 void rgb2hsv(float r, float g, float b, float& h, float& s, float& v)
 {
 	float cmin, cmax, delta;
-	
+
 	cmax = std::max(r, std::max(g, b));
 	cmin = std::min(r, std::min(g, b));
 	delta = cmax - cmin;
-	
+
 	v = cmax;
 	s = cmax ? delta / cmax : 0.0;
 
@@ -171,8 +171,8 @@ void rgb2hsv(float r, float g, float b, float& h, float& s, float& v)
 void hsv2rgb(float h, float s, float v, float& r, float& g, float& b)
 {
 	float A, B, C, F;
-	int i;
-	
+	int32 i;
+
 	if (s == 0.0)
 		r = g = b = v;
 	else
@@ -180,7 +180,7 @@ void hsv2rgb(float h, float s, float v, float& r, float& g, float& b)
 		if (h >= 1.0 || h < 0.0)
 			h = 0.0;
 		h *= 6.0;
-		i = (int)floor(h);
+		i = (int32)floor(h);
 		F = h - i;
 		A = v * (1 - s);
 		B = v * (1 - (s * F));
@@ -200,7 +200,7 @@ void hsv2rgb(float h, float s, float v, float& r, float& g, float& b)
 void rgb2ro(rgb_color rgb, roSColor& ro)
 {
 	rgb2f(rgb, ro.m_Red, ro.m_Green, ro.m_Blue, ro.m_Alpha);
-	
+
 	float sat, val;
 	rgb2hsv(ro.m_Red, ro.m_Green, ro.m_Blue, ro.m_Hue, sat, val);
 } /* rgb2ro */

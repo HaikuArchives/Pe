@@ -38,11 +38,11 @@
 #include <E-mail.h>
 
 #if __INTEL__
-extern "C" _EXPORT long perform_edit(MTextAddOn *addon);
+extern "C" _EXPORT status_t perform_edit(MTextAddOn *addon);
 #else
 #pragma export on
 extern "C" {
-long perform_edit(MTextAddOn *addon);
+status_t perform_edit(MTextAddOn *addon);
 }
 #pragma export reset
 #endif
@@ -54,7 +54,7 @@ const char *DoInclude(MTextAddOn& ao, const char *incl, const char *start, const
 void Parse(MTextAddOn& ao);
 void ReplaceGlossary(string& text, const char *filename, const char *lws);
 
-long perform_edit(MTextAddOn *addon)
+status_t perform_edit(MTextAddOn *addon)
 {
 	Parse(*addon);
 	

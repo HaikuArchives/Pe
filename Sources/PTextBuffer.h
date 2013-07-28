@@ -42,48 +42,48 @@ public:
 		PTextBuffer();
 virtual	~PTextBuffer();
 
-		void Insert(const char *bytes, int numBytes, int index);
-		void Delete(int from, int to);
-		void Replace(int offset, const char *txt);
+		void Insert(const char *bytes, int32 numBytes, int32 index);
+		void Delete(int32 from, int32 to);
+		void Replace(int32 offset, const char *txt);
 
-		char operator[] (int indx) const;
+		char operator[] (int32 indx) const;
 
-		int Size() const;
+		int32 Size() const;
 		const char* Buffer();
 
-		int ChangeCounter() const;
+		int32 ChangeCounter() const;
 
-		int CharLen(int offset) const;
-		int PrevCharLen(int offset) const;
-		void CharInfo(int offset, int& unicode, int& len) const;
+		int32 CharLen(int32 offset) const;
+		int32 PrevCharLen(int32 offset) const;
+		void CharInfo(int32 offset, int32& unicode, int32& len) const;
 
-		void Copy(char *buf, int indx, int len) const;
+		void Copy(char *buf, int32 indx, int32 len) const;
 
 		void PrintToStream();
 
-		void ChangeToNL(int indx);
+		void ChangeToNL(int32 indx);
 
 		PTextBuffer& operator=(const PTextBuffer& b);
 
 protected:
-		void MoveGap(int offset);
-		void ResizeGap(int size);
+		void MoveGap(int32 offset);
+		void ResizeGap(int32 size);
 
 		char *fText;
-		int fLogicalSize;
-		int fPhysicalSize;
-		int fGap;
-		int fGapSize;
-		int fChangeCounter;
+		int32 fLogicalSize;
+		int32 fPhysicalSize;
+		int32 fGap;
+		int32 fGapSize;
+		int32 fChangeCounter;
 };
 
 
-inline int PTextBuffer::ChangeCounter() const
+inline int32 PTextBuffer::ChangeCounter() const
 {
 	return fChangeCounter;
 }
 
-inline char PTextBuffer::operator[] (int indx) const
+inline char PTextBuffer::operator[] (int32 indx) const
 {
 	ASSERT(indx >= 0);
 	ASSERT(indx < fLogicalSize);
@@ -93,7 +93,7 @@ inline char PTextBuffer::operator[] (int indx) const
 		return fText[indx < fGap ? indx : indx + fGapSize];
 }
 
-inline int PTextBuffer::Size() const {
+inline int32 PTextBuffer::Size() const {
 	return fLogicalSize;
 }
 

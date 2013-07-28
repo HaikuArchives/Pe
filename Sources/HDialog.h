@@ -63,11 +63,11 @@ class DialogCreator {
 public:
 static	T* CreateDialog(BWindow *owner, BWindow *caller = NULL,
 						HPlacementType placement = H_PLACE_LAST_POS);
-static	T* CreateDialog(const char *name, BWindow *owner, 
-						BWindow *caller = NULL, 
-						BRect frame = BRect(0,0,199,99), 
-						HPlacementType placement = H_PLACE_LAST_POS, 
-						window_type type = B_TITLED_WINDOW, 
+static	T* CreateDialog(const char *name, BWindow *owner,
+						BWindow *caller = NULL,
+						BRect frame = BRect(0,0,199,99),
+						HPlacementType placement = H_PLACE_LAST_POS,
+						window_type type = B_TITLED_WINDOW,
 						int flags = B_ASYNCHRONOUS_CONTROLS);
 static	T* CreateDialog(BWindow *owner, BPositionIO& tmpl,
 						HPlacementType placement = H_PLACE_LAST_POS);
@@ -108,7 +108,7 @@ T* DialogCreator<T>::CreateDialog(BWindow *owner, BPositionIO& tmpl,
 } /* DialogCreator<T>::CreateDialog */
 
 template <class T>
-T* DialogCreator<T>::CreateDialog(const char *name, BWindow *owner, 
+T* DialogCreator<T>::CreateDialog(const char *name, BWindow *owner,
 								  BWindow *caller,
 								  BRect frame, HPlacementType placement,
 								  window_type type, int flags)

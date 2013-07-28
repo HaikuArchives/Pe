@@ -34,19 +34,19 @@
 #include "PeAddOn.h"
 
 #if __INTEL__
-	extern "C" _EXPORT long perform_edit(MTextAddOn *addon);
+	extern "C" _EXPORT status_t perform_edit(MTextAddOn *addon);
 #else
 #	pragma export on
 	extern "C"
-		long perform_edit(MTextAddOn *addon);
+		status_t perform_edit(MTextAddOn *addon);
 #	pragma export reset
 #endif
 
-long perform_edit(MTextAddOn *addon)
+status_t perform_edit(MTextAddOn *addon)
 {
-	long result = B_NO_ERROR;
+	status_t result = B_NO_ERROR;
 	
-	long s, e, l;
+	int32 s, e, l;
 	unsigned char *r, *t;
 	
 	addon->GetSelection(&s, &e);

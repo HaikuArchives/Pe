@@ -57,10 +57,10 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 	SetText("name", owner->Title());
 
 	char s[32];
-	sprintf(s, "%d", fDoc->TextView()->Size());
+	sprintf(s, "%" B_PRId32, fDoc->TextView()->Size());
 	SetText("docsize", s);
 
-	sprintf(s, "%d", fDoc->TextView()->LineCount());
+	sprintf(s, "%" B_PRId32, fDoc->TextView()->LineCount());
 	SetText("lines", s);
 
 	BMenuField *mf = dynamic_cast<BMenuField*>(FindView("mime"));
@@ -181,7 +181,7 @@ CInfoDialog::CInfoDialog(BRect frame, const char *name, window_type type, int fl
 	lang = mf->Menu();
 
 	CLanguageInterface *intf;
-	int cookie = 0;
+	int32 cookie = 0;
 	while ((intf = CLanguageInterface::NextIntf(cookie)) != NULL)
 		lang->AddItem(new BMenuItem(intf->Name(), new BMessage(msg_FieldChanged)));
 
@@ -234,10 +234,10 @@ bool CInfoDialog::OkClicked()
 bool CInfoDialog::CancelClicked()
 {
 	char s[32];
-	sprintf(s, "%d", (int)fDoc->TextView()->Font().Size());
+	sprintf(s, "%" B_PRId32, (int32)fDoc->TextView()->Font().Size());
 	SetText("size", s);
 
-	sprintf(s, "%d", fDoc->TextView()->TabStops());
+	sprintf(s, "%" B_PRId32, fDoc->TextView()->TabStops());
 	SetText("tabs", s);
 
 	font_family ff;
@@ -268,7 +268,7 @@ bool CInfoDialog::CancelClicked()
 		case 2:	SetOn("wrappaper"); break;
 		default:	SetOn("wrapfixed");
 	}
-	sprintf(s, "%d", fDoc->TextView()->WrapWidth());
+	sprintf(s, "%" B_PRId32, fDoc->TextView()->WrapWidth());
 	SetText("wrapfixedto", s);
 
 //	SetEnabled("wrapwindow", softwrap);

@@ -78,22 +78,22 @@ TellBeHappy(const char *topic)
 //	#pragma mark - Addon Entry
 
 #if __INTEL__
-	extern "C" _EXPORT long perform_edit(MTextAddOn* addon);
+	extern "C" _EXPORT status_t perform_edit(MTextAddOn* addon);
 #else
 	#pragma export on
 	extern "C" {
-		long perform_edit(MTextAddOn* addon);
+		status_t perform_edit(MTextAddOn* addon);
 	}
 	#pragma export reset
 #endif
 
 
-long
+status_t
 perform_edit(MTextAddOn* addon)
 {
 	status_t err;
-	long selStart;
-	long selEnd;
+	int32 selStart;
+	int32 selEnd;
 
 	addon->GetSelection(&selStart, &selEnd);
 

@@ -60,19 +60,19 @@ isOperator(char c)
 {
 	switch (c)
 	{
-		case '/': 
+		case '/':
 			return true;	// Can be: /, // or ^/
-		case '|': 
+		case '|':
 			return true;	// Can be: |, || or ^|
-		case '^': 
+		case '^':
 			return true;
-		case '&': 
+		case '&':
 			return true;	// Can be: &, && or &&&
-		case '{': 
+		case '{':
 			return true;
-		case '}': 
+		case '}':
 			return true;
-		default: 
+		default:
 			return false;
 	}
 }
@@ -88,9 +88,9 @@ enum {
 
 
 _EXPORT void
-ColorLine(CLanguageProxy& proxy, int& state)
+ColorLine(CLanguageProxy& proxy, int32& state)
 {
-	int size = proxy.Size();
+	int32 size = proxy.Size();
 
 	if (size <= 0)
 		return;
@@ -102,7 +102,7 @@ ColorLine(CLanguageProxy& proxy, int& state)
 
 	const char* text = proxy.Text();
 
-	int i = 0, s = 0, kws = 0, esc = 0;
+	int32 i = 0, s = 0, kws = 0, esc = 0;
 	char c;
 
 	bool leave = false;
@@ -140,7 +140,7 @@ ColorLine(CLanguageProxy& proxy, int& state)
 
 			case COMMAND:
 				if (!isalnum(c) && c != '_') {
-					int kwc;
+					int32 kwc;
 
 					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0) {
 						switch (kwc) {

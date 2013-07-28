@@ -38,7 +38,6 @@
 
 #include <typeinfo>
 
-#if __INTEL__	
 // Include all of appkit
 
 #include <AppKit.h>
@@ -93,8 +92,6 @@
 #include <cstring>
 #include <cstdio>
 
-//#endif // __INTEL__
-
 #include <cstdarg>
 #include <ctime>
 #include <cerrno>
@@ -103,7 +100,5 @@
 #include <set>
 #include <map>
 #include <string>
-
-#endif // __INTEL__
 
 #endif // PE_H

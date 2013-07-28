@@ -68,10 +68,10 @@ BFile gAppFile;
 PApp *gApp;
 bool gAutoIndent, gSyntaxColoring, gBalance, gBlockCursor, gFlashCursor, gSmartBrace;
 bool gPopupIncludes, gPopupProtos, gPopupFuncs, gPopupSorted;
-int gSpacesPerTab;
+int32 gSpacesPerTab;
 bool gUseWorksheet;
 bool gRestorePosition, gRestoreFont, gRestoreSelection, gRestoreScrollbar, gRestoreCWD;
-int gSavedState, gRecentBufferSize;
+int32 gSavedState, gRecentBufferSize;
 uid_t gUid;
 gid_t gGid;
 char gTabChar[4], gReturnChar[4], gSpaceChar[4], gControlChar[4];
@@ -344,7 +344,7 @@ bool PApp::QuitRequested()
 		fFindDialog->Quit();
 	}
 
-	long l;
+	int32 l;
 	if (fPrefOpener) wait_for_thread(fPrefOpener, &l);
 
 	if (fPrefsDialog)
@@ -634,12 +634,12 @@ void PApp::RefsReceived(BMessage	*inMessage)
 {
 	try
 	{
-		unsigned long type;
-		long count;
+		type_code type;
+		int32 count;
 
 		inMessage->GetInfo("refs", &type, &count);
 
-		for (int i = 0; i < count; i++)
+		for (int32 i = 0; i < count; i++)
 		{
 			entry_ref doc;
 			FailOSErr (inMessage->FindRef("refs", i, &doc));
@@ -855,7 +855,7 @@ void PApp::MessageReceived(BMessage *msg)
 					w->SetEntryRef(&doc);
 				}
 
-				long lineNr;
+				int32 lineNr;
 				if (w && msg->FindInt32("line", &lineNr) == B_OK)
 				{
 					BMessage m(msg_SelectLines);
@@ -929,7 +929,7 @@ void PApp::MessageReceived(BMessage *msg)
 
 			case msg_Preferences:
 			{
-				long l;
+				int32 l;
 				if (fPrefOpener) wait_for_thread(fPrefOpener, &l);
 				fPrefOpener = (thread_id)NULL;
 				if (fPrefsDialog) {

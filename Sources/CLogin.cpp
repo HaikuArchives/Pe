@@ -84,7 +84,7 @@ void CLogin::Connect(const char *server, string& username, string& password, boo
 
 	Show();
 
-	long l;
+	int32 l;
 	wait_for_thread(Thread(), &l);
 	username = sfUsername;
 	password = sfPassword;

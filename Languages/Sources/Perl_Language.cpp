@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 12/07/97 22:01:11 by Maarten Hekkelman
 */
@@ -50,26 +50,26 @@ enum {
 
 #define GETCHAR			(c = (i++ < size) ? text[i - 1] : 0)
 
-_EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
+_EXPORT void ColorLine(CLanguageProxy& proxy, int32& state)
 {
 	const char *text = proxy.Text();
-	int size = proxy.Size();
-	int i = 0, s = 0, kws = 0, esc = 0;
+	int32 size = proxy.Size();
+	int32 i = 0, s = 0, kws = 0, esc = 0;
 	char c, mc = 0;
 	bool leave = false;
-	
+
 	if (state == COMMENT || state == LCOMMENT)
 		proxy.SetColor(0, kColorComment1);
 	else
 		proxy.SetColor(0, kColorText);
-	
+
 	if (size <= 0)
 		return;
-	
+
 	while (!leave)
 	{
 		GETCHAR;
-		
+
 		switch (state) {
 			case START:
 				if (c == '#' && text[i - 2] != '$')
@@ -108,21 +108,21 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				}
 				else if (c == '\n' || c == 0)
 					leave = true;
-					
+
 				if (leave || (state != START && s < i))
 				{
 					proxy.SetColor(s, kColorText);
 					s = i - 1;
 				}
 				break;
-			
+
 			case LCOMMENT:
 				proxy.SetColor(s, kColorComment1);
 				leave = true;
 				if (text[size - 1] == '\n')
 					state = START;
 				break;
-			
+
 			case IDENT:
 				if (!isalnum(c) && c != '_')
 				{
@@ -144,7 +144,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					{
 						proxy.SetColor(s, kColorText);
 					}
-					
+
 					if (i == s + 2)
 					{
 						switch (*(text + s))
@@ -173,7 +173,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						state = SUB1;
 					else
 						state = START;
-					
+
 					if (state == START || state == SUB1)
 						s = --i;
 					else
@@ -187,7 +187,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 							case ' ':	state = START; s = --i; break;
 							default:	mc = c; break;
 						}
-						
+
 						if (state != START)
 							s = i - 1;
 					}
@@ -195,7 +195,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else if (kws)
 					kws = proxy.Move((int)(unsigned char)c, kws);
 				break;
-			
+
 			case SUB1:
 				if (isalpha(c))
 					state = SUB2;
@@ -205,7 +205,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					s = --i;
 				}
 				break;
-			
+
 			case SUB2:
 				if (!isalnum(c) && c != '\'' && c != '_')
 				{
@@ -214,7 +214,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					s = --i;
 				}
 				break;
-			
+
 			case STRING1:
 				if (c == '"' && !esc)
 				{
@@ -233,14 +233,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						proxy.SetColor(s, kColorText);
 						state = START;
 					}
-					
+
 					s = size;
 					leave = true;
 				}
 				else
 					esc = !esc && (c == '\\');
 				break;
-			
+
 			case STRING2:
 				if (c == '\'' && !esc)
 				{
@@ -259,14 +259,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						proxy.SetColor(s, kColorText);
 						state = START;
 					}
-					
+
 					s = size;
 					leave = true;
 				}
 				else
 					esc = !esc && (c == '\\');
 				break;
-			
+
 			case REGEX1:
 				if (c == 0)	// don't like this
 				{
@@ -283,7 +283,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else
 					esc = !esc && (c == '\\');
 				break;
-			
+
 			case REGEX2:
 				if (c == 0)	// don't like this
 				{
@@ -313,7 +313,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else
 					esc = !esc && (c == '\\');
 				break;
-			
+
 			case SCOPE:
 				if (c == '\'' || (!isalnum(c) && c != '_'))
 				{
@@ -321,7 +321,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					state = START;
 				}
 				break;
-			
+
 			case VAR:
 				if (!isalnum(c) && c != '_')
 				{
@@ -329,7 +329,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					state = START;
 				}
 				break;
-			
+
 			default:	// error condition, gracefully leave the loop
 				leave = true;
 				break;

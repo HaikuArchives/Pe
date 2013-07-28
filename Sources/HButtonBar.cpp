@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 12/30/97 23:02:18
 */
@@ -43,7 +43,8 @@
 #include "HStream.h"
 #include "ResourcesToolbars.h"
 
-HTool::HTool(HButtonBar *bar, float x, float width, int cmd=-1, const char *help="")
+
+HTool::HTool(HButtonBar *bar, float x, float width, int32 cmd=-1, const char *help="")
 	: fBar(bar), fCmd(cmd)
 	, fMenu(false), fToggle(false), fEnabled(true), fVisible(true), fDown(false), fOn(false)
 	, fImageStd(NULL), fImageAlt(NULL)
@@ -86,7 +87,7 @@ void HTool::SetEnabled(bool enabled)
 	fDown = false;
 	MouseLeave();
 	fDown = down;
-	
+
 	fEnabled = enabled;
 	Draw();
 } /* HTool::SetEnabled */
@@ -125,7 +126,7 @@ void HTool::DrawFrame(bool enter, bool active)
 	{
 		fBar->AddLine(BPoint(r.left + 17, r.top), BPoint(r.left + 17, r.bottom), m1);
 		fBar->AddLine(BPoint(r.left + 18, r.top), BPoint(r.left + 18, r.bottom), m2);
-		
+
 	}
 	fBar->EndLineArray();
 } /* HTool::DrawFrame */
@@ -134,18 +135,18 @@ void HTool::DrawButton(unsigned char *icondat, bool pushed)
 {
 	BRect r(0, 0, 15, 15);
 	BBitmap icon(r, B_COLOR_8_BIT);
-	
+
 	if (pushed)
 	{
 		unsigned char ic[256];
-		for (int i = 0; i < 256; i++)
+		for (int32 i = 0; i < 256; i++)
 			ic[i] = gSelectedMap[icondat[i]];
 		icon.SetBits(ic, 256, 0, B_COLOR_8_BIT);
 	}
 	else if (! fEnabled)
 	{
 		unsigned char ic[256];
-		for (int i = 0; i < 256; i++)
+		for (int32 i = 0; i < 256; i++)
 			ic[i] = gDisabledMap[icondat[i]];
 		icon.SetBits(ic, 256, 0, B_COLOR_8_BIT);
 	}
@@ -160,22 +161,22 @@ void HTool::DrawButton(unsigned char *icondat, bool pushed)
 		fBar->SetDrawingMode(B_OP_OVER);
 		fBar->DrawBitmap(&icon, fFrame.LeftTop());
 		fBar->SetDrawingMode(B_OP_COPY);
-		
+
 		if (fMenu)
 		{
 			BRect r(fFrame);
 			r.left = r.right - 6;
-			
+
 			if (pushed)
 				fBar->SetLowColor(BScreen().ColorForIndex(gSelectedMap[0x1b]));
 			else
 				fBar->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			fBar->FillRect(r, B_SOLID_LOW);
 			fBar->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-			
+
 			float x = fFrame.left + 18;
 			float y = fFrame.top + 7;
-			
+
 			fBar->BeginLineArray(3);
 			fBar->AddLine(BPoint(x, y), BPoint(x + 4, y), kBlack);
 			y += 1; x += 1;
@@ -187,7 +188,7 @@ void HTool::DrawButton(unsigned char *icondat, bool pushed)
 	}
 } /* HTool::Draw */
 
-void HTool::ReadToolbarImage(unsigned char** dest, int resID)
+void HTool::ReadToolbarImage(unsigned char** dest, int32 resID)
 {
 	*dest = (unsigned char *)HResources::GetResource(rtyp_Timg, resID);
 	FailNilRes(*dest);
@@ -202,7 +203,7 @@ HToolSeparator::HToolSeparator(HButtonBar *bar, float x)
 void HToolSeparator::Draw(bool pushed)
 {
 	float x = fFrame.left+2.0;
-	
+
 	fBar->BeginLineArray(2);
 	fBar->AddLine(BPoint(x, fFrame.top), BPoint(x, fFrame.bottom), tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 	fBar->AddLine(BPoint(x+1.0, fFrame.top), BPoint(x+1.0, fFrame.bottom), kWhite);
@@ -212,14 +213,14 @@ void HToolSeparator::Draw(bool pushed)
 
 #pragma mark -
 
-HToolButton::HToolButton(HButtonBar *bar, int resID, int cmd, float x, int flags, const char *help)
+HToolButton::HToolButton(HButtonBar *bar, int32 resID, int32 cmd, float x, int32 flags, const char *help)
 	: HTool(bar, x, 16.0, cmd, help)
 {
 	fMenu = (flags & (1 << bfMenu)) != 0;
 	fToggle = (flags & (1 << bfToggle)) != 0 || fMenu;
 
 	ReadToolbarImage(&fImageStd, resID);
-	
+
 	if (fMenu) fFrame.right += 7;
 } /* HToolButton::HToolButton */
 
@@ -242,7 +243,7 @@ void HToolButton::MouseLeave()
 
 #pragma mark -
 
-HToolStateButton::HToolStateButton(HButtonBar *bar, int resID1, int resID2, int cmd, float x, int flags, const char *help)
+HToolStateButton::HToolStateButton(HButtonBar *bar, int32 resID1, int32 resID2, int32 cmd, float x, int flags, const char *help)
 	: HTool(bar, x, 16.0, cmd, help)
 {
 	fMenu = (flags & (1 << bfMenu)) != 0;
@@ -250,7 +251,7 @@ HToolStateButton::HToolStateButton(HButtonBar *bar, int resID1, int resID2, int 
 
 	ReadToolbarImage(&fImageStd, resID1);
 	ReadToolbarImage(&fImageAlt, resID2);
-	
+
 	if (fMenu) fFrame.right += 7;
 } /* HToolStateButton::HToolStateButton */
 
@@ -273,7 +274,7 @@ void HToolStateButton::MouseLeave()
 
 #pragma mark -
 
-HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *target)
+HButtonBar::HButtonBar(BRect frame, const char *name, int32 resID, BHandler *target)
 	: BView(frame, name, B_FOLLOW_TOP | B_FOLLOW_LEFT, B_WILL_DRAW | B_PULSE_NEEDED)
 {
 	fTarget = target;
@@ -281,30 +282,30 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 	fLastEnter = 0;
 	fLastDisplay = 0;
 	fHelp = NULL;
-	
-	long bCnt, flags;
+
+	int32 bCnt, flags;
 	const void *p;
 	size_t size;
 	p = HResources::GetResource(rtyp_Tbar, resID, size);
 	FailNilRes(p);
-	
+
 	BMemoryIO buf(p, size);
-	
+
 	buf >> flags >> bCnt;
-	
+
 	fDragger = (flags & (1 << bbDragger)) != 0;
 	fAcceptFirstClick = (flags & (1 << bbAcceptFirstClick)) != 0;
-	
+
 	HTool* tool;
 	float x = fDragger ? 12.0 : 6.0;
-	
+
 	while (bCnt--)
 	{
-		long bID1, bID2, cmd, fl;
+		int32 bID1, bID2, cmd, fl;
 		char help[256];
-			
+
 		buf >> bID1 >> bID2 >> cmd >> fl >> help;
-		
+
 		if (fl & (1 << bfSpace))
 			x += 10.0;
 		else
@@ -320,7 +321,7 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int resID, BHandler *targe
 			x = tool->Frame().right+6.0;
 		}
 	}
-	
+
 	ResizeTo(x, frame.Height());
 } /* HButtonBar::HButtonBar */
 
@@ -333,17 +334,17 @@ HButtonBar::~HButtonBar()
 void HButtonBar::Draw(BRect update)
 {
 	BRect bounds(Bounds());
-	
+
 	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	FillRect(bounds);
-	
+
 	if (fDragger)
 	{
-		int x = 2, y;
+		int32 x = 2, y;
 		y = (int)bounds.Height() / 3;
-	
+
 		BPoint p1(3, 3), p2(4, 4);
-		
+
 		BeginLineArray(2 * x * y);
 		while (true)
 		{
@@ -359,7 +360,7 @@ void HButtonBar::Draw(BRect update)
 		}
 		EndLineArray();
 	}
-	
+
 	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end(); i++)
 	{
 		(*i)->Draw((*i)->IsDown());
@@ -371,11 +372,11 @@ void HButtonBar::MouseMoved(BPoint where, uint32 code, const BMessage *a_message
 {
 	if (Bounds().Contains(where))
 		be_app->SetCursor(B_HAND_CURSOR);
-	
+
 	if (fAcceptFirstClick || IsActive())
 	{
 		int tool = FindTool(where);
-		
+
 		if (tool != fLastToolOver)
 		{
 			if (fHelp)
@@ -383,7 +384,7 @@ void HButtonBar::MouseMoved(BPoint where, uint32 code, const BMessage *a_message
 
 			if (fLastToolOver >= 0)
 				fTools[fLastToolOver]->MouseLeave();
-			
+
 			fLastToolOver = tool;
 
 			if (fLastToolOver >= 0)
@@ -399,9 +400,9 @@ void HButtonBar::MouseMoved(BPoint where, uint32 code, const BMessage *a_message
 
 void HButtonBar::MouseDown(BPoint where)
 {
-	int toolID = FindTool(where);
+	int32 toolID = FindTool(where);
 	HTool *tool = toolID != -1 ? fTools[toolID] : NULL;
-	
+
 	if (fHelp)
 		HideHelp();
 
@@ -413,34 +414,34 @@ void HButtonBar::MouseDown(BPoint where)
 
 			BPoint p = tool->Frame().LeftBottom();
 			p.y += 5;
-			
+
 			msg.AddPoint("where", ConvertToScreen(p));
 			msg.AddBool("showalways", where.x > tool->Frame().right - 7);
-			
+
 			tool->SetDown(true);
 
 			if (fTarget)
 				fTarget->Looper()->PostMessage(&msg, fTarget);
 			return;
 		}
-		
-		unsigned long btns;
+
+		uint32 btns;
 		bool in = false;
-		
+
 		do
 		{
 			GetMouse(&where, &btns);
-			
+
 			if (in != tool->Frame().Contains(where))
 			{
 				in = !in;
-				
+
 				tool->Draw(in);
 				tool->MouseEnter(in);
 			}
 		}
 		while (btns);
-		
+
 		if (in)
 		{
 			if (tool->IsToggle())
@@ -463,9 +464,9 @@ void HButtonBar::MouseDown(BPoint where)
 	}
 } /* HButtonBar::MouseDown */
 
-int HButtonBar::FindTool(BPoint where)
+int32 HButtonBar::FindTool(BPoint where)
 {
-	int tool = -1;
+	int32 tool = -1;
 
 	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end(); i++)
 	{
@@ -475,39 +476,39 @@ int HButtonBar::FindTool(BPoint where)
 			break;
 		}
 	}
-	
+
 	return tool;
 } /* HButtonBar::FindTool */
 
-void HButtonBar::SetDown(int cmd, bool down)
+void HButtonBar::SetDown(int32 cmd, bool down)
 {
 	HTool *tool = NULL;
-	
+
 	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end() && tool == NULL; i++)
 	{
 		if ((*i)->Cmd() == cmd)
 			tool = *i;
 	}
-	
+
 	if (tool && tool->IsDown() != down)
 		tool->SetDown(down);
 } /* HButtonBar::SetDown */
 
-void HButtonBar::SetOn(int cmd, bool on)
+void HButtonBar::SetOn(int32 cmd, bool on)
 {
 	HTool *tool = NULL;
-	
+
 	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end() && tool == NULL; i++)
 	{
 		if ((*i)->Cmd() == cmd)
 			tool = *i;
 	}
-	
+
 	if (tool && tool->IsToggle())
 		tool->SetOn(on);
 } /* HButtonBar::SetOn */
 
-void HButtonBar::SetEnabled(int cmd, bool enabled)
+void HButtonBar::SetEnabled(int32 cmd, bool enabled)
 {
 	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end(); i++)
 	{
@@ -519,16 +520,16 @@ void HButtonBar::SetEnabled(int cmd, bool enabled)
 	}
 } /* HButtonBar::SetEnabled */
 
-void HButtonBar::SetVisible(int cmd, bool visible)
+void HButtonBar::SetVisible(int32 cmd, bool visible)
 {
 	HTool *tool = NULL;
-	
+
 	for (vector<HTool*>::iterator i = fTools.begin(); i != fTools.end() && tool == NULL; i++)
 	{
 		if ((*i)->Cmd() == cmd)
 			tool = *i;
 	}
-	
+
 	if (tool)
 		tool->SetVisible(visible);
 } /* HButtonBar::SetVisible */
@@ -554,22 +555,22 @@ void HButtonBar::WindowActivated(bool active)
 void HButtonBar::ShowHelp()
 {
 	font_height fh;
-	
+
 	be_plain_font->GetHeight(&fh);
-	
+
 	if (fLastToolOver >= 0)
 	{
 		HTool *tool = fTools[fLastToolOver];
 		if (!tool || !tool->IsVisible() || !tool->Help() || !strlen(tool->Help()))
 			return;
 		BRect r(tool->Frame());
-		
+
 		r.OffsetBy(30, 30);
 		r.right = r.left + be_plain_font->StringWidth(tool->Help()) + 2;
 		r.bottom = r.top + fh.ascent + fh.descent;
-		
+
 		ConvertToScreen(&r);
-		
+
 		fHelp = new HHelpWindow(r, tool->Help());
 		fLastEnter = 0;
 		fLastDisplay = system_time();

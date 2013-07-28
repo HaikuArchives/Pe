@@ -108,7 +108,7 @@ CHtmlBar::CHtmlBar()
 	BPositionIO& buf = data;
 	
 	char barname[256];
-	long flags, width;
+	int32 flags, width;
 	
 	buf >> barname >> flags >> width;
 	
@@ -149,7 +149,7 @@ bool CHtmlBar::QuitRequested()
 CHtmlButtonPane::CHtmlButtonPane(BRect frame, const char *name, BPositionIO& data)
 	: BView(frame, name, 0, B_WILL_DRAW)
 {
-	long bCnt;
+	int32 bCnt;
 	
 	data >> bCnt;
 	
@@ -161,7 +161,7 @@ CHtmlButtonPane::CHtmlButtonPane(BRect frame, const char *name, BPositionIO& dat
 
 	while (bCnt--)
 	{
-		long type;
+		int32 type;
 		
 		data >> type;
 		
@@ -263,7 +263,7 @@ void CHtmlButton::Draw()
 bool CHtmlButton::TrackClick()
 {
 	BPoint p;
-	unsigned long btns;
+	uint32 btns;
 	bool in = false;
 	
 	do

@@ -43,8 +43,8 @@ class PText;
 
 struct KeyShortcut
 {
-	long combo;
-	long prefix;
+	int32 combo;
+	int32 prefix;
 
 	KeyShortcut() : combo(0), prefix(0) {};
 	
@@ -79,10 +79,10 @@ class CKeyMapper
 	void InitKeymap();
 
 	static CKeyMapper *sfInstance;
-	int fPrefix;
+	int32 fPrefix;
 	bool fNrArgument;
 	keymap fKeybindings;
-	set<int> fPrefixSet;
+	set<int32> fPrefixSet;
 };
 
 inline bool KeyShortcut::operator<(const KeyShortcut& ks) const

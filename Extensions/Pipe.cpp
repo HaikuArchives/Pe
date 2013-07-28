@@ -38,22 +38,22 @@
 #include <cerrno>
 
 #if __INTEL__
-extern "C" _EXPORT long perform_edit(MTextAddOn *addon);
+extern "C" _EXPORT status_t perform_edit(MTextAddOn *addon);
 #else
 #pragma export on
 extern "C" {
-long perform_edit(MTextAddOn *addon);
+status_t perform_edit(MTextAddOn *addon);
 }
 #pragma export reset
 #endif
 
-long Pipe(MTextAddOn *addon);
-long SuffixLines(MTextAddOn *addon);
+status_t Pipe(MTextAddOn *addon);
+status_t SuffixLines(MTextAddOn *addon);
 
 static bool sOK = false;
 static char *sText = NULL;
 
-const unsigned long
+const uint32
 	kWindowWidth = 250,
 	kWindowHeight = 125,
 	kMsgOK = 'ok  ',
@@ -95,13 +95,13 @@ bool CPipeDialog::CancelClicked()
 	return true;
 } /* CPipeDialog::CancelClicked */
 
-long perform_edit(MTextAddOn *addon)
+status_t perform_edit(MTextAddOn *addon)
 {
-	long result = B_NO_ERROR;
+	status_t result = B_NO_ERROR;
 
 	try
 	{
-		long s, e, l;
+		int32 s, e, l;
 		addon->GetSelection(&s, &e);
 
 		BMemoryIO tmpl(kDLOG1, kDLOG1Size);
@@ -124,10 +124,10 @@ long perform_edit(MTextAddOn *addon)
 	return result;
 } /* perform_edit */
 
-long Pipe(MTextAddOn *addon)
+status_t Pipe(MTextAddOn *addon)
 {
 	char fn[PATH_MAX];
-	long start, end;
+	int32 start, end;
 
 	addon->GetSelection(&start, &end);
 

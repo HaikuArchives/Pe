@@ -107,11 +107,11 @@ inline bool PApp::IsQuitting() {
 extern PApp *gApp;
 
 extern bool gAutoIndent, gSyntaxColoring, gBalance, gBlockCursor, gFlashCursor, gSmartBrace;
-extern int gSpacesPerTab;
+extern int32 gSpacesPerTab;
 extern bool gPopupIncludes, gPopupProtos, gPopupFuncs, gPopupSorted;
 extern bool gRedirectStdErr, gUseWorksheet;
 extern bool gRestorePosition, gRestoreFont, gRestoreSelection, gRestoreScrollbar, gRestoreCWD;
-extern int gSavedState, gRecentBufferSize;
+extern int32 gSavedState, gRecentBufferSize;
 extern uid_t gUid;
 extern gid_t gGid;
 extern char gTabChar[4], gReturnChar[4], gSpaceChar[4], gControlChar[4];

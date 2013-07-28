@@ -55,11 +55,11 @@ bool isHexNum(char c)
 	return false;
 }
 
-_EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
+_EXPORT void ColorLine(CLanguageProxy& proxy, int32& state)
 {
 	const char *text = proxy.Text();
-	int size = proxy.Size();
-	int i = 0, s = 0, kws = 0;
+	int32 size = proxy.Size();
+	int32 i = 0, s = 0, kws = 0;
 	char c;
 	bool leave = false;
 	bool floating_point = false;
@@ -143,7 +143,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 			case IDENT:
 				if (!isalnum(c) && c != '_')
 				{
-					int kwc;
+					int32 kwc;
 
 					if (i > s + 1 && (kwc = proxy.IsKeyword(kws)) != 0)
 					{

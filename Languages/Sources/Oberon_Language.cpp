@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 12/07/97 22:01:11 by Maarten Hekkelman
 */
@@ -43,18 +43,18 @@ _EXPORT const char kLanguageCommentEnd[] = "*)";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.ob2";
 _EXPORT const int16 kInterfaceVersion = 2;
 
-_EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
+_EXPORT bool Balance(CLanguageProxy& proxy, int32& start, int32& end)
 {
 	const char *txt = proxy.Text();
-	int i = 1;
-	int a, c;
-	
+	int32 i = 1;
+	int32 a, c;
+
 	a = start;
 	c = end;
-	
-	int lbl = 0, lpl = 0, lal = 0, rbl = 0, rpl = 0, ral = 0;
-	int A = a - 1, C = c;
-	
+
+	int32 lbl = 0, lpl = 0, lal = 0, rbl = 0, rpl = 0, ral = 0;
+	int32 A = a - 1, C = c;
+
 	if ((txt[A] == '(' && txt[C] == ')') ||
 		(txt[A] == '[' && txt[C] == ']') ||
 		(txt[A] == '{' && txt[C] == '}'))
@@ -62,8 +62,8 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 		A--;
 		C++;
 	}
-	
-	int aa = A, cc = C;
+
+	int32 aa = A, cc = C;
 
 	while (A >= 0 && lbl >= 0 && lpl >= 0 && lal >= 0)
 	{
@@ -105,7 +105,7 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 			case ']': m = '['; break;
 		}
 
-		int level = 1;
+		int32 level = 1;
 		A = aa;
 
 		while (level && A >= 0)
@@ -138,7 +138,7 @@ _EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end)
 		}
 
 		i = 0;
-		int level = 1;
+		int32 level = 1;
 		C = cc;
 
 		while (level && C < proxy.Size() - 1)
@@ -168,26 +168,26 @@ enum {
 
 #define GETCHAR			(c = (i++ < size) ? text[i - 1] : 0)
 
-void ColorLine(CLanguageProxy& proxy, int& state)
+void ColorLine(CLanguageProxy& proxy, int32& state)
 {
 	const char *text = proxy.Text();
-	int size = proxy.Size();
-	int i = 0, s = 0, kws = 0, esc = 0;
+	int32 size = proxy.Size();
+	int32 i = 0, s = 0, kws = 0, esc = 0;
 	char c;
 	bool leave = false;
-	
+
 	if (state == COMMENT || state == XCOMMENT)
 		proxy.SetColor(0, kColorComment1);
 	else
 		proxy.SetColor(0, kColorText);
-	
+
 	if (size <= 0)
 		return;
-	
+
 	while (!leave)
 	{
 		GETCHAR;
-		
+
 		switch (state) {
 			case START:
 				if (isalpha(c) || c == '_')
@@ -203,14 +203,14 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 					state = STRING;
 				else if (c == '\n' || c == 0)
 					leave = true;
-					
+
 				if (leave || (state != START && s < i))
 				{
 					proxy.SetColor(s, kColorText);
 					s = i - 1;
 				}
 				break;
-			
+
 			case COMMENT:
 				if ((s == 0 || i > s + 1) && c == '*' && text[i] == ')')
 				{
@@ -260,14 +260,14 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 					{
 						proxy.SetColor(s, kColorText);
 					}
-					
+
 					s = --i;
 					state = START;
 				}
 				else if (kws)
 					kws = proxy.Move((int)(unsigned char)c, kws);
 				break;
-			
+
 			case STRING:
 				if (c == '"' && !esc)
 				{
@@ -286,14 +286,14 @@ void ColorLine(CLanguageProxy& proxy, int& state)
 						proxy.SetColor(s, kColorText);
 						state = START;
 					}
-					
+
 					s = size;
 					leave = true;
 				}
 				else
 					esc = !esc && (c == '\\');
 				break;
-			
+
 			default:	// error condition, gracefully leave the loop
 				leave = true;
 				break;

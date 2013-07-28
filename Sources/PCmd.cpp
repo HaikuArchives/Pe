@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "pe.h"
@@ -53,7 +53,7 @@ PCmd::PCmd(const char *str, PText *txt)
 PCmd::~PCmd() {
 	free(fStr);
 } /* PCmd::~PCmd */
-		
+
 void PCmd::Redo() {
 	Do();
 } /* PCmd::Redo */
@@ -71,7 +71,7 @@ void PCmd::Redraw()
 
 #pragma mark - Copy
 
-PCutCmd::PCutCmd(PText *txt, int append)
+PCutCmd::PCutCmd(PText *txt, int32 append)
 	: PCmd("Cut", txt)
 {
 	fSavedTxt = NULL;
@@ -176,7 +176,7 @@ void PPasteCmd::Do()
 	FailNil(fPasted);
 	fText->TextBuffer().Copy(fPasted, fWhere, cnt);
 	fPasted[cnt] = 0;
-	
+
 	Update();
 } /* PPasteCmd::Do */
 
@@ -227,15 +227,15 @@ void PTypingCmd::Do()
 {
 	fDeletedIndx = std::min(fText->Caret(), fText->Anchor());
 	fDeletedLen = abs(fText->Caret() - fText->Anchor());
-		
+
 	if (fDeletedIndx + fDeletedLen >= fText->TextBuffer().Size())
-		fDeletedLen = std::max(fText->TextBuffer().Size() - fDeletedIndx, 0);
-		
+		fDeletedLen = std::max(fText->TextBuffer().Size() - fDeletedIndx, (int32)0);
+
 	fDeleted = (char *)malloc(fDeletedLen);
-		
+
 	if (fDeletedLen)
 		fText->TextBuffer().Copy(fDeleted, fDeletedIndx, fDeletedLen);
-		
+
 	fInsertedLen = 0;
 } /* PTypingCmd::Do */
 
@@ -246,7 +246,7 @@ void PTypingCmd::Undo()
 	if (fText->Anchor() != fText->Caret())
 	{
 		int lf, lt;
-		
+
 		lf = fText->Offset2Line(std::min(fText->Anchor(), fText->Caret()));
 		lt = fText->Offset2Line(std::max(fText->Anchor(), fText->Caret()));
 		fText->TouchLines(lf, lt);
@@ -258,7 +258,7 @@ void PTypingCmd::Undo()
 		FailNil(pt);
 		fText->TextBuffer().Copy(pt, fDeletedIndx, fInsertedLen);
 	}
-	
+
 	if (fInsertedLen)
 		fText->Delete(fDeletedIndx, fDeletedIndx + fInsertedLen);
 
@@ -275,7 +275,7 @@ void PTypingCmd::Undo()
 	int t = fInsertedLen;
 	fInsertedLen = fDeletedLen;
 	fDeletedLen = t;
-	
+
 	Update();
 } /* PTypingCmd::Undo */
 
@@ -293,7 +293,7 @@ void PTypingCmd::Redo()
 //	int32 i;
 //	float f;
 //	bool b;
-//	
+//
 //	if (msg->FindString("family", &s) == B_NO_ERROR) strcpy(fNewFamily, s);
 //	if (msg->FindString("style", &s) == B_NO_ERROR) strcpy(fNewStyle, s);
 //	if (msg->FindFloat("size", &f) == B_NO_ERROR) fNewSize = f;
@@ -309,32 +309,32 @@ void PTypingCmd::Redo()
 //{
 //	font_family ff;
 //	font_style fs;
-//	
+//
 //	fText->fFont.GetFamilyAndStyle(&ff, &fs);
 //	fText->fFont.SetFamilyAndStyle(fNewFamily, fNewStyle);
 //	strcpy(fNewFamily, ff);
 //	strcpy(fNewStyle, fs);
-//	
+//
 //	float fsize = fText->fFont.Size();
 //	fText->fFont.SetSize(fNewSize);
 //	fNewSize = fsize;
-//	
+//
 //	swap(fNewTabs, fText->fTabStops);
 //	swap(fSyntaxColoring, fText->fSyntaxColoring);
 //	swap(fShowInvisibles, fText->fShowInvisibles);
 //	swap(fNewLB, fText->fLineEndType);
-//	
+//
 //	bool b = fText->Doc()->Status()->ShowsTabs();
 //	if (b != fShowTabs)
 //	{
 //		fText->ShowTabStops(fShowTabs);
 //		fShowTabs = b;
 //	}
-//	
+//
 //	int e = fText->Encoding();
 //	fText->SetEncoding(fEncoding);
 //	fEncoding = e;
-//	
+//
 //	fText->ReInit();
 //	fText->Invalidate();
 //} /* PFontTabsCmd::Do */
@@ -358,10 +358,10 @@ PDropCmd::PDropCmd(PText *txt, const char *data, ssize_t dataLen, int srcLoc, in
 	fData = (char *)malloc(fDataLen = dataLen);
 	FailNil(fData);
 	memcpy(fData, data, dataLen);
-	
+
 	char *s, *d;
 	s = d = fData;
-	
+
 	while (s < fData + dataLen)
 	{
 		if (*s == '\r')
@@ -373,7 +373,7 @@ PDropCmd::PDropCmd(PText *txt, const char *data, ssize_t dataLen, int srcLoc, in
 		else
 			*d++ = *s++;
 	}
-	
+
 	fSrcLoc = srcLoc;
 	fDstLoc = dstLoc;
 } /* PDropCmd::PDropCmd */
@@ -387,7 +387,7 @@ void PDropCmd::Do()
 {
 	if (fSrcLoc >= 0)
 		fText->Delete(fSrcLoc, fSrcLoc + fDataLen);
-	
+
 	if (fSrcLoc >= 0 && fSrcLoc < fDstLoc)
 	{
 		fText->Insert(fData, fDataLen, fDstLoc - fDataLen);
@@ -398,7 +398,7 @@ void PDropCmd::Do()
 		fText->Insert(fData, fDataLen, fDstLoc);
 		fText->Select(fDstLoc, fDstLoc + fDataLen, false, false);
 	}
-	
+
 	Redraw();
 } /* PDropCmd::Do */
 
@@ -452,7 +452,7 @@ PExtCmd::PExtCmd(PText *txt, const char *ext)
 PExtCmd::~PExtCmd()
 {
 	list<ExtAction>::iterator ai;
-	
+
 	for (ai = fActions.begin(); ai != fActions.end(); ai++)
 		free((*ai).aText);
 } /* PExtCmd::~PExtCmd */
@@ -466,25 +466,25 @@ void PExtCmd::Undo()
 {
 	int anchor = fText->Anchor();
 	int caret = fText->Caret();
-	
+
 	list<ExtAction>::reverse_iterator ai;
-	
+
 	ai = fActions.rbegin();
-	
+
 	while (ai != fActions.rend())
 	{
 		if ((*ai).aType == eaInsert)
 			fText->Delete((*ai).aOffset, (*ai).aOffset + strlen((*ai).aText));
 		else
 			fText->Insert((*ai).aText, strlen((*ai).aText), (*ai).aOffset);
-		
+
 		ai++;
 	}
 
 	fText->Select(fAnchor, fCaret, true, false);
 	std::swap(anchor, fAnchor);
 	std::swap(caret, fCaret);
-	
+
 	Update();
 } /* PExtCmd::Undo */
 
@@ -492,25 +492,25 @@ void PExtCmd::Redo()
 {
 	int anchor = fText->Anchor();
 	int caret = fText->Caret();
-	
+
 	list<ExtAction>::iterator ai;
-	
+
 	ai = fActions.begin();
-	
+
 	while (ai != fActions.end())
 	{
 		if ((*ai).aType == eaDelete)
 			fText->Delete((*ai).aOffset, (*ai).aOffset + strlen((*ai).aText));
 		else
 			fText->Insert((*ai).aText, strlen((*ai).aText), (*ai).aOffset);
-		
+
 		ai++;
 	}
-	
+
 	fText->Select(fAnchor, fCaret, true, false);
 	std::swap(anchor, fAnchor);
 	std::swap(caret, fCaret);
-	
+
 	Update();
 } /* PExtCmd::Redo */
 
@@ -534,7 +534,7 @@ PReplaceCmd::PReplaceCmd(PText *txt, int offset, int size, bool findNext, bool b
 	fBackward = backward;
 	fEntireWord = gFindDialog->Word();
 	fGrep = gFindDialog->Grep();
-	
+
 	if (fGrep)
 	{
 		fWith = gFindDialog->RxReplaceString(txt->Text(), txt->Size());
@@ -560,13 +560,13 @@ void PReplaceCmd::Do()
 	if (fWith && *fWith)
 		fText->Insert(fWith, strlen(fWith), fOffset);
 
-	int offset = fOffset;
+	int32 offset = fOffset;
 	if (!fBackward && fWith)
 		offset += strlen(fWith);
 	fText->SetCaret(offset);
 
 	Update();
-	
+
 	if (fFindNext)
 	{
 		if (gFindDialog->IsInMultiFileState())
@@ -583,7 +583,7 @@ void PReplaceCmd::Do()
 
 void PReplaceCmd::Undo()
 {
-	if (fWith && *fWith) 
+	if (fWith && *fWith)
 		fText->Delete(fOffset, fOffset + strlen(fWith));
 	fText->Insert(fWhat, strlen(fWhat), fOffset);
 	Update();
@@ -600,7 +600,7 @@ PReplaceAllCmd::PReplaceAllCmd(PText *txt)
 	fIgnoreCase = gFindDialog->IgnoreCase();
 	fEntireWord = gFindDialog->Word();
 	fGrep = gFindDialog->Grep();
-	
+
 	char buf[PATH_MAX];
 	FailOSErr(fBackingStore.SetTo(tmpnam(buf)));
 } /* PReplaceAllCmd::PReplaceAllCmd */
@@ -609,7 +609,7 @@ PReplaceAllCmd::~PReplaceAllCmd()
 {
 	if (fFind) free(fFind);
 	if (fRepl) free(fRepl);
-	
+
 	remove(fBackingStore.Path());
 } /* PReplaceAllCmd::~PReplaceAllCmd */
 
@@ -621,19 +621,19 @@ void PReplaceAllCmd::Do()
 	FailOSErr(d.CreateFile(fBackingStore.Path(), &f));
 
 	CheckedWrite(f, fText->Text(), fText->Size());
-	
+
 	fText->SetCaret(0);
 
-	int a, c;
-	
-	int rl, offset = 0;
+	int32 a, c;
+
+	int32 rl, offset = 0;
 	rl = strlen(fRepl);
-		
+
 	PLongAction la(fText);
-		
+
 	BString what;
-	int matchLen = 0;
-	while (fText->FindNext(fFind, offset, fIgnoreCase,	false, false, 
+	int32 matchLen = 0;
+	while (fText->FindNext(fFind, offset, fIgnoreCase,	false, false,
 		fEntireWord, fGrep, false, &matchLen))
 	{
 		BString originalText(fText->Text(), fText->Size());
@@ -642,7 +642,7 @@ void PReplaceAllCmd::Do()
 		fText->Delete(offset, offset + matchLen);
 		if (fGrep)
 		{
-			char* repStr 
+			char* repStr
 				= gFindDialog->RxReplaceString(originalText.String(), originalText.Length());
 			if (repStr)
 			{
@@ -654,18 +654,18 @@ void PReplaceAllCmd::Do()
 		}
 		else
 		{
-			if (rl) 
+			if (rl)
 				fText->Insert(fRepl, rl, offset);
 			offset += rl;
 		}
-		
+
 		if (la.Tick())
 			break;
 	}
 
 	a = offset;
 	c = a + rl;
-	
+
 	Update();
 	fText->Select(a, c, true, false);
 } /* PReplaceAllCmd::Do */
@@ -676,14 +676,14 @@ void PReplaceAllCmd::Undo()
 
 	BFile f;
 	FailOSErr(f.SetTo(fBackingStore.Path(), B_READ_WRITE));
-	
+
 	size_t size = f.Seek(0, SEEK_END);
 	f.Seek(0, SEEK_SET);
-	
+
 	char *t = (char *)malloc(size);
 	FailNil(t);
 	CheckedRead(f, t, size);
-	
+
 	f.Seek(0, SEEK_SET);
 	FailOSErr(f.SetSize(0));
 	CheckedWrite(f, fText->Text(), fText->Size());
@@ -691,7 +691,7 @@ void PReplaceAllCmd::Undo()
 	fText->Delete(0, fText->Size());
 	fText->Insert(t, size, 0);
 	free(t);
-	
+
 	Update();
 } /* PReplaceAllCmd::Undo */
 
@@ -709,12 +709,12 @@ PScriptCmd::PScriptCmd(PText *txt, const char *script)
 	: PCmd("Script", txt)
 {
 	char buf[PATH_MAX];
-	
+
 	BPath p;
 	BEntry e;
 	FailOSErr(gAppDir.FindEntry("Extensions", &e, true));
 	FailOSErr(e.GetPath(&p));
-	
+
 	strcpy(buf, p.Path());
 	strcat(buf, "/");
 	strcat(buf, script);
@@ -744,29 +744,29 @@ void PScriptCmd::Do()
 
 	int pi[2], po[2], pe[3], pid, err;
 	char e[PATH_MAX + 10], *cwd;
-	
+
 	BPath p;
 	BEntry(fText->Doc()->EntryRef()).GetPath(&p);
 	cwd = strdup(p.Path());
 	sprintf(e, "PE_CUR_FILE=%s", cwd);
 	char *t = strrchr(cwd, '/');
 	if (t) *t = 0;
-	
+
 	sem_id wait_for_me = create_sem(0, "Wait for me!");
-	
+
 	try
 	{
 		FailOSErr(pipe(pi));
 		FailOSErr(pipe(po));
 		FailOSErr(pipe(pe));
-		
+
 		pid = fork();
-			
+
 		if (pid == 0)		// child
 		{
 			fPid = pid;
 			setpgid(0, 0);		// Make this a new process group
-			
+
 			fflush(stdout);
 			close(STDOUT_FILENO);
 			err = dup(po[1]);		// What will happen if this fails???
@@ -776,35 +776,35 @@ void PScriptCmd::Do()
 			close(STDERR_FILENO);
 			err = dup(pe[1]);
 			if (err < 0) perror("duplicating stderr"); //THROW((err));
-			
+
 			close(STDIN_FILENO);
 			err = dup(pi[0]);
 			if (err < 0) perror("duplicating stdin");
-			
+
 			close(pi[0]);
 			close(pi[1]);
 			close(po[0]);
 			close(po[1]);
 			close(pe[0]);
 			close(pe[1]);
-			
+
 			chdir(cwd);
-			
+
 			char *args[2];
 			args[0] = fScript;
 			args[1] = NULL;
-			
+
 			int i = 0;
 			while (environ[i]) i++;
-			
+
 			char **env = (char **)malloc((i + 2) * sizeof(char*));
-			
+
 			memcpy(env, environ, i * sizeof(char *));
 			env[i++] = e;
 			env[i] = 0;
-			
+
 			release_sem(wait_for_me);
-			
+
 			if (execve(args[0], args, env))
 			{
 				beep();
@@ -814,29 +814,29 @@ void PScriptCmd::Do()
 		else if (pid >= 0)	// parent
 		{
 			acquire_sem(wait_for_me);
-			
+
 			close(pi[0]);
 			close(po[1]);
-		
+
 			fFD = pi[1];
 			resume_thread(spawn_thread(Piper, "Piper", B_NORMAL_PRIORITY, this));
-			
+
 			PErrorWindow *window = new PErrorWindow(pe, cwd);
 			fText->SetErrorWindow(window);
-			
+
 			if (fOldTextSize)
 				fText->Delete(fAnchor, fAnchor + fOldTextSize);
 
 			char buf[kBufferSize];
 			int flags;
-	
+
 			fcntl(po[0], F_GETFL, &flags);
 			fcntl(po[0], F_SETFL, flags | O_NONBLOCK);
-			
+
 			int rr;
-			
+
 			PLongAction act;
-			
+
 			while ((rr = read(po[0], buf, kBufferSize)) != 0 && ! act.Tick())
 			{
 				if (rr > 0)
@@ -861,7 +861,7 @@ void PScriptCmd::Do()
 	}
 
 	delete_sem(wait_for_me);
-	
+
 	fText->Select(fAnchor, fCaret, true, false);
 	Update();
 } /* PScriptCmd::Do */
@@ -870,7 +870,7 @@ void PScriptCmd::Undo()
 {
 	size_t size = fCaret - fAnchor;
 	char *t = NULL;
-	
+
 	if (size)
 	{
 		t = (char *)malloc(size);
@@ -878,7 +878,7 @@ void PScriptCmd::Undo()
 		fText->TextBuffer().Copy(t, fAnchor, size);
 		fText->Delete(fAnchor, fCaret);
 	}
-	
+
 	if (fOldTextSize)
 		fText->Insert(fOldText, fOldTextSize, fAnchor);
 
@@ -886,7 +886,7 @@ void PScriptCmd::Undo()
 	fOldTextSize = size;
 	if (fOldText) free(fOldText);
 	fOldText = t;
-	
+
 	fText->Select(fAnchor, fCaret, true, false);
 	Update();
 } /* PScriptCmd::Undo */
@@ -896,14 +896,14 @@ void PScriptCmd::Redo()
 	Undo();
 } /* PScriptCmd::Redo */
 
-long PScriptCmd::Piper(void *data)
+status_t PScriptCmd::Piper(void *data)
 {
 	PScriptCmd *cmd = static_cast<PScriptCmd*>(data);
-	long status = 0;
-	
-	long written = 0;
+	status_t status = 0;
+
+	int32 written = 0;
 	do {
-		long ww = write(cmd->fFD, cmd->fOldText+written, cmd->fOldTextSize-written);
+		ssize_t ww = write(cmd->fFD, cmd->fOldText+written, cmd->fOldTextSize-written);
 		if (ww < 0) {
 			status = ww;
 			break;
@@ -1116,12 +1116,12 @@ PTwiddleCmd::PTwiddleCmd(PText *txt)
 {
 	fFrom = std::min(fText->Caret(), fText->Anchor());
 	fTo = std::max(fText->Caret(), fText->Anchor());
-	
+
 	if (fFrom == fTo)
 	{
 		int line;
 		line = fText->Offset2Line(fFrom);
-		
+
 		if (fFrom == fText->LineStart(line))
 		{
 			fTo += txt->TextBuffer().CharLen(fTo);
@@ -1138,7 +1138,7 @@ PTwiddleCmd::PTwiddleCmd(PText *txt)
 			fFrom -= txt->TextBuffer().PrevCharLen(fFrom);
 		}
 	}
-	
+
 	if (fText->TextBuffer()[fFrom] == '\n' ||
 		fText->TextBuffer()[fTo - 1] == '\n' ||
 		fTo > fText->Size() || fFrom < 0)
@@ -1151,7 +1151,7 @@ void PTwiddleCmd::Do()
 {
 	char *s;
 	int size = fTo - fFrom;
-	
+
 	fText->ChangeSelection(fFrom, fTo);
 	fText->GetSelectedText(s);
 
@@ -1186,15 +1186,15 @@ PCommentCmd::PCommentCmd(PText *txt, bool comment,
 	: PCmd(comment ? "Comment" : "Uncomment", txt)
 {
 	fComment = comment;
-	
+
 	fFrom = std::min(fText->Caret(), fText->Anchor());
 	fTo = std::max(fText->Caret(), fText->Anchor());
-	
+
 	if (strlen(before) > 7 || strlen(after) > 7) THROW(("comment strings too long"));
-	
+
 	strcpy(fBefore, before);
 	strcpy(fAfter, after);
-	
+
 	if (fTo == fFrom || fTo > fText->LineStart(fText->Offset2Line(fTo)))
 	{
 		int lt = fText->Offset2Line(fTo);
@@ -1208,7 +1208,7 @@ PCommentCmd::PCommentCmd(PText *txt, bool comment,
 void PCommentCmd::Do()
 {
 	int i, lf, c;
-	
+
 	c = fText->LineCount();
 	lf = fText->Offset2Line(fFrom);
 
@@ -1222,12 +1222,12 @@ void PCommentCmd::Do()
 				fLines.push_back(i);
 		}
 	}
-	
+
 	fText->Select(fText->LineStart(lf), fText->LineStart(fText->Offset2Line(fTo)), true, false);
 	fFrom = std::min(fText->Caret(), fText->Anchor());
 	fTo = std::max(fText->Caret(), fText->Anchor());
 
-	if (fText->LineCount() != c)	
+	if (fText->LineCount() != c)
 		Redraw();
 	else
 		Update();
@@ -1239,7 +1239,7 @@ void PCommentCmd::Undo()
 
 	c = fText->LineCount();
 	lf = fText->Offset2Line(fFrom);
-	
+
 	if (fComment)
 	{
 		for (i = lf; i < fText->Offset2Line(fTo); i++)
@@ -1249,18 +1249,18 @@ void PCommentCmd::Undo()
 	else
 	{
 		vector<int>::iterator ii;
-		
+
 		for (ii = fLines.begin(); ii != fLines.end(); ii++)
 			CommentLine(*ii);
-		
+
 		fLines.erase(fLines.begin(), fLines.end());
 	}
-	
+
 	fText->Select(fText->LineStart(lf), fText->LineStart(fText->Offset2Line(fTo)), true, false);
 	fFrom = std::min(fText->Caret(), fText->Anchor());
 	fTo = std::max(fText->Caret(), fText->Anchor());
-	
-	if (fText->LineCount() != c)	
+
+	if (fText->LineCount() != c)
 		Redraw();
 	else
 		Update();
@@ -1271,10 +1271,10 @@ void PCommentCmd::CommentLine(int line)
 	int ix = fText->LineStart(line);
 
 	fText->Insert(fBefore, strlen(fBefore), ix);
-	
+
 	ix = fText->LineCount() > line ? fText->LineStart(line + 1) - 1 : fText->Size();
 	fText->Insert(fAfter, strlen(fAfter), ix);
-	
+
 	fTo += strlen(fBefore) + strlen(fAfter);
 } /* PCommentCmd::CommentLine */
 
@@ -1283,7 +1283,7 @@ bool PCommentCmd::UncommentLine(int line)
 	char b[8];
 	int j = strlen(fBefore);
 	int ix = fText->LineStart(line);
-	
+
 	b[j] = 0;
 	while (j--)
 		b[j] = fText->TextBuffer()[ix + j];
@@ -1297,11 +1297,11 @@ bool PCommentCmd::UncommentLine(int line)
 			ix = line < fText->LineCount() - 1 ? fText->LineStart(line + 1) : fText->Size();
 			j = strlen(fAfter);
 			ix -= j + 1;
-			
+
 			b[j] = 0;
 			while (j--)
 				b[j] = fText->TextBuffer()[ix + j];
-	
+
 			if (strcmp(b, fAfter) == 0)
 				fText->Delete(ix, ix + strlen(fAfter));
 		}
@@ -1350,7 +1350,7 @@ void PWrapCmd::Undo()
 		fSavedText = NULL;
 	}
 	fText->Select(fAnchor, fCaret, true, false);
-	
+
 	Redraw();
 } /* PWrapCmd::Undo */
 
@@ -1362,13 +1362,13 @@ PUnwrapCmd::PUnwrapCmd(PText *txt)
 {
 	fCaret = txt->Caret();
 	fAnchor = txt->Anchor();
-	
+
 	if (fCaret == fAnchor)
 	{
 		fAnchor = 0;
 		fCaret = fText->Size() - 1;
 	}
-	
+
 	fSavedText = NULL;
 } /* PUnwrapCmd::PUnwrapCmd */
 
@@ -1397,7 +1397,7 @@ void PUnwrapCmd::Undo()
 		fSavedText = NULL;
 	}
 	fText->Select(fAnchor, fCaret, true, false);
-	
+
 	Redraw();
 } /* PUnwrapCmd::Undo */
 
@@ -1418,20 +1418,20 @@ void PJustifyCmd::Do()
 {
 	if (fText->Caret() == fText->Anchor())
 		fText->SelectParagraph();
-	
+
 	fAnchor = std::min(fText->Anchor(), fText->Caret());
 	fOldLen = std::max(fText->Anchor(), fText->Caret()) - fAnchor;
-	
+
 	fText->GetSelectedText(fSavedText);
-	
+
 	char *t = (char *)malloc(strlen(fSavedText) + 1);
 	FailNil(t);
-	
+
 	char *p, *q;
-	
+
 	p = fSavedText;
 	q = t;
-	
+
 	while (*p)
 	{
 		if (isspace(*p))
@@ -1443,10 +1443,10 @@ void PJustifyCmd::Do()
 		else
 			*q++ = *p++;
 	}
-	
+
 	*q = 0;
 	fNewLen = strlen(t);
-	
+
 	fText->Delete(fAnchor, fAnchor + fOldLen);
 	fText->Insert(t, fNewLen, fAnchor);
 	fText->Select(fAnchor, fAnchor + fNewLen, true, false);
@@ -1459,19 +1459,19 @@ void PJustifyCmd::Do()
 void PJustifyCmd::Undo()
 {
 	char *t;
-	
+
 	fText->Select(fAnchor, fAnchor + fNewLen, true, false);
 	fText->GetSelectedText(t);
-	
+
 	fText->Delete(fAnchor, fAnchor + fNewLen);
 	fText->Insert(fSavedText, fOldLen, fAnchor);
-	
+
 	std::swap(fSavedText, t);
 	free(t);
 	std::swap(fOldLen, fNewLen);
-	
+
 	fText->Select(fAnchor, fAnchor + fNewLen, true, false);
-	
+
 	Update();
 } /* PJustifyCmd::Undo */
 
@@ -1487,7 +1487,7 @@ PChangeCaseCmd::PChangeCaseCmd(PText *txt, int newCase)
 	: PCmd("Change Case", txt)
 {
 	fText->GetSelectedText(fSavedText);
-	
+
 	if (fSavedText)
 	{
 		fAnchor = std::min(fText->Anchor(), fText->Caret());
@@ -1499,7 +1499,7 @@ PChangeCaseCmd::PChangeCaseCmd(PText *txt, int newCase)
 		fCaret = fText->Size();
 		fSavedText = strdup(fText->Text());
 	}
-	
+
 	ChangeCase(newCase);
 } /* PChangeCaseCmd::PChangeCaseCmd */
 
@@ -1511,15 +1511,15 @@ PChangeCaseCmd::~PChangeCaseCmd()
 void PChangeCaseCmd::Do()
 {
 	char *p;
-	
+
 	fText->Select(fAnchor, fCaret, true, false);
 	fText->GetSelectedText(p);
 	fText->Delete(fAnchor, fCaret);
 	fText->Insert(fSavedText, fCaret - fAnchor, fAnchor);
-	
+
 	free(fSavedText);
 	fSavedText = p;
-		
+
 	Redraw();
 } /* PChangeCaseCmd::Do */
 
@@ -1532,7 +1532,7 @@ void PChangeCaseCmd::ChangeCase(int newCase)
 {
 	char *p = fSavedText;
 	int state = 0;
-	
+
 	switch (newCase)
 	{
 		case 1:
@@ -1607,22 +1607,22 @@ PEncodingCmd::PEncodingCmd(PText *txt, int from, int to)
 {
 	fSourceEncoding = from;
 	fDestEncoding = to;
-	
+
 	fAnchor = txt->Anchor();
 	fCaret = txt->Caret();
-	
+
 	if (fAnchor == fCaret)
 	{
 		fAnchor = 0;
 		fCaret = txt->Size();
 	}
-	
+
 	fSaved = (char *)malloc(fCaret - fAnchor);
 	fSrcLen = fCaret - fAnchor;
-	
+
 	FailNil(fSaved);
 	txt->TextBuffer().Copy(fSaved, fAnchor, fSrcLen);
-	
+
 	fPrevEncoding = txt->Doc()->Encoding();
 } /* PEncodingCmd::PEncodingCmd */
 

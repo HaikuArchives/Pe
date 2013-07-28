@@ -55,14 +55,14 @@ PTextBuffer::~PTextBuffer()
 	free(fText);
 } /* PTextBuffer::~PTextBuffer */
 
-void PTextBuffer::Insert(const char *bytes, int numBytes, int index)
+void PTextBuffer::Insert(const char *bytes, int32 numBytes, int32 index)
 {
 	ASSERT(numBytes >= 0);
 	ASSERT(index >= 0 && index <= fLogicalSize);
 
 	if (numBytes < 0 || index < 0 || index > fLogicalSize) return;
 
-	index = std::max(std::min(fLogicalSize, index), 0);
+	index = std::max(std::min(fLogicalSize, index), (int32)0);
 
 	if (index != fGap)
 		MoveGap(index);
@@ -82,10 +82,10 @@ void PTextBuffer::Insert(const char *bytes, int numBytes, int index)
 //	PrintToStream();
 } /* PTextBuffer::Insert */
 
-void PTextBuffer::Delete(int from, int to)
+void PTextBuffer::Delete(int32 from, int32 to)
 {
-	int index = from;
-	int cnt = to - from;
+	int32 index = from;
+	int32 cnt = to - from;
 
 	ASSERT(cnt != 0);
 	ASSERT(from < to);
@@ -94,7 +94,7 @@ void PTextBuffer::Delete(int from, int to)
 	if (cnt <= 0 || from < 0 || index >= fLogicalSize)
 		return;
 
-	index = std::max(std::min(fLogicalSize - 1, index), 0);
+	index = std::max(std::min(fLogicalSize - 1, index), (int32)0);
 	MoveGap(index);
 
 	fGapSize += cnt;
@@ -119,19 +119,19 @@ const char* PTextBuffer::Buffer()
 	return fText;
 } /* PTextBuffer::Buffer */
 
-void PTextBuffer::MoveGap(int offset)
+void PTextBuffer::MoveGap(int32 offset)
 {
 	if (fGap == offset) return;
 
 	ASSERT(offset >= 0);
 	ASSERT(offset <= fLogicalSize);
 
-	int gapEnd = fGap + fGapSize;
-	int src, dst, cnt = 0;
+	int32 gapEnd = fGap + fGapSize;
+	int32 src, dst, cnt = 0;
 
 	if (offset > fGap)
 	{
-		int trail = fPhysicalSize - gapEnd;
+		int32 trail = fPhysicalSize - gapEnd;
 		src = gapEnd;
 		dst = fGap;
 		cnt = std::min(trail, fGapSize + offset - src);
@@ -154,7 +154,7 @@ void PTextBuffer::MoveGap(int offset)
 //	PrintToStream();
 } /* PTextBuffer::MoveGap */
 
-void PTextBuffer::ResizeGap(int gapSize)
+void PTextBuffer::ResizeGap(int32 gapSize)
 {
 	if (fGapSize == gapSize) return;
 
@@ -189,7 +189,7 @@ void PTextBuffer::ResizeGap(int gapSize)
 //	PrintToStream();
 } /* PTextBuffer::ResizeGap */
 
-void PTextBuffer::Copy(char *buf, int index, int len) const
+void PTextBuffer::Copy(char *buf, int32 index, int32 len) const
 {
 	ASSERT(index >= 0);
 	ASSERT(index + len <= fLogicalSize);
@@ -209,7 +209,7 @@ void PTextBuffer::Copy(char *buf, int index, int len) const
 	}
 	else
 	{
-		int p1, p2;
+		int32 p1, p2;
 		p1 = fGap - index;
 		p2 = len - p1;
 
@@ -222,11 +222,12 @@ void PTextBuffer::PrintToStream()
 {
 	char t[4];
 	memcpy(t, fText + fPhysicalSize, 4);
-	printf("logical size: %d, physical size: %d, gap: %d, gapsize: %d, trailer: %4.4s\n",
+	printf("logical size: %" B_PRId32 ", physical size: %" B_PRId32 ", gap: %"
+		B_PRId32 ", gapsize: %" B_PRId32 ", trailer: %4.4s\n",
 		fLogicalSize, fPhysicalSize, fGap, fGapSize, t);
 } /* PTextBuffer::PrintToStream */
 
-int PTextBuffer::CharLen(int index) const
+int32 PTextBuffer::CharLen(int32 index) const
 {
 	ASSERT(index >= 0);
 	ASSERT(index <= fLogicalSize);
@@ -234,7 +235,7 @@ int PTextBuffer::CharLen(int index) const
 	if (index < fLogicalSize && index >= 0)
 	{
 		char b[8];
-		Copy(b, index, std::min(7, fLogicalSize - index));
+		Copy(b, index, std::min((int32)7, fLogicalSize - index));
 		b[7] = 0;
 
 		return mcharlen(b);
@@ -243,7 +244,7 @@ int PTextBuffer::CharLen(int index) const
 		return 1;
 } /* PTextBuffer::CharLen */
 
-int PTextBuffer::PrevCharLen(int index) const
+int32 PTextBuffer::PrevCharLen(int32 index) const
 {
 	ASSERT(index <= fLogicalSize);
 	ASSERT(index >= 0);
@@ -251,7 +252,7 @@ int PTextBuffer::PrevCharLen(int index) const
 	if (index > 0 && index <= fLogicalSize)
 	{
 		char b[8];
-		int cnt = std::max(0, std::min(7, index));
+		int cnt = std::max((int32)0, std::min((int32)7, index));
 		Copy(b, index - cnt, cnt);
 		b[cnt] = 0;
 
@@ -261,7 +262,7 @@ int PTextBuffer::PrevCharLen(int index) const
 		return 1;
 } /* PTextBuffer::PrevCharLen */
 
-void PTextBuffer::ChangeToNL(int index)
+void PTextBuffer::ChangeToNL(int32 index)
 {
 	int i = index < fGap ? index : index + fGapSize;
 	if (fText[i] == '\r')
@@ -291,7 +292,7 @@ PTextBuffer& PTextBuffer::operator=(const PTextBuffer& b)
 	return *this;
 } /* PTextBuffer::operator= */
 
-void PTextBuffer::CharInfo(int offset, int& unicode, int& len) const
+void PTextBuffer::CharInfo(int32 offset, int32& unicode, int32& len) const
 {
 	ASSERT(offset >= 0);
 //	ASSERT(index <= fLogicalSize);
@@ -304,7 +305,7 @@ void PTextBuffer::CharInfo(int offset, int& unicode, int& len) const
 	else
 	{
 		char b[8];
-		Copy(b, offset, std::min(7, fLogicalSize - offset));
+		Copy(b, offset, std::min((int32)7, fLogicalSize - offset));
 		b[7] = 0;
 
 		len = mcharlen(b);
@@ -312,9 +313,9 @@ void PTextBuffer::CharInfo(int offset, int& unicode, int& len) const
 	}
 } /* PTextBuffer::CharInfo */
 
-void PTextBuffer::Replace(int offset, const char *txt)
+void PTextBuffer::Replace(int32 offset, const char *txt)
 {
-	int len = strlen(txt);
+	int32 len = strlen(txt);
 
 	ASSERT(offset >= 0);
 	ASSERT(offset + len <= fLogicalSize);
@@ -334,7 +335,7 @@ void PTextBuffer::Replace(int offset, const char *txt)
 	}
 	else
 	{
-		int p1, p2;
+		int32 p1, p2;
 		p1 = fGap - offset;
 		p2 = len - p1;
 

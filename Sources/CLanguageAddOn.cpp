@@ -46,8 +46,8 @@
 #include "HError.h"
 #include "HColorUtils.h"
 
-CLanguageProxy::CLanguageProxy(CLanguageInterface& intf, const char *text, int size,
-	int *starts, rgb_color *colors)
+CLanguageProxy::CLanguageProxy(CLanguageInterface& intf, const char *text, int32 size,
+	int32 *starts, rgb_color *colors)
 	: fText(text)
 	, fSize(size)
 	, fInterface(intf)
@@ -72,12 +72,12 @@ CLanguageProxy::CLanguageProxy(CLanguageInterface& intf, PText& text,
 {
 } /* CLanguageProxy::CLanguageProxy */
 
-int CLanguageProxy::Move(int ch, int state)
+int32 CLanguageProxy::Move(int32 ch, int32 state)
 {
 	return fInterface.AddToCurrentKeyword(ch, state);
 } /* CLanguageProxy::Move */
 
-int CLanguageProxy::IsKeyword(int state, int32 inSets)
+int32 CLanguageProxy::IsKeyword(int32 state, int32 inSets)
 {
 	return fInterface.LookupCurrentKeyword(state, inSets);
 } /* CLanguageProxy::IsKeyword */
@@ -87,12 +87,12 @@ const char *CLanguageProxy::Text() const
 	return fText;
 } /* CLanguageProxy::Text */
 
-int CLanguageProxy::Size() const
+int32 CLanguageProxy::Size() const
 {
 	return fSize;
 } /* CLanguageProxy::Size */
 
-void CLanguageProxy::SetColor(int start, int color)
+void CLanguageProxy::SetColor(int32 start, int32 color)
 {
 	if (start < 0)
 		start = 0;
@@ -112,7 +112,7 @@ void CLanguageProxy::SetColor(int start, int color)
 } /* CLanguageProxy::SetColor */
 
 void CLanguageProxy::AddFunction(const char *name, const char *match,
-	int offset, bool italic, const char *params)
+	int32 offset, bool italic, const char *params)
 {
 	FailNilMsg(fFunctionScanHandler, "Not a valid call in this context");
 	fFunctionScanHandler->AddFunction(name, match, offset, italic, fNestLevel, params);
@@ -162,23 +162,23 @@ bool CLanguageProxy::Sorted() const
 	return gPopupSorted;
 } /* CLanguageProxy::Sorted */
 
-void CLanguageProxy::CharInfo(const char *txt, int& unicode, int& len) const
+void CLanguageProxy::CharInfo(const char *txt, int32& unicode, int32& len) const
 {
 	len = mcharlen(txt);
 	unicode = municode(txt);
 } /* CharInfo */
 
-bool CLanguageProxy::isalpha_uc(int unicode) const
+bool CLanguageProxy::isalpha_uc(int32 unicode) const
 {
 	return ::isalpha_uc(unicode);
 } /* isalpha_uc */
 
-bool CLanguageProxy::isalnum_uc(int unicode) const
+bool CLanguageProxy::isalnum_uc(int32 unicode) const
 {
 	return ::isalnum_uc(unicode);
 } /* isalnum_uc */
 
-bool CLanguageProxy::isspace_uc(int unicode) const
+bool CLanguageProxy::isspace_uc(int32 unicode) const
 {
 	return ::isspace_uc(unicode);
 } /* isspace_uc */

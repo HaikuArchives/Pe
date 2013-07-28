@@ -300,7 +300,7 @@ void PGroupWindow::SetText(const BString& docText)
 				s++;
 		}
 
-		long l;
+		status_t l;
 		if (fIconFinder) wait_for_thread(fIconFinder->Thread(), &l);
 		fIconFinder = new PIconFinder(this, lst);
 		fIconFinder->Run();

@@ -204,7 +204,7 @@ void CDiffWindow::MessageReceived(BMessage* msg)
 				
 			case B_REFS_RECEIVED:
 			{
-				long n;
+				int32 n;
 				FailOSErr(msg->FindInt32("filenr", &n));
 				if (n == 1)
 					FailOSErr(msg->FindRef("refs", &fFile1));
@@ -277,7 +277,7 @@ void CDiffWindow::AddFile(int fileNr, BPoint where, bool showAlways, BPoint /*ms
 	if (! showAlways)
 	{
 		BPoint Where;
-		unsigned long btns;
+		uint32 btns;
 		bigtime_t longEnough = system_time() + 250000;
 	
 		fButtonBar->GetMouse(&Where, &btns);

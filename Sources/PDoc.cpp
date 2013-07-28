@@ -77,7 +77,7 @@
 #include "Scripting.h"
 #include "Utils.h"
 
-static long sDocCount = 0;
+static vint32 sDocCount = 0;
 
 const float
 	kStatusWidth = 80;
@@ -206,8 +206,6 @@ void PDoc::InitWindow(const char *name)
 			fRecent = file->ItemAt(i)->Submenu();
 		i++;
 	}
-
-	if (!fRecent) THROW(("Resources damaged?"));
 
 	b.top += fMBar->Frame().bottom + 1;
 	r = b;
@@ -1136,7 +1134,8 @@ static int32 perform_extension(void* data)
 {
 	ExtensionInfo* extInfo = reinterpret_cast<ExtensionInfo*>(data);
 	thread_id sender;
-	PText* text = (PText *)receive_data(&sender, NULL, 0);
+	PText* text = NULL;
+	receive_data(&sender, &text, sizeof(PText*));
 
 	if (extInfo != NULL && text != NULL)
 	{
@@ -1157,7 +1156,7 @@ void PDoc::PerformExtension(int nr)
 		if (tid >= B_OK)
 		{
 			resume_thread(tid);
-			send_data(tid, (int32)fText, NULL, 0);
+			send_data(tid, 0, &fText, sizeof(PText*));
 		}
 	}
 	else if (sExtensions[nr].type == ExtensionInfo::E_SCRIPT)
@@ -1810,7 +1809,7 @@ void PDoc::ShowRecentMenu(BPoint where, bool showalways)
 	if (! showalways)
 	{
 		BPoint Where;
-		unsigned long btns;
+		uint32 btns;
 		bigtime_t longEnough = system_time() + 250000;
 
 		fText->GetMouse(&Where, &btns);
@@ -2105,7 +2104,7 @@ BHandler* PDoc::ResolveSpecifier(BMessage *msg, int32 index,
 {
 	if (strcmp(property, "Line") == 0)
 	{
-		long indx, range;
+		int32 indx, range;
 
 		if (form == B_INDEX_SPECIFIER &&
 			specifier->FindInt32("index", &indx) == B_OK &&
@@ -2126,7 +2125,7 @@ BHandler* PDoc::ResolveSpecifier(BMessage *msg, int32 index,
 	}
 	else if (strcmp(property, "Char") == 0 || strcmp(property, "Character") == 0)
 	{
-		long indx, range;
+		int32 indx, range;
 
 		if (form == B_INDEX_SPECIFIER &&
 			specifier->FindInt32("index", &indx) == B_OK &&

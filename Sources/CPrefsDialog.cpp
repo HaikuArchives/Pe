@@ -175,7 +175,7 @@ CPrefsDialog::CPrefsDialog(BRect frame, const char *name, window_type type, int 
 	FailNil(fDefLanguage);
 
 	CLanguageInterface *intf;
-	int cookie = 0;
+	int32 cookie = 0;
 	while ((intf = CLanguageInterface::NextIntf(cookie)) != NULL)
 	{
 		fLanguage->AddItem(new BMenuItem(intf->Name(), new BMessage(msg_LanguageSelected)));
@@ -386,7 +386,7 @@ bool CPrefsDialog::OkClicked()
 	else
 		gPrefs->SetPrefInt(prf_I_Startup, 3);
 
-	int cookie = 0;
+	int32 cookie = 0;
 	CLanguageInterface *intf;
 	while ((intf = CLanguageInterface::NextIntf(cookie)) != NULL)
 		intf->SetExtensions(fSuffixes[cookie - 1].c_str());
@@ -566,7 +566,7 @@ bool CPrefsDialog::CancelClicked()
 	CntrlSetChkbx(pnm_Prj_X_SortProjectFiles,		prf_I_SortProjectFiles,		true);
 	CntrlSetChkbx(pnm_Prj_X_AutodetectProjects,		prf_I_AutodetectProjects,	true);
 
-	sprintf(s, "%d", gSpacesPerTab);
+	sprintf(s, "%" B_PRId32, gSpacesPerTab);
 	SetText(pnm_Edi_T_SpacesPerTab, s);
 
 	sprintf(s, "%d", gPrefs->GetPrefInt(prf_I_ContextLines, 3));
@@ -607,7 +607,7 @@ bool CPrefsDialog::CancelClicked()
 	fSuffixes.erase(fSuffixes.begin(), fSuffixes.end());
 
 	CLanguageInterface *intf;
-	int cookie = 0, i = 0;
+	int32 cookie = 0, i = 0;
 	const char *defLang = gPrefs->GetPrefString(prf_S_DefLang, "None");
 
 	while ((intf = CLanguageInterface::NextIntf(cookie)) != NULL)
@@ -621,7 +621,7 @@ bool CPrefsDialog::CancelClicked()
 	SetText(pnm_Lng_T_Suffixes, fSuffixes.size() ? fSuffixes[GetValue(pnm_Lng_P_Language) - 1].c_str() : "");
 
 
-	sprintf(s, "%d", gRecentBufferSize);
+	sprintf(s, "%" B_PRId32, gRecentBufferSize);
 	SetText(pnm_Fil_T_NrOfRecentDocs, s);
 
 	SetEnabled(pnm_Sup_X_ShowPaletteForHtml,	IsOn(pnm_Sup_X_ShowHtmlPalette));
@@ -782,7 +782,7 @@ void CPrefsDialog::MessageReceived(BMessage *msg)
 		case msg_LanguageSelected:
 			fLang = GetValue(pnm_Lng_P_Language) - 1;
 			{
-				int cookie = 0, i = 0;
+				int32 cookie = 0, i = 0;
 				CLanguageInterface *intf = NULL;
 				while ((intf = CLanguageInterface::NextIntf(cookie)) != NULL) {
 					if (i == fLang) {

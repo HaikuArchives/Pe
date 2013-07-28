@@ -1,10 +1,10 @@
 %{
 
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -14,13 +14,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -30,7 +30,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 12/02/98 15:37:52
 */
@@ -127,12 +127,12 @@ word													return WORD;
 wstring													return WSTRING;
 {ident}													{
 															yylval = ST_AddIdent(yytext);
-															
+
 															if (gMacroTable.find(yylval) != gMacroTable.end())
 															{
 																if (macro_stack_ptr >= MAX_INCLUDE_DEPTH)
 																	error("Macro's nested too deeply");
-	
+
 																macro_stack[macro_stack_ptr++] = YY_CURRENT_BUFFER;
 																yy_switch_to_buffer(yy_scan_string(gMacroTable[yylval]));
 															}
@@ -144,7 +144,7 @@ $$attributes											warn("attributes are not supported"); yylval = 0; return 
 $$bitfield												return LBITFIELD;
 $$byte													return LBYTE;
 $$countof												return COUNTOF;
-$$date													strftime(sBuf, 1023, "%A, %B %d, %Y", now_t); yylval = (int)strdup(sBuf); return STR_CONST;
+$$date													strftime(sBuf, 1023, "%A, %B %d, %Y", now_t); yylval = (addr_t)strdup(sBuf); return STR_CONST;
 $$day													yylval = now_t->tm_mday; return NUMBER;
 $$format												return FORMAT;
 $$hour													yylval = now_t->tm_hour; return NUMBER;
@@ -152,20 +152,20 @@ $$ID													yylval = gResID; return NUMBER;
 $$long													return LLONG;
 $$minute												yylval = now_t->tm_min; return NUMBER;
 $$minute												yylval = now_t->tm_mon; return NUMBER;
-$$name													yylval = (int)gResName; return STR_CONST;
+$$name													yylval = (addr_t)gResName; return STR_CONST;
 $$packedsize											warn("packedsize is not supported"); yylval = 0; return NUMBER;
 $$resource												return RESOURCE;
 $$resourcesize											return RESSIZE;
 $$second												yylval = now_t->tm_sec; return NUMBER;
 $$shell													return SHELL;
-$$time													strftime(sBuf, 1023, "%H:%M:%S", now_t); yylval = (int)strdup(sBuf); return STR_CONST;
+$$time													strftime(sBuf, 1023, "%H:%M:%S", now_t); yylval = (addr_t)strdup(sBuf); return STR_CONST;
 $$type													yylval = gResType; return NUMBER;
-$$version												yylval = (int)"rez for be 1.0a2"; return STR_CONST;
+$$version												yylval = (addr_t)"rez for be 1.0a2"; return STR_CONST;
 $$weekday												yylval = now_t->tm_wday; return NUMBER;
 $$word													return LWORD;
 $$year													yylval = now_t->tm_year; return NUMBER;
 \"														BEGIN(string); sbp = sBuf;
-<string>\"												BEGIN(INITIAL); *sbp = 0; yylval = (int)strdup(sBuf); return STR_CONST;
+<string>\"												BEGIN(INITIAL); *sbp = 0; yylval = (addr_t)strdup(sBuf); return STR_CONST;
 <string>\n												REJECT;
 <string>\\0[bB]{bindigit}+								*sbp++ = strtol(yytext + 3, &d, 2);
 <string>\\{octdigit}{3}									*sbp++ = strtol(yytext + 1, &d, 8);
@@ -181,7 +181,7 @@ $$year													yylval = now_t->tm_year; return NUMBER;
 <string>\\v												*sbp++ = 0x0B;
 <string>\\.												*sbp++ = yytext[1];
 <string>[^\\\"\n]+										strcpy(sbp, yytext); sbp += yyleng;
-$\"														BEGIN(hexstring); sbp = sBuf + sizeof(long);
+$\"														BEGIN(hexstring); sbp = sBuf + sizeof(int32);
 <hexstring>\"											BEGIN(INITIAL); CopyBuf(); return HEX_CONST;
 <hexstring>{hexdigit}{2}								*sbp++ = strtol(yytext, &d, 16);
 <hexstring>" "
@@ -229,20 +229,20 @@ ${hexdigit}{1,8}										yylval = strtol(yytext + 1, &d, 16); return NUMBER;
 															yytext[yyleng - 1] = 0;
 															const char **i = gIncludePaths;
 															char p[PATH_MAX];
-															
+
 															do
 															{
 																strcpy(p, *i++);
 																strcat(p, "/");
 																strcat(p, yytext);
-	
+
 																yyin = fopen(p, "r");
 															}
 															while (yyin == NULL && *i);
-															
+
 															if (yyin == NULL) error("Could not open file %s for input", yytext);
 															gFileName[include_stack_ptr - 1] = strdup(p);
-															
+
 															yy_switch_to_buffer(yy_create_buffer(yyin, YY_BUF_SIZE));
 															BEGIN(INITIAL);
 														}
@@ -274,22 +274,22 @@ void AddMacro(char *s)
 {
 	char *m = s + strlen("#define");
 	while (isspace(*m)) m++;
-	
+
 	char *c = m;
 	while (!isspace(*c)) c++;
 	*c++ = 0;
 	while (isspace(*c)) c++;
-	
-	int mn = ST_AddIdent(m);
-	
+
+	addr_t mn = ST_AddIdent(m);
+
 	gMacroTable[mn] = strdup(c);
 } /* AddMacro */
 
 void CopyBuf()
 {
-	size_t size = sbp - sBuf - sizeof(long);
-	memcpy(sBuf, &size, sizeof(size));
-	
-	yylval = (int)malloc(size + sizeof(long));
-	memcpy((void*)yylval, sBuf, size + sizeof(long));
+	int32 size = sbp - sBuf - sizeof(int32);
+	memcpy(sBuf, &size, sizeof(int32));
+
+	yylval = (addr_t)malloc(size + sizeof(int32));
+	memcpy((void*)yylval, sBuf, size + sizeof(int32));
 } /* CopyBuf */

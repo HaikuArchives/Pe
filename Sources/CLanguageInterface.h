@@ -48,14 +48,14 @@ public:
 		~CLanguageInterface();
 
 		void Balance(PText& text);
-		bool Balance(PText& text, int& start,  int& end);
+		bool Balance(PText& text, int32& start,  int32& end);
 		void ScanForFunctions(PText& text, CFunctionScanHandler& handler);
-		void ColorLine(const char *buf, int size,
-				int& state, int *starts, rgb_color *colors);
-		int FindNextWord(PText& text, int offset, int& mlen);
+		void ColorLine(const char *buf, int32 size,
+				int32& state, int32 *starts, rgb_color *colors);
+		int32 FindNextWord(PText& text, int32 offset, int32& mlen);
 
 		const char *Text() const;
-		int Size() const;
+		int32 Size() const;
 
 		const char *Name() const;
 		const char *Extensions() const;
@@ -63,16 +63,16 @@ public:
 
 static	void ChooseDefault();
 
-		int *Starts() const;
+		int32 *Starts() const;
 		rgb_color *Colors() const;
 
 static	void SetupLanguageInterfaces();
-static	CLanguageInterface* FindIntf(int index)	{ return fInterfaces[index]; }
+static	CLanguageInterface* FindIntf(int32 index)	{ return fInterfaces[index]; }
 static	CLanguageInterface* FindByExtension(const char *filename);
 static CLanguageInterface* FindByName(const char *language);
 
-static CLanguageInterface* NextIntf(int& cookie);
-static int GetIndex(const CLanguageInterface* intf);
+static CLanguageInterface* NextIntf(int32& cookie);
+static int32 GetIndex(const CLanguageInterface* intf);
 
 		const char* LineCommentStart() const;
 		const char* LineCommentEnd() const;
@@ -89,10 +89,10 @@ static	unsigned char *sfWordBreakTable;
 
 		const char *fLanguage, *fExtensions, *fKeywordFile;
 		const char *fLineCommentStart, *fLineCommentEnd;
-		bool (*fBalance)(CLanguageProxy& proxy, int& start, int& end);
+		bool (*fBalance)(CLanguageProxy& proxy, int32& start, int32& end);
 		void (*fScanForFunctions)(CLanguageProxy& proxy);
-		void (*fColorLine)(CLanguageProxy& proxy, int& state);
-		int (*fFindNextWord)(const CLanguageProxy& proxy);
+		void (*fColorLine)(CLanguageProxy& proxy, int32& state);
+		int32 (*fFindNextWord)(const CLanguageProxy& proxy);
 		image_id fImage;
 
 		// member introduced for proper interface version detection:
@@ -100,11 +100,11 @@ static	unsigned char *sfWordBreakTable;
 
 		// members for map-based keyword implementation:
 public:
-		int AddToCurrentKeyword(int ch, int state);
-		int LookupCurrentKeyword(int state, int32 inSets=0) const;
-		int LookupKeyword(const BString& word, int32 inSets=0) const;
+		int32 AddToCurrentKeyword(int32 ch, int32 state);
+		int32 LookupCurrentKeyword(int32 state, int32 inSets=0) const;
+		int32 LookupKeyword(const BString& word, int32 inSets=0) const;
 protected:
-		static const int kKeywordBufSize = 128;
+		static const int32 kKeywordBufSize = 128;
 		char fKeywordBuf[kKeywordBufSize+1];
 		typedef std::multimap<BString, int> KeywordMap;
 		mutable bool fHaveParsedKeywords;
@@ -135,7 +135,7 @@ public:
 		CFunctionScanHandler();
 virtual	~CFunctionScanHandler();
 
-virtual	void AddFunction(const char *name, const char *match, int offset,
+virtual	void AddFunction(const char *name, const char *match, int32 offset,
 	bool italic, uint32 nestLevel, const char *params);
 virtual	void AddInclude(const char *name, const char *open, bool italic);
 virtual	void AddSeparator(const char* name);

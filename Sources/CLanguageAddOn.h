@@ -60,7 +60,7 @@ class PText;
 
 class CLanguageProxy {
 public:
-		CLanguageProxy(CLanguageInterface& intf, const char *text, int size, int *starts = NULL, rgb_color *colors = NULL);
+		CLanguageProxy(CLanguageInterface& intf, const char *text, int32 size, int32 *starts = NULL, rgb_color *colors = NULL);
 		CLanguageProxy(CLanguageInterface& intf, PText& text, CFunctionScanHandler* handler = NULL);
 
 /*
@@ -76,8 +76,8 @@ public:
 	You can always call these functions but I think they are only useful when doing
 	syntax colouring.
 */
-virtual	int Move(int ch, int state);
-virtual	int IsKeyword(int state, int32 inSets=0);
+virtual	int32 Move(int32 ch, int32 state);
+virtual	int32 IsKeyword(int32 state, int32 inSets=0);
 
 /*
 	The next pair of calls return the text to colour or parse and it's size.
@@ -86,7 +86,7 @@ virtual	int IsKeyword(int state, int32 inSets=0);
 */
 
 virtual	const char *Text() const;
-virtual	int Size() const;
+virtual	int32 Size() const;
 
 /*
 	Call SetColor only while doing syntax colouring, nasty things will happen otherwise.
@@ -96,7 +96,7 @@ virtual	int Size() const;
 	You don't have to gather info yourself, calling SetColor with a color value the same
 	as the current color is a noop.
 */
-virtual	void SetColor(int start, int color);
+virtual	void SetColor(int32 start, int32 color);
 
 /*
 	The next three calls are here for adding functions and includes to the function popup.
@@ -106,7 +106,7 @@ virtual	void SetColor(int start, int color);
 	text. This value may be incorrect but should be 'near by', preferrably before.
 	The open parameter is of course the name of the include file.
 */
-virtual	void AddFunction(const char *name, const char *match, int offset,
+virtual	void AddFunction(const char *name, const char *match, int32 offset,
 	bool italic = false, const char *params = "");
 virtual	void AddInclude(const char *name, const char *open, bool italic = false);
 virtual	void AddSeparator(const char* name = NULL);
@@ -122,10 +122,10 @@ virtual	bool Sorted() const;
 /*
 	These methods are used for wrapping, they classify the characters in the text
 */
-virtual	void CharInfo(const char *txt, int& unicode, int& len) const;
-virtual	bool isalpha_uc(int unicode) const;
-virtual	bool isalnum_uc(int unicode) const;
-virtual	bool isspace_uc(int unicode) const;
+virtual	void CharInfo(const char *txt, int32& unicode, int32& len) const;
+virtual	bool isalpha_uc(int32 unicode) const;
+virtual	bool isalnum_uc(int32 unicode) const;
+virtual	bool isspace_uc(int32 unicode) const;
 
 virtual	void IncNestLevel();
 virtual	void DecNestLevel();
@@ -133,10 +133,10 @@ virtual	void SetNestLevel(uint32 nestLevel);
 
 private:
 		const char *fText;
-		int fSize;
+		int32 fSize;
 		CLanguageInterface& fInterface;
-		int fCIndx;
-		int *fStarts;
+		int32 fCIndx;
+		int32 *fStarts;
 		rgb_color *fColors;
 		CFunctionScanHandler* fFunctionScanHandler;
 		uint32 fNestLevel;
@@ -179,7 +179,7 @@ extern const int16 kInterfaceVersion;
 	start and end are the current selection start and end. Change them to
 	select some other part of text.
 */
-_EXPORT bool Balance(CLanguageProxy& proxy, int& start, int& end);
+_EXPORT bool Balance(CLanguageProxy& proxy, int32& start, int32& end);
 
 /*
 	ScanForFunctions, the name says it all. Scan the text and report which
@@ -193,7 +193,7 @@ _EXPORT void ScanForFunctions(CLanguageProxy& proxy);
 	for doing multiline style e.g.
 	At most 99 colour changes can be recorded, more are ignored.
 */
-_EXPORT void ColorLine(CLanguageProxy& proxy, int& state);
+_EXPORT void ColorLine(CLanguageProxy& proxy, int32& state);
 
 /*
 	FindNextWord is called to help find the next line break for softwrapping.
@@ -204,7 +204,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state);
 	This function is new for version 2.0
 */
 
-_EXPORT int FindNextWord(const CLanguageProxy& proxy);
+_EXPORT int32 FindNextWord(const CLanguageProxy& proxy);
 
 }
 

@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 02-06-02
 */
@@ -45,7 +45,7 @@ HPreferences *gPrefs = NULL;
 HPreferences::HPreferences(const char *preffilename)
 {
 	BPath settings;
-	
+
 	FailOSErr(find_directory(B_USER_SETTINGS_DIRECTORY, &settings, true));
 
 	char p[PATH_MAX];
@@ -59,10 +59,10 @@ HPreferences::HPreferences(const char *preffilename)
 HPreferences::~HPreferences()
 {
 	PrefMap::iterator pi;
-	
+
 	for (pi = fPrefs.begin(); pi != fPrefs.end(); pi++)
 		free((*pi).second);
-	
+
 	fPrefs.clear();
 
 	free(fFile);
@@ -71,7 +71,7 @@ HPreferences::~HPreferences()
 const char *HPreferences::GetPrefString(const char *name, const char *def)
 {
 	PrefMap::iterator pi = fPrefs.find(name);
-	
+
 	if (pi != fPrefs.end())
 		return (*pi).second;
 	else
@@ -85,11 +85,11 @@ const char *HPreferences::GetIxPrefString(const char *name, int ix)
 {
 	char n[32];
 	ASSERT(strlen(name) < 28);
-	
+
 	sprintf(n, "%s%d", name, ix);
-	
+
 	PrefMap::iterator pi = fPrefs.find(n);
-	
+
 	if (pi != fPrefs.end())
 		return (*pi).second;
 	else
@@ -99,7 +99,7 @@ const char *HPreferences::GetIxPrefString(const char *name, int ix)
 int HPreferences::GetPrefInt(const char *name, int def)
 {
 	PrefMap::iterator pi = fPrefs.find(name);
-	
+
 	if (pi != fPrefs.end())
 		return atoi((*pi).second);
 	else
@@ -112,7 +112,7 @@ int HPreferences::GetPrefInt(const char *name, int def)
 double HPreferences::GetPrefDouble(const char *name, double def)
 {
 	PrefMap::iterator pi = fPrefs.find(name);
-	
+
 	if (pi != fPrefs.end())
 		return atof((*pi).second);
 	else
@@ -125,25 +125,25 @@ double HPreferences::GetPrefDouble(const char *name, double def)
 rgb_color HPreferences::GetPrefColor(const char *name, rgb_color def)
 {
 	PrefMap::iterator pi = fPrefs.find(name);
-	
+
 	if (pi != fPrefs.end())
 	{
 		rgb_color c;
 		c.alpha = 255;
 		char s[4], *p;
 		const char *v = (*pi).second;
-		
+
 		s[2] = 0;
-		
+
 		strncpy(s, v + 1, 2);
 		c.red = strtoul(s, &p, 16);
-		
+
 		strncpy(s, v + 3, 2);
 		c.green = strtoul(s, &p, 16);
-		
+
 		strncpy(s, v + 5, 2);
 		c.blue = strtoul(s, &p, 16);
-		
+
 		return c;
 	}
 	else
@@ -156,13 +156,13 @@ rgb_color HPreferences::GetPrefColor(const char *name, rgb_color def)
 BRect HPreferences::GetPrefRect(const char *name, BRect def)
 {
 	PrefMap::iterator pi = fPrefs.find(name);
-	
+
 	if (pi != fPrefs.end())
 	{
 		BRect r(1, 1, 0, 0);
 		const char *v = (*pi).second;
 		char *p;
-		
+
 		r.left = strtod(v, &p);
 		p++;
 		r.top = strtod(p, &p);
@@ -170,7 +170,7 @@ BRect HPreferences::GetPrefRect(const char *name, BRect def)
 		r.right = strtod(p, &p);
 		p++;
 		r.bottom = strtod(p, &p);
-		
+
 		return r.IsValid() ? r : def;
 	}
 	else
@@ -187,7 +187,7 @@ void HPreferences::SetPrefString(const char *name, const char *value)
 	if (name && value)
 	{
 		PrefMap::iterator pi = fPrefs.find(name);
-		
+
 		if (pi != fPrefs.end())
 		{
 			free((*pi).second);
@@ -203,7 +203,7 @@ void HPreferences::SetIxPrefString(const char *name, int ix, const char *value)
 	ASSERT(strlen(name) < 28);
 	char n[32];
 	sprintf(n, "%s%d", name, ix);
-	
+
 	SetPrefString(n, value);
 } /* HPreferences::SetIxPrefString */
 
@@ -238,24 +238,24 @@ void HPreferences::SetPrefRect(const char *name, BRect value)
 void HPreferences::RemovePref(const char *name)
 {
 	PrefMap::iterator pi = fPrefs.find(name);
-	
+
 	if (pi != fPrefs.end())
 	{
 		free((*pi).second);
 		fPrefs.erase(pi);
 	}
-	
+
 	if (strlen(name) < 28)
 	{
 		int ix = 0;
 		char n[32];
-		
+
 		do
 		{
 			sprintf(n, "%s%d", name, ix++);
-			
+
 			pi = fPrefs.find(n);
-	
+
 			if (pi != fPrefs.end())
 			{
 				free((*pi).second);
@@ -271,28 +271,28 @@ void HPreferences::ReadPrefFile()
 	BLOCK;
 
 	FILE *f;
-	
+
 	f = fopen(fFile, "r");
-	
+
 	if (!f)
 		return;
-	
+
 	char s[2048];
-	
+
 	while (fgets(s, 2047, f))
 	{
 		char *n, *v;
-		
+
 		n = s;
 		v = strchr(s, '=');
 		if (!v)
 			continue;
-		
+
 		*v++ = 0;
 		v[strlen(v) - 1] = 0;
-		
+
 		char *p = v;
-		
+
 		while ((p = strchr(p, 0x1b)) != 0)
 		{
 			if (p[1] == 'n')
@@ -304,10 +304,10 @@ void HPreferences::ReadPrefFile()
 				p++;
 			p++;
 		}
-		
+
 		fPrefs[n] = strdup(v);
 	}
-	
+
 	fclose(f);
 } /* HPreferences::ReadPrefFile */
 
@@ -316,14 +316,14 @@ void HPreferences::WritePrefFile()
 	BLOCK;
 
 	FILE *f;
-	
+
 	f = fopen(fFile, "w");
-	
+
 	if (!f)
 		throw HErr("Could not create settings file");
-	
+
 	PrefMap::iterator pi;
-	
+
 	for (pi = fPrefs.begin(); pi != fPrefs.end(); pi++)
 	{
 		if (!(*pi).second)
@@ -334,10 +334,10 @@ void HPreferences::WritePrefFile()
 		{
 			char *buf = (char *)malloc(2 * strlen((*pi).second));
 			FailNil(buf);
-			
+
 			char *a, *b;
 			a = buf, b = (*pi).second;
-			
+
 			while (*b)
 			{
 				if (*b == '\n')
@@ -362,7 +362,7 @@ void HPreferences::WritePrefFile()
 			free(buf);
 		}
 	}
-	
+
 	fclose(f);
 } /* HPreferences::WritePrefFile */
 
@@ -377,10 +377,10 @@ void HPreferences::InitTextFont(BFont* font) {
 	font_family ff;
 	font_style fs;
 	be_fixed_font->GetFamilyAndStyle(&ff, &fs);
-	
+
 	strcpy(ff, GetPrefString(prf_S_FontFamily, ff));
 	strcpy(fs, GetPrefString(prf_S_FontStyle, fs));
-	
+
 	font->SetFamilyAndStyle(ff, fs);
 	font->SetSize(GetPrefDouble(prf_D_FontSize, be_plain_font->Size()));
-}	
+}

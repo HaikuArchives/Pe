@@ -1,8 +1,8 @@
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998, 2002
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -12,13 +12,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -28,7 +28,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 11/27/97 22:06:16 by Maarten Hekkelman
 */
@@ -37,6 +37,8 @@
 #define HDLOGVIEW_H
 
 #include "HLibHekkel.h"
+
+#include <vector>
 
 #define H_FOLLOW_LEFT_TOP			(B_FOLLOW_LEFT | B_FOLLOW_TOP)
 #define H_FOLLOW_RIGHT_TOP			(B_FOLLOW_RIGHT | B_FOLLOW_TOP)
@@ -52,7 +54,7 @@ class IMPEXP_LIBHEKKEL HDlogView : public BView {
 public:
 		HDlogView(BRect frame, const char *name);
 		~HDlogView();
-		
+
 virtual	void Draw(BRect update);
 
 		void AddMyLine(BRect r);
@@ -69,7 +71,7 @@ private:
 
 class IMPEXP_LIBHEKKEL HButton : public BButton {
 public:
-	HButton(BView* view, const char* name, uint32 cmd, 
+	HButton(BView* view, const char* name, uint32 cmd,
 			uint32 resizingMode = H_FOLLOW_LEFT_TOP);
 	void ResizeLocalized(const char* label);
 	//
@@ -110,7 +112,7 @@ public:
 
 class IMPEXP_LIBHEKKEL HTextControl : public BTextControl {
 public:
-	HTextControl(BView* view, const char* name, 
+	HTextControl(BView* view, const char* name,
 				 uint32 resizingMode = H_FOLLOW_LEFT_TOP);
 	void ResizeLocalized(const char* label=NULL);
 	//
@@ -134,7 +136,7 @@ public:
 
 class IMPEXP_LIBHEKKEL HTextView : public BTextView {
 public:
-	HTextView(BView* view, const char* name, 
+	HTextView(BView* view, const char* name,
 			  uint32 resizingMode = H_FOLLOW_LEFT_TOP);
 	void ResizeLocalized();
 	void KeyDown(const char* bytes, int32 num_bytes);
@@ -185,7 +187,7 @@ public:
 
 class IMPEXP_LIBHEKKEL HCheckBox : public BCheckBox {
 public:
-	HCheckBox(BView* view, const char* name, BMessage* msg = NULL, 
+	HCheckBox(BView* view, const char* name, BMessage* msg = NULL,
 			  uint32 resizingMode = H_FOLLOW_LEFT_TOP);
 	void ResizeLocalized(const char* label=NULL);
 	//
@@ -236,7 +238,7 @@ public:
 			uint32 resizingMode = H_FOLLOW_LEFT_TOP,
 			uint32 flags = B_WILL_DRAW|B_FRAME_EVENTS,
 			border_style border = B_FANCY_BORDER);
-		
+
 virtual	void Draw(BRect update);
 	//
 	float Left(void)									{ return Frame().left; }

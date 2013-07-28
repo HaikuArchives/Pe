@@ -155,28 +155,28 @@ DisplayResults(vector<BString>& results, MTextAddOn* addon)
 //	#pragma mark - Addon Entry
 
 #if __INTEL__
-	extern "C" _EXPORT long perform_edit(MTextAddOn* addon);
+	extern "C" _EXPORT status_t perform_edit(MTextAddOn* addon);
 #else
 	#pragma export on
 	extern "C" {
-		long perform_edit(MTextAddOn* addon);
+		status_t perform_edit(MTextAddOn* addon);
 	}
 	#pragma export reset
 #endif
 
 
-long
+status_t
 perform_edit(MTextAddOn* addon)
 {
-	long selStart;
-	long selEnd;
+	int32 selStart;
+	int32 selEnd;
 
 	addon->GetSelection(&selStart, &selEnd);
 
 	if (selEnd <= selStart)
 		return B_ERROR;
 
-	int length = selEnd - selStart;
+	int32 length = selEnd - selStart;
 
 	// Do NOT run the query if we have less than 3 chars. It works, but takes
 	// ages and produces an useless giant popup menu.

@@ -1,10 +1,10 @@
 /*	Xml_Language.cpp
-	
+
 	Copyright 1996, 1997, 1998, 2002
-	        Hekkelman Programmatuur B.V.  All rights reserved.       
+	        Hekkelman Programmatuur B.V.  All rights reserved.
 	Copyright 2012
 	        Przemysław Buczkowski <przemub@yahoo.pl> All rights reserved.
-		
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -14,13 +14,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -30,7 +30,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 3rd December 2012 by Przemysław Buczkowski
 */
@@ -64,23 +64,23 @@ enum {
 
 #define GETCHAR			(c = (i++ < size) ? text[i - 1] : 0)
 
-_EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
+_EXPORT void ColorLine(CLanguageProxy& proxy, int32& state)
 {
 	const char *text = proxy.Text();
-	int size = proxy.Size();
+	int32 size = proxy.Size();
 	char c;
-	int i = 0, s = 0, kws = 0;
+	int32 i = 0, s = 0, kws = 0;
 	bool leave = false;
-	
+
 	proxy.SetColor(0, kColorText);
-	
+
 	if (size <= 0)
 		return;
-	
+
 	while (!leave)
 	{
 		GETCHAR;
-		
+
 		switch (state) {
 			case START:
 				if (c == '<')
@@ -89,14 +89,14 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					state = SPECIAL;
 				else if (c == 0 || c == '\n')
 					leave = true;
-					
+
 				if ((leave || state != START) && s < i)
 				{
 					proxy.SetColor(s, kColorText);
 					s = i - 1;
 				}
 				break;
-				
+
 			case TAG:
 				switch (c)
 				{
@@ -138,7 +138,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 						break;
 				}
 				break;
-			
+
 			case TAGSTRING1:
 				if (c == '"')
 				{
@@ -152,7 +152,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					leave = true;
 				}
 				break;
-			
+
 			case TAGSTRING2:
 				if (c == '\'')
 				{
@@ -166,7 +166,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 					leave = true;
 				}
 				break;
-			
+
 			case TAGKEYWORD:
 				if (! isalnum(c))
 				{
@@ -177,7 +177,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else if (kws)
 					kws = proxy.Move(tolower(c), kws);
 				break;
-			
+
 			case SPECIAL:
 				if (c == 0 || c == '\n')
 				{
@@ -194,7 +194,7 @@ _EXPORT void ColorLine(CLanguageProxy& proxy, int& state)
 				else if (isspace(c))
 					state = START;
 				break;
-				
+
 			case COMMENT:
 				if (c == 0 || c == '\n')
 				{
@@ -228,19 +228,19 @@ const unsigned char kWordWrapTable[] =
 		0x84, 0x86, 0x00, 0x00, 0x83, 0x83
 	};
 
-int FindNextWord(const CLanguageProxy& proxy)
+int32 FindNextWord(const CLanguageProxy& proxy)
 {
-	int mark = 0, i = 0;
-	int unicode, state, len;
-	
+	int32 mark = 0, i = 0;
+	int32 unicode, state, len;
+
 	state = 1;
-	
+
 	while (state && i < proxy.Size())
 	{
 		proxy.CharInfo(proxy.Text() + i, unicode, len);
-		
+
 		int cl = 0;
-		
+
 		if (unicode == '\n')
 			cl = 3;
 		else if (proxy.isspace_uc(unicode))
@@ -268,7 +268,7 @@ int FindNextWord(const CLanguageProxy& proxy)
 				default:
 					cl = 4;
 			}
-		
+
 		unsigned char t = kWordWrapTable[(state - 1) * 6 + cl];
 
 		state = t & 0x7f;

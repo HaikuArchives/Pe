@@ -1,10 +1,10 @@
 %{
 
 /*	$Id$
-	
+
 	Copyright 1996, 1997, 1998
 	        Hekkelman Programmatuur B.V.  All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	1. Redistributions of source code must retain the above copyright notice,
@@ -14,13 +14,13 @@
 	   and/or other materials provided with the distribution.
 	3. All advertising materials mentioning features or use of this software
 	   must display the following acknowledgement:
-	   
+
 	    This product includes software developed by Hekkelman Programmatuur B.V.
-	
+
 	4. The name of Hekkelman Programmatuur B.V. may not be used to endorse or
 	   promote products derived from this software without specific prior
 	   written permission.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
 	FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
@@ -30,7 +30,7 @@
 	OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 	WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
+	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 	Created: 12/02/98 15:37:42
 */
@@ -124,9 +124,9 @@ datatype		:	booleantype
 				|											{ $$ = 0; }
 				;
 
-booleantype		:	BOOLEAN									{ $$ = (int)new RSNrValue(8); }
-				|	BOOLEAN '='	e							{ $$ = (int)new RSNrValue(8); RSV($$)->SetDefaultValue($3); }
-				|	BOOLEAN symboliclist					{ $$ = (int)new RSNrValue(8); RSV($$)->AddIdentifiers(LST($2)); }
+booleantype		:	BOOLEAN									{ $$ = (addr_t)new RSNrValue(8); }
+				|	BOOLEAN '='	e							{ $$ = (addr_t)new RSNrValue(8); RSV($$)->SetDefaultValue($3); }
+				|	BOOLEAN symboliclist					{ $$ = (addr_t)new RSNrValue(8); RSV($$)->AddIdentifiers(LST($2)); }
 				;
 
 numerictype		:	numericsize
@@ -150,24 +150,24 @@ radix			:	HEX
 				|	LITERAL
 				;
 
-numericsize		:	BITSTRING								{ $$ = (int)new RSNrValue(32); }
-				|	BITSTRING '[' e ']'						{ $$ = (int)new RSNrValue(REvaluate(RE($3), head)); }
-				|	BYTE									{ $$ = (int)new RSNrValue(8); }
-				|	INTEGER									{ $$ = (int)new RSNrValue(16); }
-				|	LONGINT									{ $$ = (int)new RSNrValue(32); }
+numericsize		:	BITSTRING								{ $$ = (addr_t)new RSNrValue(32); }
+				|	BITSTRING '[' e ']'						{ $$ = (addr_t)new RSNrValue(REvaluate(RE($3), head)); }
+				|	BYTE									{ $$ = (addr_t)new RSNrValue(8); }
+				|	INTEGER									{ $$ = (addr_t)new RSNrValue(16); }
+				|	LONGINT									{ $$ = (addr_t)new RSNrValue(32); }
 				;
 
-chartype		:	CHAR									{ $$ = (int)new RSNrValue(8); }
-				|	CHAR '=' e								{ $$ = (int)new RSNrValue(8); RSV($$)->SetDefaultValue($3); }
-				|	CHAR symboliclist						{ $$ = (int)new RSNrValue(8); RSV($$)->AddIdentifiers(LST($2)); }
+chartype		:	CHAR									{ $$ = (addr_t)new RSNrValue(8); }
+				|	CHAR '=' e								{ $$ = (addr_t)new RSNrValue(8); RSV($$)->SetDefaultValue($3); }
+				|	CHAR symboliclist						{ $$ = (addr_t)new RSNrValue(8); RSV($$)->AddIdentifiers(LST($2)); }
 				;
 
-stringtype		:	stringspecifier							{ $$ = (int)new RSStringValue($1, 0); }
-				|	stringspecifier '[' e ']'				{ $$ = (int)new RSStringValue($1, REvaluate(RE($3), head)); }
-				|	stringspecifier '=' strconst			{ $$ = (int)new RSStringValue($1, 0); RSV($$)->SetDefaultValue($3); }
-				|	stringspecifier '[' e ']' '=' strconst	{ $$ = (int)new RSStringValue($1, REvaluate(RE($3), head)); RSV($$)->SetDefaultValue($6); }
-				|	stringspecifier symboliclist			{ $$ = (int)new RSStringValue($1, 0); RSV($$)->AddIdentifiers(LST($2)); } 
-				|	stringspecifier '[' e ']' symboliclist	{ $$ = (int)new RSStringValue($1, REvaluate(RE($3), head)); RSV($$)->AddIdentifiers(LST($5)); } 
+stringtype		:	stringspecifier							{ $$ = (addr_t)new RSStringValue($1, 0); }
+				|	stringspecifier '[' e ']'				{ $$ = (addr_t)new RSStringValue($1, REvaluate(RE($3), head)); }
+				|	stringspecifier '=' strconst			{ $$ = (addr_t)new RSStringValue($1, 0); RSV($$)->SetDefaultValue($3); }
+				|	stringspecifier '[' e ']' '=' strconst	{ $$ = (addr_t)new RSStringValue($1, REvaluate(RE($3), head)); RSV($$)->SetDefaultValue($6); }
+				|	stringspecifier symboliclist			{ $$ = (addr_t)new RSStringValue($1, 0); RSV($$)->AddIdentifiers(LST($2)); }
+				|	stringspecifier '[' e ']' symboliclist	{ $$ = (addr_t)new RSStringValue($1, REvaluate(RE($3), head)); RSV($$)->AddIdentifiers(LST($5)); }
 				;
 
 stringspecifier	:	STRING									{ $$ = RSStringValue::skStr; }
@@ -177,32 +177,32 @@ stringspecifier	:	STRING									{ $$ = RSStringValue::skStr; }
 				|	CSTRING									{ $$ = RSStringValue::skCStr; }
 				;
 
-pointtype		:	POINT									{ $$ = (int)new RSArray(new RSNrValue(16), 0, 2); }
+pointtype		:	POINT									{ $$ = (addr_t)new RSArray(new RSNrValue(16), 0, 2); }
 				|	POINT '=' dataarray datalist '}'		{ error("Unimplemented constant declaration"); }
 				|	POINT symboliclist						{ error("Unimplemented constant declaration"); }
 				;
 
-recttype		:	RECT									{ $$ = (int)new RSArray(new RSNrValue(16), 0, 4); }
+recttype		:	RECT									{ $$ = (addr_t)new RSArray(new RSNrValue(16), 0, 4); }
 				|	RECT '=' dataarray datalist '}'			{ error("Unimplemented constant declaration"); }
 				|	RECT symboliclist						{ error("Unimplemented constant declaration"); }
 				;
 
-arraytype		:	ARRAY '{' datadecl '}'					{ $$ = (int)new RSArray(RS($3)); }
-				|	WIDE ARRAY '{' datadecl '}'				{ $$ = (int)new RSArray(RS($4)); }
-				|	ARRAY IDENT '{' datadecl '}'			{ $$ = (int)new RSArray(RS($4), $2); }
-				|	WIDE ARRAY IDENT '{' datadecl '}'		{ $$ = (int)new RSArray(RS($5), $3); }
-				|	ARRAY '[' e ']' '{' datadecl '}'		{ $$ = (int)new RSArray(RS($6), 0, $3); }
-				|	WIDE ARRAY '[' e ']' '{' datadecl '}'	{ $$ = (int)new RSArray(RS($7), 0, $3); }
+arraytype		:	ARRAY '{' datadecl '}'					{ $$ = (addr_t)new RSArray(RS($3)); }
+				|	WIDE ARRAY '{' datadecl '}'				{ $$ = (addr_t)new RSArray(RS($4)); }
+				|	ARRAY IDENT '{' datadecl '}'			{ $$ = (addr_t)new RSArray(RS($4), $2); }
+				|	WIDE ARRAY IDENT '{' datadecl '}'		{ $$ = (addr_t)new RSArray(RS($5), $3); }
+				|	ARRAY '[' e ']' '{' datadecl '}'		{ $$ = (addr_t)new RSArray(RS($6), 0, $3); }
+				|	WIDE ARRAY '[' e ']' '{' datadecl '}'	{ $$ = (addr_t)new RSArray(RS($7), 0, $3); }
 				;
 
-switchtype		:	SWITCH '{' casestmts '}'				{ $$ = (int)new RSSwitch(LST($3)); }
+switchtype		:	SWITCH '{' casestmts '}'				{ $$ = (addr_t)new RSSwitch(LST($3)); }
 				;
 
 casestmts		:	casestmts casestmt						{ $$ = $1; LST($1)->AddItem(RS($2)); }
-				|	casestmt								{ $$ = (int)new BList; LST($$)->AddItem(RS($1)); }
+				|	casestmt								{ $$ = (addr_t)new BList; LST($$)->AddItem(RS($1)); }
 				;
 
-casestmt		:	CASE IDENT ':' casebody ';'				{ $$ = (int)new RCase($2, RS($4)); }
+casestmt		:	CASE IDENT ':' casebody ';'				{ $$ = (addr_t)new RCase($2, RS($4)); }
 				;
 
 casebody		:	casebody ';' caseline					{ $$ = $1; RS($1)->SetNext(RS($3)); }
@@ -222,7 +222,7 @@ keytype			:	BOOLEAN
 				|	stringspecifier
 				;
 
-filltype		:	FILL fillsize							{ $$ = (int)new RSNrValue($2); RSV($$)->SetDefaultValue((int)RValue(0)); }
+filltype		:	FILL fillsize							{ $$ = (addr_t)new RSNrValue($2); RSV($$)->SetDefaultValue((addr_t)RValue(0)); }
 				|	FILL fillsize '[' e ']'					{
 																int cnt = REvaluate(RE($4), head);
 																RSNrValue *s, *t = NULL;
@@ -230,11 +230,11 @@ filltype		:	FILL fillsize							{ $$ = (int)new RSNrValue($2); RSV($$)->SetDefau
 																while (cnt--)
 																{
 																	s = new RSNrValue($2);
-																	s->SetDefaultValue((int)RValue(0));
+																	s->SetDefaultValue((addr_t)RValue(0));
 																	s->SetNext(t);
 																	t = s;
 																}
-																$$ = (int)s;
+																$$ = (addr_t)s;
 															}
 				;
 
@@ -254,13 +254,13 @@ alignsize		:	NIBBLE
 				|	LONG
 				;
 
-symboliclist	:	symbolicvalue							{ $$ = (int)new BList; LST($$)->AddItem(RS($1)); }
+symboliclist	:	symbolicvalue							{ $$ = (addr_t)new BList; LST($$)->AddItem(RS($1)); }
 				|	symboliclist ',' symbolicvalue			{ $$ = $1; LST($1)->AddItem(RS($3)); }
 				;
 
-symbolicvalue	:	IDENT									{ $$ = (int)new RSymbol($1, 0); }
-				|	IDENT '=' e								{ $$ = (int)new RSymbol($1, REvaluate(RE($3), head)); }
-				|	IDENT '=' dataarray datalist '}'		{ $$ = (int)new RSymbol($1, 0); }
+symbolicvalue	:	IDENT									{ $$ = (addr_t)new RSymbol($1, 0); }
+				|	IDENT '=' e								{ $$ = (addr_t)new RSymbol($1, REvaluate(RE($3), head)); }
+				|	IDENT '=' dataarray datalist '}'		{ $$ = (addr_t)new RSymbol($1, 0); }
 				;
 
 e				:	'(' e ')'								{ $$ = $2; }
@@ -289,7 +289,7 @@ e				:	'(' e ')'								{ $$ = $2; }
 				|	IDENT									{ $$ = (long)RIdentifier($1); }
 				|	f
 				;
-		
+
 f				:	COUNTOF '(' IDENT ')'					{ $$ = (long)RFunction(refCountOf, $3); }
 				|	LBITFIELD '(' IDENT ',' NUMBER ',' NUMBER ')'
 															{ $$ = (long)RFunction(refCopyBits, $3, $5, $7); }
@@ -307,7 +307,7 @@ resheader		:	RES NUMBER '(' NUMBER ',' strconst ')'
 																	error("Undefined resource type: %4.4s", &t);
 																}
 																head = NULL;
-																$$ = (int)new ResHeader($2, $4, $6);
+																$$ = (addr_t)new ResHeader($2, $4, $6);
 															}
 				|	RES NUMBER '(' NUMBER ')'
 															{
@@ -318,7 +318,7 @@ resheader		:	RES NUMBER '(' NUMBER ',' strconst ')'
 																	error("Undefined resource type: %4.4s", &t);
 																}
 																head = NULL;
-																$$ = (int)new ResHeader((int)$2, (int)$4, (int)0);
+																$$ = (addr_t)new ResHeader((int)$2, (int)$4, (int)0);
 															}
 				;
 
@@ -350,20 +350,20 @@ switchdata		:	IDENT '{'								{ CHECKSTATE; sState = sState->Shift($1, tCase, &
 
 hexconst		:	HEX_CONST
 				|	hexconst HEX_CONST						{ char *t, *a, *b;
-															  long sa, sb;
+															  int32 sa, sb;
 
-															  a = (char *)$1;	sa = *(long *)a;
-															  b = (char *)$2;	sb = *(long *)b;
+															  a = (char *)$1;	sa = *(int32 *)a;
+															  b = (char *)$2;	sb = *(int32 *)b;
 
-															  t = (char *)malloc(sa + sb + sizeof(long));
+															  t = (char *)malloc(sa + sb + sizeof(int32));
 															  if (!t) error("insufficient memory");
 
-															  memcpy(t + sizeof(long), a + sizeof(long), sa);
-															  memcpy(t + sizeof(long) + sa, b + sizeof(long), sb);
-															  *(long*)t = sa + sb;
+															  memcpy(t + sizeof(int32), a + sizeof(int32), sa);
+															  memcpy(t + sizeof(int32) + sa, b + sizeof(int32), sb);
+															  *(int32*)t = sa + sb;
 
 															  free(a); free(b);
-															  $$ = (int)t; }
+															  $$ = (addr_t)t; }
 				;
 
 strconst		:	STR_CONST
@@ -375,21 +375,21 @@ strconst		:	STR_CONST
 															  strcpy(t, a);
 															  strcat(t, b);
 															  free(a); free(b);
-															  $$ = (int)t; }
-				|	SHELL '(' STR_CONST ')'					{ $$ = (int)strdup(getenv((char *)$3)); }
+															  $$ = (addr_t)t; }
+				|	SHELL '(' STR_CONST ')'					{ $$ = (addr_t)strdup(getenv((char *)$3)); }
 				|	FORMAT '(' fmt ')'						{ $$ = $3; }
 				;
 
-fmt				:	STR_CONST ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3); $$ = (int)strdup(b); }
-				|	STR_CONST ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5); $$ = (int)strdup(b); }
-				|	STR_CONST ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7); $$ = (int)strdup(b); }
-				|	STR_CONST ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9); $$ = (int)strdup(b); }
-				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11); $$ = (int)strdup(b); }
-				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11, $13); $$ = (int)strdup(b); }
-				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11, $13, $15); $$ = (int)strdup(b); }
-				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11, $13, $15, $17); $$ = (int)strdup(b); }
-				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11, $13, $15, $17, $19); $$ = (int)strdup(b); }
-				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11, $13, $15, $17, $19, $21); $$ = (int)strdup(b); }
+fmt				:	STR_CONST ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3); $$ = (addr_t)strdup(b); }
+				|	STR_CONST ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5); $$ = (addr_t)strdup(b); }
+				|	STR_CONST ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7); $$ = (addr_t)strdup(b); }
+				|	STR_CONST ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9); $$ = (addr_t)strdup(b); }
+				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11); $$ = (addr_t)strdup(b); }
+				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11, $13); $$ = (addr_t)strdup(b); }
+				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11, $13, $15); $$ = (addr_t)strdup(b); }
+				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11, $13, $15, $17); $$ = (addr_t)strdup(b); }
+				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11, $13, $15, $17, $19); $$ = (addr_t)strdup(b); }
+				|	STR_CONST ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg ',' farg						{ char b[1024]; sprintf(b, (char *)$1, $3, $5, $7, $9, $11, $13, $15, $17, $19, $21); $$ = (addr_t)strdup(b); }
 				;
 
 farg			:	STR_CONST

@@ -34,12 +34,12 @@ public:
 #pragma export on
 #endif
 extern "C" {
-long perform_edit(MTextAddOn *addon);
+status_t perform_edit(MTextAddOn *addon);
 }
 #if !__INTEL__
 #pragma export reset
 #endif
 
-typedef long (*perform_edit_func)(MTextAddOn *addon);
+typedef status_t (*perform_edit_func)(MTextAddOn *addon);
 
 #endif

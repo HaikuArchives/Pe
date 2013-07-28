@@ -295,10 +295,10 @@ static const char *skip(const char *txt)
 	return txt;
 } // skip
 
-static bool InternalBalance(CLanguageProxy& proxy, int& start, int& end)
+static bool InternalBalance(CLanguageProxy& proxy, int32& start, int32& end)
 {
 	const char *txt = proxy.Text(), *et;
-	int size = proxy.Size();
+	int32 size = proxy.Size();
 
 	if (start < 0 || start > end || end > size)
 		return false;
@@ -324,7 +324,7 @@ static bool InternalBalance(CLanguageProxy& proxy, int& start, int& end)
 	char ec = 0, oc = 0;
 	stack<int> *s = NULL;
 
-	int db, dsb, dp;
+	int32 db, dsb, dp;
 
 	db = bls.empty() ? -1 : start - bls.top();
 	dsb = sbls.empty() ? -1 : start - sbls.top();
@@ -356,7 +356,7 @@ static bool InternalBalance(CLanguageProxy& proxy, int& start, int& end)
 
 	if (ec)
 	{
-		int l = 1;
+		int32 l = 1;
 
 		while (*txt)
 		{
@@ -383,7 +383,7 @@ static bool InternalBalance(CLanguageProxy& proxy, int& start, int& end)
 	return false;
 } /* InternalBalance */
 
-bool CLanguageInterface::Balance(PText& text, int& start, int& end)
+bool CLanguageInterface::Balance(PText& text, int32& start, int32& end)
 {
 	try
 	{
@@ -404,8 +404,8 @@ void CLanguageInterface::Balance(PText& text)
 {
 	try
 	{
-		int start = std::min(text.Anchor(), text.Caret());
-		int end = std::max(text.Anchor(), text.Caret());
+		int32 start = std::min(text.Anchor(), text.Caret());
+		int32 end = std::max(text.Anchor(), text.Caret());
 
 		if (! Balance(text, start, end))
 			THROW((0));
@@ -426,8 +426,8 @@ void CLanguageInterface::Balance(PText& text)
 	}
 } /* CLanguageInterface::Balance */
 
-void CLanguageInterface::ColorLine(const char *text, int size, int& state,
-		int *starts, rgb_color *colors)
+void CLanguageInterface::ColorLine(const char *text, int32 size, int32& state,
+		int32 *starts, rgb_color *colors)
 {
 	try
 	{
@@ -463,19 +463,19 @@ void CLanguageInterface::ScanForFunctions(PText& text, CFunctionScanHandler& han
 	}
 } /* CLanguageInterface::ScanForFunctions */
 
-int CLanguageInterface::FindNextWord(PText& text, int offset, int& mlen)
+int32 CLanguageInterface::FindNextWord(PText& text, int32 offset, int32& mlen)
 {
 	try
 	{
 		if (fFindNextWord)
 		{
-			int line = text.Offset2Line(offset);
-			int size;
+			int32 line = text.Offset2Line(offset);
+			int32 size;
 
 			if (line >= text.LineCount() - 1)
-				size = std::min(text.Size() - offset, 1024);
+				size = std::min(text.Size() - offset, (int32)1024);
 			else
-				size = std::min(text.LineStart(line + 1) - offset, 1024);
+				size = std::min(text.LineStart(line + 1) - offset, (int32)1024);
 
 			CAlloca txt(size + 1);
 			text.TextBuffer().Copy(txt, offset, size);
@@ -491,8 +491,8 @@ int CLanguageInterface::FindNextWord(PText& text, int offset, int& mlen)
 		}
 		else
 		{
-			int mark = offset, i = offset;
-			int unicode, state, len, iLen;
+			int32 mark = offset, i = offset;
+			int32 unicode, state, len, iLen;
 
 			state = 1;
 			mlen = 0;
@@ -502,7 +502,7 @@ int CLanguageInterface::FindNextWord(PText& text, int offset, int& mlen)
 			{
 				text.TextBuffer().CharInfo(i, unicode, len);
 
-				int cl = 0;
+				int32 cl = 0;
 
 				if (unicode == '\n')
 					cl = 3;
@@ -561,7 +561,7 @@ int CLanguageInterface::FindNextWord(PText& text, int offset, int& mlen)
 	return offset;
 } /* CLanguageInterface::FindNextWord */
 
-CLanguageInterface* CLanguageInterface::NextIntf(int& cookie)
+CLanguageInterface* CLanguageInterface::NextIntf(int32& cookie)
 {
 	if (cookie >= 0 && cookie < fInterfaces.size())
 		return fInterfaces[cookie++];
@@ -605,7 +605,7 @@ void CLanguageInterface::ChooseDefault()
 	}
 } /* CLanguageInterface::ChooseDefault */
 
-int CLanguageInterface::GetIndex(const CLanguageInterface* intf)
+int32 CLanguageInterface::GetIndex(const CLanguageInterface* intf)
 {
 	vector<CLanguageInterface*>::iterator i = find(fInterfaces.begin(), fInterfaces.end(), intf);
 	if (i == fInterfaces.end())
@@ -627,7 +627,7 @@ CLanguageInterface* CLanguageInterface::FindByName(const char *language)
 	return sDefault;
 } // CLanguageInterface::FindByName
 
-int CLanguageInterface::AddToCurrentKeyword(int ch, int state)
+int32 CLanguageInterface::AddToCurrentKeyword(int32 ch, int32 state)
 {
 	if (state > 0 && state <= kKeywordBufSize) {
 		fKeywordBuf[state-1] = ch;
@@ -636,7 +636,7 @@ int CLanguageInterface::AddToCurrentKeyword(int ch, int state)
 	return 0;
 }
 
-int CLanguageInterface::LookupCurrentKeyword(int state, int32 inSets) const
+int32 CLanguageInterface::LookupCurrentKeyword(int32 state, int32 inSets) const
 {
 	if (state < 2)
 		return 0;
@@ -645,7 +645,7 @@ int CLanguageInterface::LookupCurrentKeyword(int state, int32 inSets) const
 	return LookupKeyword(word, inSets);
 }
 
-int CLanguageInterface::LookupKeyword(const BString& word, int32 inSets) const
+int32 CLanguageInterface::LookupKeyword(const BString& word, int32 inSets) const
 {
 	if (!fHaveParsedKeywords) {
 		// do lazy loading of keywords-info:
@@ -666,7 +666,7 @@ int CLanguageInterface::LookupKeyword(const BString& word, int32 inSets) const
 		}
 		else
 		{
-			int bit;
+			int32 bit;
 			//int ret=0;
 			do {
 				bit = 1 << (iter->second-1);
@@ -814,7 +814,7 @@ CFunctionScanHandler::~CFunctionScanHandler()
 } // CFunctionScanHandler::~CFunctionScanHandler()
 
 void CFunctionScanHandler::AddFunction(const char *name, const char *match,
-	int offset, bool italic, uint32 nestLevel, const char *params)
+	int32 offset, bool italic, uint32 nestLevel, const char *params)
 {
 } // CFunctionScanHandler::AddFunction
 

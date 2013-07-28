@@ -643,17 +643,17 @@ RunPopUpMenu(BPoint where, BString &header, BString &fileName,
 
 
 #if __INTEL__
-	extern "C" _EXPORT long perform_edit(MTextAddOn *addon);
+	extern "C" _EXPORT status_t perform_edit(MTextAddOn *addon);
 #else
 #	pragma export on
 	extern "C"
-		long perform_edit(MTextAddOn *addon);
+		status_t perform_edit(MTextAddOn *addon);
 #	pragma export reset
 #endif
 
-long perform_edit(MTextAddOn *addon)
+status_t perform_edit(MTextAddOn *addon)
 {
-	long result = B_OK;
+	status_t result = B_OK;
 	entry_ref headerFile;
 	BPoint where(0,0);
 

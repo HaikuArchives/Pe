@@ -37,6 +37,7 @@
 #include "HDefines.h"
 #include "HDialogViews.h"
 
+#include <MenuItem.h>
 
 #pragma mark - HDlogView
 

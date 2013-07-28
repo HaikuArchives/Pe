@@ -48,7 +48,7 @@ CCaptureFilter::CCaptureFilter()
 
 filter_result CCaptureFilter::Filter(BMessage *msg, BHandler **target)
 {
-	long key, modifiers;
+	int32 key, modifiers;
 	filter_result result = B_DISPATCH_MESSAGE;
 
 	if (msg->FindInt32("modifiers", &modifiers) == B_OK &&
