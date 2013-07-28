@@ -70,7 +70,7 @@ public:
 		int fOne, fTwo;
 };
 
-const unsigned long
+const uint32
 	msg_ChangeTarget = 'ChTr',
 	msg_DefPageSetup = 'Page',
 	msg_StoreSuffix = 'sufx',
@@ -730,9 +730,7 @@ void CPrefsDialog::GetDefPageSetup()
 
 void CPrefsDialog::MessageReceived(BMessage *msg)
 {
-	long what = msg->what;
-
-	switch (what)
+	switch (msg->what)
 	{
 		case msg_ReloadGlossary:
 			delete gGlossary;
@@ -853,7 +851,7 @@ void CPrefsDialog::InitKeybindingPage()
 
 	while (true)
 	{
-		long cnt, cmd;
+		int32 cnt, cmd;
 		char s[256];
 		const char *name;
 
