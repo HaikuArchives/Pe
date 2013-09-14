@@ -52,7 +52,7 @@ struct KeyShortcut
 	inline bool operator==(const KeyShortcut& ks) const;
 };
 
-typedef std::map<KeyShortcut,int> keymap;
+typedef std::map<KeyShortcut,int32> keymap;
 
 class CKeyMapper
 {

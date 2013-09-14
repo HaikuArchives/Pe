@@ -266,7 +266,7 @@ void CKeyMapper::WriteKeymap(keymap& kmap)
 
 	FailOSErr(gPrefsDir.CreateFile("keybindings", &file));
 
-	file << kmap.size();
+	file << int32(kmap.size());
 
 	keymap::iterator ki;
 	for (ki = kmap.begin(); ki != kmap.end(); ki++)
