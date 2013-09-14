@@ -188,13 +188,13 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 			
 			while (t--)
 			{
-				short modifiers;
+				int16 modifiers;
 				char rawchar, key;
-				long cmd;
+				int32 cmd;
 			
 				buf >> modifiers >> rawchar >> key;
 				
-				long k = (modifiers << 16) | key;
+				int32 k = (modifiers << 16) | key;
 				b << k;
 				buf >> modifiers >> rawchar >> key;
 				k = (modifiers << 16) | key;
