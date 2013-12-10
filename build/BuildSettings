@@ -43,7 +43,12 @@ if $(OS) = HAIKU {
 }
 
 # check for pcre...
-local haveHeadersPcre = [ GLOB /boot/common/develop/headers : pcre.h ] ;
+local haveHeadersPcre = [
+	GLOB /boot/system/non-packaged/develop/headers
+		/boot/system/develop/headers
+		/boot/home/config/non-packaged/develop/headers
+		/boot/home/config/develop/headers
+		: pcre.h ] ;
 if ! $(haveHeadersPcre) {
 	Exit "You need to have pcre installed on your system." ;
 }
