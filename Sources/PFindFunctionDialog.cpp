@@ -175,7 +175,7 @@ PFindFunctionDialogController::FilterChoiceDialogAborted(
 // AddFunction
 void
 PFindFunctionDialogController::AddFunction(const char *name, const char *match,
-	int offset, bool italic, uint32 nestLevel, const char *params)
+	int32 offset, bool italic, uint32 nestLevel, const char *params)
 {
 	Choice *choice = new(std::nothrow) Choice(name, msg_JumpToProcedure, false,
 		italic, nestLevel);
