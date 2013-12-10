@@ -55,6 +55,9 @@
 %{
 #include "CLanguageAddOn.h"
 
+#include <PathFinder.h>
+#include <StringList.h>
+
 static const int kMaxNameLength = 70;
 
 static const char *gBuf = NULL;
@@ -213,22 +216,13 @@ static status_t GetLoutDirectory(const char* subDir, BPath& path)
 
 	if (kLoutDir == NULL || !PathExists(path))
 	{
-		if (find_directory(B_USER_CONFIG_DIRECTORY, &path) == B_OK)
-		{
-			path.Append("etc/lout");
-			path.Append(subDir);
-		}
+		BStringList paths;
+		status_t error = BPathFinder::FindPaths(B_FIND_PATH_ETC_DIRECTORY,
+			"lout", B_FIND_PATH_EXISTING_ONLY, paths);
+		if (error != B_OK)
+			return error;
 
-		if (!PathExists(path))
-		{
-			if (find_directory(B_COMMON_ETC_DIRECTORY, &path) == B_OK)
-			{
-				path.Append("lout");
-				path.Append(subDir);
-			}
-			if (!PathExists(path))
-				return B_ENTRY_NOT_FOUND;
-		}
+		return path.SetTo(paths.StringAt(0));
 	}
 
 	return B_OK;

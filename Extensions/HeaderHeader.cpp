@@ -300,7 +300,7 @@ GetSettingsDir(BDirectory &dir, BPath &path)
 	//BPath path;
 	status_t err;
 	// TODO: build list from text files
-	err = find_directory(B_COMMON_SETTINGS_DIRECTORY, &path, true);
+	err = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
 	if (err < B_OK)
 		return err;
 	dir.SetTo(path.Path());

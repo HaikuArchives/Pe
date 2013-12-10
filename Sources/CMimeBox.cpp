@@ -70,24 +70,21 @@ CMimeItem::CMimeItem(const char *mime)
 	{
 		try
 		{
+			BDirectory tmpdir;
+			FailOSErr(tmpdir.SetTo("/tmp"));
+
+			time_t t;
+			time(&t);
 			char p[PATH_MAX];
-			if (find_directory(B_COMMON_TEMP_DIRECTORY, 0, true, p, PATH_MAX) == B_OK)
-			{
-				BDirectory tmpdir;
-				FailOSErr(tmpdir.SetTo(p));
+			sprintf(p, "tmp.pe_is_looking_for_a_mime_icon:%" B_PRId32, t);
 
-				time_t t;
-				time(&t);
-				sprintf(p, "tmp.pe_is_looking_for_a_mime_icon:%" B_PRId32, t);
+			BFile f;
+			FailOSErr(tmpdir.CreateFile(p, &f));
 
-				BFile f;
-				FailOSErr(tmpdir.CreateFile(p, &f));
-
-				BNodeInfo ni;
-				FailOSErr(ni.SetTo(&f));
-				FailOSErr(ni.SetType(mime));
-				FailOSErr(ni.GetTrackerIcon(&bm, B_MINI_ICON));
-			}
+			BNodeInfo ni;
+			FailOSErr(ni.SetTo(&f));
+			FailOSErr(ni.SetType(mime));
+			FailOSErr(ni.GetTrackerIcon(&bm, B_MINI_ICON));
 		}
 		catch (HErr& e) { }
 	}
