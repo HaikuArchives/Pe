@@ -146,6 +146,14 @@ PeLanguage PythonExt
 # </pe-src>
 
 # <pe-src>
+PeLanguage RecipeExt
+	: Recipe_Language.cpp
+	: be
+	: keywords.recipe.rsrc
+	;
+# </pe-src>
+
+# <pe-src>
 PeLanguage RezExt 
 	: Rez_Language.cpp Rez_Popup.l 
 	: be 

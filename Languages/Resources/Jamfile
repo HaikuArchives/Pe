@@ -20,6 +20,7 @@ RezObjects
 	keywords.pl.r
 	keywords.py.r
 	keywords.rb.r
+	keywords.recipe.r
 	keywords.rez.r
 	keywords.sh.r
 	keywords.sql.r
