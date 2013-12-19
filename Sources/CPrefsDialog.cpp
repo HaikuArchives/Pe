@@ -258,7 +258,14 @@ bool CPrefsDialog::OkClicked()
 
 	fFontSize = atof(GetText(pnm_Edi_T_Font1Size));
 
+	if( fFontSize <= 4.0 )
+	{
+		SetText(pnm_Edi_T_Font1Size,"5");
+		fFontSize = 5.0;
+	}
+
 	item = fAltFont->FindMarked();
+
 	if (item)
 	{
 		strcpy(fAltFontFamily, item->Label());
@@ -267,6 +274,11 @@ bool CPrefsDialog::OkClicked()
 	}
 
 	fAltFontSize = atof(GetText(pnm_Edi_T_Font2Size));
+	if( fAltFontSize <= 4.0 )
+	{
+		SetText(pnm_Edi_T_Font2Size,"5");
+		fAltFontSize = 5.0;
+	}
 
 	CntrlGetColor(pnm_Col_C_Low,				kColorLow,				prf_C_Low);
 	CntrlGetColor(pnm_Col_C_Text,				kColorText,				prf_C_Text);
