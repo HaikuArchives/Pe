@@ -1,4 +1,4 @@
-pe
+Pe
 ==
 
 Pe is a programmer's editor for Haiku.
