@@ -77,7 +77,7 @@
 #include "Scripting.h"
 #include "Utils.h"
 
-static vint32 sDocCount = 0;
+static int32 sDocCount = 0;
 
 const float
 	kStatusWidth = 80;

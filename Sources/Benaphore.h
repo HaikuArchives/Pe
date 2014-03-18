@@ -46,7 +46,7 @@ public:
 
 private:
 	sem_id fSemID;
-	vint32 fCount;
+	int32 fCount;
 };
 
 class StBenaphore {
