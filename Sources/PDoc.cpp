@@ -566,13 +566,15 @@ void PDoc::OpenInclude(const char *incl)
 				char *pe = strchr(p, ';');
 				if (pe) *pe = 0;
 
-				FailOSErr(d.SetTo(p));
-				if (d.Contains(incl, B_FILE_NODE | B_SYMLINK_NODE))
+				if (d.SetTo(p) == B_OK)
 				{
-					FailOSErr(d.FindEntry(incl, &e, true));
-					if (!e.IsFile()) THROW((0));
-					FailOSErr(e.GetRef(&doc));
-					found = true;
+					if (d.Contains(incl, B_FILE_NODE | B_SYMLINK_NODE))
+					{
+						FailOSErr(d.FindEntry(incl, &e, true));
+						if (!e.IsFile()) THROW((0));
+						FailOSErr(e.GetRef(&doc));
+						found = true;
+					}
 				}
 
 				p = (pe && pe[1]) ? pe + 1 : NULL;
