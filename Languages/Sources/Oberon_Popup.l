@@ -49,7 +49,7 @@ static bool inString;
 #undef ECHO
 #define ECHO
 
-static void GetNextChar(char *tok, int& result, int max);
+static void GetNextChar(char *tok, yy_size_t& result, int max);
 static void AddFunction(CLanguageProxy& proxy, int level);
 static void AddPrototype(CLanguageProxy& proxy);
 static void AddInclude(CLanguageProxy& proxy);
@@ -105,7 +105,7 @@ _EXPORT void ScanForFunctions(CLanguageProxy& proxy)
 	}
 } /* ScanForFunctions */
 
-void GetNextChar(char *tok, int& result, int max)
+void GetNextChar(char *tok, yy_size_t& result, int max)
 {
 	int c = gBuf[gIndx++];
 	
@@ -122,7 +122,7 @@ void GetNextChar(char *tok, int& result, int max)
 			space++;
 		}
 		
-		result = max = std::min(max, space);
+		result = yy_size_t(max = std::min(max, space));
 		gIndx += 2;
 
 		while (max--)
@@ -131,7 +131,7 @@ void GetNextChar(char *tok, int& result, int max)
 		return;
 	}
 
-	result = (gIndx < gBufSize) ? (tok[0] = c, 1) : YY_NULL;
+	result = yy_size_t((gIndx < gBufSize) ? (tok[0] = c, 1) : YY_NULL);
 } /* GetNextChar */
 
 static void AddFunction(CLanguageProxy& proxy, int nesting)

@@ -51,7 +51,7 @@ static int gBufSize;
 #undef ECHO
 #define ECHO
 
-static void GetNextChar(char *tok, int& result, int max);
+static void GetNextChar(char *tok, yy_size_t& result, int max);
 static void Add(int level, CLanguageProxy& proxy, int hasOptional);
 %}
 
@@ -95,11 +95,11 @@ _EXPORT void ScanForFunctions(CLanguageProxy& proxy)
 	}
 } /* ScanForFunctions */
 
-void GetNextChar(char *tok, int& result, int)
+void GetNextChar(char *tok, yy_size_t& result, int)
 {
 	int c = gBuf[gIndx++];
 	
-	result = (gIndx < gBufSize) ? (tok[0] = c, 1) : YY_NULL;
+	result = yy_size_t((gIndx < gBufSize) ? (tok[0] = c, 1) : YY_NULL);
 } /* GetNextChar */
 
 static void Add(int level, CLanguageProxy& proxy, int hasOptional)
