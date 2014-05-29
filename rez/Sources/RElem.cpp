@@ -97,7 +97,7 @@ void RElem::Write()
 
 void RElem::Write(RElem *head, BPositionIO& stream)
 {
-	if (verbose >= 2) printf("Writing %" B_PRIuADDR ", this: %p, next: %p\n", fType, this, fNext);
+	if (verbose >= 2) printf("Writing %d, this: %p, next: %p\n", fType, this, fNext);
 	switch (fType)
 	{
 		case relEval:

@@ -187,11 +187,6 @@ void RelativePath(const BPath& pa, const BPath& pb, char* path)
 	s = sa = pa.Path();
 	sb = pb.Path();
 	
-	int ma, mb;
-	
-	ma = strrchr(sa, '/') - sa;
-	mb = strrchr(sb, '/') - sb;
-	
 	while (*sa == *sb)
 	{
 		sa++;

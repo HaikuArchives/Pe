@@ -170,7 +170,7 @@ RState* RSStringValue::Shift(addr_t v, int32 token, RElem** head)
 	if (t == tString || t == tRaw)
 	{
 		const char *s = (char *)v;
-		int32 l;
+		addr_t l;
 		char *p;
 
 		if (fKind == skHex)
@@ -178,7 +178,7 @@ RState* RSStringValue::Shift(addr_t v, int32 token, RElem** head)
 		else
 			l = strlen(s);
 
-		int32 size = l;
+		addr_t size = l;
 		if (fSize > l) size = fSize;
 
 		p = (char *)malloc(size + 2);
