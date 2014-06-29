@@ -22,7 +22,8 @@ resource file_types message {
 	"types" = "text/x-vnd.Hekkel-Pe-Group",
 	"types" = "text/x-makefile",
 	"types" = "text/x-rez",
-	"types" = "text/x-jamfile"
+	"types" = "text/x-jamfile",
+	"types" = "application/xhtml+xml"
 };
 
 resource vector_icon array {
