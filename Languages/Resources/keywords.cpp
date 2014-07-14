@@ -1,7 +1,7 @@
 -Pe-Keywords-Language-
 #define #else #elif #endif #error #if #ifdef #ifndef #include #pragma
-#undef asm auto bool break case catch char class const const_cast 
-const_iterator
+#undef #warning
+asm auto bool break case catch char class const const_cast const_iterator
 continue default delete do double dynamic_cast else enum extern false float 
 for friend goto if inherited inline int iterator
 long mutable namespace new 
