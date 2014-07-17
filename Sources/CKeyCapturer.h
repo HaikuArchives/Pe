@@ -49,7 +49,7 @@ virtual	void AttachedToWindow();
 virtual	void MouseDown(BPoint where);
 			
 virtual	void Draw(BRect update);
-virtual	void FilterKeyDown(unsigned long modifiers, unsigned long key);
+virtual	void FilterKeyDown(unsigned long modifiers, unsigned long key, unsigned long rawchar);
 			
 			void SetShortcut(const KeyShortcut& ks);
 			const KeyShortcut& Shortcut() const;

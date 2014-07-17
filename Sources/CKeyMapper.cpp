@@ -75,6 +75,60 @@ void CKeyMapper::InitKeymap()
 	}	
 } /* CKeyMapper::CKeyMapper */
 
+int CKeyMapper::FindCommand(int modcode, int rawchar, int key, bool checkPrefix)
+{
+	KeyShortcut ks;
+	int keycode;
+
+	if (fPrefix && checkPrefix)
+		ks.prefix = fPrefix;
+
+	keycode = (rawchar << 24) | (modcode << 16);
+	ks.combo = keycode;
+	if (fKeybindings.find(ks) != fKeybindings.end())
+		return fKeybindings[ks];
+
+	keycode = (rawchar << 24) | (modcode << 16) | key;
+	ks.combo = keycode;
+	if (fKeybindings.find(ks) != fKeybindings.end())
+		return fKeybindings[ks];
+
+	keycode = (modcode << 16) | key;
+	ks.combo = keycode;
+	if (fKeybindings.find(ks) != fKeybindings.end())
+		return fKeybindings[ks];
+
+	return 1;
+} /* CKeyMapper::FindCommand */
+
+bool CKeyMapper::GetPrefix(int modcode, int rawchar, int key, int* keyc)
+{
+	int keycode;
+
+	keycode = (rawchar << 24) | (modcode << 16);
+	if (fPrefixSet.count(keycode))
+	{
+		*keyc = keycode;
+		return true;
+	}
+
+	keycode = (rawchar << 24) | (modcode << 16) | key;
+	if (fPrefixSet.count(keycode))
+	{
+		*keyc = keycode;
+		return true;
+	}
+
+	keycode = (modcode << 16) | key;
+	if (fPrefixSet.count(keycode))
+	{
+		*keyc = keycode;
+		return true;
+	}
+
+	return false;
+} /* CKeyMapper::GetPrefix */
+
 int CKeyMapper::GetCmd(PText *txt, int modifiers, int rawchar, int key)
 {
 	int modcode = (modifiers & MODIFIERMASK);
@@ -90,10 +144,9 @@ int CKeyMapper::GetCmd(PText *txt, int modifiers, int rawchar, int key)
 		// default behaviour, we don't care about B_NUM_LOCK:
 		modcode = (modifiers & MODIFIERMASK);
 	
-	int keycode = (modcode << 16) | key;
-	KeyShortcut ks;
+	int keycode = (rawchar << 24) | (modcode << 16) | key;
 	int cmd = msg_Nothing;
-	
+
 	if (txt && txt->IsIncSearching() && rawchar == B_ESCAPE)
 		; // pass this on
 	else if (txt && fNrArgument)
@@ -108,31 +161,22 @@ int CKeyMapper::GetCmd(PText *txt, int modifiers, int rawchar, int key)
 		else
 			beep();
 	}
-	else if (fPrefix)
-	{
-		ks.prefix = fPrefix;
-		ks.combo = keycode;
-		fPrefix = 0;
-
-		if (fKeybindings.find(ks) != fKeybindings.end())
-			cmd = fKeybindings[ks];
-		else
-		{
-			beep();
-			cmd = msg_Nothing;
-		}
-	}
 	else
 	{
-		ks.prefix = 0;
-		ks.combo = keycode;
-		
-		if (fPrefixSet.count(keycode))
-			fPrefix = keycode;
-
-		if (fKeybindings.count(ks))
-			cmd = fKeybindings[ks];
-		
+		int command;
+		if(fPrefix)
+		{
+			command = FindCommand(modcode, rawchar, key, true);
+			fPrefix = 0;
+		}
+		else
+		{
+			if(GetPrefix(modcode, rawchar, key, &keycode))
+				fPrefix = keycode;
+			command = FindCommand(modcode, rawchar, key, false);
+		}
+		if (command != 1)
+			cmd = command;
 		if (cmd == kmsg_NrArgument)
 		{
 			fNrArgument = true;
@@ -194,10 +238,10 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 			
 				buf >> modifiers >> rawchar >> key;
 				
-				int32 k = (modifiers << 16) | key;
+				int32 k = (rawchar << 24) | (modifiers << 16) | key;
 				b << k;
 				buf >> modifiers >> rawchar >> key;
-				k = (modifiers << 16) | key;
+				k = (rawchar << 24) | (modifiers << 16) | key;
 				b << k;
 				
 				buf >> cmd;

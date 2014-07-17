@@ -260,8 +260,10 @@ type rtyp_Bind {
 			Ctrl	= 0x0004,
 			Opt		= 0x0040,
 			Menu	= 0x0080;						// Modifiers
-		char = 0;									// Raw Character
-		char;										// Keycode
+		char
+			B_ESCAPE		= 0x1b,
+			B_FUNCTION_KEY	= 0x10;					// Raw Character
+		char = 0;									// Keycode
 
 		// The Prefix for this combination
 		integer
@@ -270,8 +272,10 @@ type rtyp_Bind {
 			Ctrl	= 0x0004,
 			Opt		= 0x0040,
 			Menu	= 0x0080;						// Modifiers
-		char = 0;									// Raw Character
-		char;										// Keycode
+		char
+			B_ESCAPE		= 0x1b,
+			B_FUNCTION_KEY	= 0x10;					// Raw Character
+		char = 0;									// Keycode
 
 		// The command
 		longint;									// Command

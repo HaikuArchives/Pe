@@ -66,6 +66,9 @@ class CKeyMapper
 		return *sfInstance;
 	}
 
+	int FindCommand(int modcode, int rawchar, int key, bool checkPrefix);
+	bool GetPrefix(int modcode, int rawchar, int key, int* keyc);
+
 	int GetCmd(PText *txt, int modifiers, int rawchar, int key);
 
 	void ReadKeymap(keymap& kmap);
@@ -101,6 +104,6 @@ inline bool KeyShortcut::operator==(const KeyShortcut& ks) const
 } /* KeyShortcut::operator== */
 
 #define MODIFIERMASK	(B_CONTROL_KEY | B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY | B_MENU_KEY)
-#define BINDINGMASK ((MODIFIERMASK << 16) | 0x000000ff)
+#define BINDINGMASK ((MODIFIERMASK << 16) | 0xffff00ff)
 
 #endif // CKEYMAPPER_H

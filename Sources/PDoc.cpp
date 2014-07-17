@@ -1797,11 +1797,17 @@ void PDoc::ResetMenuShortcuts()
 			else
 				item = fMBar->FindItem((*ki).second);
 
-			char *ch = charMap + keyMap->normal_map[(*ki).first.combo & 0x00ff];
-			long modifiers = (*ki).first.combo >> 16;
+			char ch = ((*ki).first.combo >> 24) & 0xff;
+			long modifiers = ((*ki).first.combo >> 16) & 0xff;
+			if (ch == 0)
+			{
+				char* count = charMap + keyMap->normal_map[(*ki).first.combo & 0x00ff];
+				if(*count == 1)
+					ch = *(count+1);
+			}
 
-			if (item && *ch++ == 1 && modifiers & B_COMMAND_KEY)
-				item->SetShortcut(toupper(*ch), modifiers);
+			if (item && modifiers & B_COMMAND_KEY)
+				item->SetShortcut(toupper(ch), modifiers);
 		}
 	}
 } /* PDoc::ResetMenuShortcuts */
