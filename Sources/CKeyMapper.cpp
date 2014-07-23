@@ -164,14 +164,14 @@ int CKeyMapper::GetCmd(PText *txt, int modifiers, int rawchar, int key)
 	else
 	{
 		int command;
-		if(fPrefix)
+		if (fPrefix)
 		{
 			command = FindCommand(modcode, rawchar, key, true);
 			fPrefix = 0;
 		}
 		else
 		{
-			if(GetPrefix(modcode, rawchar, key, &keycode))
+			if (GetPrefix(modcode, rawchar, key, &keycode))
 				fPrefix = keycode;
 			command = FindCommand(modcode, rawchar, key, false);
 		}

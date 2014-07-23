@@ -1802,7 +1802,7 @@ void PDoc::ResetMenuShortcuts()
 			if (ch == 0)
 			{
 				char* count = charMap + keyMap->normal_map[(*ki).first.combo & 0x00ff];
-				if(*count == 1)
+				if (*count == 1)
 					ch = *(count+1);
 			}
 
