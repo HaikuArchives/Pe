@@ -230,9 +230,11 @@ void CFtpStream::Retrieve()
 	Automaton(1);
 } /* CFtpStream::Retrieve */
 
-void CFtpStream::Flush()
+status_t CFtpStream::Flush()
 {
 	Automaton(2);
+	
+	return B_OK;
 } /* CFtpStream::Flush */
 
 void CFtpStream::Automaton(int action)

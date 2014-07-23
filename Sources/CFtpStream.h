@@ -76,7 +76,7 @@ virtual	ssize_t WriteAt(off_t pos, const void *buffer, size_t size);
 virtual	off_t Seek(off_t position, uint32 seek_mode);
 virtual	off_t Position() const;
 
-			void Flush();
+			status_t Flush();
 			void Retrieve();
 
 protected:
