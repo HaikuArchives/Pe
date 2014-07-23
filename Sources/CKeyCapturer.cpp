@@ -48,16 +48,18 @@ CCaptureFilter::CCaptureFilter()
 
 filter_result CCaptureFilter::Filter(BMessage *msg, BHandler **target)
 {
-	int32 key, modifiers;
+	int32 key, modifiers, rawchar;
 	filter_result result = B_DISPATCH_MESSAGE;
 
 	if (msg->FindInt32("modifiers", &modifiers) == B_OK &&
-		msg->FindInt32("key", &key) == B_OK)
+		msg->FindInt32("key", &key) == B_OK &&
+		msg->FindInt32("raw_char", &rawchar) == B_OK)
 	{
+
 		CKeyCapturer *capt = dynamic_cast<CKeyCapturer*>(*target);
 		if (capt)
 		{
-			capt->FilterKeyDown(modifiers, key);
+			capt->FilterKeyDown(modifiers, key, rawchar);
 			result = B_SKIP_MESSAGE;
 		}
 	}
@@ -124,16 +126,21 @@ void CKeyCapturer::Draw(BRect)
 	SetHighColor(kBlack);
 } /* CKeyCapturer::Draw */
 
-void CKeyCapturer::FilterKeyDown(unsigned long modifiers, unsigned long key)
+void CKeyCapturer::FilterKeyDown(unsigned long modifiers, unsigned long key, unsigned long rawchar)
 {
 	if (fKS.prefix)
 		fKS.prefix = 0;
 	else
 		fKS.prefix = fKS.combo;
 
-	fKS.combo = (modifiers << 16) | key;
+	fKS.combo = (rawchar << 24) | (modifiers << 16);
 
-	Draw(Bounds());
+	if (rawchar == 0 || rawchar == B_FUNCTION_KEY)
+	{
+		fKS.combo |= key;
+	}
+
+	Invalidate(Bounds());
 } /* CKeyCapturer::FilterKeyDown */
 
 void CKeyCapturer::MouseDown(BPoint /*where*/)
@@ -175,21 +182,50 @@ void CKeyCapturer::DescribeKeys(const KeyShortcut& ks, char *desc)
 		if (keys[i] & (B_OPTION_KEY << 16))		strcat(desc, "Opt-");
 		if (keys[i] & (B_MENU_KEY << 16))			strcat(desc, "Menu-");
 		if (keys[i] & (B_NUM_LOCK << 16))		strcat(desc, "Numlock-");
-		
+
+		char key[2];
+		key[0] = (char)((keys[i] >> 24) & 0xFF);
+		key[1] = 0;
+		if (isalpha(key[0]))
+			key[0] = toupper(key[0]);
+		if (isprint(key[0]))
+			strcat(desc, key);
+		else
+			switch (key[0])
+			{
+				case B_BACKSPACE:		strcat(desc, "Backspace");	break;
+				case B_TAB:				strcat(desc, "Tab");		break;
+				case B_ENTER:			strcat(desc, "Enter");		break;
+				case B_SPACE:			strcat(desc, "Space");		break;
+				case B_ESCAPE:			strcat(desc, "Escape");		break;
+				case B_INSERT:			strcat(desc, "Insert");		break;
+				case B_HOME:			strcat(desc, "Home");		break;
+				case B_PAGE_UP:			strcat(desc, "Page up");	break;
+				case B_DELETE:			strcat(desc, "Delete");		break;
+				case B_END:				strcat(desc, "End");		break;
+				case B_PAGE_DOWN:		strcat(desc, "Page down");	break;
+				case B_UP_ARROW:		strcat(desc, "Up");			break;
+				case B_LEFT_ARROW:		strcat(desc, "Left");		break;
+				case B_RIGHT_ARROW:		strcat(desc, "Right");		break;
+				case B_DOWN_ARROW:		strcat(desc, "Down");		break;
+				case 0xc8:				strcat(desc, "SysRq");		break;
+				case 0xca:				strcat(desc, "Break");		break;
+			}
+				
 		switch (keys[i] & 0x000000FF)
 		{
 			case 0x26:					strcat(desc, "Tab");			break;
 			case 0x5e:					strcat(desc, "Space");			break;
-			case 0x1e:					strcat(desc, "Backspace");	break;
-			case 0x47:					strcat(desc, "Return");		break;
+			case 0x1e:					strcat(desc, "Backspace");		break;
+			case 0x47:					strcat(desc, "Return");			break;
 			case 0x5b:					strcat(desc, "Enter");			break;
-			case 0x01:					strcat(desc, "Esc");				break;
+			case 0x01:					strcat(desc, "Esc");			break;
 			case 0x61:					strcat(desc, "Left");			break;
 			case 0x63:					strcat(desc, "Right");			break;
 			case 0x57:					strcat(desc, "Up");				break;
 			case 0x62:					strcat(desc, "Down");			break;
-			case 0x1f:					strcat(desc, "Ins");				break;
-			case 0x34:					strcat(desc, "Del");				break;
+			case 0x1f:					strcat(desc, "Ins");			break;
+			case 0x34:					strcat(desc, "Del");			break;
 			case 0x20:					strcat(desc, "Home");			break;
 			case 0x35:					strcat(desc, "End");			break;
 			case 0x21:					strcat(desc, "PgUp");			break;
@@ -218,6 +254,7 @@ void CKeyCapturer::DescribeKeys(const KeyShortcut& ks, char *desc)
 			case 0x5a:					strcat(desc, "KP_PgDn");		break;
 			case 0x64:					strcat(desc, "KP_Ins");			break;
 			case 0x65:					strcat(desc, "KP_Del");			break;
+			case 0x00:													break;
 			default:
 			{								
 											char k[8], *sk, *dk = k;
