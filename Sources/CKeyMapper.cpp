@@ -206,9 +206,9 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 
 	BFile file;
 
-	if (!gPrefsDir.Contains("keybindings"))
+	if (!gPrefsDir.Contains("keybindings-v2"))
 	{
-		FailOSErr(gPrefsDir.CreateFile("keybindings", &file));
+		FailOSErr(gPrefsDir.CreateFile("keybindings-v2", &file));
 
 		int32 resID = rid_Bind_Editing, cnt = 0;
 		BMallocIO b;
@@ -253,10 +253,10 @@ void CKeyMapper::ReadKeymap(keymap& kmap)
 		b << cnt;
 		
 		if (file.Write(b.Buffer(), b.BufferLength()) != b.BufferLength())
-			THROW(("Error writing keybindings"));
+			THROW(("Error writing keybindings-v2"));
 	}
 	else
-		FailOSErr(file.SetTo(&gPrefsDir, "keybindings", B_READ_ONLY));
+		FailOSErr(file.SetTo(&gPrefsDir, "keybindings-v2", B_READ_ONLY));
 	
 	int32 cnt, cmd, size;
 
@@ -300,15 +300,15 @@ void CKeyMapper::WriteKeymap(keymap& kmap)
 {
 	BFile file;
 
-	if (gPrefsDir.Contains("keybindings"))
+	if (gPrefsDir.Contains("keybindings-v2"))
 	{
 		BEntry e;
 		
-		FailOSErr(gPrefsDir.FindEntry("keybindings", &e, true));
+		FailOSErr(gPrefsDir.FindEntry("keybindings-v2", &e, true));
 		FailOSErr(e.Remove());
 	}
 
-	FailOSErr(gPrefsDir.CreateFile("keybindings", &file));
+	FailOSErr(gPrefsDir.CreateFile("keybindings-v2", &file));
 
 	file << int32(kmap.size());
 
