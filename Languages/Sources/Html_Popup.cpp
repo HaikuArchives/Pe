@@ -35,6 +35,7 @@
 
 #include "CLanguageAddOn.h"
 #include <string>
+#include <strings.h>
 
 const long kMaxNameSize = 256;
 

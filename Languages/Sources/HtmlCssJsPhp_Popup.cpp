@@ -39,6 +39,7 @@
 */
 #include <map>
 #include <string>
+#include <strings.h>
 #include <vector>
 #include "CLanguageAddOn.h"
 

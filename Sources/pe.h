@@ -88,13 +88,14 @@
 #include <UTF8.h>
 
 
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <stdio.h>
 
-#include <cstdarg>
-#include <ctime>
-#include <cerrno>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
 
 #include <vector>
 #include <set>
