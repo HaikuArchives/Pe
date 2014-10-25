@@ -33,8 +33,9 @@
 	Created: 12/07/97 22:01:11 by Maarten Hekkelman
 */
 
-#include <cctype>
-#include <cstring>
+#include <ctype.h>
+#include <string.h>
+#include <strings.h>
 #include <stack>
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"

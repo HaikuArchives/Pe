@@ -35,6 +35,7 @@
 
 #include "SymbolTable.h"
 #include <string.h>
+#include <strings.h>
 
 struct Node {
 	Node *left, *right;

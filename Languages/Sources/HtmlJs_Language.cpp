@@ -36,6 +36,8 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
+#include <strings.h>
+
 _EXPORT const char kLanguageName[] = "HTML-JS";
 _EXPORT const char kLanguageExtensions[] = "html;htm";
 _EXPORT const char kLanguageCommentStart[] = "<!";
