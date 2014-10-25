@@ -133,7 +133,7 @@ void CKeyCapturer::FilterKeyDown(unsigned long modifiers, unsigned long key, uns
 	else
 		fKS.prefix = fKS.combo;
 
-	fKS.combo = (rawchar << 24) | (modifiers << 16);
+	fKS.combo = (rawchar << 24) | ((modifiers & 0xFF) << 16);
 
 	if (rawchar == 0 || rawchar == B_FUNCTION_KEY)
 	{
