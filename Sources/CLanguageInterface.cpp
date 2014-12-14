@@ -48,6 +48,7 @@
 #include "Prefs.h"
 #include <algorithm>
 
+#include <Alert.h>
 
 using std::map;
 
@@ -207,6 +208,7 @@ void CLanguageInterface::SetupLanguageInterfaces()
 			if (next > B_ERROR &&
 				(err = get_image_symbol(next, "kLanguageName", B_SYMBOL_TYPE_DATA, (void**)&l)) == B_OK)
 			{
+				(new BAlert("", l, "OK"))->Go();
 				if (strlen(l) > 28) THROW(("Language name too long"));
 				CLanguageInterface *intf = new CLanguageInterface(plug, next);
 				fInterfaces.push_back(intf);
