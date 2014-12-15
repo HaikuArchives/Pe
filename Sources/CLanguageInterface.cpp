@@ -48,7 +48,6 @@
 #include "Prefs.h"
 #include <algorithm>
 #include <strings.h>
-#include <Alert.h>
 
 using std::map;
 
@@ -169,11 +168,11 @@ void AddInterface(char *s, T* i)
 	free(s);
 } /* AddInterface */
 
-bool compareInterfacesByName(const CLanguageInterface *first,
+bool CompareInterfacesByName(const CLanguageInterface *first,
 	const CLanguageInterface *second)
 {
 	return strcasecmp(first->Name(), second->Name()) < 0;
-}
+} /* CompareInterfacesByName */
 
 void CLanguageInterface::SetupLanguageInterfaces()
 {
@@ -214,7 +213,6 @@ void CLanguageInterface::SetupLanguageInterfaces()
 			if (next > B_ERROR &&
 				(err = get_image_symbol(next, "kLanguageName", B_SYMBOL_TYPE_DATA, (void**)&l)) == B_OK)
 			{
-				(new BAlert("", l, "OK"))->Go();
 				if (strlen(l) > 28) THROW(("Language name too long"));
 				CLanguageInterface *intf = new CLanguageInterface(plug, next);
 				fInterfaces.push_back(intf);
@@ -224,7 +222,11 @@ void CLanguageInterface::SetupLanguageInterfaces()
 			}
 		}
 	}
-	std::sort(fInterfaces.begin(), fInterfaces.end(), compareInterfacesByName);
+	
+	// readdir does not guarantee any order of the results, but we want the
+	// languages to appear alphabetically in the drop down menu.
+	std::sort(fInterfaces.begin(), fInterfaces.end(), CompareInterfacesByName);
+
 	ChooseDefault();
 } /* CLanguageInterface::SetupLanguageInterfaces */
 
