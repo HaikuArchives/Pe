@@ -47,7 +47,7 @@
 #include "ResourcesMisc.h"
 #include "Prefs.h"
 #include <algorithm>
-#include <strings.h>
+#include <Collator.h>
 
 using std::map;
 
@@ -68,6 +68,7 @@ public:
 static map<ext, CLanguageInterface*> sInterfaces;
 static CLanguageInterface *sDefault;
 vector<CLanguageInterface*> CLanguageInterface::fInterfaces;
+BCollator collator;
 
 ext::ext()
 {
@@ -171,7 +172,7 @@ void AddInterface(char *s, T* i)
 bool CompareInterfacesByName(const CLanguageInterface *first,
 	const CLanguageInterface *second)
 {
-	return strcasecmp(first->Name(), second->Name()) < 0;
+	return collator.GreaterOrEqual(second->Name(), first->Name(), B_COLLATE_SECONDARY);
 } /* CompareInterfacesByName */
 
 void CLanguageInterface::SetupLanguageInterfaces()
