@@ -48,6 +48,7 @@
 #include "Prefs.h"
 #include <algorithm>
 #include <Collator.h>
+#include <Locale.h>
 
 using std::map;
 
@@ -223,11 +224,13 @@ void CLanguageInterface::SetupLanguageInterfaces()
 			}
 		}
 	}
-	
-	// readdir does not guarantee any order of the results, but we want the
-	// languages to appear alphabetically in the drop down menu.
-	std::sort(fInterfaces.begin(), fInterfaces.end(), CompareInterfacesByName);
 
+	if (BLocale::Default()->GetCollator(&collator) == B_OK)
+	{
+		// readdir does not guarantee any order of the results, but we want the
+		// languages to appear alphabetically in the drop down menu.
+		std::sort(fInterfaces.begin(), fInterfaces.end(), CompareInterfacesByName);
+	}
 	ChooseDefault();
 } /* CLanguageInterface::SetupLanguageInterfaces */
 
