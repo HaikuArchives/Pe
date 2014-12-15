@@ -173,7 +173,7 @@ void AddInterface(char *s, T* i)
 bool CompareInterfacesByName(const CLanguageInterface *first,
 	const CLanguageInterface *second)
 {
-	return collator.GreaterOrEqual(second->Name(), first->Name(), B_COLLATE_SECONDARY);
+	return collator.Greater(second->Name(), first->Name(), B_COLLATE_SECONDARY);
 } /* CompareInterfacesByName */
 
 void CLanguageInterface::SetupLanguageInterfaces()
