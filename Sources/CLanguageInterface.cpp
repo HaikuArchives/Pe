@@ -47,7 +47,7 @@
 #include "ResourcesMisc.h"
 #include "Prefs.h"
 #include <algorithm>
-
+#include <cstring>
 #include <Alert.h>
 
 using std::map;
@@ -169,6 +169,12 @@ void AddInterface(char *s, T* i)
 	free(s);
 } /* AddInterface */
 
+bool compareInterfacesByName(const CLanguageInterface *first,
+	const CLanguageInterface *second)
+{
+	return strcmp(first->Name(), second->Name()) < 0;
+}
+
 void CLanguageInterface::SetupLanguageInterfaces()
 {
 	sDefault = new CLanguageInterface();
@@ -218,7 +224,7 @@ void CLanguageInterface::SetupLanguageInterfaces()
 			}
 		}
 	}
-
+	std::sort(fInterfaces.begin(), fInterfaces.end(), compareInterfacesByName);
 	ChooseDefault();
 } /* CLanguageInterface::SetupLanguageInterfaces */
 
