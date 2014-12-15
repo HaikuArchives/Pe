@@ -47,7 +47,7 @@
 #include "ResourcesMisc.h"
 #include "Prefs.h"
 #include <algorithm>
-#include <cstring>
+#include <strings.h>
 #include <Alert.h>
 
 using std::map;
@@ -172,7 +172,7 @@ void AddInterface(char *s, T* i)
 bool compareInterfacesByName(const CLanguageInterface *first,
 	const CLanguageInterface *second)
 {
-	return strcmp(first->Name(), second->Name()) < 0;
+	return strcasecmp(first->Name(), second->Name()) < 0;
 }
 
 void CLanguageInterface::SetupLanguageInterfaces()
