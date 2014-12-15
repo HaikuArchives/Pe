@@ -47,7 +47,8 @@
 #include "ResourcesMisc.h"
 #include "Prefs.h"
 #include <algorithm>
-
+#include <Collator.h>
+#include <Locale.h>
 
 using std::map;
 
@@ -68,6 +69,7 @@ public:
 static map<ext, CLanguageInterface*> sInterfaces;
 static CLanguageInterface *sDefault;
 vector<CLanguageInterface*> CLanguageInterface::fInterfaces;
+BCollator collator;
 
 ext::ext()
 {
@@ -168,6 +170,12 @@ void AddInterface(char *s, T* i)
 	free(s);
 } /* AddInterface */
 
+bool CompareInterfacesByName(const CLanguageInterface *first,
+	const CLanguageInterface *second)
+{
+	return collator.Greater(second->Name(), first->Name(), B_COLLATE_SECONDARY);
+} /* CompareInterfacesByName */
+
 void CLanguageInterface::SetupLanguageInterfaces()
 {
 	sDefault = new CLanguageInterface();
@@ -217,6 +225,12 @@ void CLanguageInterface::SetupLanguageInterfaces()
 		}
 	}
 
+	if (BLocale::Default()->GetCollator(&collator) == B_OK)
+	{
+		// readdir does not guarantee any order of the results, but we want the
+		// languages to appear alphabetically in the drop down menu.
+		std::sort(fInterfaces.begin(), fInterfaces.end(), CompareInterfacesByName);
+	}
 	ChooseDefault();
 } /* CLanguageInterface::SetupLanguageInterfaces */
 
