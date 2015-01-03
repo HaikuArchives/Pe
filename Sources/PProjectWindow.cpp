@@ -263,24 +263,7 @@ void PProjectWindow::ReadAttr(BFile& file, BMessage& settingsMsg)
 
 void PProjectWindow::GetText(BString& docText) const
 {
-}
-
-void PProjectWindow::Save()
-{
-	StopWatchingFile();
-	try
-	{
-		if (!fPrjFile)
-			THROW(("No project available"));
-
-		fPrjFile->Save();
-		SetDirty(false);
-	}
-	catch (HErr& e)
-	{
-		e.DoError();
-	}
-	StartWatchingFile();
+	fPrjFile->GetText(docText);
 }
 
 void PProjectWindow::WriteAttr(BFile& file, const BMessage& settingsMsg)
