@@ -77,7 +77,6 @@ protected:
 	virtual	const char* DefaultName() const;
 	virtual	void NameChanged();
 
-	virtual void Save();
 	virtual	void ReadAttr(BFile& file, BMessage& settingsMsg);
 	virtual	void WriteAttr(BFile& file, const BMessage& settingsMsg);
 
