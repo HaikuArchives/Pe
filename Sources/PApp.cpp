@@ -443,7 +443,14 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 {
 	try
 	{
-		BNode n(&doc);
+		// Traverse symlinks if necessary
+		BEntry actualEntry(&doc, true);
+		entry_ref actual;
+
+		if (actualEntry.GetRef(&actual) != B_OK)
+			actual = doc;
+
+		BNode n(&actual);
 		char mime[256];
 
 		BNodeInfo ni(&n);
@@ -451,9 +458,9 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 			mime[0] = 0;
 
 		if (gPrefs->GetPrefInt(prf_I_AutodetectProjects, 1)) {
-			if (!strcmp(doc.name, "Jamfile"))
+			if (!strcmp(actual.name, "Jamfile"))
 				ni.SetType("text/x-jamfile");
-			else if (!strcasecmp(doc.name, "Makefile"))
+			else if (!strcasecmp(actual.name, "Makefile"))
 				ni.SetType("text/x-makefile");
 			ni.GetType(mime);
 		}
@@ -461,32 +468,33 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 		if (strcmp(mime, "text/x-vnd.Hekkel-Pe-Group") == 0 ||
 			strcmp(mime, "text/x-pe-group") == 0)
 		{
-			PGroupWindow *w = dynamic_cast<PGroupWindow*>(CDoc::FindDoc(doc));
+			PGroupWindow *w = dynamic_cast<PGroupWindow*>
+				(CDoc::FindDoc(actual));
 			if (w)
 			{
 				if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 					w->SetWorkspaces(1 << current_workspace());
 				if (show)
 					w->Activate(true);
-				return CDoc::FindDoc(doc);
+				return CDoc::FindDoc(actual);
 			}
 			else
-				return new PGroupWindow(&doc);
+				return new PGroupWindow(&actual);
 		}
 		else if (ProjectRoster->IsProjectType(mime))
 		{
-			BWindow *w = dynamic_cast<BWindow*>(CDoc::FindDoc(doc));
+			BWindow *w = dynamic_cast<BWindow*>(CDoc::FindDoc(actual));
 			if (w)
 			{
 				if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 					w->SetWorkspaces(1 << current_workspace());
 				if (show)
 					w->Activate(true);
-				return CDoc::FindDoc(doc);
+				return CDoc::FindDoc(actual);
 			}
 			else
 			{
-				PProjectWindow* prjWin = PProjectWindow::Create(&doc, mime);
+				PProjectWindow* prjWin = PProjectWindow::Create(&actual, mime);
 				if (prjWin && prjWin->InitCheck() == B_OK)
 				{
 					prjWin->Show();
@@ -495,23 +503,23 @@ CDoc* PApp::OpenWindow(const entry_ref& doc, bool show)
 				else
 				{
 					delete prjWin;
-					return gApp->NewWindow(&doc);
+					return gApp->NewWindow(&actual);
 				}
 			}
 		}
 		else
 		{
-			PDoc *d = dynamic_cast<PDoc*>(CDoc::FindDoc(doc));
+			PDoc *d = dynamic_cast<PDoc*>(CDoc::FindDoc(actual));
 			if (d)
 			{
 				if (gPrefs->GetPrefInt(prf_I_SmartWorkspaces, 1))
 					d->SetWorkspaces(1 << current_workspace());
 				if (show)
 					d->Activate(true);
-				return CDoc::FindDoc(doc);
+				return CDoc::FindDoc(actual);
 			}
 			else
-				return NewWindow(&doc, show);
+				return NewWindow(&actual, show);
 		}
 	}
 	catch (HErr& e)
