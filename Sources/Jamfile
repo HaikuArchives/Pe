@@ -16,7 +16,7 @@ SAVED_DEFINES = $(DEFINES) ;
 DEFINES += H_BUILDING_LIBHEKKEL ;
 
 # <pe-src>
-SharedLibrary libhekkel.so : 
+SharedLibrary libhekkel.so :
 	HAppResFile.cpp
 	HButtonBar.cpp
 	HColorControl.cpp
@@ -45,7 +45,7 @@ SubDirSysHdrs /boot/common/include ;
 LINKFLAGS += -L/boot/home/config/lib -L/boot/common/lib ;
 
 #<pe-src>
-Application Pe : 
+Application Pe :
 	Benaphore.cpp
 	CCharObject.cpp
 	CDiff.cpp
@@ -96,6 +96,7 @@ Application Pe :
 	PGlossyWindow.cpp
 	PGroupWindow.cpp
 	PItalicMenuItem.cpp
+	PJumpToProcedure.cpp
 	PKeyDownFilter.cpp
 	PLongAction.cpp
 	PMessageWindow.cpp
@@ -118,7 +119,7 @@ if $(OSPLAT) = X86 {
 	ObjectC++Flags CGlossary.cpp : -Wno-format ;
 }
 
-XRes Pe : 
+XRes Pe :
 	Bindings.rsrc
 	Cursor.rsrc
 	Dialog-Colorpicker.rsrc

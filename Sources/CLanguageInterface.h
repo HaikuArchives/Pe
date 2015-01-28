@@ -37,10 +37,15 @@
 #define CLANGUAGEINTERFACE_H
 
 #include <map>
+#include <vector>
+
+#include <image.h>
 #include <String.h>
 
 class CFunctionScanHandler;
 class CLanguageProxy;
+class PText;
+struct rgb_color;
 
 class CLanguageInterface {
 friend class CLanguageProxy;

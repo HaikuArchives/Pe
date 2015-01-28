@@ -59,6 +59,7 @@
 #include "HButtonBar.h"
 #include "PItalicMenuItem.h"
 #include "PSplitter.h"
+#include "PJumpToProcedure.h"
 #include "CGlossary.h"
 #include "KeyBindings.h"
 #include "CFindDialog.h"
@@ -1973,6 +1974,20 @@ void PText::MouseDown(BPoint where)
 
 		if (modifiers & B_SHIFT_KEY)
 			ChangeSelection(fAnchor, curOffset, fBlockSelect);
+		else if (modifiers & B_COMMAND_KEY)
+		{
+			// Jump to procedure
+
+			// Find word below cursor
+			anchor1 = FindWord(curOffset, B_LEFT_ARROW);
+			anchor2 = FindWord(anchor1, B_RIGHT_ARROW);
+			if (anchor1 > curOffset || anchor2 < curOffset)
+				anchor1 = anchor2 = curOffset;
+
+			if (anchor1 < anchor2)
+				PJumpToProcedure(this, anchor1, anchor2);
+			return;
+		}
 		else
 		{
 			if (modifiers & B_OPTION_KEY)
