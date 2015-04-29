@@ -22,6 +22,7 @@ RezObjects
 	keywords.rb.r
 	keywords.recipe.r
 	keywords.rez.r
+	keywords.rs.r
 	keywords.sh.r
 	keywords.sql.r
 	keywords.tex.r
