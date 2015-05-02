@@ -170,6 +170,14 @@ PeLanguage RubyExt
 # </pe-src>
 
 # <pe-src>
+PeLanguage RustExt
+	: Rust_Language.cpp Rust_Popup.cpp
+	: be
+	: keywords.rs.rsrc
+	;
+# </pe-src>
+
+# <pe-src>
 PeLanguage ShellExt 
 	: Shell_Language.cpp 
 	: be 
