@@ -43,6 +43,10 @@
 #include "HError.h"
 #include "HDefines.h"
 
+#include <ControlLook.h>
+#include <tracker_private.h>
+#include "DirMenu.h"
+
 PStatus::PStatus(BRect frame, PText *txt)
 	: BView(frame, "status", B_FOLLOW_BOTTOM | B_FOLLOW_LEFT, B_WILL_DRAW)
 {
@@ -69,27 +73,16 @@ PStatus::~PStatus()
 
 void PStatus::Draw(BRect updateRect)
 {
-	BRect b(Bounds());
+	if (be_control_look != NULL) {
+		BRect bounds(Bounds());
+		be_control_look->DrawMenuBarBackground(this,
+			bounds, updateRect, ViewColor());
+	}
 
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
-	StrokeLine(b.LeftTop(), b.RightTop());
-	b.top++;
-
-	font_height fh;
-	be_plain_font->GetHeight(&fh);
-
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
-	StrokeLine(b.RightBottom(), b.LeftBottom());
-	StrokeLine(b.RightTop(), b.RightBottom());
-
-	SetHighColor(kWhite);
-	StrokeLine(b.LeftTop(), b.RightTop());
-	StrokeLine(b.LeftTop(), b.LeftBottom());
-
-	b.InsetBy(1, 1);
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	FillRect(b, B_SOLID_LOW);
+	BRect bounds(Bounds());
+	rgb_color highColor = HighColor();
+	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
+	StrokeLine(bounds.LeftTop(), bounds.RightTop());
 
 	SetHighColor(kBlack);
 	MovePenTo(3, fBaseline);
@@ -135,45 +128,24 @@ void PStatus::MouseDown(BPoint where)
 
 	if (fPath)
 	{
-		BPopUpMenu popup("no title");
-		popup.SetFont(be_plain_font);
+		BEntry entry;
+		status_t status = entry.SetTo(fPath);
 
-		char *s = strdup(fPath), *d;
+		if (status != B_OK || !entry.Exists())
+			return;
 
-		d = strrchr(s, '/');
-		if (d) *d = 0;
+		BPrivate::BDirMenu* menu = new BDirMenu(NULL,
+			BMessenger(kTrackerSignature), B_REFS_RECEIVED);
 
-		d = strtok(s, "/");
-		while (d)
-		{
-			popup.AddItem(new BMenuItem(d, NULL), 0);
-			d = strtok(NULL, "/");
-		}
+		menu->Populate(&entry, Window(), false, false, true, false, true);
 
-		where.y = Bounds().bottom + 1;
-		BMenuItem *i = popup.Go(ConvertToScreen(where), true, false, ConvertToScreen(Bounds()));
-
-		if (i)
-		{
-			free(s);
-			s = strdup(fPath);
-			d = strchr(s, '/');
-			FailNil(d);
-
-			int ix = popup.CountItems() - popup.IndexOf(i);
-
-			while (ix--)
-				d = strchr(d + 1, '/');
-
-			FailNil(d);
-			*d = 0;
-
-			entry_ref ref;
-			FailOSErr(get_ref_for_path(s, &ref));
-			OpenInTracker(ref);
-		}
-
-		free(s);
+		BPoint point = Bounds().LeftBottom();
+		point.y += 3;
+		ConvertToScreen(&point);
+		BRect clickToOpenRect(Bounds());
+		ConvertToScreen(&clickToOpenRect);
+		menu->Go(point, true, true, clickToOpenRect);
+		delete menu;
 	}
 	else
 		beep();
