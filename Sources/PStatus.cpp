@@ -45,7 +45,7 @@
 
 #include <ControlLook.h>
 #include <tracker_private.h>
-#include "DirMenu.h"
+#include <DirMenu.h>
 
 PStatus::PStatus(BRect frame, PText *txt)
 	: BView(frame, "status", B_FOLLOW_BOTTOM | B_FOLLOW_LEFT, B_WILL_DRAW)
@@ -73,13 +73,10 @@ PStatus::~PStatus()
 
 void PStatus::Draw(BRect updateRect)
 {
-	if (be_control_look != NULL) {
-		BRect bounds(Bounds());
-		be_control_look->DrawMenuBarBackground(this,
-			bounds, updateRect, ViewColor());
-	}
-
 	BRect bounds(Bounds());
+	be_control_look->DrawMenuBarBackground(this,
+		bounds, updateRect, ViewColor());
+
 	rgb_color highColor = HighColor();
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
 	StrokeLine(bounds.LeftTop(), bounds.RightTop());
