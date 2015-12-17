@@ -47,7 +47,6 @@ LINKFLAGS += -L/boot/home/config/lib -L/boot/common/lib ;
 
 #<pe-src>
 Application Pe :
-	Benaphore.cpp
 	CCharObject.cpp
 	CDiff.cpp
 	CDiffWindow.cpp
