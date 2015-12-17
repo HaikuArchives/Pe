@@ -253,31 +253,37 @@ CFindDialog::CFindDialog(BRect frame, const char *name,
 	fCurrentDir = NULL;
 
 	char *bi = strdup(getenv("BEINCLUDES"));
-
-	int i = 1;
-	const char *p = bi;
-	while ((p = strchr(p + 1, ';')) != NULL)
-		i++;
-
-	fBeIncludes = (char **)malloc(i * sizeof(char *));
+	fBeIncludes = (char **)malloc(1 * sizeof(char *));
+	fBeIncludeCount = 0;
 	FailNil(fBeIncludes);
 
-	p = bi;
-	i = 0;
+	if (bi != NULL) {
+		int i = 1;
+		const char* p = bi;
+		while ((p = strchr(p + 1, ';')) != NULL)
+			i++;
 
-	do
-	{
-		char *ep = strchr(p, ';');
-		if (ep) *ep++ = 0;
+		free(fBeIncludes);
+		fBeIncludes = (char **)malloc(i * sizeof(char *));
+		FailNil(fBeIncludes);
 
-		fBeIncludes[i] = strdup(p);
-		FailNil(fBeIncludes[i++]);
-		p = ep;
+		p = bi;
+		i = 0;
+
+		do
+		{
+			char *ep = strchr(p, ';');
+			if (ep) *ep++ = 0;
+
+			fBeIncludes[i] = strdup(p);
+			FailNil(fBeIncludes[i++]);
+			p = ep;
+		}
+		while (p);
+
+		free(bi);
+		fBeIncludeCount = i;
 	}
-	while (p);
-
-	free(bi);
-	fBeIncludeCount = i;
 
 	fDirPanel = NULL;
 
