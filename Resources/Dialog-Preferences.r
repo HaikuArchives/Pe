@@ -131,7 +131,7 @@ resource 'DLOG' (132, "Preferences") {
 				CheckBox		{{   0,   0, 140,  16 }, pnm_Edi_X_ShowTabs,			"Show tabstops"						},
 				Edit			{{ 150,   0, 290,  16 }, pnm_Edi_T_SpacesPerTab,		"Spaces per tab:",		"", "0123456789", 3, 90		},
 
-				CheckBox		{{   0,  20, 140,  36 }, pnm_Edi_X_SyntaxColoring,		"Syntax colouring"					},
+				CheckBox		{{   0,  20, 140,  36 }, pnm_Edi_X_SyntaxColoring,		"Syntax coloring"					},
 				CheckBox		{{ 150,  20, 290,  36 }, pnm_Edi_X_AutoIndent,			"Auto-indent"						},
 
 				CheckBox		{{   0,  40, 140,  56 }, pnm_Edi_X_BalanceWhileTyping,	"Balance while typing"				},
