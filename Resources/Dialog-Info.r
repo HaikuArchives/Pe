@@ -133,7 +133,7 @@ resource 'DLOG' (6, "Info") {
 			TabSheet			{ "Editor",					"Editor options"														},
 				CheckBox		{{   0,   0, 140,  16 },	"show tabs",		"Show tabstops"										},
 				Edit			{{ 150,   0, 275,  16 },	"tabs",				"Spaces per tab:",	"", "0123456789", 3, 120		},
-				CheckBox		{{   0,  20, 140,  36 },	"syntaxcol",		"Syntax colouring"									},
+				CheckBox		{{   0,  20, 140,  36 },	"syntaxcol",		"Syntax coloring"									},
 				CheckBox		{{ 150,  20, 275,  36 },	"show invisibles",	"Show invisibles"									},
 				
 				Line			{{   0,  43, 275,  44 }																				},

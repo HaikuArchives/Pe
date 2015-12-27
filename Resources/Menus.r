@@ -258,7 +258,7 @@ resource rtyp_Popu (rid_Popu_CtxText, "Main view") {
 		Item		{ "Comment",					msg_Comment,				none,	noKey	},
 		Item		{ "Uncomment",					msg_Uncomment,				none,	noKey	},
 		Separator	{																			},
-		Item		{ "Syntax colouring",			msg_ToggleSyntaxColoring,	none,	noKey	},
+		Item		{ "Syntax coloring",			msg_ToggleSyntaxColoring,	none,	noKey	},
 		Item		{ "Show invisibles",			msg_ToggleShowInvisibles,	none,	noKey	},
 		Item		{ "Soft-wrap",					msg_SoftWrap,				none,	noKey	},
 		Item		{ "Alternate font",				msg_ToggleFont,				none,	noKey	}
