@@ -239,10 +239,10 @@ resource 'DLOG' (132, "Preferences") {
 			TabSheetEnd			{																							},
 
 			TabSheet			{ "Languages", "Options for syntax coloring and the function popup"							},
-				CheckBox		{{   0,   0, 140,  16 }, pnm_Lng_X_ShowIncludes,		"Show includes"						},
-				CheckBox		{{   0,  20, 140,  36 }, pnm_Lng_X_ShowPrototypes,		"Show function prototypes"			},
-				CheckBox		{{ 150,   0, 290,  16 }, pnm_Lng_X_ShowTypes,			"Show types"						},
-				CheckBox		{{ 150,  20, 290,  36 }, pnm_Lng_X_SortPopup,			"Sort alphabetically"				},
+				CheckBox		{{   0,   0, 160,  16 }, pnm_Lng_X_ShowIncludes,		"Show includes"						},
+				CheckBox		{{   0,  20, 160,  36 }, pnm_Lng_X_ShowPrototypes,		"Show function prototypes"			},
+				CheckBox		{{ 170,   0, 290,  16 }, pnm_Lng_X_ShowTypes,			"Show types"						},
+				CheckBox		{{ 170,  20, 290,  36 }, pnm_Lng_X_SortPopup,			"Sort alphabetically"				},
 
 				Line			{{   0,  40, 290,  41 }},
 
@@ -252,7 +252,7 @@ resource 'DLOG' (132, "Preferences") {
 
 				Line			{{   0,  93, 290,  94 }},
 
-				PopupMenu		{{   0, 101, 200, 117 }, pnm_Lng_P_DefaultLanguage,		"Default language:",	rid_Popu_PrfDefaultLang, 90	},
+				PopupMenu		{{   0, 101, 200, 117 }, pnm_Lng_P_DefaultLanguage,		"Default language:",	rid_Popu_PrfDefaultLang, 100	},
 			TabSheetEnd			{																							},
 
 			TabSheet			{ "Projects", "Project window options"														},
