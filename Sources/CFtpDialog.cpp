@@ -59,6 +59,7 @@ typedef int socklen_t;
 static string sfPassword;
 
 const unsigned long
+	msg_ServerNameChanged = 'snch',
 	msg_SelectedListItem = 'slct',
 	msg_SelectedDirectory = 'dirS',
 	msg_ToggleDot = 'dotT';
@@ -154,6 +155,8 @@ void CFtpDialog::Create(void)
 	// Server-Box
 	fLoginBox = new HBox(fMainView, "", B_FOLLOW_RIGHT|B_FOLLOW_TOP);
 	fServerName = new HTextControl(fLoginBox, "srvr");
+	fServerName->SetModificationMessage(new BMessage(msg_ServerNameChanged));
+	fServerName->SetTarget(this);
 	fUserName = new HTextControl(fLoginBox, "user");
 	fPassword = new HTextControl(fLoginBox, "pass");
 	fPassword->TextView()->HideTyping(true);
@@ -391,6 +394,10 @@ void CFtpDialog::MessageReceived(BMessage *msg)
 			Connect();
 			break;
 
+		case msg_ServerNameChanged:
+			fServerName->MarkAsInvalid(false);
+			break;
+
 		case msg_SelectedDirectory:
 		{
 			BMenuItem *src;
@@ -500,14 +507,23 @@ void CFtpDialog::Connect()
 
 		struct hostent *host;
 		if ((host = gethostbyname(GetText("srvr"))) == NULL)
+		{
+			fServerName->MarkAsInvalid(true);
 			THROW(("Failed to get server address: %s", strerror(errno)));
+		}
 
 		struct sockaddr_in sa;
 		sa.sin_family = AF_INET;
 		sa.sin_port = htons(21);
 		sa.sin_addr.s_addr = *(unsigned int *)host->h_addr;
 
-		FailOSErr(connect(fSocket, (struct sockaddr *)&sa, sizeof(sa)));
+		if (connect(fSocket, (struct sockaddr *)&sa, sizeof(sa)) < 0)
+		{
+			if (!(errno == ECONNREFUSED || errno == ETIMEDOUT || errno == ENETUNREACH))
+				fServerName->MarkAsInvalid(true);
+
+			THROW(("Failed to connect to the host: %s", strerror(errno)));
+		}
 
 		int state = 1;
 		while (state)
