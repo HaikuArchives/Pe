@@ -144,9 +144,14 @@ void CDoc::Save()
 			if (IsDirty())
 			{
 				StopWatchingFile();
-				if (fDocIO->WriteDoc())
+				bool written = fDocIO->WriteDoc();
+				if (written)
 					SetDirty(false);
 				StartWatchingFile();
+
+				BEntry e(EntryRef(), true);
+				if (!(e.Exists() || written))
+					SaveAs();
 			}
 		}
 		else

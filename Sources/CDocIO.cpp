@@ -518,7 +518,10 @@ bool CLocalDocIO::WriteDoc()
 		BFile file;
 		BDirectory dir;
 		FailOSErr(e.GetParent(&dir));
-		FailOSErr(dir.CreateFile(name, &file, false));
+
+		if (dir.CreateFile(name, &file, false) != B_OK)
+			return false;
+
 		CheckedWrite(file, docText.String(), docText.Length());
 		fDoc->WriteAttr(file, settingsMsg);
 		file.Sync();
