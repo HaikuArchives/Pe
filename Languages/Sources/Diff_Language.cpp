@@ -39,7 +39,7 @@
 
 extern "C" {
 _EXPORT const char kLanguageName[] = "Diff";
-_EXPORT const char kLanguageExtensions[] = "diff;patch";
+_EXPORT const char kLanguageExtensions[] = "diff;patch;patchset";
 _EXPORT const char kLanguageCommentStart[] = "";
 _EXPORT const char kLanguageCommentEnd[] = "";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.diff";
