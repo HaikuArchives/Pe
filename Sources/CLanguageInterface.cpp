@@ -74,6 +74,7 @@ BCollator collator;
 ext::ext()
 {
 	t[0] = 0;
+        collator.SetStrength(B_COLLATE_SECONDARY);
 } /* CLanguageInterface::ext::ext */
 
 ext::ext(const char *e)
@@ -81,6 +82,7 @@ ext::ext(const char *e)
 	if (strlen(e) > 11) THROW(("Extension `%s' is too long", e));
 
 	strcpy(t, e);
+        collator.SetStrength(B_COLLATE_SECONDARY);
 } /* CLanguageInterface::ext::ext */
 
 bool ext::operator<(const ext& e) const
@@ -173,7 +175,7 @@ void AddInterface(char *s, T* i)
 bool CompareInterfacesByName(const CLanguageInterface *first,
 	const CLanguageInterface *second)
 {
-	return collator.Greater(second->Name(), first->Name(), B_COLLATE_SECONDARY);
+	return collator.Greater(second->Name(), first->Name());
 } /* CompareInterfacesByName */
 
 void CLanguageInterface::SetupLanguageInterfaces()
