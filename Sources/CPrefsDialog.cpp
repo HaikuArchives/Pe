@@ -714,20 +714,20 @@ void CPrefsDialog::UpdateFields()
 
 void CPrefsDialog::GetDefPageSetup()
 {
-//	BPrintJob prJob("a page setup job");
+//	BPrintJob printJob("a page setup job");
 //
 //	if (fPageSetup)
 //	{
 //		BMessage *s = new BMessage;
 //		if (s && s->Unflatten(fPageSetup) == B_NO_ERROR)
-//			prJob.SetSettings(s);
+//			printJob.SetSettings;
 //	}
 //
-//	int result = prJob.ConfigPage();
+//	int result = printJob.ConfigPage();
 //
 //	if (result == B_NO_ERROR)
 //	{
-//		BMessage s(prJob.Settings());
+//		BMessage s(printJob.Settings());
 //
 //		fPageSetupSize = s.FlattenedSize();
 //		if (fPageSetup) free(fPageSetup);
