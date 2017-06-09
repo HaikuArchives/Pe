@@ -116,7 +116,7 @@ protected:
 		mutable KeywordMap fKeywordMap;
 //		void GenerateKeywordMap(const char *ext);
 
-static	vector<CLanguageInterface*>	fInterfaces;
+static	std::vector<CLanguageInterface*>	fInterfaces;
 };
 
 inline const char* CLanguageInterface::LineCommentStart() const

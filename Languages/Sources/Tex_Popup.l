@@ -44,14 +44,14 @@ static int gBufSize;
 #undef YY_DECL
 #define YY_DECL	static int yylex(CLanguageProxy& proxy)
 #undef YY_INPUT
-#define YY_INPUT(tok,result,max)	GetNextChar(tok, result, max)
+#define YY_INPUT(tok,result,max)	result = GetNextChar(tok, max)
 #define YY_SKIP_YYWRAP
 #undef yywrap
 #define yywrap()	1
 #undef ECHO
 #define ECHO
 
-static void GetNextChar(char *tok, yy_size_t& result, int max);
+static int GetNextChar(char *tok, int max);
 static void Add(int level, CLanguageProxy& proxy, int hasOptional);
 %}
 
@@ -95,11 +95,11 @@ _EXPORT void ScanForFunctions(CLanguageProxy& proxy)
 	}
 } /* ScanForFunctions */
 
-void GetNextChar(char *tok, yy_size_t& result, int)
+int GetNextChar(char *tok, int)
 {
 	int c = gBuf[gIndx++];
 	
-	result = yy_size_t((gIndx < gBufSize) ? (tok[0] = c, 1) : YY_NULL);
+	return (gIndx < gBufSize) ? (tok[0] = c, 1) : YY_NULL;
 } /* GetNextChar */
 
 static void Add(int level, CLanguageProxy& proxy, int hasOptional)

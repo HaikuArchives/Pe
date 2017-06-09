@@ -42,14 +42,14 @@ static bool inString;
 #undef YY_DECL
 #define YY_DECL	static int yylex(CLanguageProxy& proxy)
 #undef YY_INPUT
-#define YY_INPUT(tok,result,max)	GetNextChar(tok, result, max)
+#define YY_INPUT(tok,result,max)	result = GetNextChar(tok, max)
 #define YY_SKIP_YYWRAP
 #undef yywrap
 #define yywrap()	1
 #undef ECHO
 #define ECHO
 
-static void GetNextChar(char *tok, yy_size_t& result, int max);
+static int GetNextChar(char *tok, int max);
 static void AddFunction(CLanguageProxy& proxy);
 static void AddInclude(CLanguageProxy& proxy);
 static void AddInclude2(CLanguageProxy& proxy);
@@ -104,7 +104,7 @@ _EXPORT void ScanForFunctions(CLanguageProxy& proxy)
 	}
 } /* ScanForFunctions */
 
-void GetNextChar(char *tok, yy_size_t& result, int max)
+int GetNextChar(char *tok, int max)
 {
 	int c = gBuf[gIndx++];
 	
@@ -113,6 +113,7 @@ void GetNextChar(char *tok, yy_size_t& result, int max)
 	else if (c == '#')
 	{
 		int space = 0;
+		int result;
 		
 		do
 		{
@@ -121,15 +122,15 @@ void GetNextChar(char *tok, yy_size_t& result, int max)
 		}
 		while (gIndx < gBufSize && c != '\n');
 
-		result = yy_size_t(max = std::min(max, space));
+		result = max = std::min(max, space);
 
 		while (max--)
 			*tok++ = ' ';
 
-		return;
+		return result;
 	}
 
-	result = yy_size_t((gIndx < gBufSize) ? (tok[0] = c, 1) : YY_NULL);
+	return (gIndx < gBufSize) ? (tok[0] = c, 1) : YY_NULL;
 } /* GetNextChar */
 
 static void AddFunction(CLanguageProxy& proxy)
