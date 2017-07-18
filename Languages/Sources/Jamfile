@@ -76,7 +76,7 @@ PeLanguage HtmlCssJsPhpExt
 # <pe-src>
 PeLanguage JamExt 
 	: Jam_Language.cpp 
-	: be 
+	: be $(STDC++LIB)
 	: keywords.jam.rsrc 
 	;
 # </pe-src>
