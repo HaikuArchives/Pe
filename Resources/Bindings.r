@@ -403,7 +403,7 @@ resource rtyp_Bind (rid_Bind_WindowMenu, "Bindings for window menu") {
 resource rtyp_Bind (rid_Bind_HelpMenu, "Bindings for help menu") {
 	{
 //		0,				0,		0, 		0,			msg_About,
-		0,				B_FUNCTION_KEY,	0,	0,		msg_Help
+//		0,				B_FUNCTION_KEY,	0,	0,		msg_Help
 	}
 };
 
