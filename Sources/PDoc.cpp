@@ -263,7 +263,7 @@ void PDoc::InitWindow(const char *name)
 
 	r = b;
 	r.right = r.left + kStatusWidth;
-	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT + 1;
+	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT;
 	fStatus = new PStatus(r, fText);
 	AddChild(fStatus);
 
