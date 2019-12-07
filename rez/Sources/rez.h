@@ -36,6 +36,7 @@
 #ifndef REZ_H
 #define REZ_H
 
+#include <arpa/inet.h>
 #include <sys/types.h>
 
 struct RElem;

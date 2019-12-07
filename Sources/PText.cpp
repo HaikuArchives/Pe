@@ -35,6 +35,7 @@
 
 #include "pe.h"
 
+#include <arpa/inet.h>
 #include <signal.h>
 #include <PrintJob.h>
 #include <String.h>
