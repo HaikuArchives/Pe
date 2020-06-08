@@ -458,7 +458,6 @@ const char *JavaScript(const char *txt, PopupList &lstJsFunctions, PopupList &ls
 
 const char *PhpScript(const char *txt, PopupList &lstPhpFunctions, PopupList &lstPhpClasses, bool sorted)
 {
-	std::map <int,int,int> headings;
 	BString class_name;
 	while (*txt)
 	{
