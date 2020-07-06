@@ -74,12 +74,13 @@ PStatus::~PStatus()
 void PStatus::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
-	be_control_look->DrawMenuBarBackground(this,
-		bounds, updateRect, ViewColor());
 
-	rgb_color highColor = HighColor();
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
-	StrokeLine(bounds.LeftTop(), bounds.RightTop());
+	StrokeRect(bounds);
+	bounds.InsetBy(1, 1);
+
+	be_control_look->DrawMenuBarBackground(this,
+		bounds, updateRect,	ViewColor());
 
 	SetHighColor(kBlack);
 	MovePenTo(3, fBaseline);

@@ -1857,7 +1857,6 @@ void PText::ScrollBarChanged(BScrollBar *bar, g_unit_t dy)
 			src.bottom += dy;
 		}
 
-		src.top += 1;
 		dst = src;
 		dst.OffsetBy(0, -dy);
 
@@ -2126,32 +2125,29 @@ void PText::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
 {
 	if (!a_message)
 	{
-		if (fWindowActive)
+		if (code == B_EXITED_VIEW)
 		{
-			if (code == B_EXITED_VIEW)
+			be_app->SetCursor(B_HAND_CURSOR);
+			fSplitCursorShown = false;
+		}
+		else
+		{
+			// set the splitter cursor when the mouse is over it
+			if (fSplitAt > 0
+				&& where.y >= fSplitAt - kSplitterHeight
+				&& where.y <= fSplitAt)
 			{
-				be_app->SetCursor(B_HAND_CURSOR);
-				fSplitCursorShown = false;
+				if (!fSplitCursorShown)
+				{
+					be_app->SetCursor(PSplitter::Cursor());
+					fSplitCursorShown = true;
+				}
 			}
-			else
+			else if (code == B_ENTERED_VIEW
+				|| (code == B_INSIDE_VIEW && fSplitCursorShown))
 			{
-				// set the splitter cursor when the mouse is over it
-				if (fSplitAt > 0
-					&& where.y >= fSplitAt - kSplitterHeight
-					&& where.y <= fSplitAt)
-				{
-					if (!fSplitCursorShown)
-					{
-						be_app->SetCursor(PSplitter::Cursor());
-						fSplitCursorShown = true;
-					}
-				}
-				else if (code == B_ENTERED_VIEW
-					|| (code == B_INSIDE_VIEW && fSplitCursorShown))
-				{
-					be_app->SetCursor(B_I_BEAM_CURSOR);
-					fSplitCursorShown = false;
-				}
+				be_app->SetCursor(B_I_BEAM_CURSOR);
+				fSplitCursorShown = false;
 			}
 		}
 	}
@@ -5451,8 +5447,7 @@ void PText::ShiftLines(int32 first, int32 dy, int32 part)
 	if (part == 1)
 	{
 		v = fVScrollBar1->Value();
-		b.top += 1;
-		b.bottom = fSplitAt - kSplitterHeight;
+		b.bottom = fSplitAt - kSplitterHeight - 1;
 	}
 	else
 	{

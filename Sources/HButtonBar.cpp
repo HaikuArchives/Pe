@@ -294,7 +294,6 @@ HButtonBar::HButtonBar(BRect frame, const char *name, int32 resID, BHandler *tar
 	buf >> flags >> bCnt;
 
 	fDragger = (flags & (1 << bbDragger)) != 0;
-	fAcceptFirstClick = (flags & (1 << bbAcceptFirstClick)) != 0;
 
 	HTool* tool;
 	float x = fDragger ? 12.0 : 6.0;
@@ -373,28 +372,25 @@ void HButtonBar::MouseMoved(BPoint where, uint32 code, const BMessage *a_message
 	if (Bounds().Contains(where))
 		be_app->SetCursor(B_HAND_CURSOR);
 
-	if (fAcceptFirstClick || IsActive())
+	int tool = FindTool(where);
+
+	if (tool != fLastToolOver)
 	{
-		int tool = FindTool(where);
+		if (fHelp)
+			HideHelp();
 
-		if (tool != fLastToolOver)
+		if (fLastToolOver >= 0)
+			fTools[fLastToolOver]->MouseLeave();
+
+		fLastToolOver = tool;
+
+		if (fLastToolOver >= 0)
 		{
-			if (fHelp)
-				HideHelp();
-
-			if (fLastToolOver >= 0)
-				fTools[fLastToolOver]->MouseLeave();
-
-			fLastToolOver = tool;
-
-			if (fLastToolOver >= 0)
-			{
-				fTools[fLastToolOver]->MouseEnter();
-				fLastEnter = system_time();
-			}
-			else
-				fLastEnter = 0;
+			fTools[fLastToolOver]->MouseEnter();
+			fLastEnter = system_time();
 		}
+		else
+			fLastEnter = 0;
 	}
 } /* HButtonBar::MouseMoved */
 

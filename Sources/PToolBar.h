@@ -38,7 +38,7 @@
 
 const float
 	kTabStopHeight = 6,
-	kToolBarHeight = 23;
+	kToolBarHeight = 22;
 
 class PText;
 

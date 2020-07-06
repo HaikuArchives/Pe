@@ -225,7 +225,7 @@ void PDoc::InitWindow(const char *name)
 	fError->SetFont(be_plain_font);
 	fError->SetHighColor(kBlack);
 
-	b.top += kToolBarHeight;
+	b.top += kToolBarHeight + 1;
 
 	BScrollBar *bars[4] = { NULL, NULL, NULL, NULL };
 
@@ -262,7 +262,9 @@ void PDoc::InitWindow(const char *name)
 	AddChild(new PSplitter(r, fText));
 
 	r = b;
-	r.right = r.left + kStatusWidth;
+	r.right = r.left + kStatusWidth + 1;
+	r.left -= 1;
+	r.bottom += 1;
 	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT;
 	fStatus = new PStatus(r, fText);
 	AddChild(fStatus);
