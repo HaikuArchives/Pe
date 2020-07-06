@@ -1939,14 +1939,17 @@ void PText::MouseDown(BPoint where)
 		else if (where.y < fSplitAt && fActivePart == 2)
 			SwitchPart(1);
 
-		if ((curOffset < anchor1 || curOffset > anchor2 || anchor1 == anchor2) &&
+		BRegion rgn;
+		Selection2Region(rgn, fActivePart);
+
+		if (!rgn.Contains(where) &&
 			fDragButtons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON))
 		{
 			ShowContextualMenu(where);
 			return;
 		}
 
-		if (curOffset > anchor1 && curOffset < anchor2 &&
+		if (rgn.Contains(where) &&
 			(fDragButtons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON) ||
 			 (fMouseClicks == 1 && WaitMouseMoved(where))))
 		{
@@ -2144,9 +2147,15 @@ void PText::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
 				}
 			}
 			else if (code == B_ENTERED_VIEW
-				|| (code == B_INSIDE_VIEW && fSplitCursorShown))
+				|| (code == B_INSIDE_VIEW))
 			{
-				be_app->SetCursor(B_I_BEAM_CURSOR);
+				BRegion rgn;
+				Selection2Region(rgn, (where.y < fSplitAt) ? 1 : 2);
+				if (rgn.Contains(where))
+					be_app->SetCursor(B_HAND_CURSOR);
+				else
+					be_app->SetCursor(B_I_BEAM_CURSOR);
+
 				fSplitCursorShown = false;
 			}
 		}
