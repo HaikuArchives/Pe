@@ -197,6 +197,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fExec = NULL;
 	fWindowActive = false;
 	fMetrics = NULL;
+	fDropPos = -1;
 	fDragStart = -1;
 	fSyntaxColoring = gSyntaxColoring;
 	fCWD = NULL;
@@ -1964,9 +1965,6 @@ void PText::MouseDown(BPoint where)
 			fDragStart = min(fAnchor, fCaret);
 			sfDragSource = this;
 
-			fSavedAnchor = fAnchor;
-			fSavedCaret = fCaret;
-
 			BRegion rgn;
 			Selection2Region(rgn, fActivePart);
 			DragMessage(&drag, rgn.Frame());
@@ -2168,16 +2166,13 @@ void PText::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
 			case B_ENTERED_VIEW:
 				if (!fWindowActive)
 					HiliteSelection();
-				fSavedAnchor = fAnchor;
-				fSavedCaret = fCaret;
 				fWindowActive = true;
 			case B_INSIDE_VIEW:
 				TrackDrag(where);
 				break;
 			case B_EXITED_VIEW:
 				HideCaret();
-				fAnchor = fSavedAnchor;
-				fCaret = fSavedCaret;
+				fDropPos = -1;
 				fWindowActive = Window()->IsActive();
 				if (!fWindowActive)
 					HiliteSelection();
@@ -2188,33 +2183,18 @@ void PText::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
 
 void PText::TrackDrag(BPoint where)
 {
-	BRect b(Bounds());
-
-	b.InsetBy(0, -10);
-
 	int32 part = (where.y > fSplitAt) ? 2 : 1;
-	SwitchPart(part);
-
-	if (part == 2)
-		b.top += fSplitAt;
-	else
-		b.bottom = b.top + fSplitAt + 20;
+	if (part != fActivePart)
+		SwitchPart(part);
 
 	int32 offset = Position2Offset(where, part);
 
-	if (offset >= min(fSavedCaret, fSavedAnchor) &&
-		offset <= max(fSavedCaret, fSavedAnchor))
+	if (offset != fDropPos)
 	{
 		HideCaret();
-		fAnchor = fSavedAnchor;
-		fCaret = fSavedCaret;
-
-		ScrollToOffset(offset, part, false);
-	}
-	else if (offset != fCaret)
-		SetCaret(offset);
-	else
+		fDropPos = offset;
 		ShowCaret();
+	}
 } /* PText::TrackDrag */
 
 void PText::HandleDrop(BMessage *msg)
@@ -2245,8 +2225,7 @@ void PText::HandleDrop(BMessage *msg)
 				if (!item)
 				{
 					HideCaret();
-					fAnchor = fSavedAnchor;
-					fCaret = fSavedCaret;
+					fDropPos = -1;
 					return;
 				}
 
@@ -2258,18 +2237,8 @@ void PText::HandleDrop(BMessage *msg)
 			else
 				offset = fDragStart;
 
-			if (offset == -1 || fCaret < offset || fCaret > offset + sl)
-			{
-				if (sfDragSource == this)
-				{
-					int32 a, c;
-
-					a = Offset2Line(fSavedAnchor);
-					c = Offset2Line(fSavedCaret);
-					TouchLines(min(a, c), max(a, c));
-				}
-				RegisterCommand(new PDropCmd(this, s, sl, offset, fCaret));
-			}
+			if (offset == -1 || fDropPos < offset || fDropPos > offset + sl)
+				RegisterCommand(new PDropCmd(this, s, sl, offset, fDropPos));
 		}
 	}
 	else if (msg->HasRef("refs"))
@@ -2281,6 +2250,8 @@ void PText::HandleDrop(BMessage *msg)
 			openMsg.AddRef("refs", &ref);
 		be_app_messenger.SendMessage(&openMsg);
 	}
+	HideCaret();
+	fDropPos = -1;
 } /* PText::HandleDrop */
 
 bool PText::WaitMouseMoved(BPoint where)
@@ -4807,7 +4778,7 @@ void PText::Draw(BRect updateRect)
 	ConstrainClippingRegion(NULL);
 
 	// draw the caret
-	if (fCaret == fAnchor && updateRect.Intersects(CursorFrame(fCaret))) {
+	if ((fDropPos != -1 || fCaret == fAnchor) && updateRect.Intersects(CursorFrame((fDropPos != -1) ? fDropPos : fCaret))) {
 		fCaretDrawn = false;
 		DrawCaret();
 	}
@@ -5211,7 +5182,7 @@ void PText::RedrawDirtyLines()
 	int32 i;
 	float y1, y2;
 
-	int32 caretLine = Offset2Line(fCaret);
+	int32 caretLine = Offset2Line((fDropPos != -1) ? fDropPos : fCaret);
 	BRegion dirtyCaretRegion;
 
 	BRegion clip1, clip2;
@@ -5328,6 +5299,9 @@ void PText::ChangeSelection(int32 newAnchor, int32 newCaret, bool block)
 	int32 na, nc;
 	int32 oa, oc;
 
+	if (newAnchor == fAnchor && newCaret == fCaret && block == fBlockSelect)
+		return;
+
 	na = min(newAnchor, newCaret);
 	nc = max(newAnchor, newCaret);
 
@@ -5377,7 +5351,7 @@ void PText::ChangeSelection(int32 newAnchor, int32 newCaret, bool block)
 
 void PText::Pulse()
 {
-	if (IsFocus() && fWindowActive && fNextCaret < system_time() && (gFlashCursor || ! fCaretVisible))
+	if (fDropPos == -1 && IsFocus() && fWindowActive && fNextCaret < system_time() && (gFlashCursor || ! fCaretVisible))
 		ToggleCaret();
 } /* PText::Pulse */
 
@@ -5404,7 +5378,7 @@ BRect PText::CursorFrame(int32 caret)
 
 void PText::ToggleCaret()
 {
-	if (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible))
+	if (fDropPos == -1 && (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible)))
 		return;
 
 	fNextCaret = system_time() + 500000;
@@ -5419,10 +5393,11 @@ void PText::ToggleCaret()
 
 void PText::DrawCaret()
 {
-	if (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible)
-		|| fCaretVisible == fCaretDrawn) {
+	if (fCaretVisible == fCaretDrawn)
 		return;
-	}
+
+	if (fDropPos == -1 && (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible)))
+		return;
 
 	BRegion clip;
 	BRect r(fBounds);
@@ -5432,7 +5407,7 @@ void PText::DrawCaret()
 		r.top = fSplitAt;
 	clip.Include(r);
 
-	r = CursorFrame(fCaret);
+	r = CursorFrame((fDropPos != -1) ? fDropPos : fCaret);
 
 	if (clip.Frame().IsValid())
 	{

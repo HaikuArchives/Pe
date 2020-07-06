@@ -348,7 +348,7 @@ private:
 			bool fWindowActive;
 			bool fSyntaxColoring;
 			bool fShowInvisibles;
-			int32 fSavedCaret, fSavedAnchor;
+			int32 fDropPos;
 			int32 fDragStart;
 			int32 fDragButtons;
 			PSplitter *fSplitter;
