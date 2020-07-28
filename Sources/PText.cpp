@@ -1621,34 +1621,36 @@ void PText::AdjustScrollBars()
 
 	fBounds = Bounds();
 
-	g_unit_t h, y;
+	g_unit_t h;
 
 	int32 lines = LineCount();
+	g_unit_t totalHeight = lines * fLineHeight;
 
 	if (fSplitAt > 0)
 	{
 		h = fBounds.Height() - fSplitAt;
-		y = (lines * fLineHeight - h) / fLineHeight;
 
-		fVScrollBar2->SetRange(0.0, max(y * fLineHeight, (float)0));
-		fVScrollBar2->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
+		fVScrollBar2->SetRange(0, max<float>(totalHeight - h, 0));
+		fVScrollBar2->SetSteps(fLineHeight, max<float>(h, 0));
+		fVScrollBar2->SetProportion(min<float>(h / totalHeight, 1));
 
 		h = fSplitAt - kSplitterHeight;
-		y = (lines * fLineHeight - h) / fLineHeight;
 
-		fVScrollBar1->SetRange(0.0, max(y * fLineHeight, (float)0));
-		fVScrollBar1->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
+		fVScrollBar1->SetRange(0, max<float>(totalHeight - h, 0));
+		fVScrollBar1->SetSteps(fLineHeight, max<float>(h, 0));
+		fVScrollBar1->SetProportion(min<float>(h / totalHeight, 1));
 	}
 	else
 	{
 		h = fBounds.Height();
-		y = (lines * fLineHeight - h) / fLineHeight;
 
-		fVScrollBar2->SetRange(0.0, max(y * fLineHeight, (float)0));
-		fVScrollBar2->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
+		fVScrollBar2->SetRange(0, max<float>(totalHeight - h, 0));
+		fVScrollBar2->SetSteps(fLineHeight, max(h, 0.0f));
+		fVScrollBar2->SetProportion(min<float>(h / totalHeight, 1));
 
-		fVScrollBar1->SetRange(0.0, max(y * fLineHeight, (float)0));
-		fVScrollBar1->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
+		fVScrollBar1->SetRange(0, max<float>(totalHeight - h, 0));
+		fVScrollBar1->SetSteps(fLineHeight, max<float>(h, 0));
+		fVScrollBar1->SetProportion(min<float>(h / totalHeight, 1));
 	}
 
 	if (fSoftWrap)
