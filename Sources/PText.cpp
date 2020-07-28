@@ -1534,6 +1534,13 @@ void PText::DoneMovingSplitter()
 
 		fSplitAt = 0;
 
+		if (v < 1.0f)
+		{
+			BRect upperPad = b;
+			upperPad.bottom = upperPad.top;
+			FillRect(upperPad, B_SOLID_LOW);
+		}
+
 		TouchLines(floor(v / fLineHeight));
 		RedrawDirtyLines();
 
@@ -2205,6 +2212,9 @@ void PText::HandleDrop(BMessage *msg)
 	{
 		char *s;
 		ssize_t sl;
+
+		if (fDropPos == -1)
+			return;
 
 		FailOSErr(msg->FindData("text/plain", B_MIME_TYPE, (const void**)&s, &sl));
 		if (s)
@@ -4718,7 +4728,7 @@ void PText::Draw(BRect updateRect)
 			StrokeLine(fBounds.LeftTop(), fBounds.RightTop());
 			ConstrainClippingRegion(&clip);
 
-			start = max((int32)0, (int32)floor((updateRect.top + v) / fLineHeight));
+			start = max((int32)0, (int32)floor((updateRect.top - 1.0f + v) / fLineHeight));
 			end = min(LineCount(),
 				(int32)ceil((min(updateRect.bottom, fSplitAt - kSplitterHeight) + v) / fLineHeight) + 1);
 
@@ -4758,7 +4768,7 @@ void PText::Draw(BRect updateRect)
 
 		v = fVScrollBar2->Value();
 
-		start = max((int32)0, (int32)floor((max(updateRect.top - fSplitAt, (float)0) + v) / fLineHeight));
+		start = max((int32)0, (int32)floor((max(updateRect.top - 1.0f - fSplitAt, (float)0) + v) / fLineHeight));
 		end = min(LineCount(), (int32)ceil((updateRect.bottom + v - fSplitAt) / fLineHeight) + 1);
 
 		y = ceil(fSplitAt + fLineHeight * start - v);
