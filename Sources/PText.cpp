@@ -197,6 +197,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	fExec = NULL;
 	fWindowActive = false;
 	fMetrics = NULL;
+	fDropPos = -1;
 	fDragStart = -1;
 	fSyntaxColoring = gSyntaxColoring;
 	fCWD = NULL;
@@ -1533,6 +1534,13 @@ void PText::DoneMovingSplitter()
 
 		fSplitAt = 0;
 
+		if (v < 1.0f)
+		{
+			BRect upperPad = b;
+			upperPad.bottom = upperPad.top;
+			FillRect(upperPad, B_SOLID_LOW);
+		}
+
 		TouchLines(floor(v / fLineHeight));
 		RedrawDirtyLines();
 
@@ -1613,34 +1621,36 @@ void PText::AdjustScrollBars()
 
 	fBounds = Bounds();
 
-	g_unit_t h, y;
+	g_unit_t h;
 
 	int32 lines = LineCount();
+	g_unit_t totalHeight = lines * fLineHeight;
 
 	if (fSplitAt > 0)
 	{
 		h = fBounds.Height() - fSplitAt;
-		y = (lines * fLineHeight - h) / fLineHeight;
 
-		fVScrollBar2->SetRange(0.0, max(y * fLineHeight, (float)0));
-		fVScrollBar2->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
+		fVScrollBar2->SetRange(0, max<float>(totalHeight - h, 0));
+		fVScrollBar2->SetSteps(fLineHeight, max<float>(h, 0));
+		fVScrollBar2->SetProportion(min<float>(h / totalHeight, 1));
 
 		h = fSplitAt - kSplitterHeight;
-		y = (lines * fLineHeight - h) / fLineHeight;
 
-		fVScrollBar1->SetRange(0.0, max(y * fLineHeight, (float)0));
-		fVScrollBar1->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
+		fVScrollBar1->SetRange(0, max<float>(totalHeight - h, 0));
+		fVScrollBar1->SetSteps(fLineHeight, max<float>(h, 0));
+		fVScrollBar1->SetProportion(min<float>(h / totalHeight, 1));
 	}
 	else
 	{
 		h = fBounds.Height();
-		y = (lines * fLineHeight - h) / fLineHeight;
 
-		fVScrollBar2->SetRange(0.0, max(y * fLineHeight, (float)0));
-		fVScrollBar2->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
+		fVScrollBar2->SetRange(0, max<float>(totalHeight - h, 0));
+		fVScrollBar2->SetSteps(fLineHeight, max(h, 0.0f));
+		fVScrollBar2->SetProportion(min<float>(h / totalHeight, 1));
 
-		fVScrollBar1->SetRange(0.0, max(y * fLineHeight, (float)0));
-		fVScrollBar1->SetSteps(fLineHeight, max(h - fLineHeight, (float)0));
+		fVScrollBar1->SetRange(0, max<float>(totalHeight - h, 0));
+		fVScrollBar1->SetSteps(fLineHeight, max<float>(h, 0));
+		fVScrollBar1->SetProportion(min<float>(h / totalHeight, 1));
 	}
 
 	if (fSoftWrap)
@@ -1857,7 +1867,6 @@ void PText::ScrollBarChanged(BScrollBar *bar, g_unit_t dy)
 			src.bottom += dy;
 		}
 
-		src.top += 1;
 		dst = src;
 		dst.OffsetBy(0, -dy);
 
@@ -1940,14 +1949,17 @@ void PText::MouseDown(BPoint where)
 		else if (where.y < fSplitAt && fActivePart == 2)
 			SwitchPart(1);
 
-		if ((curOffset < anchor1 || curOffset > anchor2 || anchor1 == anchor2) &&
+		BRegion rgn;
+		Selection2Region(rgn, fActivePart);
+
+		if (!rgn.Contains(where) &&
 			fDragButtons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON))
 		{
 			ShowContextualMenu(where);
 			return;
 		}
 
-		if (curOffset > anchor1 && curOffset < anchor2 &&
+		if (rgn.Contains(where) &&
 			(fDragButtons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON) ||
 			 (fMouseClicks == 1 && WaitMouseMoved(where))))
 		{
@@ -1961,9 +1973,6 @@ void PText::MouseDown(BPoint where)
 
 			fDragStart = min(fAnchor, fCaret);
 			sfDragSource = this;
-
-			fSavedAnchor = fAnchor;
-			fSavedCaret = fCaret;
 
 			BRegion rgn;
 			Selection2Region(rgn, fActivePart);
@@ -2126,32 +2135,35 @@ void PText::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
 {
 	if (!a_message)
 	{
-		if (fWindowActive)
+		if (code == B_EXITED_VIEW)
 		{
-			if (code == B_EXITED_VIEW)
+			be_app->SetCursor(B_HAND_CURSOR);
+			fSplitCursorShown = false;
+		}
+		else
+		{
+			// set the splitter cursor when the mouse is over it
+			if (fSplitAt > 0
+				&& where.y >= fSplitAt - kSplitterHeight
+				&& where.y <= fSplitAt)
 			{
-				be_app->SetCursor(B_HAND_CURSOR);
-				fSplitCursorShown = false;
+				if (!fSplitCursorShown)
+				{
+					be_app->SetCursor(PSplitter::Cursor());
+					fSplitCursorShown = true;
+				}
 			}
-			else
+			else if (code == B_ENTERED_VIEW
+				|| (code == B_INSIDE_VIEW))
 			{
-				// set the splitter cursor when the mouse is over it
-				if (fSplitAt > 0
-					&& where.y >= fSplitAt - kSplitterHeight
-					&& where.y <= fSplitAt)
-				{
-					if (!fSplitCursorShown)
-					{
-						be_app->SetCursor(PSplitter::Cursor());
-						fSplitCursorShown = true;
-					}
-				}
-				else if (code == B_ENTERED_VIEW
-					|| (code == B_INSIDE_VIEW && fSplitCursorShown))
-				{
+				BRegion rgn;
+				Selection2Region(rgn, (where.y < fSplitAt) ? 1 : 2);
+				if (rgn.Contains(where))
+					be_app->SetCursor(B_HAND_CURSOR);
+				else
 					be_app->SetCursor(B_I_BEAM_CURSOR);
-					fSplitCursorShown = false;
-				}
+
+				fSplitCursorShown = false;
 			}
 		}
 	}
@@ -2163,16 +2175,13 @@ void PText::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
 			case B_ENTERED_VIEW:
 				if (!fWindowActive)
 					HiliteSelection();
-				fSavedAnchor = fAnchor;
-				fSavedCaret = fCaret;
 				fWindowActive = true;
 			case B_INSIDE_VIEW:
 				TrackDrag(where);
 				break;
 			case B_EXITED_VIEW:
 				HideCaret();
-				fAnchor = fSavedAnchor;
-				fCaret = fSavedCaret;
+				fDropPos = -1;
 				fWindowActive = Window()->IsActive();
 				if (!fWindowActive)
 					HiliteSelection();
@@ -2183,33 +2192,18 @@ void PText::MouseMoved(BPoint where, uint32 code, const BMessage *a_message)
 
 void PText::TrackDrag(BPoint where)
 {
-	BRect b(Bounds());
-
-	b.InsetBy(0, -10);
-
 	int32 part = (where.y > fSplitAt) ? 2 : 1;
-	SwitchPart(part);
-
-	if (part == 2)
-		b.top += fSplitAt;
-	else
-		b.bottom = b.top + fSplitAt + 20;
+	if (part != fActivePart)
+		SwitchPart(part);
 
 	int32 offset = Position2Offset(where, part);
 
-	if (offset >= min(fSavedCaret, fSavedAnchor) &&
-		offset <= max(fSavedCaret, fSavedAnchor))
+	if (offset != fDropPos)
 	{
 		HideCaret();
-		fAnchor = fSavedAnchor;
-		fCaret = fSavedCaret;
-
-		ScrollToOffset(offset, part, false);
-	}
-	else if (offset != fCaret)
-		SetCaret(offset);
-	else
+		fDropPos = offset;
 		ShowCaret();
+	}
 } /* PText::TrackDrag */
 
 void PText::HandleDrop(BMessage *msg)
@@ -2220,6 +2214,9 @@ void PText::HandleDrop(BMessage *msg)
 	{
 		char *s;
 		ssize_t sl;
+
+		if (fDropPos == -1)
+			return;
 
 		FailOSErr(msg->FindData("text/plain", B_MIME_TYPE, (const void**)&s, &sl));
 		if (s)
@@ -2240,8 +2237,7 @@ void PText::HandleDrop(BMessage *msg)
 				if (!item)
 				{
 					HideCaret();
-					fAnchor = fSavedAnchor;
-					fCaret = fSavedCaret;
+					fDropPos = -1;
 					return;
 				}
 
@@ -2253,18 +2249,8 @@ void PText::HandleDrop(BMessage *msg)
 			else
 				offset = fDragStart;
 
-			if (offset == -1 || fCaret < offset || fCaret > offset + sl)
-			{
-				if (sfDragSource == this)
-				{
-					int32 a, c;
-
-					a = Offset2Line(fSavedAnchor);
-					c = Offset2Line(fSavedCaret);
-					TouchLines(min(a, c), max(a, c));
-				}
-				RegisterCommand(new PDropCmd(this, s, sl, offset, fCaret));
-			}
+			if (offset == -1 || fDropPos < offset || fDropPos > offset + sl)
+				RegisterCommand(new PDropCmd(this, s, sl, offset, fDropPos));
 		}
 	}
 	else if (msg->HasRef("refs"))
@@ -2276,6 +2262,8 @@ void PText::HandleDrop(BMessage *msg)
 			openMsg.AddRef("refs", &ref);
 		be_app_messenger.SendMessage(&openMsg);
 	}
+	HideCaret();
+	fDropPos = -1;
 } /* PText::HandleDrop */
 
 bool PText::WaitMouseMoved(BPoint where)
@@ -4742,7 +4730,7 @@ void PText::Draw(BRect updateRect)
 			StrokeLine(fBounds.LeftTop(), fBounds.RightTop());
 			ConstrainClippingRegion(&clip);
 
-			start = max((int32)0, (int32)floor((updateRect.top + v) / fLineHeight));
+			start = max((int32)0, (int32)floor((updateRect.top - 1.0f + v) / fLineHeight));
 			end = min(LineCount(),
 				(int32)ceil((min(updateRect.bottom, fSplitAt - kSplitterHeight) + v) / fLineHeight) + 1);
 
@@ -4782,7 +4770,7 @@ void PText::Draw(BRect updateRect)
 
 		v = fVScrollBar2->Value();
 
-		start = max((int32)0, (int32)floor((max(updateRect.top - fSplitAt, (float)0) + v) / fLineHeight));
+		start = max((int32)0, (int32)floor((max(updateRect.top - 1.0f - fSplitAt, (float)0) + v) / fLineHeight));
 		end = min(LineCount(), (int32)ceil((updateRect.bottom + v - fSplitAt) / fLineHeight) + 1);
 
 		y = ceil(fSplitAt + fLineHeight * start - v);
@@ -4802,7 +4790,7 @@ void PText::Draw(BRect updateRect)
 	ConstrainClippingRegion(NULL);
 
 	// draw the caret
-	if (fCaret == fAnchor && updateRect.Intersects(CursorFrame(fCaret))) {
+	if ((fDropPos != -1 || fCaret == fAnchor) && updateRect.Intersects(CursorFrame((fDropPos != -1) ? fDropPos : fCaret))) {
 		fCaretDrawn = false;
 		DrawCaret();
 	}
@@ -5206,7 +5194,7 @@ void PText::RedrawDirtyLines()
 	int32 i;
 	float y1, y2;
 
-	int32 caretLine = Offset2Line(fCaret);
+	int32 caretLine = Offset2Line((fDropPos != -1) ? fDropPos : fCaret);
 	BRegion dirtyCaretRegion;
 
 	BRegion clip1, clip2;
@@ -5323,6 +5311,9 @@ void PText::ChangeSelection(int32 newAnchor, int32 newCaret, bool block)
 	int32 na, nc;
 	int32 oa, oc;
 
+	if (newAnchor == fAnchor && newCaret == fCaret && block == fBlockSelect)
+		return;
+
 	na = min(newAnchor, newCaret);
 	nc = max(newAnchor, newCaret);
 
@@ -5372,7 +5363,7 @@ void PText::ChangeSelection(int32 newAnchor, int32 newCaret, bool block)
 
 void PText::Pulse()
 {
-	if (IsFocus() && fWindowActive && fNextCaret < system_time() && (gFlashCursor || ! fCaretVisible))
+	if (fDropPos == -1 && IsFocus() && fWindowActive && fNextCaret < system_time() && (gFlashCursor || ! fCaretVisible))
 		ToggleCaret();
 } /* PText::Pulse */
 
@@ -5399,7 +5390,7 @@ BRect PText::CursorFrame(int32 caret)
 
 void PText::ToggleCaret()
 {
-	if (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible))
+	if (fDropPos == -1 && (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible)))
 		return;
 
 	fNextCaret = system_time() + 500000;
@@ -5414,10 +5405,11 @@ void PText::ToggleCaret()
 
 void PText::DrawCaret()
 {
-	if (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible)
-		|| fCaretVisible == fCaretDrawn) {
+	if (fCaretVisible == fCaretDrawn)
 		return;
-	}
+
+	if (fDropPos == -1 && (fAnchor != fCaret || !fWindowActive || (fIncSearch && fCaretVisible)))
+		return;
 
 	BRegion clip;
 	BRect r(fBounds);
@@ -5427,7 +5419,7 @@ void PText::DrawCaret()
 		r.top = fSplitAt;
 	clip.Include(r);
 
-	r = CursorFrame(fCaret);
+	r = CursorFrame((fDropPos != -1) ? fDropPos : fCaret);
 
 	if (clip.Frame().IsValid())
 	{
@@ -5451,8 +5443,7 @@ void PText::ShiftLines(int32 first, int32 dy, int32 part)
 	if (part == 1)
 	{
 		v = fVScrollBar1->Value();
-		b.top += 1;
-		b.bottom = fSplitAt - kSplitterHeight;
+		b.bottom = fSplitAt - kSplitterHeight - 1;
 	}
 	else
 	{

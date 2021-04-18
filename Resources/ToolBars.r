@@ -39,8 +39,7 @@
 type rtyp_Tbar {
 	longint
 		standard			= 0,
-		dragger				= 1,
-		acceptFirstClick	= 2;		// Flags
+		dragger				= 1;		// Flags
 	longint = $$CountOf(buttons);
 	array buttons {
 		longint;						// ResID for icon 1
@@ -96,7 +95,7 @@ resource rtyp_Tbar (rid_Tbar_DifferencesWin) {
 
 /* Group Window */
 resource rtyp_Tbar (rid_Tbar_GroupWin) {
-	acceptFirstClick,
+	standard,
 	{
 		rid_Timg_FileAdd,		0,						'Add ',				0,				"Add file",
 		rid_Timg_FileRemove,	0,						'Rmve',				0,				"Remove file",

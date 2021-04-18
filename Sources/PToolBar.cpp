@@ -51,7 +51,6 @@ void PToolBar::Draw(BRect /*update*/)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	BRect b(Bounds());
-	b.bottom -= 1;
 		
 	FillRect(b, B_SOLID_LOW);
 

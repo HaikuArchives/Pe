@@ -153,7 +153,7 @@ private:
 			void HideHelp();
 virtual	void Pulse();
 
-			bool fDragger, fAcceptFirstClick;
+			bool fDragger;
 			BHandler *fTarget;
 			vector<HTool*> fTools;
 			int32 fLastToolOver;
