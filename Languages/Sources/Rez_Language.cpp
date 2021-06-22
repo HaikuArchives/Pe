@@ -37,7 +37,7 @@
 #include "HColorUtils.h"
 
 _EXPORT const char kLanguageName[] = "Rez";
-_EXPORT const char kLanguageExtensions[] = "r;rez";
+_EXPORT const char kLanguageExtensions[] = "r;rez;rdef";
 _EXPORT const char kLanguageCommentStart[] = "//";
 _EXPORT const char kLanguageCommentEnd[] = "";
 _EXPORT const char kLanguageKeywordFile[] = "keywords.rez";
