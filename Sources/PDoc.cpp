@@ -80,7 +80,8 @@
 static int32 sDocCount = 0;
 
 const float
-	kStatusWidth = 80;
+	kStatusWidth = 280; // not sure if this value makes sense, longer
+						// file paths will be obscured by scrollbar
 
 PDoc::PDoc(const entry_ref *doc, bool show)
 	: inherited(doc)

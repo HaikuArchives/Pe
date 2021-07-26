@@ -84,9 +84,9 @@ void PStatus::Draw(BRect updateRect)
 
 	SetHighColor(kBlack);
 	MovePenTo(3, fBaseline);
-	char s[32];
+	char s[100];
 	int32 line = fText->Offset2Line(fOffset);
-	sprintf(s, "%" B_PRId32 ",%" B_PRId32, line + 1, fText->Offset2Column(fOffset) + 1);
+	sprintf(s, "%s" ":%" B_PRId32 ":%" B_PRId32, fPath, line + 1, fText->Offset2Column(fOffset) + 1);
 	DrawString(s);
 } /* PStatus::Draw */
 
