@@ -588,7 +588,7 @@ void PText::GetSettingsMW(BPositionIO& set)
 	fontsize = (long)fFont.Size();
 	fFont.GetFamilyAndStyle(&font, &style);
 
-	set << htonl(anchor) << htonl(caret) << htonl(tabs) << htonl(flags) << htonl(fontsize);
+	set << B_BENDIAN_TO_HOST_INT32(anchor) << B_BENDIAN_TO_HOST_INT32(caret) << B_BENDIAN_TO_HOST_INT32(tabs) << B_BENDIAN_TO_HOST_INT32(flags) << B_BENDIAN_TO_HOST_INT32(fontsize);
 	set.Write(font, sizeof(font));
 	set.Write(style, sizeof(style));
 } /* PText::GetSettingsMW */
@@ -609,18 +609,18 @@ void PText::SetSettingsMW(BPositionIO& set)
 		if (gRestoreFont)
 		{
 			if (tabs)
-				fTabStops = ntohl(tabs);
+				fTabStops = B_BENDIAN_TO_HOST_INT32(tabs);
 			if (*font && *style)
 				fFont.SetFamilyAndStyle(font, style);
 			if (fontsize)
-				fFont.SetSize((float)(ntohl(fontsize)));
+				fFont.SetSize((float)(B_BENDIAN_TO_HOST_INT32(fontsize)));
 		}
 
 		ReInit();
 
 		if (gRestoreSelection)
 		{
-			Select(ntohl(anchor), ntohl(caret), true, false);
+			Select(B_BENDIAN_TO_HOST_INT32(anchor), B_BENDIAN_TO_HOST_INT32(caret), true, false);
 			fWalkOffset = Offset2Position(fCaret).x;
 		}
 	}
