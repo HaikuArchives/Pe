@@ -66,7 +66,7 @@ RState* RState::FirstState(int32 type)
 
 void RState::FinishType(int32 type, RState *state)
 {
-	int32 sType = htonl(type);
+	int32 sType = B_BENDIAN_TO_HOST_INT32(type);
 
 	if (sfTypeMap.find(type) != sfTypeMap.end())
 		warn("warning: redefinition of type '%4.4s'", &sType);
@@ -76,7 +76,7 @@ void RState::FinishType(int32 type, RState *state)
 
 void RState::CopyType(int32 type1, int32 type2)
 {
-	int32 sType = htonl(type1);
+	int32 sType = B_BENDIAN_TO_HOST_INT32(type1);
 
 	if (sfTypeMap.find(type1) != sfTypeMap.end())
 		warn("warning: redefinition of type '%4.4s'", &sType);

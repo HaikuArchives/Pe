@@ -303,7 +303,7 @@ resheader		:	RES NUMBER '(' NUMBER ',' strconst ')'
 																sState = RState::FirstState($2);
 																if (!sState)
 																{
-																	int t = ntohl($2);
+																	int t = B_BENDIAN_TO_HOST_INT32($2);
 																	error("Undefined resource type: %4.4s", &t);
 																}
 																head = NULL;
@@ -314,7 +314,7 @@ resheader		:	RES NUMBER '(' NUMBER ',' strconst ')'
 																sState = RState::FirstState($2);
 																if (!sState)
 																{
-																	int t = ntohl($2);
+																	int t = B_BENDIAN_TO_HOST_INT32($2);
 																	error("Undefined resource type: %4.4s", &t);
 																}
 																head = NULL;

@@ -262,7 +262,7 @@ void WriteResource(addr_t x)
 {
 	ResHeader *rh = (ResHeader *)x;
 
-	long sType = htonl(rh->type);
+	long sType = B_BENDIAN_TO_HOST_INT32(rh->type);
 	if (verbose) printf("Writing Resource. Type: %4.4s, id: %d, name: %s\n",
 		(char*)&sType, rh->id, rh->name);
 
@@ -304,7 +304,7 @@ void WriteResource(const char *file, int type, int id, const char *name)
 
 	if (!f) error("Error opening file %s: %s", file, strerror(errno));
 
-	long sType = htonl(type);
+	long sType = B_BENDIAN_TO_HOST_INT32(type);
 	if (verbose) printf("Writing Resource. Type: %4.4s, id: %d, name: %s\n", (char*)&sType, id, name);
 
 	fseek(f, 0, SEEK_END);
@@ -339,7 +339,7 @@ void WriteHeader(unsigned long type, int id, const unsigned char *buf,
 {
 	const unsigned char *p = buf;
 	int b = bufSize;
-	long aType = htonl(type);
+	long aType = B_BENDIAN_TO_HOST_INT32(type);
 
 	fprintf(gHeader, "const unsigned char\n\tk%4.4s%d[%d] = {", (char*)&aType, id, bufSize);
 
