@@ -99,7 +99,15 @@ ScanForFunctions(CLanguageProxy& proxy)
 				// -2 in order to skip back over '@@'
 			proxy.SetNestLevel(1);
 			proxy.AddFunction(displayLine.String(), matchLine.String(), pos-text, false);
+		} else if (strncmp(pos, "Subject: ", 9) == 0) {
+			const char* lineEnd = strchr(pos, '\n');
+			if (!lineEnd)
+				lineEnd = pos + strlen(pos);
+			pos += 9; // Leave out "Subject: "
+			BString patchSubject(pos, lineEnd-pos);
+			proxy.AddSeparator(patchSubject);
 		}
+
 		if ((pos = strchr(pos+1, '\n')) != NULL)
 			pos++;
 	}
