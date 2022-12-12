@@ -20,10 +20,10 @@ static const char *sAboutText = "HeaderHeader extension for Pe\n"
 "using the appropriate comment characters for the language used, \n"
 "and informations from a selected People file as author.\n"
 "\n"
-"First select your own People file from \"Set author"B_UTF8_ELLIPSIS"\", \n"
+"First select your own People file from \"Set author" B_UTF8_ELLIPSIS "\", \n"
 "then just select the header you want to use.\n"
 "You can also add your own templates in the settings folder. \n"
-"Use the \"Open template folder"B_UTF8_ELLIPSIS"\" menu, \n"
+"Use the \"Open template folder" B_UTF8_ELLIPSIS "\" menu, \n"
 "create text files there which contain the licence or informations you want. \n"
 "\n"
 "Keywords from the list below will be replaced by the corresponding value:\n"
@@ -385,11 +385,11 @@ BuildPopUp(BDirectory &dir)
 	}
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Open template folder"B_UTF8_ELLIPSIS, 
+	menu->AddItem(new BMenuItem("Open template folder" B_UTF8_ELLIPSIS, 
 		new BMessage('optf')));
-	menu->AddItem(new BMenuItem("Set author"B_UTF8_ELLIPSIS, 
+	menu->AddItem(new BMenuItem("Set author" B_UTF8_ELLIPSIS, 
 		new BMessage('seta')));
-	menu->AddItem(new BMenuItem("About"B_UTF8_ELLIPSIS, 
+	menu->AddItem(new BMenuItem("About" B_UTF8_ELLIPSIS, 
 		new BMessage(B_ABOUT_REQUESTED)));
 	return menu;
 }
