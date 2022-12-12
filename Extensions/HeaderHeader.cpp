@@ -44,7 +44,7 @@ static const char *sAboutText = "HeaderHeader extension for Pe\n"
 ;
 
 static const char *sHaikuHeaderTemplate = "%COMMS%\n"
-"%COMMC% Copyright %YEAR%, Haiku, Inc.\n"
+"%COMMC% Copyright %YEAR%, Haiku, Inc. All rights reserved.\n"
 "%COMMC% Distributed under the terms of the MIT License.\n"
 "%COMMC%\n"
 "%COMMC% Authors:\n"
