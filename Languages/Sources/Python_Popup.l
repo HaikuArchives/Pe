@@ -65,16 +65,16 @@ ident		[a-zA-Z_][a-zA-Z0-9_]*{ws}
 
 %%
 "#"[^\n]*\n
-\"\"\"														BEGIN(comment);
+\"\"\"											BEGIN(comment);
 <comment>\"\"\"									BEGIN(INITIAL);
 <comment>.
-"from"{ws}[^ \t]+{ws}"import"[^\n]+\n		AddInclude2(proxy);
-"import"{ws}											BEGIN(import);
+"from"{ws}[^ \t]+{ws}"import"[^\n]+\n			AddInclude2(proxy);
+"import"{ws}									BEGIN(import);
 <import>[ \t,]+
-<import>[^\n, \t]+									AddInclude(proxy);
-<import>\n											BEGIN(INITIAL);
-^[ \t]*("def"|"class"){ws}[^:]+:					AddFunction(proxy);
-<import,comment><<EOF>>					BEGIN(INITIAL); return 0;
+<import>[^\n, \t]+								AddInclude(proxy);
+<import>\n										BEGIN(INITIAL);
+^[ \t]*("def"|"class"){ws}[^:]+:				AddFunction(proxy);
+<import,comment><<EOF>>							BEGIN(INITIAL); return 0;
 %%
 
 /*
