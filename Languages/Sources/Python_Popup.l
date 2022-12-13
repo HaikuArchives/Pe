@@ -73,7 +73,7 @@ ident		[a-zA-Z_][a-zA-Z0-9_]*{ws}
 <import>[ \t,]+
 <import>[^\n, \t]+								AddInclude(proxy);
 <import>\n										BEGIN(INITIAL);
-^[ \t]*("def"|"class"){ws}[^:]+:				AddFunction(proxy);
+^[ \t]*("def"[ \t]|"class"[ \t]){ws}[^:]+:		AddFunction(proxy);
 <import,comment><<EOF>>							BEGIN(INITIAL); return 0;
 %%
 
