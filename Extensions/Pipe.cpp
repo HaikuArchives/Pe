@@ -162,14 +162,14 @@ status_t Pipe(MTextAddOn *addon)
 			close(ofd[0]);
 			close(ofd[1]);
 
-			char cmd[1024];
-			sprintf(cmd, "cat %s | %s", fn, sText);
+			BString cmd;
+			cmd.SetToFormat("cat %s | %s", fn, sText);
 
 			const char *args[4];
 
 			args[0] = "/bin/sh";
 			args[1] = "-c";
-			args[2] = cmd;
+			args[2] = cmd.String();
 			args[3] = NULL;
 
 			if (execvp(args[0], (char**)args) < 0)
@@ -214,7 +214,7 @@ status_t Pipe(MTextAddOn *addon)
 		close(ofd[0]);
 //		remove(fn);
 	}
-	catch (HErr e)
+	catch (HErr& e)
 	{
 		e.DoError();
 	}

@@ -54,7 +54,7 @@ const char kAboutText[] =
 		"copyright © 2003-2014, Team Pe,\n"
 		"compiled on:\n%s\n\n"
 		"Pe is now hosted at Github:\n"
-		"https://github.com/olta/pe\n\n"
+		"https://github.com/HaikuArchives/Pe\n\n"
 		"You can reach Team Pe\n"
 		"via Pe's mailing-list:\n"
 		"pedevel@freelists.org\n\n"

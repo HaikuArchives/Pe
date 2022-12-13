@@ -55,10 +55,10 @@ void IJRandom(jrPtr theJRPtr)
 
 #define abs(a) ((a)<0?-(a):(a))
 
-void jrSeed(register jrPtr theJRPtr,
+void jrSeed(jrPtr theJRPtr,
 	unsigned long seedVal)
 {
-	register short j;
+	short j;
 	
 //	theJRPtr->dummy = MODULO(Abs(ADDEND - seedVal));
 // MLH: Changed Abs to abs
@@ -71,12 +71,12 @@ void jrSeed(register jrPtr theJRPtr,
 
 
 
-short jrLinearShort(register jrPtr theJRPtr,
-	register short lowest, short highest)
+short jrLinearShort(jrPtr theJRPtr,
+	short lowest, short highest)
 {
-	register long interval = highest - lowest + 1;
-	register long partitionSize;
-	register short j;
+	long interval = highest - lowest + 1;
+	long partitionSize;
+	short j;
 	
 	if (interval <= 0) return lowest;
 	partitionSize = (NDISTINCTRANDOMVALUES-1)/interval;
