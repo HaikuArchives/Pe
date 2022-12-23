@@ -1025,7 +1025,7 @@ void PApp::DisplayInBrowser(const entry_ref& doc)
 {
 	try
 	{
-		BMessage msg(B_NETPOSITIVE_OPEN_URL);
+		BMessage msg(B_REFS_RECEIVED);
 
 		BPath path;
 		FailOSErr(BEntry(&doc).GetPath(&path));
@@ -1033,7 +1033,7 @@ void PApp::DisplayInBrowser(const entry_ref& doc)
 		string url = "file://";
 		url += path.Path();
 
-		msg.AddString("be:url", url.c_str());
+		msg.AddString("url", url.c_str());
 
 		char sig[B_MIME_TYPE_LENGTH];
 		BMimeType("text/html").GetPreferredApp(sig);
