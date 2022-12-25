@@ -563,13 +563,17 @@ PDoc* PApp::OpenWorksheet()
 
 static void Usage()
 {
-	fprintf(stderr, "Usage: pe [\"+\"linenr] file1 file2 ...\n");
+	fprintf(stderr, "Usage: pe [\"+\"linenr] [--diff] file1 file2 ...\n");
 } /* Usage */
 
 void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 {
 	try
 	{
+		// -1 = No, 0 = yes, 1 = got first file, 2 = got second file
+		int invokeDiff = -1;
+		entry_ref f1, f2;
+
 		int i = 1, lineNr = -1;
 		char *p;
 
@@ -578,12 +582,13 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 			switch (argv[i][0])
 			{
 				case '-':
-					if (strcmp(argv[i], "-reload_worksheet") == 0)
-					{
+					if (strcmp(argv[i], "-reload_worksheet") == 0) {
 						PDoc *d = OpenWorksheet();
 						if (d && d->Lock())
 							d->Quit();
 						d = OpenWorksheet();
+					} else if (argc == 4 && strcmp(argv[i], "--diff") == 0) {
+						invokeDiff = 0;
 					} else {
 						Usage();
 					}
@@ -611,8 +616,16 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 					BEntry e;
 					FailOSErr(e.SetTo(&doc));
 
-					if (e.Exists())
+					if (e.Exists()) {
 						d = dynamic_cast<CDocWindow*>(OpenWindow(doc));
+						if (invokeDiff >= 0) {
+							invokeDiff += 1;
+							if (invokeDiff == 1)
+								f1 = doc;
+							else
+								f2 = doc;
+						}
+					}
 					else
 					{
 						d = NewWindow(NULL);
@@ -630,6 +643,19 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 				}
 			}
 			i++;
+		}
+
+		if (invokeDiff == 2) {
+			// Size doesn't matter here as the window will be resized right away.
+			BRect r(0, 0, 0, 0);
+			CDiffWindow *ndw = new CDiffWindow(r, "Differences");
+
+			BMessage msg(msg_Add2Files);
+			msg.AddRef("refs", &f1);
+			msg.AddRef("refs", &f2);
+			ndw->PostMessage(&msg);
+
+			ndw->PostMessage(msg_RefreshDiffs);
 		}
 	}
 	catch (HErr& e)
