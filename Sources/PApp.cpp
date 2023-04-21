@@ -1034,19 +1034,7 @@ void PApp::DisplayInBrowser(const entry_ref& doc)
 		url += path.Path();
 
 		msg.AddString("url", url.c_str());
-
-		char sig[B_MIME_TYPE_LENGTH];
-		BMimeType("text/html").GetPreferredApp(sig);
-		team_id team = be_roster->TeamFor(sig);
-
-		if (team > 0)
-		{
-			BMessenger msr(sig, team);
-			msg.AddSpecifier("Window", (int32)0);
-			msr.SendMessage(&msg, (BHandler*)NULL, 1000);
-			be_roster->ActivateApp(team);
-		}
-		else if (be_roster->Launch(sig, &msg))
+		if (be_roster->Launch("text/html", &msg) == B_LAUNCH_FAILED)
 			THROW(("Could not launch browser"));
 	}
 	catch (HErr& e)
