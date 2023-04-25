@@ -31,18 +31,27 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 
 
-  Notes:
-    Put together in 2006, by Oscar Lesta, from "CperlFuncPopup.l" and some bits
+   Put together in 2006, by Oscar Lesta, from "CperlFuncPopup.l" and some bits
     of "CtexFuncPopup.l". Don't ask me how this work, it just does it! :-)
 
-  Caveats:
-    - This assumes that lout's data is installed under:
-      "/boot/home/config/etc/lout/" or "/boot/common/etc/lout/"
+  Caveats/Notes:
+
+    - This will look for lout's data is installed under the first of
+      `findpaths B_FIND_PATH_DATA_DIRECTORY` + "/lout" that exists, namely;
+
+		/boot/home/config/non-packaged/data/lout
+		/boot/home/config/data/lout
+		/boot/system/non-packaged/data/lout
+		/boot/system/data/lout
+
       *but*
+
       if the enviromental variable "$LOUTLIB" is found, it's value is used
       instead (make sure it is correct!).
+
     - Assumes that *your* files end with .lt (lout's files) and .ld (lout's
       databases).
+
     - Assumes that chapters, sections, subsections, etc. are in the form:
       @Section
         @Title { A Title }
@@ -173,6 +182,13 @@ char* trimstring(char str[])
 }
 
 
+static bool PathExists(const BPath& path)
+{
+	BEntry entry(path.Path(), true);
+	return entry.Exists();
+}
+
+
 static void AddInclude(CLanguageProxy& proxy, const char ext[])
 {
 	char *s, *i = yytext;
@@ -184,24 +200,19 @@ static void AddInclude(CLanguageProxy& proxy, const char ext[])
 	if (!s) return;
 
 	s++;
-
 	s = trimstring(s);
-	char* tmp = (char*) calloc(1, strlen(s) + strlen(ext) + 1);
-	if (!tmp)
-		return;
 
-	strcat(tmp, s);
-	if (!strstr(tmp, ext))
-		strcat(tmp, ext);
-	proxy.AddInclude(s, tmp);
-	free(tmp);
-}
+	BString nameNoExt(s);
+	BPath path(nameNoExt);
 
+	path.Append(ext);
 
-static bool PathExists(const BPath& path)
-{
-	BEntry entry(path.Path(), true);
-	return entry.Exists();
+	// Also try without the extension (useful when working with Lout's own doc files).
+	if (!PathExists(path))
+		path.SetTo(nameNoExt);
+
+	if (PathExists(path))
+		proxy.AddInclude(s, path.Path(), false);
 }
 
 
@@ -209,21 +220,23 @@ static status_t GetLoutDirectory(const char* subDir, BPath& path)
 {
 	static const char* kLoutDir = getenv("LOUTLIB");
 
-	if (kLoutDir != NULL)
-	{
+	if (kLoutDir != NULL) {
 		path.SetTo(kLoutDir);
 		path.Append(subDir);
 	}
 
-	if (kLoutDir == NULL || !PathExists(path))
-	{
+	if (kLoutDir == NULL || !PathExists(path)) {
 		BStringList paths;
-		status_t error = BPathFinder::FindPaths(B_FIND_PATH_ETC_DIRECTORY,
+		status_t status = BPathFinder::FindPaths(B_FIND_PATH_DATA_DIRECTORY,
 			"lout", B_FIND_PATH_EXISTING_ONLY, paths);
-		if (error != B_OK)
-			return error;
+		if (status != B_OK)
+			return status;
 
-		return path.SetTo(paths.StringAt(0));
+		path.SetTo(paths.StringAt(0));
+		path.Append(subDir);
+
+		if (!PathExists(path))
+			return B_ENTRY_NOT_FOUND;
 	}
 
 	return B_OK;
@@ -252,7 +265,8 @@ static void AddSysDataBase(CLanguageProxy& proxy)
 	name << ".ld";
 	path.Append(name.String());
 
-	proxy.AddInclude(s, path.Path());
+	if (PathExists(path))
+		proxy.AddInclude(s, path.Path(), true);
 }
 
 
@@ -269,7 +283,6 @@ static void AddSysInclude(CLanguageProxy& proxy)
 	s++;
 
 	s = trimstring(s);
-	char* tmp;
 
 	BPath path;
 	if (GetLoutDirectory("include", path) != B_OK)
@@ -277,7 +290,8 @@ static void AddSysInclude(CLanguageProxy& proxy)
 
 	path.Append(s);
 
-	proxy.AddInclude(s, path.Path());
+	if (PathExists(path))
+		proxy.AddInclude(s, path.Path(), true);
 }
 
 
