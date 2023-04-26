@@ -496,6 +496,17 @@ void PDoc::OpenInclude(const char *incl)
 			return;
 		}
 
+		// Handle absolute paths
+		if (strncmp(incl, "/", 1) == 0)
+		{
+			BPath path(incl);
+			if (e.SetTo(path.Path(), true) == B_OK && e.Exists() && e.IsFile())
+			{
+				FailOSErr(e.GetRef(&doc));
+				found = true;
+			}
+		}
+
 		if (! found && fText->GetCWD())
 		{
 			FailOSErr(d.SetTo(fText->GetCWD()));
