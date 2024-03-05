@@ -117,9 +117,14 @@ resource 'DLOG' (132, "Preferences") {
 			TabSheetEnd			{																							},
 
 			TabSheet			{ "Connections", "Options that control the connections to other programs"					},
+#ifdef __BEOS__
 				CheckBox		{{   0,   0, 200,  16 }, pnm_Con_X_ShowBeIdeMenu,		"Show Metrowerks BeIDE menu"		},
 				CheckBox		{{   0,  20, 200,  36 }, pnm_Con_X_LoadBeIdeExt,		"Load Metrowerks BeIDE extensions"	},
 				CheckBox		{{   0,  50, 200,  66 }, pnm_Con_X_PassiveFtp,			"Use passive FTP by default"		},
+#else
+				CheckBox		{{   0,   0, 200,  16 }, pnm_Con_X_ShowBeIdeMenu,		"Show Paladin IDE menu"				},
+				CheckBox		{{   0,  30, 200,  46 }, pnm_Con_X_PassiveFtp,			"Use passive FTP by default"		},
+#endif
 			TabSheetEnd			{																							},
 
 			TabSheet			{ "Differences", "Options that control the 'Find differences' command"						},
