@@ -108,6 +108,7 @@
 	
 #define msg_OutputWillFollow			'OutP'
 #define msg_Execute						'Exec'
+#define msg_ExecuteToWorksheet			'ExWs'
 #define msg_ExecFinished				'Fnsh'
 #define msg_TypeString					'TypS'
 #define msg_Preferences					'Pref'

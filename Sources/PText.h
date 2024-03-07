@@ -265,7 +265,7 @@ virtual		void FrameResized(float w, float h);
 			void JumpToFunction(const char *func, int32 offset);
 			void FindNextError(bool backward);
 
-			void ExecuteSelection();
+			void ExecuteSelection(bool outputToWorkSheet = false);
 			void KillCurrentJob();
 			void PrepareForOutput();
 			void SetCWD(const char *cwd);
