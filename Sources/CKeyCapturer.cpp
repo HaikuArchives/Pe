@@ -191,7 +191,7 @@ void CKeyCapturer::DescribeKeys(const KeyShortcut& ks, char *desc)
 		if (isprint(key[0]))
 			strcat(desc, key);
 		else
-			switch (key[0])
+			switch ((unsigned char)key[0])
 			{
 				case B_BACKSPACE:		strcat(desc, "Backspace");	break;
 				case B_TAB:				strcat(desc, "Tab");		break;
