@@ -36,12 +36,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-_EXPORT const char kLanguageName[] = "Shell";
-_EXPORT const char kLanguageExtensions[] = "sh;make;Makefile;makefile";
-_EXPORT const char kLanguageCommentStart[] = "#";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.sh";
-_EXPORT const int16 kInterfaceVersion = 2;
+const char kLanguageName[] = "Shell";
+const char kLanguageExtensions[] = "sh;make;Makefile;makefile";
+const char kLanguageCommentStart[] = "#";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.sh";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START, IDENT, LCOMMENT, STRING1, STRING2

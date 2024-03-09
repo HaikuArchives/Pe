@@ -37,14 +37,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-extern "C" {
-_EXPORT const char kLanguageName[] = "Diff";
-_EXPORT const char kLanguageExtensions[] = "diff;patch;patchset";
-_EXPORT const char kLanguageCommentStart[] = "";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.diff";
-_EXPORT const int16 kInterfaceVersion = 2;
-}
+const char kLanguageName[] = "Diff";
+const char kLanguageExtensions[] = "diff;patch;patchset";
+const char kLanguageCommentStart[] = "";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.diff";
+const int16 kInterfaceVersion = 2;
 
 // #pragma mark - coloring
 

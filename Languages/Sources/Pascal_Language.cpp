@@ -40,14 +40,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-extern "C" {
-_EXPORT const char kLanguageName[] = "Pascal";
-_EXPORT const char kLanguageExtensions[] = "pas;pp;inc";
-_EXPORT const char kLanguageCommentStart[] = "//";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.pas";
-_EXPORT const int16 kInterfaceVersion = 2;
-}
+const char kLanguageName[] = "Pascal";
+const char kLanguageExtensions[] = "pas;pp;inc";
+const char kLanguageCommentStart[] = "//";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.pas";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START,

@@ -36,12 +36,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-_EXPORT const char kLanguageName[] = "Java";
-_EXPORT const char kLanguageExtensions[] = "java";
-_EXPORT const char kLanguageCommentStart[] = "//";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.java";
-_EXPORT const int16 kInterfaceVersion = 2;
+	const char kLanguageName[] = "Java";
+	const char kLanguageExtensions[] = "java";
+	const char kLanguageCommentStart[] = "//";
+	const char kLanguageCommentEnd[] = "";
+	const char kLanguageKeywordFile[] = "keywords.java";
+	const int16 kInterfaceVersion = 2;
 
 enum {
 	START, IDENT, OTHER, COMMENT, LCOMMENT, STRING,

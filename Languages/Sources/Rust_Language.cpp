@@ -34,14 +34,12 @@
 #include "HColorUtils.h"
 
 
-extern "C" {
-	_EXPORT const char	kLanguageName[]			= "Rust";
-	_EXPORT const char	kLanguageExtensions[]	= "rs";
-	_EXPORT const char	kLanguageCommentStart[]	= "//";
-	_EXPORT const char	kLanguageCommentEnd[]	= "";
-	_EXPORT const char	kLanguageKeywordFile[]	= "keywords.rs";
-	_EXPORT const int16	kInterfaceVersion		= 2;
-}
+const char	kLanguageName[]			= "Rust";
+const char	kLanguageExtensions[]	= "rs";
+const char	kLanguageCommentStart[]	= "//";
+const char	kLanguageCommentEnd[]	= "";
+const char	kLanguageKeywordFile[]	= "keywords.rs";
+const int16	kInterfaceVersion		= 2;
 
 
 enum {

@@ -46,14 +46,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-extern "C" {
-_EXPORT const char kLanguageName[] = "Ruby";
-_EXPORT const char kLanguageExtensions[] = "rb;rbw";
-_EXPORT const char kLanguageCommentStart[] = "#";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.rb";
-_EXPORT const int16 kInterfaceVersion = 2;
-}
+const char kLanguageName[] = "Ruby";
+const char kLanguageExtensions[] = "rb;rbw";
+const char kLanguageCommentStart[] = "#";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.rb";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START				= 0x00,

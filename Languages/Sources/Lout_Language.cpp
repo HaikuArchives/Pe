@@ -47,13 +47,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-_EXPORT const char kLanguageName[] = "Lout";
-_EXPORT const char kLanguageExtensions[] = "lt;ld";
-_EXPORT const char kLanguageCommentStart[] = "#";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.lt";
-_EXPORT const int16 kInterfaceVersion = 2;
-
+const char kLanguageName[] = "Lout";
+const char kLanguageExtensions[] = "lt;ld";
+const char kLanguageCommentStart[] = "#";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.lt";
+const int16 kInterfaceVersion = 2;
 
 static inline bool
 isOperator(char c)

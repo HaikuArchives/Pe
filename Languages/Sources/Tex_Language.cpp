@@ -36,12 +36,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-_EXPORT const char kLanguageName[] = "TeX";
-_EXPORT const char kLanguageExtensions[] = "tex";
-_EXPORT const char kLanguageCommentStart[] = "%";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.tex";
-_EXPORT const int16 kInterfaceVersion = 2;
+const char kLanguageName[] = "TeX";
+const char kLanguageExtensions[] = "tex";
+const char kLanguageCommentStart[] = "%";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.tex";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START, COMMAND1, COMMAND2, CONSTCHAR,

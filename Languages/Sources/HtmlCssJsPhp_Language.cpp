@@ -53,12 +53,12 @@ enum Language {
 	kLanguagePhp
 };
 
-_EXPORT const char kLanguageName[]         = "HTML-CSS-JS-PHP";
-_EXPORT const char kLanguageExtensions[]   = "html;htm;php";
-_EXPORT const char kLanguageCommentStart[] = "<!--";
-_EXPORT const char kLanguageCommentEnd[]   = "-->";
-_EXPORT const char kLanguageKeywordFile[]  = "keywords.html-css-js-php";
-_EXPORT const int16 kInterfaceVersion      = 2;
+const char kLanguageName[]         = "HTML-CSS-JS-PHP";
+const char kLanguageExtensions[]   = "html;htm;php";
+const char kLanguageCommentStart[] = "<!--";
+const char kLanguageCommentEnd[]   = "-->";
+const char kLanguageKeywordFile[]  = "keywords.html-css-js-php";
+const int16 kInterfaceVersion      = 2;
 
 enum {
 	START = 0,
