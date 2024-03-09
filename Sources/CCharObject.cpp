@@ -56,7 +56,11 @@ BHandler *CCharObject::GetSubSpecifier(BMessage *msg, int32 index,
 
 void CCharObject::MessageReceived(BMessage *msg)
 {
+#if __GNUC__ == 2
 	std::auto_ptr<CCharObject> destroy(this);
+#else
+	std::unique_ptr<CCharObject> destroy(this);
+#endif
 
 	switch (msg->what)
 	{

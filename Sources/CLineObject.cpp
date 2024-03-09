@@ -83,7 +83,11 @@ BHandler *CLineObject::GetSubSpecifier(BMessage *msg, int32 index,
 
 void CLineObject::MessageReceived(BMessage *msg)
 {
+#if __GNUC__ == 2
 	std::auto_ptr<CLineObject> destroy(this);
+#else
+	std::unique_ptr<CLineObject> destroy(this);
+#endif
 
 	switch (msg->what)
 	{
