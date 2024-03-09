@@ -43,12 +43,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-_EXPORT const char kLanguageName[] = "Recipe";
-_EXPORT const char kLanguageExtensions[] = "recipe";
-_EXPORT const char kLanguageCommentStart[] = "#";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.recipe";
-_EXPORT const int16 kInterfaceVersion = 2;
+const char kLanguageName[] = "Recipe";
+const char kLanguageExtensions[] = "recipe";
+const char kLanguageCommentStart[] = "#";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.recipe";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START, IDENT, LCOMMENT, STRING1, STRING2

@@ -37,14 +37,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-extern "C" {
-_EXPORT const char kLanguageName[] = "Antlr";
-_EXPORT const char kLanguageExtensions[] = "g;tree.g";
-_EXPORT const char kLanguageCommentStart[] = "//";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.g";
-_EXPORT const int16 kInterfaceVersion = 2;
-}
+const char kLanguageName[] = "Antlr";
+const char kLanguageExtensions[] = "g;tree.g";
+const char kLanguageCommentStart[] = "//";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.g";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START, IDENT, OTHER, COMMENT, LCOMMENT, STRING,

@@ -36,12 +36,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-_EXPORT const char kLanguageName[] = "HTML";
-_EXPORT const char kLanguageExtensions[] = "html;htm";
-_EXPORT const char kLanguageCommentStart[] = "<!";
-_EXPORT const char kLanguageCommentEnd[] = ">";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.html";
-_EXPORT const int16 kInterfaceVersion = 2;
+const char kLanguageName[] = "HTML";
+const char kLanguageExtensions[] = "html;htm";
+const char kLanguageCommentStart[] = "<!";
+const char kLanguageCommentEnd[] = ">";
+const char kLanguageKeywordFile[] = "keywords.html";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START,

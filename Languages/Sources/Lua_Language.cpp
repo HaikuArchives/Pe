@@ -6,14 +6,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-extern "C" {
-_EXPORT const char kLanguageName[] = "Lua";
-_EXPORT const char kLanguageExtensions[] = "lua;Lua;LUA;decor"; // decor is for Dano's decors
-_EXPORT const char kLanguageCommentStart[] = "--";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.lua";
-_EXPORT const int16 kInterfaceVersion = 2;
-}
+const char kLanguageName[] = "Lua";
+const char kLanguageExtensions[] = "lua;Lua;LUA;decor"; // decor is for Dano's decors
+const char kLanguageCommentStart[] = "--";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.lua";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START,

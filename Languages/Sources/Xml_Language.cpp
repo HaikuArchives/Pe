@@ -43,14 +43,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-extern "C" {
-_EXPORT const char  kLanguageName[] = "XML";
-_EXPORT const char  kLanguageExtensions[] = "xml";
-_EXPORT const char  kLanguageCommentStart[] = "<!";
-_EXPORT const char  kLanguageCommentEnd[] = ">";
-_EXPORT const char  kLanguageKeywordFile[] = "keywords.xml";
-_EXPORT const int16 kInterfaceVersion = 2;
-}
+const char  kLanguageName[] = "XML";
+const char  kLanguageExtensions[] = "xml";
+const char  kLanguageCommentStart[] = "<!";
+const char  kLanguageCommentEnd[] = ">";
+const char  kLanguageKeywordFile[] = "keywords.xml";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START,

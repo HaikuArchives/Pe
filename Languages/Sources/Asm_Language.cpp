@@ -8,14 +8,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-extern "C" {
-_EXPORT const char kLanguageName[] = "ASM-x86";
-_EXPORT const char kLanguageExtensions[] = "as;asm;ASM;nas;s;S";
-_EXPORT const char kLanguageCommentStart[] = ";";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.asm";
-_EXPORT const int16 kInterfaceVersion = 2;
-}
+const char kLanguageName[] = "ASM-x86";
+const char kLanguageExtensions[] = "as;asm;ASM;nas;s;S";
+const char kLanguageCommentStart[] = ";";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.asm";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START, IDENT, COMMENT, LCOMMENT, STRING, NUMERIC, OPERATOR, SYMBOL, LEAVE

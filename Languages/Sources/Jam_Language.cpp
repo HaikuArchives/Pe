@@ -32,12 +32,14 @@
 class ParseContext;
 class Token;
 
-_EXPORT const char kLanguageName[] = "Jam";
-_EXPORT const char kLanguageExtensions[] = "Jamfile;Jamrules;Jambase";
-_EXPORT const char kLanguageCommentStart[] = "#";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.jam";
-_EXPORT const int16 kInterfaceVersion = 2;
+extern "C" {
+	const char kLanguageName[] = "Jam";
+	const char kLanguageExtensions[] = "Jamfile;Jamrules;Jambase";
+	const char kLanguageCommentStart[] = "#";
+	const char kLanguageCommentEnd[] = "";
+	const char kLanguageKeywordFile[] = "keywords.jam";
+	const int16 kInterfaceVersion = 2;
+}
 
 // #pragma mark ----- tokens -----
 

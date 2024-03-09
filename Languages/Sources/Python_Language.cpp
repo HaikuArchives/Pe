@@ -36,12 +36,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-_EXPORT const char kLanguageName[] = "Python";
-_EXPORT const char kLanguageExtensions[] = "py";
-_EXPORT const char kLanguageCommentStart[] = "#";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.py";
-_EXPORT const int16 kInterfaceVersion = 2;
+const char kLanguageName[] = "Python";
+const char kLanguageExtensions[] = "py";
+const char kLanguageCommentStart[] = "#";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.py";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START, IDENT, OTHER, COMMENT, LCOMMENT, STRING1, STRING2, STRING3,

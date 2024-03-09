@@ -43,14 +43,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-extern "C" {
-_EXPORT const char kLanguageName[] = "C/C++";
-_EXPORT const char kLanguageExtensions[] = "c;h;C;H;cc;hh;cpp;hpp;cxx;hxx;cp;hp";
-_EXPORT const char kLanguageCommentStart[] = "//";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.cpp";
-_EXPORT const int16 kInterfaceVersion = 2;
-}
+const char kLanguageName[] = "C/C++";
+const char kLanguageExtensions[] = "c;h;C;H;cc;hh;cpp;hpp;cxx;hxx;cp;hp";
+const char kLanguageCommentStart[] = "//";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.cpp";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START				= 0x00,

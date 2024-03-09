@@ -36,12 +36,12 @@
 #include "CLanguageAddOn.h"
 #include "HColorUtils.h"
 
-_EXPORT const char kLanguageName[] = "Rez";
-_EXPORT const char kLanguageExtensions[] = "r;rez;rdef";
-_EXPORT const char kLanguageCommentStart[] = "//";
-_EXPORT const char kLanguageCommentEnd[] = "";
-_EXPORT const char kLanguageKeywordFile[] = "keywords.rez";
-_EXPORT const int16 kInterfaceVersion = 2;
+const char kLanguageName[] = "Rez";
+const char kLanguageExtensions[] = "r;rez;rdef";
+const char kLanguageCommentStart[] = "//";
+const char kLanguageCommentEnd[] = "";
+const char kLanguageKeywordFile[] = "keywords.rez";
+const int16 kInterfaceVersion = 2;
 
 enum {
 	START, IDENT, OTHER, COMMENT, LCOMMENT, STRING,
