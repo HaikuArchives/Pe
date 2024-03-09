@@ -49,7 +49,11 @@ HLazyObject::~HLazyObject()
 BHandler *HLazyObject::ResolveSpecifier(BMessage *msg, int32 index,
 						BMessage *specifier, int32 form, const char *property)
 {
+#if __GNUC__ == 2
 	std::auto_ptr<HLazyObject> lets_commit_suicide(this);
+#else
+	std::unique_ptr<HLazyObject> lets_commit_suicide(this);
+#endif
 	BHandler *result = NULL;
 
 //	if (index > 0)
