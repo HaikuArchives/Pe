@@ -156,7 +156,7 @@ PApp::PApp()
 			else
 			{
 				BEntry d;
-				FailOSErr(e.FindEntry("pe", &d, B_DIRECTORY_NODE));
+				FailOSErr(e.FindEntry("pe", &d, B_DIRECTORY_NODE != 0));
 				FailOSErr(gPrefsDir.SetTo(&d));
 			}
 		}
