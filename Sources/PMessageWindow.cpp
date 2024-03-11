@@ -193,7 +193,11 @@ void PMessageItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 
 	p.Set(30, bounds.top + fh.ascent);
 
-	if (fErr) owner->DrawString(fErr, strlen(fErr) - 1, p); p.y += lineHeight;
+	if (fErr)
+		owner->DrawString(fErr, strlen(fErr) - 1, p);
+
+	p.y += lineHeight;
+
 	if (fSrc)
 	{
 		for (int i = 0; i < strlen(fSrc); i++)
