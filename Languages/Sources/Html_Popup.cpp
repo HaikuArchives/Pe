@@ -138,14 +138,12 @@ const char *Anchor(const char *txt, CLanguageProxy& ao)
 			if (*txt == 0)
 				break;
 			
-			char *p = name + kMaxNameSize;
 			int l = std::min(kMaxNameSize - 1, txt - anchor - 1);
 			strncpy(name, anchor, l);
 			name[l] = 0;
-			
-			sprintf(p, "A: %s", name);
-			
-			ao.AddFunction(p, name, offset);
+
+			BString tmp;
+			ao.AddFunction(tmp.SetToFormat("A: %s", name).String(), name, offset);
 		}
 	}
 	while (false);
