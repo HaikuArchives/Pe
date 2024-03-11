@@ -87,7 +87,7 @@ static void SaveRecentMenu()
 
 static void RestoreRecentMenu()
 {
-	char name[12];
+	BString name;
 	int i = gRecentBufferSize;
 	const char *path;
 
@@ -95,8 +95,8 @@ static void RestoreRecentMenu()
 	{
 		try
 		{
-			sprintf(name, "recentdoc%d", i--);
-			path = gPrefs->GetPrefString(name);
+			name.SetToFormat("recentdoc%d", i--);
+			path = gPrefs->GetPrefString(name.String());
 			if (path)
 				PDoc::AddRecent(path);
 		}
