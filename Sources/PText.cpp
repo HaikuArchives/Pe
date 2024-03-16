@@ -4452,10 +4452,12 @@ const char
 #include "PExec.h"
 #include "PErrorWindow.h"
 
-PExec::PExec(PText *txt, const char *cmd, const char *wd)
+PExec::PExec(PText *txt, const char *cmd, const char *wd, PText *dest)
 	: MThread("execvp")
 {
 	fText = txt;
+	fDest = dest; // destination for "msg_ExecFinished" if not NULL.
+
 	fWindow = fText->Looper();
 
 	BPath appDirPath, settingsDirPath;
@@ -4642,14 +4644,17 @@ long PExec::Execute()
 	}
 
 	BMessage msg(msg_ExecFinished);
-	fWindow->PostMessage(&msg, fText);
+	if (fDest != NULL)
+		fDest->Looper()->PostMessage(&msg, fDest);
+	else
+		fWindow->PostMessage(&msg, fText);
 
 	return 0;
 } /* PExec::Execute */
 
 // #pragma mark -
 
-void PText::ExecuteSelection()
+void PText::ExecuteSelection(bool outputToWorkSheet)
 {
 	if (fExec)
 	{
@@ -4674,7 +4679,28 @@ void PText::ExecuteSelection()
 		fText.Copy(s, from, to - from);
 	}
 
-	fExec = new PExec(this, s, fCWD);
+	PText* outputText = this;
+	if (outputToWorkSheet)
+	{
+		if (!this->Doc()->IsWorksheet())
+		{
+			// We're not the Worksheet, is one already open?.
+			PDoc *doc = PDoc::GetWorksheet();
+
+			if (doc && !doc->IsWorksheet()) // GetWorksheet() bogus?
+			{
+				// Let's open it ourselves.
+				PApp *app = dynamic_cast<PApp*>(be_app);
+				doc = app->OpenWorksheet();
+			}
+			outputText = doc->TextView();
+		}
+	}
+
+	// if outputText != this, PExec's fWindow needs to be set to *this* 'this', otherwise
+	// the doc window never gets the msg_ExecFinished message, causing the
+	// "Execute Command" button to gets stuck on low.
+	fExec = new PExec(outputText, s, fCWD, (outputText != this) ? this : NULL);
 	fExec->Run();
 	Doc()->ButtonBar()->SetDown(msg_Execute, true);
 
@@ -6130,6 +6156,10 @@ void PText::MessageReceived(BMessage *msg)
 
 			case msg_Execute:
 				ExecuteSelection();
+				break;
+
+			case msg_ExecuteToWorksheet:
+				ExecuteSelection(true);
 				break;
 
 			case msg_CancelCommand:

@@ -43,11 +43,12 @@ class PErrorWindow;
 
 class PExec : public MThread {
 public:
-			PExec(PText *txt, const char *cmd, const char *wd);
+			PExec(PText *txt, const char *cmd, const char *wd, PText *dest = NULL);
 			~PExec();
 
 virtual	long Execute();
 
+			PText *fDest;
 			PText *fText;
 			BLooper *fWindow;
 			PErrorWindow *fErrorWindow;

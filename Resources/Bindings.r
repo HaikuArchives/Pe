@@ -221,6 +221,7 @@ resource rtyp_Cmnd (rid_Cmnd_Miscellaneous, "Miscellaneous") {
 		kmsg_SplitWindow,							"Split window",
 		msg_CancelCommand,							"Cancel executing command",
 		msg_Execute,								"Execute command",
+		msg_ExecuteToWorksheet,						"Execute command (w/ output to Worksheet)",
 		msg_SwitchHeaderSource,						"Open header/source",
 	}
 };
@@ -421,6 +422,7 @@ resource rtyp_Bind (rid_Bind_Miscellaneous, "Miscellaneous bindings") {
 	{
 		Ctrl,			0x63,	0,		0,			msg_CancelCommand,
 		Cmd,			0x0a,	0,		0,			msg_Execute,
+		Cmd|Shift,		0x0a,	0,		0,			msg_ExecuteToWorksheet,
 //		0,				0x0a,	0,		0,			msg_Execute,
 		Cmd,			0x09,	0,		0,			msg_SwitchHeaderSource
 	}
