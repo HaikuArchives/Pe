@@ -465,6 +465,9 @@ void PText::ApplySettings(const BMessage& msg)
 	if (msg.FindInt32("tabstop", &i) == B_OK)
 		fTabStops = i;
 
+	if (msg.FindBool("show invisibles", &b) == B_OK)
+		fShowInvisibles = b;
+
 	if (gRestoreFont)
 	{
 		if (msg.FindBool("show tabs", &b) == B_OK)
@@ -541,6 +544,8 @@ void PText::CollectSettings(BMessage& msg)
 	if (TabStops() != gPrefs->GetPrefInt(prf_I_SpacesPerTab, 4))
 		FailOSErr(msg.AddInt32("tabstop", TabStops()));
 	FailOSErr(msg.AddBool("show tabs", Doc()->ToolBar()->ShowsTabs()));
+
+	FailOSErr(msg.AddBool("show invisibles", fShowInvisibles));
 
 	FailOSErr(msg.AddInt32("fontkind", fFontKind));
 	if (fFontKind == kIndividualFont) {
