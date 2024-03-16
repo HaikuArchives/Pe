@@ -181,7 +181,6 @@ void CKeyCapturer::DescribeKeys(const KeyShortcut& ks, char *desc)
 		if (keys[i] & (B_CONTROL_KEY << 16))		strcat(desc, "Ctrl-");
 		if (keys[i] & (B_OPTION_KEY << 16))		strcat(desc, "Opt-");
 		if (keys[i] & (B_MENU_KEY << 16))			strcat(desc, "Menu-");
-		if (keys[i] & (B_NUM_LOCK << 16))		strcat(desc, "Numlock-");
 
 		char key[2];
 		key[0] = (char)((keys[i] >> 24) & 0xFF);
