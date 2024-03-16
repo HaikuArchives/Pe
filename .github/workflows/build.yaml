@@ -25,6 +25,6 @@ jobs:
           version: ${{ matrix.config.version }}
           architecture: ${{ matrix.config.architecture }}
           run: |
-            ssh user@localhost "pkgman install -y haiku_devel devel:libpcre" &&
-            ssh user@localhost "pkgman install -y cmd:bison cmd:flex cmd:jam cmd:gcc" &&
+            ssh user@localhost "pkgman update -y haiku_devel devel:libpcre" &&
+            ssh user@localhost "pkgman update -y cmd:bison cmd:flex cmd:jam cmd:gcc" &&
             jam -q
