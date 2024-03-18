@@ -198,6 +198,7 @@
 #define msg_RefreshDiffs				'RfrD'
 #define msg_DiffFile1					'Dff1'
 #define msg_DiffFile2					'Dff2'
+#define msg_Add2Files					'Ad2F'
 
 #define msg_SelectError					'SelE'
 

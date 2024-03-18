@@ -57,8 +57,7 @@ inline int compare(const char *a, const char *b)
 
 const unsigned long
 	msg_InvokeScriptItem = 'InvS',
-	msg_SelectScriptItem = 'SelS',
-	msg_Add2Files = 'Ad2F';
+	msg_SelectScriptItem = 'SelS';
 
 class CDiffToolBar : public PToolBar {
 public:
