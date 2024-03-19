@@ -102,4 +102,13 @@
 #include <map>
 #include <string>
 
+#ifdef __HAIKU__
+	#define PE_DEFAULT_IDE_APPSIG "application/x-vnd.dw-Paladin"
+	#define PE_DEFAULT_IDE_NAME "Paladin"
+#else
+	#define PE_DEFAULT_IDE_APPSIG "application/x-mw-BeIDE"
+	#define PE_DEFAULT_IDE_NAME "BeIDE"
+#endif
+
+
 #endif // PE_H

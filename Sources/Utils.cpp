@@ -158,8 +158,9 @@ void OpenInTracker(const entry_ref& ref)
 void SendToIDE(const BMessage& msg, BMessage *reply)
 {
 	entry_ref ide;
-	if (be_roster->FindApp("application/x-mw-BeIDE", &ide))
-		THROW(("BeIDE was not found"));
+
+	if (be_roster->FindApp(PE_DEFAULT_IDE_APPSIG, &ide))
+		THROW((PE_DEFAULT_IDE_NAME " was not found"));
 
 	if (be_roster->IsRunning(&ide))
 	{
