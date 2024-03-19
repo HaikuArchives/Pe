@@ -396,6 +396,10 @@ void CDiffWindow::Work()
 		}
 		
 		ArrangeWindows();
+
+		fScript->Select(0);
+		fScript->MakeFocus(true);
+		Activate();
 	}
 	catch (HErr& e)
 	{

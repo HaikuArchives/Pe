@@ -646,8 +646,9 @@ void PApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 		}
 
 		if (invokeDiff == 2) {
-			// Size doesn't matter here as the window will be resized right away.
-			BRect r(0, 0, 0, 0);
+			// CDiffWindow get resized right away, but not if files are equal, so...
+			// Provide some sane defaults for its size.
+			BRect r(100, 100, 500, 250);
 			CDiffWindow *ndw = new CDiffWindow(r, "Differences");
 
 			BMessage msg(msg_Add2Files);
