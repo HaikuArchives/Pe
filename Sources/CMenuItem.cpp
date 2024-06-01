@@ -45,7 +45,7 @@ CMenuItem::CMenuItem(BMenu *subMenu)
 	{
 		sfBitmap = new BBitmap(BRect(0, 0, 15, 15), B_COLOR_8_BIT);
 		
-		BMimeType mime("application/x-mw-BeIDE");
+		BMimeType mime(PE_DEFAULT_IDE_APPSIG);
 		mime.GetIcon(sfBitmap, B_MINI_ICON);
 	}
 } /* CMenuItem::CMenuItem */
