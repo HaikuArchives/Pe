@@ -26,6 +26,14 @@ PeLanguage AsmExt
 # </pe-src>
 
 # <pe-src>
+PeLanguage CMakeExt 
+	: CMake_Language.cpp
+	: be 
+	: keywords.cmake.rsrc 
+	;
+# </pe-src>
+
+# <pe-src>
 PeLanguage CppExt 
 	: Cpp_Language.cpp Cpp_Popup.cpp 
 	: be 

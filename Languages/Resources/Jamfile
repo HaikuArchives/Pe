@@ -3,6 +3,7 @@ SubDir TOP Languages Resources ;
 # <pe-src>
 RezObjects
 	keywords.asm.r
+	keywords.cmake.r
 	keywords.cpp.r
 	keywords.d.r
 	keywords.diff.r
