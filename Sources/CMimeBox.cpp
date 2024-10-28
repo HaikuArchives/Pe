@@ -76,7 +76,7 @@ CMimeItem::CMimeItem(const char *mime)
 			time_t t;
 			time(&t);
 			char p[PATH_MAX];
-			sprintf(p, "tmp.pe_is_looking_for_a_mime_icon:%" B_PRId32, t);
+			sprintf(p, "tmp.pe_is_looking_for_a_mime_icon:%" B_PRIdTIME, t);
 
 			BFile f;
 			FailOSErr(tmpdir.CreateFile(p, &f));
