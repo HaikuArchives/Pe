@@ -1,8 +1,15 @@
+ARCH = $(OSPLAT) ;
+if $(OS) = HAIKU && $(OSPLAT) = X86 {
+	ARCH = x86_64 ;
+	if [ Glob /boot/system/lib/x86 : libbe.so ] {
+		ARCH = x86_32 ;
+	}
+}
 
 # The directories used by the build.
 BUILD_DIR			= [ FDirName $(TOP) build ] ;
-GENERATED_DIR		= [ FDirName $(TOP) generated ] ;
-DISTRO_DIR			= [ FDirName $(TOP) generated distro ] ;
+GENERATED_DIR		= [ FDirName $(TOP) generated.$(ARCH) ] ;
+DISTRO_DIR			= [ FDirName $(GENERATED_DIR) distro ] ;
 
 # First find out which gcc version the platform uses.
 IS_GCC_4_PLATFORM = ;

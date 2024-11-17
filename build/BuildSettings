@@ -95,14 +95,23 @@ rule SetUpSubDirBuildSettings {
 		}
 	}
 
+	ARCH = $(OSPLAT) ;
+	if $(OS) = HAIKU && $(OSPLAT) = X86 {
+		ARCH = x86_64 ;
+		if [ Glob /boot/system/lib/x86 : libbe.so ] {
+			ARCH = x86_32 ;
+		}
+	}
+	GENERATED_DIR = [ FDirName $(TOP) generated.$(ARCH) ] ;
+
 	# set the objects-folder according to debugging settings:
 	if $(DEBUG) && $(DEBUG) != 0
 	{
-		OBJECTS_DIR			= [ FDirName $(TOP) generated objects-debug ] ;
+		OBJECTS_DIR			= [ FDirName $(GENERATED_DIR) objects-debug ] ;
 	} 
 	else 
 	{
-		OBJECTS_DIR			= [ FDirName $(TOP) generated objects-nodebug ] ;
+		OBJECTS_DIR			= [ FDirName $(GENERATED_DIR) objects-nodebug ] ;
 	}
 	
 	# debugging settings
