@@ -711,16 +711,29 @@ void PApp::RefsReceived(BMessage	*inMessage)
 			}
 			else if (inMessage->HasInt32("be:line"))
 			{
-				int32 line;
+				int32 line, column;
 
 				FailOSErr(inMessage->FindInt32("be:line", &line));
 
-				BMessage msg(msg_SelectLines);
-				FailOSErr(msg.AddInt32("from", line));
-				FailOSErr(msg.AddInt32("to", line - 1));
-
 				BMessenger msgr(d->TextView());
-				FailOSErr(msgr.SendMessage(&msg));
+
+				if (inMessage->FindInt32("be:column", &column) == B_OK)
+				{
+					int32 offset = d->TextView()->Column2Offset(line - 1, column - 1);
+					BMessage msg(msg_Select);
+					FailOSErr(msg.AddInt32("anchor", offset));
+					FailOSErr(msg.AddInt32("caret", offset));
+
+					FailOSErr(msgr.SendMessage(&msg));
+				}
+				else
+				{
+					BMessage msg(msg_SelectLines);
+					FailOSErr(msg.AddInt32("from", line));
+					FailOSErr(msg.AddInt32("to", line - 1));
+
+					FailOSErr(msgr.SendMessage(&msg));
+				}
 			}
 		}
 	}
@@ -893,10 +906,26 @@ void PApp::MessageReceived(BMessage *msg)
 				int32 lineNr;
 				if (w && msg->FindInt32("line", &lineNr) == B_OK)
 				{
-					BMessage m(msg_SelectLines);
-					FailOSErr(m.AddInt32("from", lineNr));
-					FailOSErr(m.AddInt32("to", lineNr - 1));
-					w->PostMessage(&m, w->PreferredHandler());
+					int32 colNr;
+					if (msg->FindInt32("column", &colNr) == B_OK)
+					{
+						PDoc *d = dynamic_cast<PDoc*>(OpenWindow(doc));
+						if (d)
+						{
+							int32 offset = d->TextView()->Column2Offset(lineNr - 1, colNr - 1);
+							BMessage m(msg_Select);
+							FailOSErr(m.AddInt32("anchor", offset));
+							FailOSErr(m.AddInt32("caret", offset));
+							w->PostMessage(&m, w->PreferredHandler());
+						}
+					}
+					else
+					{
+						BMessage m(msg_SelectLines);
+						FailOSErr(m.AddInt32("from", lineNr));
+						FailOSErr(m.AddInt32("to", lineNr - 1));
+						w->PostMessage(&m, w->PreferredHandler());
+					}
 				}
 
 				if (w)
