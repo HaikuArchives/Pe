@@ -53,7 +53,7 @@ static BString sTempFilePath;
 
 void DoError(const char *e, ...);
 void Usage(bool error);
-void OpenInPe(entry_ref& ref, int lineNr, int colNr=-1);
+void OpenInPe(entry_ref& ref, int lineNr, int colNr = -1);
 
 void Usage(bool error)
 {
@@ -84,11 +84,12 @@ void OpenInPe(entry_ref& doc, int lineNr, int colNr)
 	BMessage msg(msg_CommandLineOpen), reply;
 	msg.AddRef("refs", &doc);
 	
-	if (lineNr >= 0)
+	if (lineNr >= 0) {
 		msg.AddInt32("line", lineNr);
 
-	if (colNr >= 0)
-		msg.AddInt32("column", colNr);
+		if (colNr >= 0)
+			msg.AddInt32("column", colNr);
+	}
 
 	entry_ref pe;
 	if (be_roster->FindApp("application/x-vnd.beunited.pe", &pe))
@@ -193,7 +194,7 @@ int main(int argc, char *argv[])
 				path = argv[i];
 
 				err = e.SetTo(path.String());
-				if (err == B_OK && !e.Exists() && path.FindLast(':'))
+				if (err == B_OK && !e.Exists() && path.FindLast(':') >= 0)
 				{
 					// remove final ':', if any.
 					if (path[path.Length() - 1] == ':')
