@@ -4940,15 +4940,17 @@ void PText::DrawLine(int32 lineNr, float y, bool buffer)
 			a += s;
 			c += s;
 
-			if (fWindowActive)
-			{
-				r.left = Offset2Position(fAnchor).x - hv;
-				r.right = Offset2Position(fCaret).x - hv;
-				if (r.right < r.left) std::swap(r.right, r.left);
+			// Display block clearly even if window is not active
 
-				vw->SetLowColor(gColor[kColorSelection]);
-				vw->FillRect(r, B_SOLID_LOW);
-			}
+			//if (fWindowActive)
+			//{
+			r.left = Offset2Position(fAnchor).x - hv;
+			r.right = Offset2Position(fCaret).x - hv;
+			if (r.right < r.left) std::swap(r.right, r.left);
+
+			vw->SetLowColor(gColor[kColorSelection]);
+			vw->FillRect(r, B_SOLID_LOW);
+			//}
 		}
 		else
 		{
@@ -4960,12 +4962,14 @@ void PText::DrawLine(int32 lineNr, float y, bool buffer)
 			if (c < e || (lineNr == LineCount() - 1 && c == fText.Size()))
 				r.right = Offset2Position(c).x - hv;
 
-			if (fWindowActive)
-			{
-				vw->SetLowColor(gColor[kColorSelection]);
-				vw->FillRect(r, B_SOLID_LOW);
-			}
-			else if (a <= e && c > s)
+			// Display block clearly even if window is not active
+
+			//if (fWindowActive)
+			//{
+			vw->SetLowColor(gColor[kColorSelection]);
+			vw->FillRect(r, B_SOLID_LOW);
+			//}
+			/*else if (a <= e && c > s)
 			{
 				vw->SetHighColor(gColor[kColorSelection]);
 
@@ -5013,7 +5017,7 @@ void PText::DrawLine(int32 lineNr, float y, bool buffer)
 
 					vw->StrokeLine(BPoint(x1, r.top), BPoint(x2, r.top));
 				}
-			}
+			}*/
 		}
 
 		if (a > s)
