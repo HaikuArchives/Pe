@@ -53,12 +53,11 @@ static BString sTempFilePath;
 
 void DoError(const char *e, ...);
 void Usage(bool error);
-void OpenInPe(entry_ref& ref, int lineNr);
+void OpenInPe(entry_ref& ref, int lineNr, int colNr = -1);
 
 void Usage(bool error)
 {
-	puts("usage: lpe [--type <fileType>] [file:linenr | +linenr [file] | file] "
-		"...");
+	puts("usage: lpe [--type <fileType>] [file:linenr[:colnr] | +linenr [file] | file] ...");
 	puts("If no file has been specified, copy stdin to a temporary file and");
 	puts("open that. In that case <fileType> specifies the file extension to");
 	puts("be used to help Pe recognize the content type.");
@@ -80,13 +79,17 @@ void DoError(const char *e, ...)
 	exit(1);
 } /* error */
 
-void OpenInPe(entry_ref& doc, int lineNr)
+void OpenInPe(entry_ref& doc, int lineNr, int colNr)
 {
 	BMessage msg(msg_CommandLineOpen), reply;
 	msg.AddRef("refs", &doc);
 	
-	if (lineNr >= 0)
+	if (lineNr >= 0) {
 		msg.AddInt32("line", lineNr);
+
+		if (colNr >= 0)
+			msg.AddInt32("column", colNr);
+	}
 
 	entry_ref pe;
 	if (be_roster->FindApp("application/x-vnd.beunited.pe", &pe))
@@ -152,12 +155,11 @@ int main(int argc, char *argv[])
 {
 	int			i = 0;
 	char	 	*p;
-	char		*dpPtr;
 	int			lineNr = -1;
+	int			colNr = -1;
 	status_t	err;
 	BEntry		e;
 	BString		path;
-	int			nr;
 	bool		pathSeen = false;
 	const char*	fileType = NULL;
 
@@ -190,14 +192,43 @@ int main(int argc, char *argv[])
 			{
 				pathSeen = true;
 				path = argv[i];
-				dpPtr = strrchr(argv[i], ':');
-				if (dpPtr != NULL)
+
+				err = e.SetTo(path.String());
+				if (err == B_OK && !e.Exists() && path.FindLast(':') >= 0)
 				{
-					nr = strtoul(dpPtr + 1, &p, 10);
-					if (strlen(p) == 0)
+					// remove final ':', if any.
+					if (path[path.Length() - 1] == ':')
+						path.Truncate(path.Length() - 1);
+
+					err = e.SetTo(path.String());
+					if (err == B_OK && !e.Exists())
 					{
-						path.SetTo(argv[i], dpPtr-argv[i]);
-						lineNr = nr;
+						// See if we find "file:line" or "file:line:col"
+						i = path.FindLast(':');
+						if (i > 0)
+						{
+							// "file:line"
+							errno = 0;
+							lineNr = strtol(path.String() + i + 1, NULL, 10);
+							if (errno == ERANGE)
+								lineNr = -1;
+
+							path.Truncate(i);
+
+							err = e.SetTo(path.String());
+							if (err == B_OK && !e.Exists())
+							{
+								// "file:line:col"
+								colNr = lineNr;
+								i = path.FindLast(':');
+								errno = 0;
+								lineNr = strtol(path.String() + i + 1, NULL, 10);
+								if (errno == ERANGE)
+									lineNr = -1;
+
+								path.Truncate(i);
+							}
+						}
 					}
 				}
 
@@ -209,8 +240,9 @@ int main(int argc, char *argv[])
 				entry_ref ref;
 				err = e.GetRef(&ref);
 				if (err) DoError("Error trying to access file %s, (%s)", path.String(), strerror(err));
-				OpenInPe(ref, lineNr);
+				OpenInPe(ref, lineNr, colNr);
 				lineNr = -1;
+				colNr = -1;
 			}
 		}
 	}
