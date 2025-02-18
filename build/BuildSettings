@@ -98,11 +98,11 @@ rule SetUpSubDirBuildSettings {
 	# set the objects-folder according to debugging settings:
 	if $(DEBUG) && $(DEBUG) != 0
 	{
-		OBJECTS_DIR			= [ FDirName $(TOP) generated objects-debug ] ;
+		OBJECTS_DIR			= [ FDirName $(GENERATED_DIR) objects-debug ] ;
 	} 
 	else 
 	{
-		OBJECTS_DIR			= [ FDirName $(TOP) generated objects-nodebug ] ;
+		OBJECTS_DIR			= [ FDirName $(GENERATED_DIR) objects-nodebug ] ;
 	}
 	
 	# debugging settings
