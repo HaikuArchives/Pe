@@ -4941,16 +4941,12 @@ void PText::DrawLine(int32 lineNr, float y, bool buffer)
 			c += s;
 
 			// Display block clearly even if window is not active
-
-			//if (fWindowActive)
-			//{
 			r.left = Offset2Position(fAnchor).x - hv;
 			r.right = Offset2Position(fCaret).x - hv;
 			if (r.right < r.left) std::swap(r.right, r.left);
 
 			vw->SetLowColor(gColor[kColorSelection]);
 			vw->FillRect(r, B_SOLID_LOW);
-			//}
 		}
 		else
 		{
@@ -4963,61 +4959,8 @@ void PText::DrawLine(int32 lineNr, float y, bool buffer)
 				r.right = Offset2Position(c).x - hv;
 
 			// Display block clearly even if window is not active
-
-			//if (fWindowActive)
-			//{
 			vw->SetLowColor(gColor[kColorSelection]);
 			vw->FillRect(r, B_SOLID_LOW);
-			//}
-			/*else if (a <= e && c > s)
-			{
-				vw->SetHighColor(gColor[kColorSelection]);
-
-				vw->StrokeLine(r.LeftBottom(), r.LeftTop());
-				vw->StrokeLine(r.RightBottom(), r.RightTop());
-
-				if (a >= s)
-					vw->StrokeLine(r.LeftTop(), r.RightTop());
-
-				if (c < e + 1)
-					vw->StrokeLine(r.LeftBottom(), r.RightBottom());
-
-				if (c > e && a >= s)
-				{
-					float x1, x2;
-
-					if (Offset2Line(c) == lineNr + 1)
-					{
-						x1 = max(r.left, Offset2Position(c).x - hv);
-						x2 = fBounds.right;
-					}
-					else
-					{
-						x1 = hv ? 0 : 3;
-						x2 = r.left;
-					}
-
-					vw->StrokeLine(BPoint(x1, r.bottom), BPoint(x2, r.bottom));
-				}
-
-				if (a < s && (c < e || (lineNr == LineCount() - 1 && c == fText.Size())))
-				{
-					float x1, x2;
-
-					if (Offset2Line(a) == lineNr - 1)
-					{
-						x1 = hv ? 0 : 3;
-						x2 = min(r.right, Offset2Position(a).x - hv);
-					}
-					else
-					{
-						x1 = r.right;
-						x2 = fBounds.right;
-					}
-
-					vw->StrokeLine(BPoint(x1, r.top), BPoint(x2, r.top));
-				}
-			}*/
 		}
 
 		if (a > s)
