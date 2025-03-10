@@ -29,7 +29,7 @@ PeExtension BeHappy
 # </pe-src>
 
 # <pe-src>
-PeExtension Copy\ Lines\ Containing 
+PeExtension Copy\ lines\ containing 
 	: CopyContaining.cpp 
 	: libhekkel.so pcreposix $(RX_LIB) be $(STDC++LIB) 
 	: copycon.r
@@ -37,21 +37,21 @@ PeExtension Copy\ Lines\ Containing
 # </pe-src>
 
 # <pe-src>
-PeExtension Cut\ Lines\ Containing 
+PeExtension Cut\ lines\ containing 
 	: CutContaining.cpp 
 	: libhekkel.so pcreposix $(RX_LIB) be $(STDC++LIB) 
 	;
 # </pe-src>
 
 # <pe-src>
-PeExtension Expand\ Tabs
+PeExtension Expand\ tabs
 	: ConvertTabs.cpp 
 	: libhekkel.so be $(STDC++LIB) 
 	;
 # </pe-src>
 
 # <pe-src>
-PeExtension Replace\ As\ Tabs
+PeExtension Replace\ as\ tabs
 	: ConvertTabs.cpp 
 	: libhekkel.so be $(STDC++LIB) 
 	;
