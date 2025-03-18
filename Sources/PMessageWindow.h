@@ -42,7 +42,8 @@ public:
 			~PMessageItem();
 	
 virtual	void DrawItem(BView *owner, BRect bounds, bool complete = false);
-	
+virtual	void Update(BView *owner, const BFont *font);
+
 			void SetError(const char *err);
 			void SetFile(const char *file);
 			void SetLine(int line);
