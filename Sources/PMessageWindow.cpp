@@ -247,6 +247,12 @@ void PMessageItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 	owner->SetLowColor(kWhite);
 } /* PMessageItem::DrawItem */
 
+void PMessageItem::Update(BView *owner, const BFont *font)
+{
+	SetWidth(owner->Bounds().Width());
+	SetHeight(PreferredHeight());
+} /* PMessageItem::Update */
+
 float PMessageItem::PreferredHeight() const
 {
 	font_height fh;
@@ -331,9 +337,7 @@ void PMessageWindow::MessageReceived(BMessage *msg)
 
 void PMessageWindow::AddMessage(PMessageItem *err)
 {
-	err->SetHeight(err->PreferredHeight());
 	fMessageList->AddItem(err);
-	err->SetHeight(err->PreferredHeight());
 
 	int ix = fMessageList->CountItems() - 1;
 
