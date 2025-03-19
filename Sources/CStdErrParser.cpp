@@ -158,10 +158,6 @@ bool CStdErrParser::MatchOne(bool flush)
 
 		if (lock.IsLocked())
 		{
-			font_height fi;
-			be_plain_font->GetHeight(&fi);
-			float h = fi.ascent + fi.descent + 2;
-	
 			while (m > 0)
 			{
 				int l = (int)fErrBuffer.find('\n');
@@ -169,7 +165,6 @@ bool CStdErrParser::MatchOne(bool flush)
 				CMessageItem *i = new CMessageItem(fErrBuffer.c_str(),
 					std::min(m, l), CMessageItem::msgInfo);
 				fErrList->AddItem(i);
-				i->SetHeight(h);
 				
 				fErrBuffer.erase(0, std::min(l + 1, m));
 				m -= l + 1;
@@ -180,7 +175,6 @@ bool CStdErrParser::MatchOne(bool flush)
 			if (item)
 			{
 				fErrList->AddItem(item);
-				item->SetHeight(h);
 				
 				found = true;
 			}

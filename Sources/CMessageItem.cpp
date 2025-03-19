@@ -104,6 +104,16 @@ void CMessageItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 	owner->StrokeLine(bounds.LeftBottom(), bounds.RightBottom(), B_MIXED_COLORS);
 } // CMessageItem::DrawItem
 
+void CMessageItem::Update(BView *owner, const BFont *font)
+{
+	font_height fi;
+	be_plain_font->GetHeight(&fi);
+	float h = fi.ascent + fi.descent + 2;
+
+	SetWidth(owner->Bounds().Width());
+	SetHeight(h);
+} // CMessageItem::Update
+
 void CMessageItem::ShowMessage()
 {
 	if (fFile)

@@ -288,7 +288,6 @@ void PGroupWindow::SetText(const BString& docText)
 					FailOSErr(e.GetRef(&ref));
 					fList->AddItem(i = new PEntryItem(ref));
 					lst->push_back(i);
-//					i->SetHeight(18);
 				}
 				catch (HErr& e)
 				{
@@ -412,7 +411,6 @@ PEntryItem* PGroupWindow::AddRef(entry_ref& ref)
 	}
 
 	fList->AddItem(item = new PEntryItem(ref));
-//	fList->LastItem()->SetHeight(18);
 	fList->InvalidateItem(fList->CountItems() - 1);
 
 	SetDirty(true);

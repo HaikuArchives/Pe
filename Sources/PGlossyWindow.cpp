@@ -53,6 +53,7 @@ public:
 		~PGlossyItem();
 	
 virtual	void DrawItem(BView *owner, BRect bounds, bool complete = false);
+virtual	void Update(BView *owner, const BFont *font);
 		
 		int Char() const;
 		int Modifiers() const;
@@ -102,6 +103,16 @@ void PGlossyItem::DrawItem(BView *owner, BRect bounds, bool /*complete*/)
 	owner->DrawString(fName, p);
 	owner->SetLowColor(kWhite);
 } /* PGlossyItem::DrawItem */
+
+void PGlossyItem::Update(BView *owner, const BFont *font)
+{
+	font_height fh;
+	be_plain_font->GetHeight(&fh);
+	float ih = fh.ascent + fh.descent + 2;
+
+	SetWidth(owner->Bounds().Width());
+	SetHeight(ih);
+} /* PGlossyItem::Update */
 
 inline int PGlossyItem::Char() const
 {
@@ -240,10 +251,6 @@ void PGlossyWindow::ParseGlossaryFile()
 	BFile file;
 	FailOSErr(file.SetTo(&gPrefsDir, "Glossary", B_READ_ONLY));
 	
-	font_height fh;
-	be_plain_font->GetHeight(&fh);
-	float ih = fh.ascent + fh.descent + 2;
-	
 	char s[256];
 
 	file >> s;
@@ -278,10 +285,7 @@ void PGlossyWindow::ParseGlossaryFile()
 		}
 		
 		if (kp && strncmp(kp, "##", 2) == 0 && (kp = strtok(NULL, "\n")) != NULL)
-		{
 			fList->AddItem(item = new PGlossyItem(kp, key, mods));
-			item->SetHeight(ih);
-		}
 
 		do
 			file >> s;

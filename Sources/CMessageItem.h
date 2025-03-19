@@ -53,6 +53,7 @@ class CMessageItem : public BListItem
 	virtual ~CMessageItem();
 	
 	virtual void DrawItem(BView *owner, BRect bounds, bool complete = false);
+	virtual	void Update(BView *owner, const BFont *font);
 	
 	void ShowMessage();
 
