@@ -53,6 +53,7 @@ public:
 		CMimeItem(const char *mime);
 		
 virtual	void DrawItem(BView *owner, BRect bounds, bool complete = false);
+virtual	void Update(BView *owner, const BFont *font);
 
 		BMimeType fMime;
 		unsigned char fIcon[256], fIconSelected[256];
@@ -130,6 +131,12 @@ void CMimeItem::DrawItem(BView *owner, BRect bounds, bool)
 	
 	owner->SetLowColor(kWhite);
 } /* CMimeItem::DrawItem */
+
+void CMimeItem::Update(BView *owner, const BFont *font)
+{
+	SetWidth(owner->Bounds().Width());
+	SetHeight(18);
+} /* CMimeItem::Update */
 
 CMimeBox::CMimeBox(BRect r, const char *name)
 	: CListBox(r, name)
@@ -358,7 +365,6 @@ void CMimeBox::AddType(const char *type)
 	
 	m = new CMimeItem(type);
 	fList->AddItem(m);
-	m->SetHeight(18);
 	fList->InvalidateItem(fList->IndexOf(m));
 
 	ListBoxChanged();
