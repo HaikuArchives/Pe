@@ -141,6 +141,9 @@ bool CRecentPatternController::AddCurrentPattern()
 
 void CRecentPatternController::Next()
 {
+	if (fPatternVect.empty())
+		return;
+
 	if (fCurrIdx == fPatternVect.size()-1)
 	{	// restore the saved pattern edited by user:
 		if (fSavedPattern.IsEmpty())
