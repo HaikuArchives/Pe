@@ -180,7 +180,7 @@ void PGroupWindow::SetupSizeAndLayout()
 		= new PGroupStatus(r, fDocIO->EntryRef() ? fDocIO->EntryRef()->name : NULL));
 
 	r = Bounds();
-	r.top = fToolBar->Frame().bottom;
+	r.top = fToolBar->Frame().bottom + 1;
 
 	r.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
 	r.bottom -= be_control_look->GetScrollBarWidth(B_HORIZONTAL);
