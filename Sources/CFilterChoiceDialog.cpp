@@ -10,6 +10,7 @@
 
 #include <Application.h>
 #include <Beep.h>
+#include <ControlLook.h>
 #include <ListItem.h>
 #include <ListView.h>
 #include <Screen.h>
@@ -421,8 +422,8 @@ CFilterChoiceDialog::CFilterChoiceDialog(const char *title,
 	// list view
 	rect = fMainView->Bounds();
 	rect.top = fFilterStringControl->Frame().bottom + 1 + 5;
-	rect.right -= B_V_SCROLL_BAR_WIDTH;
-	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	rect.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
+	rect.bottom -= be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 	fChoicesList = new(std::nothrow) BListView(rect, "choices list",
 		B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
 	FailNil(fChoicesList);

@@ -33,6 +33,8 @@
 	Created: 09/29/97 11:46:52
 */
 
+#include <ControlLook.h>
+
 #include "pe.h"
 #include "PMessageWindow.h"
 #include "PDoc.h"
@@ -300,8 +302,8 @@ PMessageWindow::PMessageWindow(const char *title)
 
 	BRect r(Frame());
 	r.OffsetTo(0, 0);
-	r.right -= B_V_SCROLL_BAR_WIDTH;
-	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	r.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
+	r.bottom -= be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 	fMessageList = new BListView(r, "messages", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 
 	AddChild(new BScrollView("scroller", fMessageList, B_FOLLOW_ALL_SIDES, 0, true, true, B_NO_BORDER));

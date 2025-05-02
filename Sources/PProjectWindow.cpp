@@ -37,6 +37,7 @@
 
 #include <stack>
 
+#include <ControlLook.h>
 #include <fs_attr.h>
 
 #include "CDocIO.h"
@@ -116,16 +117,16 @@ void PProjectWindow::SetupSizeAndLayout()
 	fToolBar->AddChild(fButtonBar = new HButtonBar(r, "buttonbar", rid_Tbar_ProjectWin, this));
 
 	r = Bounds();
-	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT + 1;
-	r.right -= B_V_SCROLL_BAR_WIDTH;
+	r.top = r.bottom - be_control_look->GetScrollBarWidth(B_HORIZONTAL) + 1;
+	r.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
 	AddChild(fStatus
 		= new PGroupStatus(r, fDocIO->EntryRef() ? fDocIO->EntryRef()->name : NULL));
 
 	r = Bounds();
 	r.top = fToolBar->Frame().bottom;
 
-	r.right -= B_V_SCROLL_BAR_WIDTH;
-	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	r.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
+	r.bottom -= be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 	fList = new PTypeAHeadList(r, "group", fStatus);
 	fList->SetInvocationMessage(new BMessage(msg_PProjectItemInvoked));
 	fList->SetSelectionMessage(new BMessage(msg_PProjectItemSelected));

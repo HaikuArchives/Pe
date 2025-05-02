@@ -35,6 +35,7 @@
 
 #include <algorithm>
 
+#include <ControlLook.h>
 #include <NodeMonitor.h>
 #include <fs_attr.h>
 #include <String.h>
@@ -373,8 +374,8 @@ BRect CDocWindow::NextPosition(bool inc)
 
 	BRect initialDefaultRect(
 		40, 25,
-		40 + 80*textFont.StringWidth("m") + B_V_SCROLL_BAR_WIDTH + 5,
-		25 + 40*lh + B_H_SCROLL_BAR_HEIGHT
+		40 + 80*textFont.StringWidth("m") + be_control_look->GetScrollBarWidth(B_VERTICAL) + 5,
+		25 + 40*lh + be_control_look->GetScrollBarWidth(B_HORIZONTAL)
 	);
 	BString prefsName = prf_R_DefaultDocumentRect;
 		prefsName << DocWindowType();

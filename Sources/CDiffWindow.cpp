@@ -33,6 +33,8 @@
 	Created: 03/29/98 20:13:00
 */
 
+#include <ControlLook.h>
+
 #include "pe.h"
 #include "CDiffWindow.h"
 #include "PToolBar.h"
@@ -136,7 +138,7 @@ CDiffWindow::CDiffWindow(BRect frame, const char *name)
 	r = Bounds();
 	r.top = fToolBar->Frame().bottom;
 	
-	r.right -= B_V_SCROLL_BAR_WIDTH;
+	r.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
 	fScript = new BListView(r, "scriptlist", B_MULTIPLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 	fScript->SetInvocationMessage(new BMessage(msg_InvokeScriptItem));
 	
