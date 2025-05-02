@@ -33,6 +33,8 @@
 	Created: 11/18/98 21:25:47
 */
 
+#include <ControlLook.h>
+
 #include "pe.h"
 #include "PGroupWindow.h"
 #include "PTypeAHeadList.h"
@@ -47,6 +49,14 @@ PGroupStatus::PGroupStatus(BRect frame, const char *name)
 {
 	fPath = NULL;
 	fText = NULL;
+
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	BFont font(be_plain_font);
+	// font.SetSize(10);
+	font.SetSize(ceilf(font.Size() * 0.67));
+	SetFont(&font);
 } /* PGroupStatus::PGroupStatus */
 
 PGroupStatus::~PGroupStatus()
@@ -55,30 +65,23 @@ PGroupStatus::~PGroupStatus()
 	if (fText) free(fText);
 } /* PGroupStatus::~PGroupStatus */
 
-void PGroupStatus::Draw(BRect /*update*/)
+void PGroupStatus::Draw(BRect updateRect)
 {
-	BRect b(Bounds());
-	
-	FillRect(b, B_SOLID_LOW);
+	BRect bounds(Bounds());
 
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_2_TINT));
-	StrokeLine(b.LeftTop(), b.RightTop());
-	b.top++;
+	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
+	StrokeRect(bounds);
+	bounds.InsetBy(1, 1);
+
+	be_control_look->DrawMenuBarBackground(this, bounds, 
+		updateRect, ViewColor());
 
 	font_height fh;
 	be_plain_font->GetHeight(&fh);
-	float l = b.top + fh.ascent;
-
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT));
-	StrokeLine(b.RightBottom(), b.LeftBottom());
-//	StrokeLine(b.RightTop(), b.RightBottom());
-	
-	SetHighColor(kWhite);
-	StrokeLine(b.LeftTop(), b.RightTop());
-	StrokeLine(b.LeftTop(), b.LeftBottom());
+	float baseline = bounds.bottom - fh.descent;
 
 	SetHighColor(kBlack);
-	MovePenTo(3, l);
+	MovePenTo(be_control_look->DefaultItemSpacing() * 0.25, baseline);
 	
 	if (fText)
 		DrawString(fText);

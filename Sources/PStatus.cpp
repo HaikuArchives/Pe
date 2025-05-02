@@ -55,7 +55,7 @@ PStatus::PStatus(BRect frame, PText *txt)
 
 	BFont font(be_plain_font);
 	// font.SetSize(10);
-	font.SetSize(ceilf(font.Size() * 0.66));
+	font.SetSize(ceilf(font.Size() * 0.67));
 	SetFont(&font);
 
 	font_height fh;

@@ -118,7 +118,9 @@ void PProjectWindow::SetupSizeAndLayout()
 
 	r = Bounds();
 	r.top = r.bottom - be_control_look->GetScrollBarWidth(B_HORIZONTAL) + 1;
-	r.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
+	r.bottom++;
+	r.right -= be_control_look->GetScrollBarWidth(B_VERTICAL) - 1;
+	r.left--;
 	AddChild(fStatus
 		= new PGroupStatus(r, fDocIO->EntryRef() ? fDocIO->EntryRef()->name : NULL));
 
