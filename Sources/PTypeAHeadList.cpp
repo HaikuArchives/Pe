@@ -54,7 +54,6 @@ PGroupStatus::PGroupStatus(BRect frame, const char *name)
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BFont font(be_plain_font);
-	// font.SetSize(10);
 	font.SetSize(ceilf(font.Size() * 0.67));
 	SetFont(&font);
 } /* PGroupStatus::PGroupStatus */
