@@ -54,7 +54,8 @@ PStatus::PStatus(BRect frame, PText *txt)
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BFont font(be_plain_font);
-	font.SetSize(10);
+	// font.SetSize(10);
+	font.SetSize(ceilf(font.Size() * 0.67));
 	SetFont(&font);
 
 	font_height fh;
@@ -83,7 +84,7 @@ void PStatus::Draw(BRect updateRect)
 		bounds, updateRect,	ViewColor());
 
 	SetHighColor(kBlack);
-	MovePenTo(3, fBaseline);
+	MovePenTo(be_control_look->DefaultItemSpacing() * 0.25, fBaseline);
 	char s[32];
 	int32 line = fText->Offset2Line(fOffset);
 	sprintf(s, "%" B_PRId32 ",%" B_PRId32, line + 1, fText->Offset2Column(fOffset) + 1);

@@ -31,6 +31,8 @@
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 	
 */
 
+#include <ControlLook.h>
+
 #include "pe.h"
 #include "PMessageWindow.h"
 #include "PErrorWindow.h"
@@ -284,8 +286,8 @@ PErrorWindow::PErrorWindow(int *fd, const char *cwd)
 	
 	BRect r(Frame());
 	r.OffsetTo(0, 0);
-	r.right -= B_V_SCROLL_BAR_WIDTH;
-	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	r.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
+	r.bottom -= be_control_look->GetScrollBarWidth(B_VERTICAL);
 	fErrorList = new BListView(r, "errors", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 	
 	AddChild(new BScrollView("scroller", fErrorList, B_FOLLOW_ALL_SIDES, 0, true, true, B_NO_BORDER));

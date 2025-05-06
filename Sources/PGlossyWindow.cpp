@@ -33,6 +33,8 @@
 	Created: 11/12/97 10:36:38 by Maarten Hekkelman
 */
 
+#include <ControlLook.h>
+
 #include "pe.h"
 #include "PGlossyWindow.h"
 #include "CGlossary.h"
@@ -133,7 +135,7 @@ PGlossyWindow::PGlossyWindow()
 {
 	BRect r(Bounds());
 	
-	r.right -= B_V_SCROLL_BAR_WIDTH;
+	r.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
 	
 	fList = new BListView(r, "glossylist", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 	AddChild(new BScrollView("glossyscroller", fList, B_FOLLOW_ALL_SIDES, 0, false, true, B_NO_BORDER));

@@ -33,6 +33,8 @@
 	Created: 10/20/97 20:08:37
 */
 
+#include <ControlLook.h>
+
 #include "pe.h"
 #include "CListBox.h"
 #include "PMessages.h"
@@ -56,7 +58,7 @@ CListBox::CListBox(BRect frame, const char *name)
 
 	BRect r(Bounds());
 	r.InsetBy(2, 2);
-	r.right -= 70 * gFactor + B_V_SCROLL_BAR_WIDTH;
+	r.right -= 70 * gFactor + be_control_look->GetScrollBarWidth(B_VERTICAL);
 	
 	fList = new BListView(r, "list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 	fList->SetSelectionMessage(new BMessage(msg_LBSelect));

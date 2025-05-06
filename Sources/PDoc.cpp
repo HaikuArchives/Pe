@@ -35,6 +35,7 @@
 
 #include "pe.h"
 
+#include <ControlLook.h>
 #include <fs_attr.h>
 
 #include "CCharObject.h"
@@ -229,8 +230,8 @@ void PDoc::InitWindow(const char *name)
 
 	BScrollBar *bars[4] = { NULL, NULL, NULL, NULL };
 
-	r.Set(b.right - B_V_SCROLL_BAR_WIDTH + 1, b.top + kSplitterHeight,
-		b.right + 1, b.bottom + 1 - B_H_SCROLL_BAR_HEIGHT);
+	r.Set(b.right - be_control_look->GetScrollBarWidth(B_VERTICAL) + 1, b.top + kSplitterHeight,
+		b.right + 1, b.bottom + 1 - be_control_look->GetScrollBarWidth(B_HORIZONTAL));
 	bars[1] = new PScrollBar(r, "v scrollbar 2", NULL, 0, 100, B_VERTICAL);
 	AddChild(bars[1]);
 
@@ -241,14 +242,14 @@ void PDoc::InitWindow(const char *name)
 	bars[0]->Hide();
 	bars[0]->ResizeTo(r.Width(), 0);
 
-	r.Set(b.left + kStatusWidth + 1, b.bottom - B_H_SCROLL_BAR_HEIGHT + 1,
-		b.right + 1 - B_V_SCROLL_BAR_WIDTH, b.bottom + 1);
+	r.Set(b.left + kStatusWidth + 1, b.bottom - be_control_look->GetScrollBarWidth(B_HORIZONTAL) + 1,
+		b.right + 1 - be_control_look->GetScrollBarWidth(B_VERTICAL), b.bottom + 1);
 	bars[2] = new BScrollBar(r, "h scrollbar", NULL, 0, 100000, B_HORIZONTAL);
 	AddChild(bars[2]);
 
 	r = b;
-	r.right -= B_V_SCROLL_BAR_WIDTH;
-	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	r.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
+	r.bottom -= be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 
 	fText = new PText(r, fTextBuffer, bars, name);
 	AddChild(fText);
@@ -257,7 +258,7 @@ void PDoc::InitWindow(const char *name)
 	fButtonBar->SetTarget(fText);
 
 	r = b;
-	r.left = r.right - B_V_SCROLL_BAR_WIDTH + 1;
+	r.left = r.right - be_control_look->GetScrollBarWidth(B_VERTICAL) + 1;
 	r.bottom = r.top + kSplitterHeight;
 	AddChild(new PSplitter(r, fText));
 
@@ -265,7 +266,7 @@ void PDoc::InitWindow(const char *name)
 	r.right = r.left + kStatusWidth + 1;
 	r.left -= 1;
 	r.bottom += 1;
-	r.top = r.bottom - B_H_SCROLL_BAR_HEIGHT;
+	r.top = r.bottom - be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 	fStatus = new PStatus(r, fText);
 	AddChild(fStatus);
 

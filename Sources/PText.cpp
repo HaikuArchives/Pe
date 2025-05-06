@@ -37,6 +37,8 @@
 
 #include <arpa/inet.h>
 #include <signal.h>
+
+#include <ControlLook.h>
 #include <PrintJob.h>
 #include <String.h>
 
@@ -1371,9 +1373,6 @@ void PText::TypeString(const char *string)
 const g_unit_t
 	kSplitMinimum = 50;
 
-#ifndef B_V_SCROLL_BAR_WIDTH
-#define B_V_SCROLL_BAR_WIDTH 16
-#endif
 
 void PText::TrackSplitter(BPoint where)
 {
@@ -1443,11 +1442,11 @@ void PText::SplitterMoved(g_unit_t dy)
 
 		fSplitter->MoveBy(0, dy);
 
-		fVScrollBar1->ResizeTo(B_V_SCROLL_BAR_WIDTH, ns - kSplitterHeight + 1);
+		fVScrollBar1->ResizeTo(be_control_look->GetScrollBarWidth(B_VERTICAL), ns - kSplitterHeight + 1);
 	}
 	else
 	{
-		fVScrollBar1->ResizeTo(B_V_SCROLL_BAR_WIDTH, ns - kSplitterHeight + 1);
+		fVScrollBar1->ResizeTo(be_control_look->GetScrollBarWidth(B_VERTICAL), ns - kSplitterHeight + 1);
 
 		fSplitter->MoveBy(0, dy);
 
@@ -1527,13 +1526,13 @@ void PText::DoneMovingSplitter()
 		fActivePart = 2;
 		fVScrollBar2->SetValue(v);
 
-		fVScrollBar1->ResizeTo(B_V_SCROLL_BAR_WIDTH, 0);
+		fVScrollBar1->ResizeTo(be_control_look->GetScrollBarWidth(B_VERTICAL), 0);
 
 		fSplitter->MoveTo(f.right + 1, f.top);
 
 		fVScrollBar2->MoveTo(f.right + 1, f.top + kSplitterHeight);
 
-		fVScrollBar2->ResizeTo(B_V_SCROLL_BAR_WIDTH, f.Height() - kSplitterHeight + 1);
+		fVScrollBar2->ResizeTo(be_control_look->GetScrollBarWidth(B_VERTICAL), f.Height() - kSplitterHeight + 1);
 		if (fVScrollBar2->IsHidden())
 			fVScrollBar2->Show();
 
@@ -1580,10 +1579,10 @@ void PText::SplitWindow()
 
 	fSplitAt = floor(m);
 
-	fVScrollBar2->ResizeTo(B_V_SCROLL_BAR_WIDTH, f.Height() - fSplitAt);
+	fVScrollBar2->ResizeTo(be_control_look->GetScrollBarWidth(B_VERTICAL), f.Height() - fSplitAt);
 	fVScrollBar2->MoveTo(f.right + 1, f.top + fSplitAt);
 	fSplitter->MoveTo(f.right + 1, f.top + fSplitAt - kSplitterHeight);
-	fVScrollBar1->ResizeTo(B_V_SCROLL_BAR_WIDTH, fSplitAt - kSplitterHeight - 1);
+	fVScrollBar1->ResizeTo(be_control_look->GetScrollBarWidth(B_VERTICAL), fSplitAt - kSplitterHeight - 1);
 	if (fVScrollBar1->IsHidden())
 		fVScrollBar1->Show();
 
@@ -1610,7 +1609,7 @@ void PText::FrameMoved(BPoint newPosition)
 	fVScrollBar2->MoveBy(0, -dy);
 
 	if (fSplitAt == 0)
-		fVScrollBar1->ResizeTo(B_V_SCROLL_BAR_WIDTH, 0);
+		fVScrollBar1->ResizeTo(be_control_look->GetScrollBarWidth(B_VERTICAL), 0);
 
 	fSplitter->Invalidate(fSplitter->Bounds());
 //	fStatus->Invalidate(fStatus->Bounds());
