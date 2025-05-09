@@ -51,6 +51,7 @@ virtual	void AttachedToWindow();
 private:
 			BWindow *fOwner;
 			char *fPath, *fText;
+			float fBaseline;
 };
 
 class CProjectItem;

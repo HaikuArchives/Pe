@@ -54,13 +54,14 @@ PStatus::PStatus(BRect frame, PText *txt)
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BFont font(be_plain_font);
-	// font.SetSize(10);
-	font.SetSize(ceilf(font.Size() * 0.67));
+	font.SetSize(ceilf(font.Size() * 0.75));
 	SetFont(&font);
 
-	font_height fh;
-	font.GetHeight(&fh);
-	fBaseline = Bounds().bottom - fh.descent;
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
+
+	fBaseline = (Bounds().bottom + Bounds().top
+		+ ceilf(fontHeight.ascent) - ceilf(fontHeight.descent)) / 2;
 
 	fText = txt;
 	fOffset = 0;

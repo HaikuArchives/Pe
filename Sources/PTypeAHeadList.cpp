@@ -54,8 +54,14 @@ PGroupStatus::PGroupStatus(BRect frame, const char *name)
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BFont font(be_plain_font);
-	font.SetSize(ceilf(font.Size() * 0.67));
+	font.SetSize(ceilf(font.Size() * 0.75));
 	SetFont(&font);
+
+	font_height fontHeight;
+	font.GetHeight(&fontHeight);
+
+	fBaseline = (Bounds().bottom + Bounds().top
+		+ ceilf(fontHeight.ascent) - ceilf(fontHeight.descent)) / 2;
 } /* PGroupStatus::PGroupStatus */
 
 PGroupStatus::~PGroupStatus()
@@ -75,12 +81,8 @@ void PGroupStatus::Draw(BRect updateRect)
 	be_control_look->DrawMenuBarBackground(this, bounds, 
 		updateRect, ViewColor());
 
-	font_height fh;
-	be_plain_font->GetHeight(&fh);
-	float baseline = bounds.bottom - fh.descent;
-
 	SetHighColor(kBlack);
-	MovePenTo(be_control_look->DefaultItemSpacing() * 0.25, baseline);
+	MovePenTo(be_control_look->DefaultItemSpacing() * 0.25, fBaseline);
 	
 	if (fText)
 		DrawString(fText);
