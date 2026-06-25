@@ -235,6 +235,7 @@ PText::PText(BRect frame, PTextBuffer& txt, BScrollBar *bars[], const char *ext)
 	SetViewColor(gColor[kColorLow]);
 
 	fTabStops = gPrefs->GetPrefInt(prf_I_SpacesPerTab, 4);
+	fTabsToSpace = false;
 
 	fLineMap = NULL;
 	fLineView = NULL;
@@ -466,6 +467,9 @@ void PText::ApplySettings(const BMessage& msg)
 
 	if (msg.FindInt32("tabstop", &i) == B_OK)
 		fTabStops = i;
+
+	if (msg.FindBool("indentstyle", &b) == B_OK)
+		fTabsToSpace = b;
 
 	if (msg.FindBool("show invisibles", &b) == B_OK)
 		fShowInvisibles = b;
@@ -3451,7 +3455,11 @@ void PText::KeyDown(const char *bytes, int32 numBytes)
 						 !(modifiers & (B_CONTROL_KEY | B_COMMAND_KEY)) &&
 						 (!iscntrl(bytes[0]) || ch == B_RETURN || ch == B_TAB))
 				{
-					CharKeyDown(bytes, numBytes);
+					if (ch == B_TAB && fTabsToSpace) {
+						std::string s(TabStops(), ' ');
+						CharKeyDown(s.c_str(), TabStops());
+					} else
+						CharKeyDown(bytes, numBytes);
 				}
 				else if (modifiers & B_NUM_LOCK && (isdigit(bytes[0]) || ispunct(bytes[0])))
 				{

@@ -84,6 +84,7 @@ private:
 	virtual	void StopWatchingFolder(void);
 
 			bool _HasFileContentsChanged(BFile& file);
+			void _LoadEditorconfig(BPath* filePath, BMessage& settings);
 
 			entry_ref *fEntryRef;
 			node_ref fNodeRef;

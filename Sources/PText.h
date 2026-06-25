@@ -403,6 +403,7 @@ static		PText *sfDragSource;
 			int32 fWrapType;
 			int32 fWrapWidth;
 			int32 fFontKind;
+			bool fTabsToSpace;
 };
 
 inline void PText::HideCaret() {
