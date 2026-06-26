@@ -27,6 +27,12 @@ jobs:
           version: ${{ matrix.config.version }}
           architecture: ${{ matrix.config.architecture }}
           run: |
-            ssh user@localhost "pkgman install -y haiku_devel devel:libpcre" &&
-            ssh user@localhost "pkgman update -y cmd:bison cmd:flex cmd:jam cmd:gcc" &&
-            jam -q
+            if [[ `uname -m` == BePC ]]; then
+              ssh user@localhost "pkgman install -y haiku_x86_devel devel:libpcre_x86 gcc_x86_syslibs_devel" &&
+              ssh user@localhost "pkgman update -y cmd:bison cmd:flex cmd:jam cmd:gcc_x86 cmd:as_x86" &&
+              setarch x86 jam -q
+            else
+              ssh user@localhost "pkgman install -y haiku_devel devel:libpcre" &&
+              ssh user@localhost "pkgman update -y cmd:bison cmd:flex cmd:jam cmd:gcc" &&
+              jam -q
+            fi
