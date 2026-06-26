@@ -48,6 +48,7 @@ local haveHeadersPcre = [
 		/boot/system/develop/headers
 		/boot/home/config/non-packaged/develop/headers
 		/boot/home/config/develop/headers
+		/boot/system/develop/headers/x86
 		: pcre.h ] ;
 if ! $(haveHeadersPcre) {
 	Exit "You need to have pcre installed on your system." ;
