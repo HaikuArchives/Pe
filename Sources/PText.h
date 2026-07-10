@@ -398,6 +398,7 @@ static		PText *sfDragSource;
 
 // saveable settings
 			int32 fTabStops;
+			int32 fIndentSize;
 			char *fCWD;
 			bool fSoftWrap;
 			int32 fWrapType;
