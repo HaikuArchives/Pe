@@ -398,6 +398,11 @@ bool CDocIO::DoPostEditTextConversions(BString& docText, BMessage& settingsMsg)
 	return true;
 }
 
+void CDocIO::RebaseSettings(BMessage& settingsMsg)
+{
+}
+
+
 // #pragma mark - CLocalDocIO
 
 BLocker CLocalDocIO::sfDocListLock("DocListLock");
@@ -514,6 +519,7 @@ bool CLocalDocIO::WriteDoc()
 		if (gPrefs->GetPrefInt(prf_I_UseEditorconfig, 1)) {
 			BPath filePath(fEntryRef);
 			_LoadEditorconfig(&filePath, editorconfigMsg);
+			RebaseSettings(settingsMsg);
 		}
 
 		BString docText;
@@ -731,6 +737,22 @@ bool CLocalDocIO::MatchesNodeMonitorMsg(BMessage* msg)
 	}
 
 	return false;
+}
+
+void CLocalDocIO::RebaseSettings(BMessage& settingsMsg)
+{
+	if (gPrefs->GetPrefInt(prf_I_UseEditorconfig, 1)) {
+		BPath filePath(fEntryRef);
+		BMessage editorConfig;
+		_LoadEditorconfig(&filePath, editorConfig);
+
+		int32 tabstopFile, tabstopConfig;
+		if (settingsMsg.FindInt32("tabstop", &tabstopFile) == B_OK
+			&& editorConfig.FindInt32("tabstop", &tabstopConfig) == B_OK
+			&& tabstopFile == tabstopConfig) {
+			settingsMsg.RemoveName("tabstop");
+		}
+	}
 }
 
 bool CLocalDocIO::VerifyFile()

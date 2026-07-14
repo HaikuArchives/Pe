@@ -136,6 +136,7 @@ status_t CDocWindow::WriteState()
 		BString text;
 		GetText(text);
 		fDocIO->PrepareTextForSaving(text, settingsMsg);
+		fDocIO->RebaseSettings(settingsMsg);
 
 		WriteAttr(file, settingsMsg);
 		return file.Sync();
