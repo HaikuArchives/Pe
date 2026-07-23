@@ -189,6 +189,7 @@ resource 'DLOG' (132, "Preferences") {
 
 				CheckBox		{{   0, 133, 120, 149 }, pnm_Fil_X_ZoomOpenPanel,		"Zoom 'Open' dialog"					},
 				CheckBox		{{ 140, 133, 290, 149 }, pnm_Fil_X_FullPathInTitle,		"Full path in window title"			},
+				CheckBox		{{   0, 153, 290, 169 }, pnm_Fil_X_UseEditorconfig,		"Use .editorconfig if possible"		},
 
 			TabSheetEnd			{																							},
 

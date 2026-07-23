@@ -13,6 +13,7 @@
 #include "CDoc.h"
 #include "CDocIO.h"
 #include "CFtpStream.h"
+#include "Editorconfig.h"
 #include "HError.h"
 #include "HPreferences.h"
 #include "MAlert.h"
@@ -255,7 +256,9 @@ bool CDocIO::MatchesNodeMonitorMsg(BMessage* msg)
 void CDocIO::PrepareTextForSaving(BString& docText, BMessage& settingsMsg)
 {
 	// ATM we only remove trailing white space. If disabled, get out.
-	if (gPrefs->GetPrefInt(prf_I_DiscardTrailingSpace, 0) == 0)
+	bool trim = settingsMsg.GetBool("trim_trailing_whitespace",
+		gPrefs->GetPrefInt(prf_I_DiscardTrailingSpace, 0));
+	if (!trim)
 		return;
 
 	// If we actually remove white space, we'll have to adjust anchor and
@@ -381,7 +384,9 @@ bool CDocIO::DoPostEditTextConversions(BString& docText, BMessage& settingsMsg)
 		}
 	}
 
-	if (gPrefs->GetPrefInt(prf_I_EndWithNewline, 1) && docText.Length() > 0
+	bool endWithNewline = settingsMsg.GetBool("insert final newline",
+		gPrefs->GetPrefInt(prf_I_EndWithNewline, 1));
+	if (endWithNewline && docText.Length() > 0
 		&& docText[docText.Length() - 1] != '\n')
 	{
 		docText << "\n";
@@ -392,6 +397,11 @@ bool CDocIO::DoPostEditTextConversions(BString& docText, BMessage& settingsMsg)
 
 	return true;
 }
+
+void CDocIO::RebaseSettings(BMessage& settingsMsg)
+{
+}
+
 
 // #pragma mark - CLocalDocIO
 
@@ -439,6 +449,10 @@ bool CLocalDocIO::ReadDoc(bool readAttributes)
 	BMessage settingsMsg;
 	if (readAttributes)
 		fDoc->ReadAttr(file, settingsMsg);
+	if (gPrefs->GetPrefInt(prf_I_UseEditorconfig, 1)) {
+		BPath filePath(fEntryRef);
+		_LoadEditorconfig(&filePath, settingsMsg);
+	}
 
 	off_t size;
 	FailOSErr(file.GetSize(&size));
@@ -501,9 +515,16 @@ bool CLocalDocIO::WriteDoc()
 	{
 		BMessage settingsMsg;
 		fDoc->CollectSettings(settingsMsg);
+		BMessage editorconfigMsg(settingsMsg);
+		if (gPrefs->GetPrefInt(prf_I_UseEditorconfig, 1)) {
+			BPath filePath(fEntryRef);
+			_LoadEditorconfig(&filePath, editorconfigMsg);
+			RebaseSettings(settingsMsg);
+		}
+
 		BString docText;
 		fDoc->GetText(docText);
-		if (!DoPostEditTextConversions(docText, settingsMsg))
+		if (!DoPostEditTextConversions(docText, editorconfigMsg))
 			return false;
 
 		FailOSErr(e.GetName(name));
@@ -718,6 +739,22 @@ bool CLocalDocIO::MatchesNodeMonitorMsg(BMessage* msg)
 	return false;
 }
 
+void CLocalDocIO::RebaseSettings(BMessage& settingsMsg)
+{
+	if (gPrefs->GetPrefInt(prf_I_UseEditorconfig, 1)) {
+		BPath filePath(fEntryRef);
+		BMessage editorConfig;
+		_LoadEditorconfig(&filePath, editorConfig);
+
+		int32 tabstopFile, tabstopConfig;
+		if (settingsMsg.FindInt32("tabstop", &tabstopFile) == B_OK
+			&& editorConfig.FindInt32("tabstop", &tabstopConfig) == B_OK
+			&& tabstopFile == tabstopConfig) {
+			settingsMsg.RemoveName("tabstop");
+		}
+	}
+}
+
 bool CLocalDocIO::VerifyFile()
 {
 	bool result = true;
@@ -819,6 +856,67 @@ bool CLocalDocIO::_HasFileContentsChanged(BFile& file)
 		// We're not interested in any error. Just assume the file contents
 		// changed.
 		return true;
+	}
+}
+
+
+void CLocalDocIO::_LoadEditorconfig(BPath* filePath, BMessage& settings)
+{
+	BPath editorconfig;
+	if (Editorconfig::Find(filePath, &editorconfig)) {
+		BMessage allProps;
+		if (Editorconfig::Parse(editorconfig.Path(), &allProps)) {
+			BMessage props;
+			Editorconfig::MatchFilename(filePath->Path(), &allProps, &props);
+			char* name;
+			uint32 type;
+			int32 count;
+			for (int32 i = 0; props.GetInfo(B_STRING_TYPE, i, &name, &type, &count) == B_OK; i++) {
+				BString propName(name);
+				BString value;
+				props.FindString(propName, &value);
+				propName.ToLower();
+				if (propName == "end_of_line") {
+					value.ToLower();
+					int eolMode = kle_LF;
+					if(value == "lf")
+						eolMode = kle_LF;
+					else if(value == "cr")
+						eolMode = kle_CR;
+					else if(value == "crlf")
+						eolMode = kle_CRLF;
+					if (!settings.HasInt32("line breaks"))
+						settings.AddInt32("line breaks", eolMode);
+				} else if (propName == "tab_width") {
+					int32 tabWidth = std::stoi(value.String());
+					if (!settings.HasInt32("tabstop"))
+						settings.AddInt32("tabstop", tabWidth);
+				} else if (propName == "indent_style") {
+					value.ToLower();
+					bool tabsToSpaces = (value == "space");
+					if (!settings.HasBool("indentstyle"))
+						settings.AddBool("indentstyle", tabsToSpaces);
+				} else if (propName == "indent_size") {
+					if (value.ToLower() == "tab") {
+						int32 tabWidth;
+						if (settings.FindInt32("tabstop", &tabWidth) == B_OK && !settings.HasInt32("indentsize"))
+							settings.AddInt32("indentsize", tabWidth);
+					} else {
+						uint8 indentWidth = std::stoi(value.String());
+						if (!settings.HasInt32("indentsize"))
+							settings.AddInt32("indentsize", indentWidth);
+					}
+				} else if (propName == "trim_trailing_whitespace") {
+					bool trim = (value.ToLower() == "true");
+					if (!settings.HasBool("trim_trailing_whitespace"))
+						settings.AddBool("trim_trailing_whitespace", trim);
+				} else if (propName == "insert_final_newline") {
+					bool insert = (value.ToLower() == "true");
+					if (!settings.HasBool("insert final newline"))
+						settings.AddBool("insert final newline", insert);
+				}
+			}
+		}
 	}
 }
 

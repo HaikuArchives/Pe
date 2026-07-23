@@ -39,6 +39,7 @@ public:
 	virtual bool VerifyFile();
 	virtual void SetEntryRef(const entry_ref* ref);
 	virtual BLooper* Target();
+	virtual void RebaseSettings(BMessage& settingsMsg);
 
 			void PrepareTextForSaving(BString& docText, BMessage& settingsMsg);
 
@@ -79,11 +80,14 @@ public:
 	virtual bool VerifyFile();
 	virtual void SetEntryRef(const entry_ref* ref);
 	virtual BLooper* Target();
+	virtual void RebaseSettings(BMessage& settingsMsg);
+
 private:
 	virtual	void StartWatchingFolder(void);
 	virtual	void StopWatchingFolder(void);
 
 			bool _HasFileContentsChanged(BFile& file);
+			void _LoadEditorconfig(BPath* filePath, BMessage& settings);
 
 			entry_ref *fEntryRef;
 			node_ref fNodeRef;

@@ -398,11 +398,13 @@ static		PText *sfDragSource;
 
 // saveable settings
 			int32 fTabStops;
+			int32 fIndentSize;
 			char *fCWD;
 			bool fSoftWrap;
 			int32 fWrapType;
 			int32 fWrapWidth;
 			int32 fFontKind;
+			bool fTabsToSpace;
 };
 
 inline void PText::HideCaret() {

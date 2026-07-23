@@ -3,13 +3,9 @@ SubDir TOP Sources ;
 
 SubDirHdrs $(OBJECTS_DIR) Sources ;
 
+C++FLAGS += -std=c++17 ;
 if $(OSPLAT) = X86 {
 	C++FLAGS += -Wno-sign-compare -Wno-overloaded-virtual ;
-} else {
-	# generate precompiled pe-headers on PPC:
-	Depends libhekkel.so : $(PREFIX_FILE) ;
-	PreCompile $(PREFIX_FILE) : [ FDirName $(TOP) Sources pe.pch++ ] ;
-	C++FLAGS += -prefix $(PREFIX_FILE) ;
 }
 
 SAVED_DEFINES = $(DEFINES) ;
@@ -85,6 +81,7 @@ Application Pe :
 	CStdErrParser.cpp
 	CUrlOpener.cpp
 	CFontStyle.cpp
+	Editorconfig.cpp
 	MTextAddOnImpl.cpp
 	PAbout.cpp
 	PAddOn.cpp
